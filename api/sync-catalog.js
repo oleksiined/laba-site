@@ -1,5 +1,6 @@
 // api/sync-catalog.js
 // Синхронізує каталог з Google Sheets → Supabase
+// Назви колонок = Google Sheets (не маппінг, передаємо як є)
 // Виклики: GET /api/sync-catalog?secret=XXX  або Vercel Cron
 'use strict';
 const https = require('https');
@@ -35,7 +36,7 @@ function gsFetch(sheetName) {
   });
 }
 
-// ─── Supabase upsert ──────────────────────────────────────────────────────────
+// ─── Supabase request ─────────────────────────────────────────────────────────
 function sbRequest(method, path, body) {
   const url  = process.env.SUPABASE_URL;
   const key  = process.env.SUPABASE_SERVICE_KEY;
@@ -75,12 +76,19 @@ function sbRequest(method, path, body) {
 }
 
 // Upsert батчами по 500 рядків
-async function upsert(table, rows) {
+async function upsert(table, conflictCol, rows) {
   if (!rows.length) return;
   const size = 500;
   for (let i = 0; i < rows.length; i += size) {
-    await sbRequest('POST', `${table}?on_conflict=`, rows.slice(i, i + size));
+    await sbRequest('POST', `${table}?on_conflict=${conflictCol}`, rows.slice(i, i + size));
   }
+}
+
+// bool helper: 'true'/true/1 → true, інше → false
+function toBool(v, defaultVal = false) {
+  if (v === true || v === 1 || v === 'true' || v === '1') return true;
+  if (v === false || v === 0 || v === 'false' || v === '0') return false;
+  return defaultVal;
 }
 
 // ─── Головна функція синку ────────────────────────────────────────────────────
@@ -97,16 +105,27 @@ async function syncCatalog() {
   const svcRows = services
     .filter(r => r.service_id)
     .map(r => ({
-      service_id:     r.service_id,
-      name:           r.name || null,
-      description:    r.description || null,
-      group_name:     r.group_name || null,
-      material_id:    r.material_id || null,
-      price:          r.price != null ? Number(r.price) : null,
-      unit:           r.unit || null,
-      client_visible: r.client_visible !== false && r.client_visible !== 'false',
-      status:         r.status || 'active',
-      synced_at:      now,
+      service_id:           r.service_id,
+      material_id:          r.material_id          || null,
+      service_code:         r.service_code         || null,
+      shp_code:             r.shp_code             || null,
+      group_name:           r.group_name           || null,
+      name:                 r.name                 || null,
+      short_name:           r.short_name           || null,
+      symbol:               r.symbol               || null,
+      short_description:    r.short_description    || null,
+      price:                r.price != null        ? Number(r.price) : null,
+      currency:             r.currency             || 'UAH',
+      turnaround_value:     r.turnaround_value     ? Number(r.turnaround_value) : null,
+      turnaround_unit:      r.turnaround_unit      || 'days',
+      status:               r.status               || 'active',
+      slug:                 r.slug                 || null,
+      sort_order:           r.sort_order != null   ? Number(r.sort_order) : null,
+      orderable_standalone: toBool(r.orderable_standalone, true),
+      billing_unit:         r.billing_unit         || null,
+      vat_included:         toBool(r.vat_included, false),
+      min_samples_count:    r.min_samples_count    ? Number(r.min_samples_count) : null,
+      synced_at:            now,
     }));
 
   // ── Packages ──
@@ -114,44 +133,53 @@ async function syncCatalog() {
     .filter(r => r.package_id)
     .map(r => ({
       package_id:       r.package_id,
-      slug:             r.slug || null,
-      name:             r.name || null,
-      material_id:      r.material_id || null,
-      price:            r.price != null ? Number(r.price) : null,
+      material_id:      r.material_id      || null,
+      package_group:    r.package_group    || null,
+      name:             r.name             || null,
+      short_description: r.short_description || null,
+      price:            r.price != null    ? Number(r.price) : null,
+      currency:         r.currency         || 'UAH',
       turnaround_value: r.turnaround_value ? Number(r.turnaround_value) : null,
-      turnaround_unit:  r.turnaround_unit || 'days',
-      status:           r.status || 'active',
+      turnaround_unit:  r.turnaround_unit  || 'days',
+      status:           r.status           || 'active',
+      slug:             r.slug             || null,
+      sort_order:       r.sort_order != null ? Number(r.sort_order) : null,
+      is_seasonal:      toBool(r.is_seasonal, false),
+      billing_unit:     r.billing_unit     || null,
+      vat_included:     toBool(r.vat_included, false),
       synced_at:        now,
     }));
 
   // ── Package Items ──
   const itemRows = pkgItems
     .filter(r => r.package_id && r.service_id)
-    .map(r => ({ package_id: r.package_id, service_id: r.service_id }));
+    .map(r => ({
+      package_id:    r.package_id,
+      service_id:    r.service_id,
+      method_id:     r.method_id     || null,
+      display_order: r.display_order ? Number(r.display_order) : null,
+      required:      toBool(r.required, true),
+    }));
 
-  // DELETE старих package_items і вставляємо нові
-  // (простіше ніж diff — таблиця невелика)
+  // DELETE всіх package_items і вставляємо нові (таблиця мала)
   if (itemRows.length) {
-    await sbRequest('DELETE', 'catalog_package_items?package_id=neq.PLACEHOLDER', null)
-      .catch(() => {}); // ignore if empty
-    // Видаляємо ВСІ — потім вставимо нові
     await sbRequest('DELETE', 'catalog_package_items?service_id=neq.__none__', null).catch(() => {});
   }
 
   await Promise.all([
-    upsert('catalog_services', svcRows),
-    upsert('catalog_packages', pkgRows),
+    upsert('catalog_services',  'service_id',  svcRows),
+    upsert('catalog_packages',  'package_id',  pkgRows),
   ]);
 
   if (itemRows.length) {
-    await upsert('catalog_package_items', itemRows);
+    await upsert('catalog_package_items', 'package_id,service_id', itemRows);
   }
 
   return {
-    services: svcRows.length,
-    packages: pkgRows.length,
+    services:     svcRows.length,
+    packages:     pkgRows.length,
     packageItems: itemRows.length,
-    syncedAt: now,
+    syncedAt:     now,
   };
 }
 
@@ -159,8 +187,7 @@ async function syncCatalog() {
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
-  // Перевірка секрету (якщо задано) або Vercel Cron header
-  const secret = process.env.SYNC_SECRET;
+  const secret     = process.env.SYNC_SECRET;
   const cronHeader = req.headers['x-vercel-cron'];
   const querySecret = (req.url || '').match(/[?&]secret=([^&]+)/)?.[1];
 
