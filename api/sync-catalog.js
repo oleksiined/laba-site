@@ -10,7 +10,7 @@ const GS_ID = '1S15HjJ3374uHPmH6ciu1y3xB6dkLq5DKI3j5rF7nK-4';
 // ─── gviz fetch ───────────────────────────────────────────────────────────────
 function gsFetch(sheetName) {
   return new Promise((resolve, reject) => {
-    const url = `https://docs.google.com/spreadsheets/d/${GS_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+    const url = `https://docs.google.com/spreadsheets/d/${GS_ID}/gviz/tq?tqx=out:json&headers=1&sheet=${encodeURIComponent(sheetName)}`;
     https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
       let data = '';
       res.on('data', d => data += d);
