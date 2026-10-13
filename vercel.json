@@ -6,7 +6,7 @@
   "crons": [
     {
       "path":     "/api/sync-catalog",
-      "schedule": "0 6 * * *"
+      "schedule": "0 * * * *"
     }
   ],
   "rewrites": [
