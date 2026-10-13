@@ -189,10 +189,12 @@ async function syncCatalog(debug = false) {
     };
   }
 
-  // DELETE всіх package_items і вставляємо нові (таблиця мала)
-  if (itemRows.length) {
-    await sbRequest('DELETE', 'catalog_package_items?service_id=neq.__none__', null).catch(() => {});
-  }
+  // DELETE всіх таблиць і вставляємо нові (повна заміна — дзеркало Sheet)
+  await Promise.all([
+    sbRequest('DELETE', 'catalog_services?service_id=neq.__none__',      null).catch(() => {}),
+    sbRequest('DELETE', 'catalog_packages?package_id=neq.__none__',      null).catch(() => {}),
+    sbRequest('DELETE', 'catalog_package_items?service_id=neq.__none__', null).catch(() => {}),
+  ]);
 
   await Promise.all([
     upsert('catalog_services',  'service_id',  svcRows),
