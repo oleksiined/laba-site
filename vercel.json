@@ -1,7 +1,14 @@
 {
   "functions": {
-    "api/order.js": { "maxDuration": 10 }
+    "api/order.js":        { "maxDuration": 10 },
+    "api/sync-catalog.js": { "maxDuration": 30 }
   },
+  "crons": [
+    {
+      "path":     "/api/sync-catalog",
+      "schedule": "0 6 * * *"
+    }
+  ],
   "rewrites": [
     { "source": "/", "destination": "/index.html" }
   ]
