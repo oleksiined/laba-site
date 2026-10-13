@@ -7080,13 +7080,24 @@ const NS_CAT = {
 NS_CAT.categories[0].items = NS_CAT.categories.slice(1).flatMap(c => c.items);
 
 // ══════════════════════════════════════════
-// GOOGLE SHEETS CATALOG LOADER
+// SUPABASE CATALOG LOADER
+// Дані: Google Sheets → Supabase (синк щодня о 6:00)
+// Порожня ціна відображається як ***
 // ══════════════════════════════════════════
-const GS_SHEET_ID = '1S15HjJ3374uHPmH6ciu1y3xB6dkLq5DKI3j5rF7nK-4';
 
-// Supabase (для замовлень клієнтів)
+// Supabase (для каталогу І замовлень)
 const SUPABASE_URL      = 'https://lczccbminjzefmmehntq.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Axo6-4xZHWuXXlUY2zU5lA_lPbz2eFn';
+
+// Форматування ціни: null/undefined/0 → '***', інакше '1 234 грн'
+function fmtPrice(p) {
+  if (p == null || p === '' || p === 0) return '<span style="color:#aaa;letter-spacing:.05em">***</span>';
+  return Number(p).toLocaleString('uk-UA') + '\u00a0грн';
+}
+function fmtPriceRaw(p) {
+  if (p == null || p === '' || p === 0) return '***';
+  return Number(p).toLocaleString('uk-UA') + '\u00a0грн';
+}
 
 // Карта material_id → внутрішній ключ
 const _matIdToKey = {
@@ -7098,53 +7109,43 @@ const _matIdToKey = {
   'MAT-06': 'plant',
 };
 
-// Парсер gviz JSON відповіді Google Sheets
-async function _gsFetch(sheetName) {
-  const url = `https://docs.google.com/spreadsheets/d/${GS_SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`GSheets ${sheetName}: ${r.status}`);
-  const text = await r.text();
-  // gviz відповідь: /*O_o*/\ngoogle.visualization.Query.setResponse({...});
-  const json = JSON.parse(text.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, ''));
-  const cols = json.table.cols.map(c => c.label || c.id);
-  const rows = json.table.rows || [];
-  // Рядок 0 = опис колонок (укр.) → пропускаємо, рядок 1+ = дані
-  return rows.slice(1).map(row => {
-    const obj = {};
-    cols.forEach((col, i) => {
-      const cell = row.c && row.c[i];
-      obj[col] = (cell && cell.v !== null && cell.v !== undefined) ? cell.v : null;
-    });
-    return obj;
-  }).filter(r => Object.values(r).some(v => v !== null));
+// ─── Supabase fetch helper ─────────────────────────────────────────────────
+async function _sbFetch(table, params = '') {
+  const url = `${SUPABASE_URL}/rest/v1/${table}?${params}`;
+  const r = await fetch(url, {
+    headers: {
+      'apikey':        SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+    },
+  });
+  if (!r.ok) throw new Error(`Supabase ${table}: ${r.status}`);
+  return r.json();
 }
 
-async function loadCatalogFromGSheets() {
+// ─── Завантаження каталогу з Supabase ─────────────────────────────────────
+async function loadCatalogFromSupabase() {
   try {
     const [services, packages, pkgItems] = await Promise.all([
-      _gsFetch('Services'),
-      _gsFetch('Packages'),
-      _gsFetch('Package Items'),
+      _sbFetch('catalog_services',      'select=*&status=eq.active&order=service_id'),
+      _sbFetch('catalog_packages',      'select=*&status=in.(active,draft)&order=package_id'),
+      _sbFetch('catalog_package_items', 'select=*'),
     ]);
 
-    if (!services.length && !packages.length) return; // порожньо — лишаємо hardcoded
-
-    // ── Фільтруємо лише активні ──
-    const activeSvcs = services.filter(r => !r.status || r.status === 'active');
-    const activePkgs = packages.filter(r => !r.status || r.status === 'active' || r.status === 'draft');
+    if (!services.length && !packages.length) {
+      console.warn('⚠ Supabase catalog порожній — використовуємо hardcoded дані');
+      return;
+    }
 
     // ── Build pkg → [service_id] map ──
     const pkgIncluded = {};
     for (const pi of pkgItems) {
-      const pid = pi.package_id;
-      const sid = pi.service_id;
-      if (pid && sid) {
-        (pkgIncluded[pid] = pkgIncluded[pid] || []).push(sid);
+      if (pi.package_id && pi.service_id) {
+        (pkgIncluded[pi.package_id] = pkgIncluded[pi.package_id] || []).push(pi.service_id);
       }
     }
 
     // ── Оновлюємо NC_CATALOG.packages ──
-    for (const pkg of activePkgs) {
+    for (const pkg of packages) {
       const matKey = _matIdToKey[pkg.material_id] || 'soil';
       const key = pkg.slug || pkg.package_id;
       if (!key) continue;
@@ -7153,14 +7154,14 @@ async function loadCatalogFromGSheets() {
         id:         key,
         name:       pkg.name || existing.name || key,
         materialId: matKey,
-        price:      pkg.price || existing.price || 0,
+        price:      pkg.price,
         termDays:   pkg.turnaround_value || existing.termDays || 5,
         included:   pkgIncluded[pkg.package_id] || existing.included || [],
       };
     }
 
     // ── Оновлюємо NS_CAT.packages ──
-    for (const pkg of activePkgs) {
+    for (const pkg of packages) {
       const matKey = _matIdToKey[pkg.material_id] || 'soil';
       const key = pkg.slug || pkg.package_id;
       if (!key) continue;
@@ -7168,7 +7169,7 @@ async function loadCatalogFromGSheets() {
       NS_CAT.packages[key] = {
         name:       pkg.name || existing.name || key,
         materialId: matKey,
-        price:      pkg.price || existing.price || 0,
+        price:      pkg.price,
         termDays:   pkg.turnaround_value || existing.termDays || 5,
         included:   pkgIncluded[pkg.package_id] || existing.included || [],
       };
@@ -7176,7 +7177,7 @@ async function loadCatalogFromGSheets() {
 
     // ── Перебудовуємо категорії з services ──
     const catMap = new Map();
-    for (const svc of activeSvcs) {
+    for (const svc of services) {
       const group = svc.group_name;
       if (!group || svc.client_visible === false) continue;
       if (!catMap.has(group)) {
@@ -7190,7 +7191,7 @@ async function loadCatalogFromGSheets() {
       catMap.get(group).items.push({
         id:    svc.service_id,
         name:  svc.name,
-        price: svc.price || 0,
+        price: svc.price,
         mat:   matKey ? [matKey] : [],
       });
     }
@@ -7206,17 +7207,17 @@ async function loadCatalogFromGSheets() {
     if (typeof nc_render === 'function') try { nc_render(); } catch(e) {}
     if (typeof ns_render === 'function') try { ns_render(); } catch(e) {}
 
-    console.log(`✅ Каталог з Google Sheets: ${activePkgs.length} пакетів, ${activeSvcs.length} послуг`);
+    console.log(`✅ Каталог з Supabase: ${packages.length} пакетів, ${services.length} послуг`);
   } catch (err) {
-    console.warn('⚠ Google Sheets catalog load failed, using hardcoded data:', err.message);
+    console.warn('⚠ Supabase catalog load failed, using hardcoded data:', err.message);
   }
 }
 
 // Запускаємо після завантаження сторінки
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', loadCatalogFromGSheets);
+  document.addEventListener('DOMContentLoaded', loadCatalogFromSupabase);
 } else {
-  loadCatalogFromGSheets();
+  loadCatalogFromSupabase();
 }
 
 function ns_findInd(id) {
@@ -7288,7 +7289,7 @@ function ns_totals() {
   return { pkgSum, addSum, addSlots, sub, grand: sub - NS.promoDiscount, n: NS.samples.length };
 }
 
-function ns_fmtPrice(n) { return n.toLocaleString('uk-UA') + '\u00a0грн'; }
+function ns_fmtPrice(n) { return (n==null||n===0) ? '<span style="color:#aaa">***</span>' : n.toLocaleString('uk-UA') + '\u00a0грн'; }
 
 // ══════════════════════════════════════════
 // ОПЕРАЦІЇ
