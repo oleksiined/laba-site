@@ -7126,8 +7126,8 @@ async function _sbFetch(table, params = '') {
 async function loadCatalogFromSupabase() {
   try {
     const [services, packages, pkgItems] = await Promise.all([
-      _sbFetch('catalog_services',      'select=*&status=eq.active&order=service_id'),
-      _sbFetch('catalog_packages',      'select=*&status=in.(active,draft)&order=package_id'),
+      _sbFetch('catalog_services',      'select=*&status=eq.active&order=sort_order.asc.nullslast,service_id'),
+      _sbFetch('catalog_packages',      'select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,package_id'),
       _sbFetch('catalog_package_items', 'select=*'),
     ]);
 
@@ -7179,7 +7179,7 @@ async function loadCatalogFromSupabase() {
     const catMap = new Map();
     for (const svc of services) {
       const group = svc.group_name;
-      if (!group || svc.client_visible === false) continue;
+      if (!group || svc.orderable_standalone === false) continue;
       if (!catMap.has(group)) {
         catMap.set(group, {
           id:    group.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, ''),
