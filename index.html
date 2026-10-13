@@ -6881,7 +6881,7 @@ async function _sbFetch(table, params = '') {
 async function loadCatalogFromSupabase() {
   try {
     const [services, packages, pkgItems] = await Promise.all([
-      _sbFetch('catalog_services',      'select=*&status=eq.active&order=sort_order.asc.nullslast,service_id'),
+      _sbFetch('catalog_services',      'select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,service_id'),
       _sbFetch('catalog_packages',      'select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,package_id'),
       _sbFetch('catalog_package_items', 'select=*'),
     ]);
