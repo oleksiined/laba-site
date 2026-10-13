@@ -27,7 +27,7 @@ function gsFetch(sheetName) {
             });
             return obj;
           }).filter(r => Object.values(r).some(v => v !== null));
-          resolve(result);
+          resolve({ cols, rows: result });
         } catch (e) {
           reject(new Error(`Parse error for sheet "${sheetName}": ${e.message}`));
         }
@@ -92,12 +92,16 @@ function toBool(v, defaultVal = false) {
 }
 
 // ─── Головна функція синку ────────────────────────────────────────────────────
-async function syncCatalog() {
-  const [services, packages, pkgItems] = await Promise.all([
+async function syncCatalog(debug = false) {
+  const [svcRaw, pkgRaw, itemRaw] = await Promise.all([
     gsFetch('Services'),
     gsFetch('Packages'),
     gsFetch('Package Items'),
   ]);
+
+  const services = svcRaw.rows;
+  const packages = pkgRaw.rows;
+  const pkgItems = itemRaw.rows;
 
   const now = new Date().toISOString();
 
@@ -161,6 +165,30 @@ async function syncCatalog() {
       required:      toBool(r.required, true),
     }));
 
+  if (debug) {
+    return {
+      debug: true,
+      services_sheet: {
+        cols: svcRaw.cols,
+        total_rows: services.length,
+        first_row: services[0] || null,
+        filtered: svcRows.length,
+      },
+      packages_sheet: {
+        cols: pkgRaw.cols,
+        total_rows: packages.length,
+        first_row: packages[0] || null,
+        filtered: pkgRows.length,
+      },
+      items_sheet: {
+        cols: itemRaw.cols,
+        total_rows: pkgItems.length,
+        first_row: pkgItems[0] || null,
+        filtered: itemRows.length,
+      },
+    };
+  }
+
   // DELETE всіх package_items і вставляємо нові (таблиця мала)
   if (itemRows.length) {
     await sbRequest('DELETE', 'catalog_package_items?service_id=neq.__none__', null).catch(() => {});
@@ -190,6 +218,7 @@ module.exports = async function handler(req, res) {
   const secret     = process.env.SYNC_SECRET;
   const cronHeader = req.headers['x-vercel-cron'];
   const querySecret = (req.url || '').match(/[?&]secret=([^&]+)/)?.[1];
+  const isDebug    = (req.url || '').includes('debug=1');
 
   if (secret && !cronHeader && querySecret !== secret) {
     res.writeHead(401, { 'Content-Type': 'application/json' });
@@ -198,7 +227,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const result = await syncCatalog();
+    const result = await syncCatalog(isDebug);
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ ok: true, ...result }));
   } catch (err) {
