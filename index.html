@@ -3527,177 +3527,12 @@ let extrasTempSel = {};
 // DATA
 // ═══════════════════════════════════════════════
 const SERVICES = {
-  soil: {
-    label: 'Ґрунт', matCode:'01',
-    packages: [
-      { code:'01-2-001', popular:90, name:'Повний чекап ґрунту', price:5100, material:'Ґрунт', days:7,
-        tags:['протокол','інтерпретація','рекомендації'], tasks:['full','yield'],
-        params:['TOC','pH H₂O','pH KCl','BpH','EC','SS','гранулометрика','P','K','Ca','Mg','S','NO₃','NH₄','мін.азот','ЄКО','BS','K%','Ca%','Mg%','Na%','H%','Zn','Fe','Mn','Cu','B','Mo'],
-        indicators:['01-1-004','01-1-013','01-1-014','01-1-015','01-1-003','01-1-002','01-1-010','01-1-011','01-1-012','01-1-022','01-1-008','01-1-006','01-1-007','01-1-016','01-1-017','01-1-018','01-1-019','01-1-020','01-1-021'],
-        bundles:['01-2-007','01-2-012'],
-        desc:'Максимально комплексний аналіз ґрунту: фізика, здоровʼя, NPK, азотна діагностика...',
-        descRich:`<strong>Фізика:</strong> гранулометрика, EC<br><strong>Здоровʼя:</strong> TOC, pH H₂O, pH KCl, BpH, SS<br><strong>Живлення:</strong> P, K, Ca, Mg, S<br><strong>Азот:</strong> NO₃, NH₄, мін.азот<br><strong>Мікроелементи:</strong> Zn, Fe, Mn, Cu, B, Mo` },
-      { code:'01-2-002', popular:100, name:'Базовий чекап ґрунту', price:2190, material:'Ґрунт', days:5,
-        tags:['протокол','інтерпретація'], tasks:['season'],
-        params:['TOC','pH H₂O','pH KCl','BpH','P','K','Ca','Mg','S','ЄКО','BS'],
-        indicators:['01-1-004','01-1-013','01-1-014','01-1-015','01-1-010','01-1-011','01-1-012','01-1-022','01-1-008'],
-        bundles:['01-2-007','01-2-009'],
-        desc:"Базовий комплекс для оцінки родючості, кислотності та основних елементів живлення",
-        descRich:`<strong>Здоровʼя:</strong> TOC, pH H₂O, pH KCl, BpH<br><strong>Живлення:</strong> P, K, Ca, Mg, S<br><strong>Катіонний баланс:</strong> ЄКО, BS` },
-      { code:'01-2-003', popular:85, name:'Чекап живлення + рекомендації', price:3740, material:'Ґрунт', days:7,
-        tags:['протокол','рекомендації'], tasks:['yield','full'],
-        params:['TOC','pH H₂O','P','K','Ca','Mg','S','NO₃','NH₄','Zn','Fe','Mn','Cu','B','Mo'],
-        indicators:['01-1-004','01-1-013','01-1-010','01-1-011','01-1-012','01-1-022','01-1-008','01-1-006','01-1-007','01-1-016','01-1-017','01-1-018','01-1-019','01-1-020','01-1-021'],
-        bundles:['01-2-012'],
-        desc:"Комплексний аналіз з розрахунком рекомендацій щодо живлення",
-        descRich:`<strong>Живлення:</strong> P, K, Ca, Mg, S<br><strong>Азот:</strong> NO₃, NH₄<br><strong>Мікроелементи:</strong> Zn, Fe, Mn, Cu, B, Mo<br><strong>Результат:</strong> рекомендації на 4 культури` },
-      { code:'01-2-004', popular:70, name:'Діагностика проблемних ділянок', price:1890, material:'Ґрунт', days:5,
-        tags:['протокол','звіт'], tasks:['problem'],
-        params:['TOC','pH H₂O','BpH','P','K','Ca','Mg','S','ЄКО','BS'],
-        indicators:['01-1-004','01-1-013','01-1-015','01-1-010','01-1-011','01-1-012','01-1-022','01-1-008'],
-        bundles:['01-2-009','01-2-005'],
-        desc:"Поглиблений аналіз причин нерівномірного розвитку культур",
-        descRich:`<strong>Здоровʼя:</strong> TOC, pH H₂O, BpH<br><strong>Живлення:</strong> P, K, Ca, Mg, S<br><strong>Результат:</strong> порівняльний звіт` },
-      { code:'01-2-005', popular:75, name:'Діагностика кислотності', price:1410, material:'Ґрунт', days:5,
-        tags:['протокол'], tasks:['season','problem'],
-        params:['pH H₂O','pH KCl','BpH','EC','ЄКО','BS','Ca%','Mg%','K%','Na%','H%','Al обм.','гумус'],
-        indicators:['01-1-013','01-1-014','01-1-015','01-1-003','01-1-005'],
-        bundles:['01-2-008','01-2-002'],
-        desc:"Комплексна оцінка кислотності та катіонного балансу ґрунту",
-        descRich:`<strong>Кислотність:</strong> pH H₂O, pH KCl, BpH, EC<br><strong>Катіони:</strong> ЄКО, BS, Ca%, Mg%, K%, Na%, H%, Al обм.<br><strong>Органіка:</strong> гумус` },
-      { code:'01-2-007', popular:60, name:'Оцінка забезпеченості азоту', price:660, material:'Ґрунт', days:3,
-        tags:['протокол'], tasks:['yield','season'],
-        params:['NO₃','NH₄','мін.азот'],
-        indicators:['01-1-006','01-1-007'],
-        bundles:['01-2-002','01-2-010'],
-        desc:"Аналіз форм азоту для оцінки живлення та планування підживлень",
-        descRich:`<strong>Азот мінеральний</strong> (NO₃+NH₄ мг/кг)<br><strong>Нітратний</strong> NO₃<br><strong>Амонійний</strong> NH₄` },
-      { code:'01-2-009', popular:55, name:'Мікроелементи', price:720, material:'Ґрунт', days:5,
-        tags:['протокол'], tasks:['yield','problem'],
-        params:['Zn','Fe','Mn','Cu','B','Mo'],
-        indicators:['01-1-016','01-1-017','01-1-018','01-1-019','01-1-020','01-1-021'],
-        bundles:['01-2-002','01-2-003'],
-        desc:'Zn, Fe, Mn, Cu, B, Mo — для попередження прихованих дефіцитів',
-        descRich:`Zn, Fe, Mn, Cu, B, Mo (мг/кг)` },
-      { code:'01-2-012', popular:40, name:'Продуктивна волога — 3 горизонти', price:300, material:'Ґрунт', days:3,
-        tags:['протокол'], tasks:['season'],
-        params:[],
-        bundles:[],
-        desc:'Запаси продуктивної вологи в 0–30, 30–60, 60–90 см',
-        descRich:`Горизонти 0–30, 30–60, 60–90 см` },
-    ],
-    individual: [
-      { code:'01-1-006', name:'Нітратний азот (NO₃)', price:240, material:'Ґрунт', desc:'', groups:['Азот'] },
-      { code:'01-1-007', name:'Амонійний азот (NH₄)', price:480, material:'Ґрунт', desc:'', groups:['Азот'] },
-      { code:'01-1-013', name:'pH водний H₂O', price:140, material:'Ґрунт', desc:'', groups:['pH'] },
-      { code:'01-1-014', name:'pH сольовий KCl', price:140, material:'Ґрунт', desc:'', groups:['pH'] },
-      { code:'01-1-015', name:'pH буферний BpH Sikora', price:140, material:'Ґрунт', desc:'', groups:['pH'] },
-      { code:'01-1-010', name:'Фосфор доступний', price:420, material:'Ґрунт', desc:'Визначення вмісту доступного фосфору для оцінки забезпеченості ґрунту елементами живлення.', days:5, tags:['протокол'], groups:['Макроелементи'], methods:[
-        {id:'chyrikov', name:'Чиріков (NH₄-Ac)', std:'ДСТУ 4115-2002', tag:'Для нейтральних і слабокислих ґрунтів', price:420, days:5},
-        {id:'machyhin', name:'Мачигін', std:'ДСТУ 4114-2002', tag:'Для карбонатних ґрунтів', price:460, days:6},
-        {id:'kirsanov', name:'Кірсанов', std:'ДСТУ 4405:2005', tag:'Для кислих ґрунтів', price:440, days:5},
-      ]},
-      { code:'01-1-011', name:'Калій обмінний', price:240, material:'Ґрунт', desc:'', groups:['Макроелементи'] },
-      { code:'01-1-012', name:'Кальцій обмінний', price:240, material:'Ґрунт', desc:'', groups:['Макроелементи'] },
-      { code:'01-1-022', name:'Магній обмінний', price:240, material:'Ґрунт', desc:'', groups:['Макроелементи'] },
-      { code:'01-1-008', name:'Сірка рухома', price:240, material:'Ґрунт', desc:'', groups:['Макроелементи'] },
-      { code:'01-1-016', name:'Цинк (Zn)', price:220, material:'Ґрунт', desc:'', groups:['Мікроелементи'] },
-      { code:'01-1-017', name:'Залізо (Fe)', price:160, material:'Ґрунт', desc:'', groups:['Мікроелементи'] },
-      { code:'01-1-018', name:'Марганець (Mn)', price:160, material:'Ґрунт', desc:'', groups:['Мікроелементи'] },
-      { code:'01-1-019', name:'Мідь (Cu)', price:160, material:'Ґрунт', desc:'', groups:['Мікроелементи'] },
-      { code:'01-1-020', name:'Бор (B)', price:160, material:'Ґрунт', desc:'', groups:['Мікроелементи'] },
-      { code:'01-1-021', name:'Молібден (Mo)', price:240, material:'Ґрунт', desc:'', groups:['Мікроелементи'] },
-      { code:'01-1-002', name:'Гранулометричний склад + тип ґрунту', price:240, material:'Ґрунт', desc:'', groups:['Фізичні'] },
-      { code:'01-1-003', name:'Електропровідність (EC)', price:140, material:'Ґрунт', desc:'', groups:['Фізичні'] },
-      { code:'01-1-004', name:'Загальний органічний вуглець (TOC)', price:440, material:'Ґрунт', desc:'', groups:['Фізичні'] },
-      { code:'01-1-005', name:'Органічна речовина (гумус)', price:440, material:'Ґрунт', desc:'', groups:['Фізичні'] },
-    ]
-  },
-  water: {
-    label: 'Вода', matCode:'05',
-    packages: [
-      { code:'05-2-001', popular:80, name:'Аналіз для фертигації', price:3000, material:'Вода', days:5, tags:['протокол'], tasks:['season','yield'], params:[], indicators:['05-1-001','05-1-002','05-1-003','05-1-006','05-1-007'], bundles:[], desc:'pH, твердість, мінералізація, P, K, Zn, Mn, Fe, Cu', descRich:'pH, твердість, мінералізація, P, K, Zn, Mn, Fe, Cu' },
-      { code:'05-2-002', popular:65, name:'Оцінка якості води', price:1200, material:'Вода', days:3, tags:['протокол'], tasks:['season'], params:[], indicators:['05-1-001','05-1-002','05-1-003'], bundles:[], desc:'pH, загальна жорсткість, сухий залишок', descRich:'pH, жорсткість, сухий залишок' },
-    ],
-    individual: [
-      { code:'05-1-001', name:'pH води', price:120, material:'Вода', desc:'', groups:['Базові'] },
-      { code:'05-1-002', name:'Загальна жорсткість', price:180, material:'Вода', desc:'', groups:['Базові'] },
-      { code:'05-1-003', name:'Сухий залишок (TDS)', price:150, material:'Вода', desc:'', groups:['Базові'] },
-      { code:'05-1-004', name:'Нітрати (NO₃)', price:200, material:'Вода', desc:'', groups:['Аніони'] },
-      { code:'05-1-005', name:'Хлориди (Cl)', price:180, material:'Вода', desc:'', groups:['Аніони'] },
-      { code:'05-1-006', name:'Залізо загальне (Fe)', price:200, material:'Вода', desc:'', groups:['Метали'] },
-      { code:'05-1-007', name:'Марганець (Mn)', price:200, material:'Вода', desc:'', groups:['Метали'] },
-    ]
-  },
-  fertilizer: {
-    label: 'Добрива', matCode:'02',
-    packages: [
-      { code:'02-2-008', popular:70, name:'Контроль: N-P-K', price:2600, material:'Добрива', days:5, tags:['протокол'], tasks:[], params:[], bundles:[], desc:'N, P загальний, P водорозчинний, K водорозчинний', descRich:'N, P, K' },
-      { code:'02-2-001', popular:60, name:'Контроль: сульфат амонію', price:2100, material:'Добрива', days:5, tags:['протокол'], tasks:[], params:[], bundles:[], desc:'N амонійний, S водорозчинна, вологість', descRich:'N, S, вологість' },
-      { code:'02-2-004', popular:55, name:'Контроль: КАС (повний)', price:2400, material:'Добрива', days:5, tags:['протокол'], tasks:[], params:[], bundles:[], desc:'Густота, лужність, аміачна селітра, карбамід, N загальний', descRich:'Густота, лужність, NH4NO3, карбамід, N' },
-      { code:'02-2-012', popular:50, name:'Органічні добрива. Склад', price:3400, material:'Добрива', days:7, tags:['протокол'], tasks:[], params:[], bundles:[], desc:'Сухі речовини, зола, N, P₂O₅, K₂O', descRich:'Суха речовина, зола, N, P₂O₅, K₂O' },
-    ],
-    individual: [
-      { code:'02-1-001', name:'Азот загальний (N)', price:320, material:'Добрива', desc:'', groups:['Макроелементи'] },
-      { code:'02-1-002', name:'Фосфор загальний (P₂O₅)', price:350, material:'Добрива', desc:'', groups:['Макроелементи'] },
-      { code:'02-1-003', name:'Калій водорозчинний (K₂O)', price:280, material:'Добрива', desc:'', groups:['Макроелементи'] },
-      { code:'02-1-004', name:'Сірка загальна (S)', price:280, material:'Добрива', desc:'', groups:['Макроелементи'] },
-      { code:'02-1-005', name:'Вологість', price:150, material:'Добрива', desc:'', groups:['Фізичні'] },
-      { code:'02-1-006', name:'Азот амонійний (NH₄)', price:280, material:'Добрива', desc:'', groups:['Макроелементи'] },
-    ]
-  },
-  seeds: {
-    label: 'Насіння', matCode:'03',
-    packages: [
-      { code:'03-2-001', popular:70, name:'Оцінка потенціалу', price:866, material:'Насіння', days:5, tags:['протокол'], tasks:['season'], params:[], bundles:[], desc:'Енергія проростання, схожість, маса 1000 насінин', descRich:'Енергія, схожість, маса 1000 шт' },
-      { code:'03-2-002', popular:65, name:'Насіння без ризику', price:1750, material:'Насіння', days:7, tags:['протокол'], tasks:['season','problem'], params:[], bundles:[], desc:'Чистота, вологість, схожість, шкідники', descRich:'Чистота, вологість, схожість, шкідники' },
-    ],
-    individual: [
-      { code:'03-1-001', name:'Енергія проростання', price:250, material:'Насіння', desc:'', groups:['Посівні якості'] },
-      { code:'03-1-002', name:'Лабораторна схожість', price:280, material:'Насіння', desc:'', groups:['Посівні якості'] },
-      { code:'03-1-003', name:'Маса 1000 насінин', price:180, material:'Насіння', desc:'', groups:['Посівні якості'] },
-      { code:'03-1-004', name:'Вологість насіння', price:150, material:'Насіння', desc:'', groups:['Фізичні'] },
-      { code:'03-1-005', name:'Чистота насіння', price:200, material:'Насіння', desc:'', groups:['Фізичні'] },
-    ]
-  },
-  grain: {
-    label: 'Зерно', matCode:'04',
-    packages: [
-      { code:'04-4-006', popular:80, name:'Пшениця', price:3000, material:'Зерно', days:5, tags:['протокол'], tasks:['full'], params:[], bundles:[], desc:'Натура, білок, клейковина, число падіння, склоподібність', descRich:'Натура, білок, клейковина, ЧП, склоподібність' },
-      { code:'04-4-003', popular:75, name:'Соя', price:2666, material:'Зерно', days:5, tags:['протокол'], tasks:['full'], params:[], bundles:[], desc:'Вологість, білок, олійність, домішки', descRich:'Вологість, білок, олійність, домішки' },
-      { code:'04-4-004', popular:65, name:'Ріпак', price:1934, material:'Зерно', days:5, tags:['протокол'], tasks:['full'], params:[], bundles:[], desc:'Вологість, олійність, домішки', descRich:'Вологість, олійність, домішки' },
-      { code:'04-4-005', popular:70, name:'Кукурудза', price:1934, material:'Зерно', days:5, tags:['протокол'], tasks:['full'], params:[], bundles:[], desc:'Вологість, домішки, крупність, зараженість', descRich:'Вологість, домішки, крупність, зараженість' },
-    ],
-    individual: [
-      { code:'04-1-001', name:'Вологість зерна', price:150, material:'Зерно', desc:'', groups:['Фізичні'] },
-      { code:'04-1-002', name:'Натура (об\'ємна маса)', price:180, material:'Зерно', desc:'', groups:['Фізичні'] },
-      { code:'04-1-003', name:'Білок (протеїн)', price:280, material:'Зерно', desc:'', groups:['Якісні'] },
-      { code:'04-1-004', name:'Олійність', price:300, material:'Зерно', desc:'', groups:['Якісні'] },
-      { code:'04-1-005', name:'Клейковина', price:250, material:'Зерно', desc:'', groups:['Якісні'] },
-      { code:'04-1-006', name:'Число падіння (ЧП)', price:280, material:'Зерно', desc:'', groups:['Якісні'] },
-      { code:'04-1-007', name:'Склоподібність', price:180, material:'Зерно', desc:'', groups:['Якісні'] },
-      { code:'04-1-008', name:'Зернові домішки', price:180, material:'Зерно', desc:'', groups:['Фізичні'] },
-    ]
-  },
-  plants: {
-    label: 'Рослини', matCode:'06',
-    packages: [
-      { code:'06-2-001', popular:75, name:'Елементний профіль рослини', price:2800, material:'Рослини', days:7, tags:['протокол'], tasks:['yield','problem'], params:[], indicators:['06-1-001','06-1-002','06-1-003','06-1-006','06-1-004','06-1-005','06-1-007','06-1-008','06-1-009','06-1-010'], bundles:[], desc:'N, P, K, S, Ca, Mg + мікроелементи Zn, Fe, Cu, Mn', descRich:'N, P, K, S, Ca, Mg, Zn, Fe, Cu, Mn' },
-    ],
-    individual: [
-      { code:'06-1-001', name:'Азот загальний (N)', price:320, material:'Рослини', desc:'', groups:['Макроелементи'] },
-      { code:'06-1-002', name:'Фосфор (P)', price:320, material:'Рослини', desc:'', groups:['Макроелементи'] },
-      { code:'06-1-003', name:'Калій (K)', price:280, material:'Рослини', desc:'', groups:['Макроелементи'] },
-      { code:'06-1-004', name:'Кальцій (Ca)', price:280, material:'Рослини', desc:'', groups:['Макроелементи'] },
-      { code:'06-1-005', name:'Магній (Mg)', price:280, material:'Рослини', desc:'', groups:['Макроелементи'] },
-      { code:'06-1-006', name:'Сірка (S)', price:280, material:'Рослини', desc:'', groups:['Макроелементи'] },
-      { code:'06-1-007', name:'Цинк (Zn)', price:220, material:'Рослини', desc:'', groups:['Мікроелементи'] },
-      { code:'06-1-008', name:'Залізо (Fe)', price:220, material:'Рослини', desc:'', groups:['Мікроелементи'] },
-      { code:'06-1-009', name:'Мідь (Cu)', price:220, material:'Рослини', desc:'', groups:['Мікроелементи'] },
-      { code:'06-1-010', name:'Марганець (Mn)', price:220, material:'Рослини', desc:'', groups:['Мікроелементи'] },
-      { code:'06-1-011', name:'Бор (B)', price:220, material:'Рослини', desc:'', groups:['Мікроелементи'] },
-    ]
-  },
+  soil:       { label: 'Ґрунт',   matCode:'01', packages:[], individual:[] },
+  water:      { label: 'Вода',    matCode:'05', packages:[], individual:[] },
+  fertilizer: { label: 'Добрива', matCode:'02', packages:[], individual:[] },
+  seeds:      { label: 'Насіння', matCode:'03', packages:[], individual:[] },
+  grain:      { label: 'Зерно',   matCode:'04', packages:[], individual:[] },
+  plants:     { label: 'Рослини', matCode:'06', packages:[], individual:[] },
 };
 SERVICES.other = { label:'Інше', matCode:'', packages:[], individual:[] };
 
@@ -6957,6 +6792,42 @@ async function loadCatalogFromSupabase() {
       NS_CAT.categories = cats;
       NC_CATALOG.categories = cats.slice(1).map(c => ({ id: c.id, name: c.name, items: c.items }));
     }
+
+    // ── Оновлюємо SERVICES (стара сторінка каталогу) ──
+    const _matKeyToSvcKey  = { soil:'soil', water:'water', fertilizer:'fertilizer', seeds:'seeds', grain:'grain', plant:'plants' };
+    const _matKeyToLabel   = { soil:'Ґрунт', water:'Вода', fertilizer:'Добрива', seeds:'Насіння', grain:'Зерно', plant:'Рослини' };
+    Object.values(SERVICES).forEach(s => { s.packages = []; s.individual = []; });
+    for (const pkg of packages) {
+      const mk = _matIdToKey[pkg.material_id] || 'soil';
+      const sk = _matKeyToSvcKey[mk] || mk;
+      if (!SERVICES[sk]) continue;
+      SERVICES[sk].packages.push({
+        code:     pkg.slug || pkg.package_id,
+        name:     pkg.name || pkg.package_id,
+        price:    pkg.price || 0,
+        material: _matKeyToLabel[mk] || mk,
+        days:     pkg.turnaround_value || 5,
+        tags:     [], tasks:[], params:[], bundles:[],
+        desc:     pkg.short_description || '',
+        descRich: pkg.short_description || '',
+        popular:  pkg.sort_order != null ? Math.max(0, 100 - pkg.sort_order) : 50,
+      });
+    }
+    for (const svc of services) {
+      if (svc.orderable_standalone === false) continue;
+      const mk = _matIdToKey[svc.material_id] || 'soil';
+      const sk = _matKeyToSvcKey[mk] || mk;
+      if (!SERVICES[sk]) continue;
+      SERVICES[sk].individual.push({
+        code:     svc.service_id,
+        name:     svc.name || svc.service_id,
+        price:    svc.price || 0,
+        material: _matKeyToLabel[mk] || mk,
+        desc:     svc.short_description || '',
+        groups:   svc.group_name ? [svc.group_name] : [],
+      });
+    }
+    if (typeof render === 'function') try { render(); } catch(e) {}
 
     // ── Перерендеримо якщо каталог вже відкритий ──
     if (typeof nc_render === 'function') try { nc_render(); } catch(e) {}
