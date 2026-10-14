@@ -2579,8 +2579,7 @@ main{flex:1}
       <div class="srv-filter-block">
         <div class="srv-filter-title" style="font-size:16px">Формат послуги</div>
         <div class="fmt-tabs">
-          <button class="fmt-tab active" data-fmt="all" onclick="srvSetFmt('all',this)">Всі</button>
-          <button class="fmt-tab" data-fmt="packages" onclick="srvSetFmt('packages',this)">Пакети</button>
+          <button class="fmt-tab active" data-fmt="packages" onclick="srvSetFmt('packages',this)">Пакети</button>
           <button class="fmt-tab" data-fmt="individual" onclick="srvSetFmt('individual',this)">Окремі показники</button>
         </div>
       </div>
@@ -3866,7 +3865,7 @@ function updateCartUI(){
 // ═══════════════════════════════════════════════
 // SERVICES RENDER (v24 compatible)
 // ═══════════════════════════════════════════════
-let srvMat = '', srvFmt = 'all', srvTask = '';
+let srvMat = '', srvFmt = 'packages', srvTask = '';
 
 const SRV_MAT_MAP = {'Ґрунт':'soil','Вода':'water','Добрива':'fertilizer','Насіння':'seeds','Зерно':'grain','Рослини':'plants'};
 function srvSetMatByName(name) {
@@ -3918,8 +3917,11 @@ function srvSetMat(mat, btn) {
 
 function srvSetFmt(fmt, btn) {
   srvFmt = fmt;
+  srvTask = '';
   document.querySelectorAll('.fmt-tab').forEach(b=>b.classList.remove('active'));
   if(btn){ btn.classList.add('active'); btn.blur(); }
+  buildTasksFromGroups();
+  renderTaskFilter();
   render();
 }
 
@@ -3931,14 +3933,15 @@ function srvSetTask(task, btn) {
 }
 
 function srvResetFilters() {
-  srvMat=''; srvFmt='all'; srvTask=''; searchQ='';
+  srvMat=''; srvFmt='packages'; srvTask=''; searchQ='';
   document.querySelectorAll('.mat-btn,.fmt-tab,.srv-task-pill').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.fmt-tab[data-fmt="packages"]')?.classList.add('active');
   document.getElementById('seasonalBtn')?.classList.remove('active');
   document.getElementById('allResearchBtn')?.classList.remove('active');
   const ctx = document.getElementById('srvTaskContext');
   if(ctx) ctx.style.display='';
   document.getElementById('searchInput').value='';
-  renderTaskFilter(); render();
+  buildTasksFromGroups(); renderTaskFilter(); render();
 }
 
 function goSeasonal(){
@@ -4007,13 +4010,24 @@ let ALL_TASKS = [];
 function buildTasksFromGroups(){
   const seen = new Set();
   const groups = [];
-  Object.values(SERVICES).forEach(srv => {
-    (srv.individual||[]).forEach(item => {
-      (item.groups||[]).forEach(g => {
+  if(srvFmt === 'individual'){
+    // Групи з Services → group_name
+    Object.values(SERVICES).forEach(srv => {
+      (srv.individual||[]).forEach(item => {
+        (item.groups||[]).forEach(g => {
+          if(g && !seen.has(g)){ seen.add(g); groups.push(g); }
+        });
+      });
+    });
+  } else {
+    // Групи з Packages → package_group
+    Object.values(SERVICES).forEach(srv => {
+      (srv.packages||[]).forEach(item => {
+        const g = item.package_group;
         if(g && !seen.has(g)){ seen.add(g); groups.push(g); }
       });
     });
-  });
+  }
   ALL_TASKS = groups.map(g => ({ key: g, label: g }));
 }
 function renderTaskFilter(){
@@ -4031,13 +4045,13 @@ function getSrvItems(){
   let pkgs = [], inds = [];
   if(mat && SERVICES[mat]) {
     const srv = SERVICES[mat];
-    pkgs = (srvFmt!=='individual') ? srv.packages.map(p=>({...p,_type:'pkg'})) : [];
-    inds = (srvFmt!=='packages') ? (srv.individual||[]).map(p=>({...p,_type:'ind'})) : [];
+    pkgs = (srvFmt==='packages'||srvFmt==='all') ? srv.packages.map(p=>({...p,_type:'pkg'})) : [];
+    inds = (srvFmt==='individual'||srvFmt==='all') ? (srv.individual||[]).map(p=>({...p,_type:'ind'})) : [];
   } else {
     // Всі матеріали
     Object.values(SERVICES).forEach(srv => {
-      if(srvFmt!=='individual') pkgs.push(...(srv.packages||[]).map(p=>({...p,_type:'pkg'})));
-      if(srvFmt!=='packages')   inds.push(...(srv.individual||[]).map(p=>({...p,_type:'ind'})));
+      if(srvFmt==='packages'||srvFmt==='all') pkgs.push(...(srv.packages||[]).map(p=>({...p,_type:'pkg'})));
+      if(srvFmt==='individual'||srvFmt==='all') inds.push(...(srv.individual||[]).map(p=>({...p,_type:'ind'})));
     });
   }
   let items = [...pkgs,...inds];
@@ -4059,7 +4073,7 @@ function render(){
   const count = document.getElementById('servicesResultCount');
   if(count) count.textContent = `${items.length} послуг`;
   const clearBtn = document.getElementById('srvClearBtn');
-  if(clearBtn) clearBtn.style.display = (srvMat||srvTask||srvFmt!=='all'||searchQ) && srvTask!=='season' && srvTask!=='all' ? 'inline-flex' : 'none';
+  if(clearBtn) clearBtn.style.display = (srvMat||srvTask||searchQ) && srvTask!=='season' && srvTask!=='all' ? 'inline-flex' : 'none';
   const seasonHdr = document.getElementById('seasonalHeader');
   if(seasonHdr) seasonHdr.style.display = (srvTask==='season') ? 'block' : 'none';
   const empty = document.getElementById('emptyState');
@@ -6938,6 +6952,7 @@ async function loadCatalogFromSupabase() {
         material: _matKeyToLabel[mk] || mk,
         days:     pkg.turnaround_value || 5,
         tags:     pkgTags(pkg.package_id), tasks:[], params:[], bundles:[],
+        groups:   pkg.package_group ? [pkg.package_group] : [],
         desc:     pkg.short_description || '',
         descRich: pkg.short_description || '',
         popular:  pkg.sort_order != null ? Math.max(0, 100 - pkg.sort_order) : 50,
