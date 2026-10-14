@@ -4471,9 +4471,7 @@ function makeRow(item, type){
       </div>
       <div class="service-name">${item.name}</div>
       ${item.desc?`<div class="service-short" style="margin-top:2px">${item.desc}</div>`:''}
-      ${tagsHtml}
       <div class="srv-meta-row" style="margin-top:6px;margin-bottom:0">
-        ${paramsCount?`<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 5h14M3 10h10M3 15h7" stroke-linecap="round"/></svg>${paramsCount} показників</span>`:''}
         ${daysText?`<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>${daysText}</span>`:''}
       </div>
     </div>
@@ -4541,6 +4539,8 @@ function makeRow(item, type){
         <div class="srv-btn-tip"><div class="srv-btn-tip-title">Інтерпретація</div><div class="srv-btn-tip-desc">Пояснення результатів простою мовою: що означають значення, які є відхилення та ризики.</div></div>
       </button>
     </div>
+    <!-- Чіпи елементів пакету -->
+    ${tagsHtml ? `<div style="margin-bottom:10px"><div style="font-size:12px;color:var(--text-soft);margin-bottom:6px">${item.tags.length} показників дослідження:</div>${tagsHtml}</div>` : ''}
     <!-- Показники -->
     ${(item.indicators?.length||item.params?.length) ? renderParamChips(item) : ''}
     <!-- Приклад протоколу (внизу) -->
