@@ -3692,16 +3692,17 @@ const TASKS_BY_MAT = {
   };
 
   window.hsbGoItem = function(matCode, id, isPackage) {
-    // Find the item name to use as search query
     const found = _results.find(r => r.id === id);
     const itemName = found ? found.name : '';
     hsbCloseDropdown();
-    srvSetMat(matCode, null);
-    // Set search filter to show only this item
+    // Clear material filter — show results like typing in the catalog search box
+    srvMat = ''; currentMaterial = '';
+    document.querySelectorAll('.mat-btn').forEach(b=>b.classList.remove('active'));
     searchQ = itemName.toLowerCase();
+    navigate('services');
+    // Set search input value after navigation (DOM is now active)
     const si = document.getElementById('searchInput');
     if (si) si.value = itemName;
-    navigate('services');
   };
 
   window.hsbCloseDropdown = function() {
