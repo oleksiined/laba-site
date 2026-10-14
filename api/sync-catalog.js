@@ -93,15 +93,17 @@ function toBool(v, defaultVal = false) {
 
 // ─── Головна функція синку ────────────────────────────────────────────────────
 async function syncCatalog(debug = false) {
-  const [svcRaw, pkgRaw, itemRaw] = await Promise.all([
+  const [svcRaw, pkgRaw, itemRaw, methRaw] = await Promise.all([
     gsFetch('Services'),
     gsFetch('Packages'),
     gsFetch('Package Items'),
+    gsFetch('Methods'),
   ]);
 
   const services = svcRaw.rows;
   const packages = pkgRaw.rows;
   const pkgItems = itemRaw.rows;
+  const methods  = methRaw.rows;
 
   const now = new Date().toISOString();
 
@@ -154,6 +156,41 @@ async function syncCatalog(debug = false) {
       synced_at:        now,
     }));
 
+  // ── Methods ──
+  const methRows = methods
+    .filter(r => r.method_id)
+    .map(r => ({
+      method_id:               r.method_id,
+      service_id:              r.service_id              || null,
+      method_name:             r.method_name             || null,
+      method_full_name:        r.method_full_name        || null,
+      laboratory:              r.laboratory              || null,
+      standard_code:           r.standard_code           || null,
+      standard_full:           r.standard_full           || null,
+      method_description:      r.method_description      || null,
+      selection_note:          r.selection_note          || null,
+      is_default:              toBool(r.is_default, false),
+      measurement_range:       r.measurement_range       || null,
+      accuracy:                r.accuracy                || null,
+      result_form:             r.result_form             || null,
+      price:                   r.price != null           ? Number(r.price) : null,
+      currency:                r.currency                || 'UAH',
+      turnaround_value:        r.turnaround_value        ? Number(r.turnaround_value) : null,
+      turnaround_unit:         r.turnaround_unit         || 'days',
+      status:                  r.status                  || 'active',
+      sort_order:              r.sort_order != null      ? Number(r.sort_order) : null,
+      min_sample_quantity:     r.min_sample_quantity     ? Number(r.min_sample_quantity) : null,
+      sample_quantity_unit:    r.sample_quantity_unit    || null,
+      min_samples_count:       r.min_samples_count       ? Number(r.min_samples_count) : null,
+      storage_conditions:      r.storage_conditions      || null,
+      max_delivery_hours:      r.max_delivery_hours      ? Number(r.max_delivery_hours) : null,
+      sampling_instruction_url: r.sampling_instruction_url || null,
+      container_type:          r.container_type          || null,
+      sample_requirements:     r.sample_requirements     || null,
+      client_preparation:      r.client_preparation      || null,
+      synced_at:               now,
+    }));
+
   // ── Package Items ──
   const itemRows = pkgItems
     .filter(r => r.package_id && r.service_id)
@@ -186,6 +223,12 @@ async function syncCatalog(debug = false) {
         first_row: pkgItems[0] || null,
         filtered: itemRows.length,
       },
+      methods_sheet: {
+        cols: methRaw.cols,
+        total_rows: methods.length,
+        first_row: methods[0] || null,
+        filtered: methRows.length,
+      },
     };
   }
 
@@ -194,11 +237,13 @@ async function syncCatalog(debug = false) {
     sbRequest('DELETE', 'catalog_services?service_id=neq.__none__',      null).catch(() => {}),
     sbRequest('DELETE', 'catalog_packages?package_id=neq.__none__',      null).catch(() => {}),
     sbRequest('DELETE', 'catalog_package_items?service_id=neq.__none__', null).catch(() => {}),
+    sbRequest('DELETE', 'catalog_methods?method_id=neq.__none__',        null).catch(() => {}),
   ]);
 
   await Promise.all([
     upsert('catalog_services',  'service_id',  svcRows),
     upsert('catalog_packages',  'package_id',  pkgRows),
+    upsert('catalog_methods',   'method_id',   methRows),
   ]);
 
   if (itemRows.length) {
@@ -209,6 +254,7 @@ async function syncCatalog(debug = false) {
     services:     svcRows.length,
     packages:     pkgRows.length,
     packageItems: itemRows.length,
+    methods:      methRows.length,
     syncedAt:     now,
   };
 }
