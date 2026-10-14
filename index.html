@@ -4451,7 +4451,7 @@ function makeRow(item, type){
   const paramsCount = item.params?.length || 0;
   const daysText = item.days ? `${item.days} роб. днів` : '';
   const materialBadge = item.material ? `<div class="srv-material-badge">Матеріал: ${item.material}</div>` : '';
-  const tagsHtml = item.tags?.length ? `<div class="service-tags">${item.tags.map(t=>`<span class="service-tag">${t}</span>`).join('')}</div>` : '';
+  const tagsHtml = item.tags?.length ? `<div class="service-tags">${item.tags.map(t=>{const sym=t?.s||t; const tip=t?.name||''; return `<span class="service-tag"${tip?` data-tooltip="${tip.replace(/"/g,'&quot;')}"`:''} style="${tip?'cursor:help':''}">` + sym + `</span>`;}).join('')}</div>` : '';
 
   return `
 <div class="service-row" id="srow-${safeCode}">
@@ -6744,17 +6744,24 @@ async function loadCatalogFromSupabase() {
       }
     }
 
-    // ── Build service_id → symbol map ──
+    // ── Build service_id → symbol map + symbol → name map ──
     const svcSymbol = {};
+    const svcSymbolName = {};
     for (const svc of services) {
-      if (svc.service_id && svc.symbol) svcSymbol[svc.service_id] = svc.symbol;
+      if (svc.service_id && svc.symbol) {
+        svcSymbol[svc.service_id] = svc.symbol;
+        if (!svcSymbolName[svc.symbol]) svcSymbolName[svc.symbol] = svc.name || svc.symbol;
+      }
     }
 
-    // ── Helper: get unique symbols for a package ──
+    // ── Helper: get unique symbol objects {s, name} for a package ──
     const pkgTags = (pkgId) => {
       const ids = pkgIncluded[pkgId] || [];
       const seen = new Set();
-      return ids.map(id => svcSymbol[id]).filter(s => s && !seen.has(s) && seen.add(s));
+      return ids
+        .map(id => svcSymbol[id])
+        .filter(s => s && !seen.has(s) && seen.add(s))
+        .map(s => ({ s, name: svcSymbolName[s] || s }));
     };
 
     // ── Оновлюємо NC_CATALOG.packages ──
