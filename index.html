@@ -4446,10 +4446,7 @@ function makeRow(item, type){
           <div style="font-size:12px;color:var(--text-soft);margin-top:1px">${m.std}</div>
         </div>
         ${m.tag?`<span style="font-size:12px;color:var(--text-soft);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:2px 10px;white-space:nowrap">${m.tag}</span>`:''}
-        <div style="text-align:right;flex-shrink:0;min-width:80px">
-          ${m.price!=null?`<div style="font-size:14px;font-weight:700;color:var(--navy);white-space:nowrap">${Number(m.price).toLocaleString('uk-UA')} грн</div>`:''}
-          ${m.days?`<div style="font-size:12px;color:var(--text-soft);margin-top:1px;white-space:nowrap">${m.days} роб. днів</div>`:''}
-        </div>
+        ${m.days?`<div style="text-align:right;flex-shrink:0;font-size:12px;color:var(--text-soft);white-space:nowrap">${m.days} роб. днів</div>`:''}
       </label>`).join('')}
     </div>
     <div style="font-size:13px;margin-top:8px;padding-bottom:16px"><a href="#" style="color:var(--t2);font-weight:600;text-decoration:none" onclick="event.preventDefault();showToast('Буде доступно після публікації')">Як обрати метод? →</a></div>
