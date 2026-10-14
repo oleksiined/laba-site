@@ -3750,7 +3750,7 @@ function navigate(page) {
   } else {
     stepBar.style.display = 'none';
   }
-  if (page === 'services') { if(!srvMat) { srvMat=''; currentMaterial=''; } buildTasksFromGroups(); renderTaskFilter(); render(); }
+  if (page === 'services') { if(!srvMat) { srvMat=''; currentMaterial=''; srvFmtChosen=false; const ctx=document.getElementById('srvTaskContext'); if(ctx) ctx.style.display='none'; } buildTasksFromGroups(); renderTaskFilter(); render(); }
   else { searchQ=''; const si=document.getElementById('searchInput'); if(si) si.value=''; }
   if (page === 'calculator') calcInit();
   if (page === 'cabinet') { cabInit(); cabSwitch('orders'); }
@@ -3865,7 +3865,7 @@ function updateCartUI(){
 // ═══════════════════════════════════════════════
 // SERVICES RENDER (v24 compatible)
 // ═══════════════════════════════════════════════
-let srvMat = '', srvFmt = 'packages', srvTask = '';
+let srvMat = '', srvFmt = 'packages', srvTask = '', srvFmtChosen = false;
 
 const SRV_MAT_MAP = {'Ґрунт':'soil','Вода':'water','Добрива':'fertilizer','Насіння':'seeds','Зерно':'grain','Рослини':'plants'};
 function srvSetMatByName(name) {
@@ -3904,7 +3904,7 @@ function srvSetMat(mat, btn) {
   document.getElementById('seasonalBtn')?.classList.remove('active');
   document.getElementById('allResearchBtn')?.classList.remove('active');
   const ctx = document.getElementById('srvTaskContext');
-  if(ctx) ctx.style.display='';
+  if(ctx) ctx.style.display = srvFmtChosen ? '' : 'none';
   document.querySelectorAll('.mat-btn').forEach(b=>b.classList.remove('active'));
   const activeBtn = btn || document.querySelector(`.mat-btn[data-mat="${mat}"]`);
   if(activeBtn){ activeBtn.classList.add('active'); activeBtn.blur(); }
@@ -3917,11 +3917,14 @@ function srvSetMat(mat, btn) {
 
 function srvSetFmt(fmt, btn) {
   srvFmt = fmt;
+  srvFmtChosen = true;
   srvTask = '';
   document.querySelectorAll('.fmt-tab').forEach(b=>b.classList.remove('active'));
   if(btn){ btn.classList.add('active'); btn.blur(); }
   buildTasksFromGroups();
   renderTaskFilter();
+  const ctx = document.getElementById('srvTaskContext');
+  if(ctx) ctx.style.display = ALL_TASKS.length ? '' : 'none';
   render();
 }
 
@@ -3933,13 +3936,13 @@ function srvSetTask(task, btn) {
 }
 
 function srvResetFilters() {
-  srvMat=''; srvFmt='packages'; srvTask=''; searchQ='';
+  srvMat=''; srvFmt='packages'; srvTask=''; srvFmtChosen=false; searchQ='';
   document.querySelectorAll('.mat-btn,.fmt-tab,.srv-task-pill').forEach(b=>b.classList.remove('active'));
-  document.querySelector('.fmt-tab[data-fmt="packages"]')?.classList.add('active');
+  document.querySelectorAll('.fmt-tab').forEach(b=>b.classList.remove('active'));
   document.getElementById('seasonalBtn')?.classList.remove('active');
   document.getElementById('allResearchBtn')?.classList.remove('active');
   const ctx = document.getElementById('srvTaskContext');
-  if(ctx) ctx.style.display='';
+  if(ctx) ctx.style.display='none';
   document.getElementById('searchInput').value='';
   buildTasksFromGroups(); renderTaskFilter(); render();
 }
@@ -4035,10 +4038,17 @@ function renderTaskFilter(){
   const opts = document.getElementById('srvTaskOptions');
   if(!opts) return;
   if(!ALL_TASKS.length) buildTasksFromGroups();
+  const ctx = document.getElementById('srvTaskContext');
+  if(!srvFmtChosen) {
+    if(ctx) ctx.style.display='none';
+    opts.innerHTML='';
+    return;
+  }
   opts.innerHTML = ALL_TASKS.map(t=>`
     <button class="srv-task-pill ${srvTask===t.key?'active':''}" onclick="srvSetTask('${t.key}',this)">
       ${t.label}
     </button>`).join('');
+  if(ctx) ctx.style.display = ALL_TASKS.length ? '' : 'none';
 }
 
 function getSrvItems(){
