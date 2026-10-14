@@ -4020,11 +4020,12 @@ function buildTasksFromGroups(){
       });
     });
   } else {
-    // Групи з Packages → package_group
+    // Групи з Packages → package_group (збережено в groups[])
     Object.values(SERVICES).forEach(srv => {
       (srv.packages||[]).forEach(item => {
-        const g = item.package_group;
-        if(g && !seen.has(g)){ seen.add(g); groups.push(g); }
+        (item.groups||[]).forEach(g => {
+          if(g && !seen.has(g)){ seen.add(g); groups.push(g); }
+        });
       });
     });
   }
