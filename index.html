@@ -3692,8 +3692,15 @@ const TASKS_BY_MAT = {
   };
 
   window.hsbGoItem = function(matCode, id, isPackage) {
+    // Find the item name to use as search query
+    const found = _results.find(r => r.id === id);
+    const itemName = found ? found.name : '';
     hsbCloseDropdown();
     srvSetMat(matCode, null);
+    // Set search filter to show only this item
+    searchQ = itemName.toLowerCase();
+    const si = document.getElementById('searchInput');
+    if (si) si.value = itemName;
     navigate('services');
   };
 
@@ -3736,6 +3743,7 @@ function navigate(page) {
     stepBar.style.display = 'none';
   }
   if (page === 'services') { if(!srvMat) { srvMat=''; currentMaterial=''; } renderTaskFilter(); render(); }
+  else { searchQ=''; const si=document.getElementById('searchInput'); if(si) si.value=''; }
   if (page === 'calculator') calcInit();
   if (page === 'cabinet') { cabInit(); cabSwitch('orders'); }
   if (page === 'sampling') initSampling();
