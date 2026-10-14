@@ -6773,11 +6773,16 @@ async function loadCatalogFromSupabase() {
       return;
     }
 
-    // ── Build pkg → [service_id] map ──
-    const pkgIncluded = {};
+    // ── Build pkg → [{service_id, method_id}] map (зберігаємо method_id з Package Items) ──
+    const pkgIncluded = {};     // package_id → [service_id, ...] (для NC_CATALOG сумісності)
+    const pkgItemsFull = {};    // package_id → [{service_id, method_id}, ...]
     for (const pi of pkgItems) {
       if (pi.package_id && pi.service_id) {
         (pkgIncluded[pi.package_id] = pkgIncluded[pi.package_id] || []).push(pi.service_id);
+        (pkgItemsFull[pi.package_id] = pkgItemsFull[pi.package_id] || []).push({
+          service_id: pi.service_id,
+          method_id:  pi.method_id || null,
+        });
       }
     }
 
@@ -6791,24 +6796,29 @@ async function loadCatalogFromSupabase() {
       }
     }
 
-    // ── Build service_id → methods array ──
-    const svcMethods = {};
-    const svcDefaultMethod = {}; // service_id → default method info
+    // ── Build method_id → method object + service_id → methods array ──
+    // Fallback: якщо service_id пустий, виводимо з method_id (формат MM-T-NNN-NN)
+    const methodById  = {}; // method_id → method object
+    const svcMethods  = {}; // service_id → [method, ...]
+    const svcDefaultMethod = {}; // service_id → default method
     for (const m of methods) {
-      if (!m.service_id) continue;
+      // Derive service_id from method_id if missing (format: "01-1-019-04" → "01-1-019")
+      const sid = m.service_id || (m.method_id ? m.method_id.split('-').slice(0,3).join('-') : null);
+      if (!sid) continue;
       const mo = {
         id:    m.method_id,
-        name:  m.method_name  || '',
+        name:  m.method_name   || '',
         std:   m.standard_code || '',
         tag:   m.selection_note || '',
         days:  m.turnaround_value || null,
         price: m.price != null ? m.price : null,
       };
-      (svcMethods[m.service_id] = svcMethods[m.service_id] || []).push(mo);
-      if (m.is_default && !svcDefaultMethod[m.service_id]) svcDefaultMethod[m.service_id] = mo;
+      methodById[m.method_id] = mo;
+      (svcMethods[sid] = svcMethods[sid] || []).push(mo);
+      if (m.is_default && !svcDefaultMethod[sid]) svcDefaultMethod[sid] = mo;
     }
 
-    // ── Build symbol → {name, method} for chip popover ──
+    // ── Build symbol → {name, method} for chip popover (service default) ──
     const svcSymbolData = {}; // symbol → { name, method }
     for (const svc of services) {
       if (!svc.service_id || !svc.symbol) continue;
@@ -6818,13 +6828,24 @@ async function loadCatalogFromSupabase() {
     }
 
     // ── Helper: get unique symbol objects {s, name, method} for a package ──
+    // Використовує method_id з Package Items (точний метод пакета), fallback — дефолт сервісу
     const pkgTags = (pkgId) => {
-      const ids = pkgIncluded[pkgId] || [];
+      const pis = pkgItemsFull[pkgId] || [];
       const seen = new Set();
-      return ids
-        .map(id => svcSymbol[id])
-        .filter(s => s && !seen.has(s) && seen.add(s))
-        .map(s => ({ s, name: (svcSymbolData[s]||{}).name || s, method: (svcSymbolData[s]||{}).method || null }));
+      return pis
+        .filter(pi => {
+          const sym = svcSymbol[pi.service_id];
+          return sym && !seen.has(sym) && seen.add(sym);
+        })
+        .map(pi => {
+          const sym = svcSymbol[pi.service_id];
+          const svcData = svcSymbolData[sym] || {};
+          const method = (pi.method_id && methodById[pi.method_id])
+            || svcDefaultMethod[pi.service_id]
+            || (svcMethods[pi.service_id] || [])[0]
+            || null;
+          return { s: sym, name: svcData.name || sym, method };
+        });
     };
 
     // ── Оновлюємо NC_CATALOG.packages ──
