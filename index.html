@@ -4003,18 +4003,26 @@ document.getElementById('searchInput').addEventListener('input', function(){
   searchQ=this.value.toLowerCase(); render();
 });
 
-const ALL_TASKS = [
-  {key:'full',   icon:'🌿', label:'Комплексна оцінка'},
-  {key:'season', icon:'📅', label:'Сезонна діагностика'},
-  {key:'yield',  icon:'📈', label:'Підвищення врожайності'},
-  {key:'problem',icon:'⚠️', label:'Проблемні ділянки'},
-];
+let ALL_TASKS = [];
+function buildTasksFromGroups(){
+  const seen = new Set();
+  const groups = [];
+  Object.values(SERVICES).forEach(srv => {
+    (srv.individual||[]).forEach(item => {
+      (item.groups||[]).forEach(g => {
+        if(g && !seen.has(g)){ seen.add(g); groups.push(g); }
+      });
+    });
+  });
+  ALL_TASKS = groups.map(g => ({ key: g, label: g }));
+}
 function renderTaskFilter(){
   const opts = document.getElementById('srvTaskOptions');
   if(!opts) return;
+  if(!ALL_TASKS.length) buildTasksFromGroups();
   opts.innerHTML = ALL_TASKS.map(t=>`
     <button class="srv-task-pill ${srvTask===t.key?'active':''}" onclick="srvSetTask('${t.key}',this)">
-      ${t.icon} ${t.label}
+      ${t.label}
     </button>`).join('');
 }
 
@@ -4033,7 +4041,7 @@ function getSrvItems(){
     });
   }
   let items = [...pkgs,...inds];
-  if(srvTask && srvTask!=='all') items=items.filter(i=>i.tasks&&i.tasks.includes(srvTask));
+  if(srvTask && srvTask!=='all') items=items.filter(i=>i.groups&&i.groups.includes(srvTask));
   if(searchQ) items=items.filter(i=>(i.name+' '+i.desc+' '+(i.params||[]).join(' ')).toLowerCase().includes(searchQ));
   if(currentSort==='price_asc') items.sort((a,b)=>(a.price||0)-(b.price||0));
   else if(currentSort==='price_desc') items.sort((a,b)=>(b.price||0)-(a.price||0));
@@ -6939,6 +6947,7 @@ async function loadCatalogFromSupabase() {
         methods:  svcMethods[svc.service_id] || [],
       });
     }
+    if (typeof buildTasksFromGroups === 'function') try { buildTasksFromGroups(); } catch(e) {}
     if (typeof render === 'function') try { render(); } catch(e) {}
 
     // ── Перерендеримо якщо каталог вже відкритий ──
