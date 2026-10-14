@@ -3750,7 +3750,7 @@ function navigate(page) {
   } else {
     stepBar.style.display = 'none';
   }
-  if (page === 'services') { if(!srvMat) { srvMat=''; currentMaterial=''; } renderTaskFilter(); render(); }
+  if (page === 'services') { if(!srvMat) { srvMat=''; currentMaterial=''; } buildTasksFromGroups(); renderTaskFilter(); render(); }
   else { searchQ=''; const si=document.getElementById('searchInput'); if(si) si.value=''; }
   if (page === 'calculator') calcInit();
   if (page === 'cabinet') { cabInit(); cabSwitch('orders'); }
@@ -6974,6 +6974,7 @@ async function loadCatalogFromSupabase() {
       });
     }
     if (typeof buildTasksFromGroups === 'function') try { buildTasksFromGroups(); } catch(e) {}
+    if (typeof renderTaskFilter === 'function') try { renderTaskFilter(); } catch(e) {}
     if (typeof render === 'function') try { render(); } catch(e) {}
 
     // ── Перерендеримо якщо каталог вже відкритий ──
