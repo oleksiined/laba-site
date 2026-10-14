@@ -6765,7 +6765,7 @@ async function loadCatalogFromSupabase() {
       _sbFetch('catalog_services',      'select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,service_id'),
       _sbFetch('catalog_packages',      'select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,package_id'),
       _sbFetch('catalog_package_items', 'select=*'),
-      _sbFetch('catalog_methods',       'select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,method_id'),
+      _sbFetch('catalog_methods',       'select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,method_id').catch(e=>{console.warn('methods fetch:',e);return[];}),
     ]);
 
     if (!services.length && !packages.length) {
