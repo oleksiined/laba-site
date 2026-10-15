@@ -1357,7 +1357,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .srv-btn-tip-desc  { font-size:12px; color:var(--text-mid); line-height:1.4; display:inline; }
 /* Individual expanded */
 .ind-body { padding:16px 18px 0; }
-.ind-methods-list { display:flex; flex-direction:column; gap:8px; margin-bottom:9px; }
+.ind-methods-list { display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
 .ind-method-item { display:flex; align-items:center; gap:12px; border:1.5px solid var(--border); border-radius:10px; padding:12px 16px; cursor:pointer; transition:border-color .15s, background .15s; background:#fff; }
 .ind-method-item.selected { border-color:var(--neon-dark); background:#f5ffe0; }
 .ind-method-item:hover { border-color:var(--border); }
@@ -4468,7 +4468,7 @@ function makeRow(item, type){
     ${item.methods?.length===1?`
     <!-- Один метод — статичний блок -->
     <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:10px">Метод дослідження</div>
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;background:#fff;margin-bottom:5px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;background:#fff;margin-bottom:10px">
       <div style="min-width:0">
         <div style="font-size:14px;font-weight:700;color:var(--navy)">${item.methods[0].name}</div>
         <div style="font-size:12px;color:var(--text-soft);margin-top:2px">${item.methods[0].std||''}</div>
