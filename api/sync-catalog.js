@@ -93,17 +93,19 @@ function toBool(v, defaultVal = false) {
 
 // ─── Головна функція синку ────────────────────────────────────────────────────
 async function syncCatalog(debug = false) {
-  const [svcRaw, pkgRaw, itemRaw, methRaw] = await Promise.all([
+  const [svcRaw, pkgRaw, itemRaw, methRaw, matRaw] = await Promise.all([
     gsFetch('Services'),
     gsFetch('Packages'),
     gsFetch('Package Items'),
     gsFetch('Methods'),
+    gsFetch('Materials'),
   ]);
 
-  const services = svcRaw.rows;
-  const packages = pkgRaw.rows;
-  const pkgItems = itemRaw.rows;
-  const methods  = methRaw.rows;
+  const services  = svcRaw.rows;
+  const packages  = pkgRaw.rows;
+  const pkgItems  = itemRaw.rows;
+  const methods   = methRaw.rows;
+  const materials = matRaw.rows;
 
   const now = new Date().toISOString();
 
@@ -202,9 +204,41 @@ async function syncCatalog(debug = false) {
       required:      toBool(r.required, true),
     }));
 
+  // ── Materials ──
+  const matRows = materials
+    .filter(r => r.material_id)
+    .map(r => ({
+      material_id:              r.material_id,
+      name:                     r.name                     || null,
+      name_uk:                  r.name                     || null,
+      internal_key:             r.material_code ? r.material_code.toLowerCase() : null,
+      material_code:            r.material_code            || null,
+      short_name:               r.short_name               || null,
+      description:              r.description              || null,
+      status:                   r.status                   || 'active',
+      sort_order:               r.sort_order != null       ? Number(r.sort_order) : null,
+      min_sample_quantity:      r.min_sample_quantity      ? Number(r.min_sample_quantity) : null,
+      sample_quantity_unit:     r.sample_quantity_unit     || null,
+      min_samples_count:        r.min_samples_count        ? Number(r.min_samples_count) : null,
+      storage_conditions:       r.storage_conditions       || null,
+      max_delivery_hours:       r.max_delivery_hours       ? Number(r.max_delivery_hours) : null,
+      sampling_instruction_url: r.sampling_instruction_url || null,
+      sample_form_id:           r.sample_form_id           || null,
+      container_type:           r.container_type           || null,
+      sample_requirements:      r.sample_requirements      || null,
+      client_preparation:       r.client_preparation       || null,
+      synced_at:                now,
+    }));
+
   if (debug) {
     return {
       debug: true,
+      materials_sheet: {
+        cols: matRaw.cols,
+        total_rows: materials.length,
+        first_row: materials[0] || null,
+        filtered: matRows.length,
+      },
       services_sheet: {
         cols: svcRaw.cols,
         total_rows: services.length,
@@ -234,6 +268,7 @@ async function syncCatalog(debug = false) {
 
   // DELETE всіх таблиць і вставляємо нові (повна заміна — дзеркало Sheet)
   await Promise.all([
+    sbRequest('DELETE', 'catalog_materials?material_id=neq.__none__',    null).catch(() => {}),
     sbRequest('DELETE', 'catalog_services?service_id=neq.__none__',      null).catch(() => {}),
     sbRequest('DELETE', 'catalog_packages?package_id=neq.__none__',      null).catch(() => {}),
     sbRequest('DELETE', 'catalog_package_items?service_id=neq.__none__', null).catch(() => {}),
@@ -241,9 +276,10 @@ async function syncCatalog(debug = false) {
   ]);
 
   await Promise.all([
-    upsert('catalog_services',  'service_id',  svcRows),
-    upsert('catalog_packages',  'package_id',  pkgRows),
-    upsert('catalog_methods',   'method_id',   methRows),
+    upsert('catalog_materials', 'material_id',  matRows),
+    upsert('catalog_services',  'service_id',   svcRows),
+    upsert('catalog_packages',  'package_id',   pkgRows),
+    upsert('catalog_methods',   'method_id',    methRows),
   ]);
 
   if (itemRows.length) {
@@ -251,6 +287,7 @@ async function syncCatalog(debug = false) {
   }
 
   return {
+    materials:    matRows.length,
     services:     svcRows.length,
     packages:     pkgRows.length,
     packageItems: itemRows.length,
