@@ -112,7 +112,7 @@ async function syncCatalog(debug = false) {
   const materials      = matRaw.rows;
   const resultParams   = resParRaw.rows;
   const serviceRelations = svcRelRaw.rows;
-  const sampleForms    = sFormRaw.rows;
+  const sampleForms      = sFormRaw.rows;
   const sampleFormFields = sFormFldRaw.rows;
 
   const now = new Date().toISOString();
@@ -294,33 +294,113 @@ async function syncCatalog(debug = false) {
     };
   }
 
+  // ── Result Parameters ──
+  const resParRows = resultParams
+    .filter(r => r.result_parameter_id)
+    .map(r => ({
+      result_parameter_id: r.result_parameter_id,
+      method_id:           r.method_id    || null,
+      service_id:          r.service_id   || null,
+      name:                r.name         || null,
+      code:                r.code         || null,
+      symbol:              r.symbol       || null,
+      result_type:         r.result_type  || null,
+      unit:                r.unit         || null,
+      display_order:       r.display_order ? Number(r.display_order) : null,
+      client_visible:      toBool(r.client_visible, true),
+      required:            toBool(r.required, true),
+      synced_at:           now,
+    }));
+
+  // ── Service Relations ──
+  const svcRelRows = serviceRelations
+    .filter(r => r.source_id && r.target_id)
+    .map(r => ({
+      source_type:      r.source_type      || null,
+      source_id:        r.source_id,
+      target_type:      r.target_type      || null,
+      target_id:        r.target_id,
+      target_method_id: r.target_method_id || null,
+      relation_type:    r.relation_type    || null,
+      sort_order:       r.sort_order != null ? Number(r.sort_order) : null,
+      status:           r.status           || 'active',
+      synced_at:        now,
+    }));
+
+  // ── Sample Forms ──
+  const sFormRows = sampleForms
+    .filter(r => r.form_id)
+    .map(r => ({
+      form_id:     r.form_id,
+      name:        r.name        || null,
+      description: r.description || null,
+      status:      r.status      || 'active',
+      synced_at:   now,
+    }));
+
+  // ── Sample Form Fields ──
+  const sFormFldRows = sampleFormFields
+    .filter(r => r.form_id && r.field_key)
+    .map(r => ({
+      form_id:      r.form_id,
+      field_key:    r.field_key,
+      label:        r.label       || null,
+      field_type:   r.field_type  || null,
+      required:     toBool(r.required, true),
+      options:      r.options     || null,
+      placeholder:  r.placeholder || null,
+      help_text:    r.help_text   || null,
+      unit:         r.unit        || null,
+      min_value:    r.min_value != null ? Number(r.min_value) : null,
+      max_value:    r.max_value != null ? Number(r.max_value) : null,
+      sort_order:   r.sort_order != null ? Number(r.sort_order) : null,
+      status:       r.status      || 'active',
+      synced_at:    now,
+    }));
+
   // DELETE всіх таблиць і вставляємо нові (повна заміна — дзеркало Sheet)
   await Promise.all([
-    sbRequest('DELETE', 'catalog_materials?material_id=neq.__none__',    null).catch(() => {}),
-    sbRequest('DELETE', 'catalog_services?service_id=neq.__none__',      null).catch(() => {}),
-    sbRequest('DELETE', 'catalog_packages?package_id=neq.__none__',      null).catch(() => {}),
-    sbRequest('DELETE', 'catalog_package_items?service_id=neq.__none__', null).catch(() => {}),
-    sbRequest('DELETE', 'catalog_methods?method_id=neq.__none__',        null).catch(() => {}),
+    sbRequest('DELETE', 'catalog_materials?material_id=neq.__none__',                      null).catch(() => {}),
+    sbRequest('DELETE', 'catalog_services?service_id=neq.__none__',                        null).catch(() => {}),
+    sbRequest('DELETE', 'catalog_packages?package_id=neq.__none__',                        null).catch(() => {}),
+    sbRequest('DELETE', 'catalog_package_items?service_id=neq.__none__',                   null).catch(() => {}),
+    sbRequest('DELETE', 'catalog_methods?method_id=neq.__none__',                          null).catch(() => {}),
+    sbRequest('DELETE', 'catalog_result_parameters?result_parameter_id=neq.__none__',      null).catch(() => {}),
+    sbRequest('DELETE', 'catalog_service_relations?source_id=neq.__none__',                null).catch(() => {}),
+    sbRequest('DELETE', 'catalog_sample_forms?form_id=neq.__none__',                       null).catch(() => {}),
+    sbRequest('DELETE', 'catalog_sample_form_fields?form_id=neq.__none__',                 null).catch(() => {}),
   ]);
 
   await Promise.all([
-    upsert('catalog_materials', 'material_id',  matRows),
-    upsert('catalog_services',  'service_id',   svcRows),
-    upsert('catalog_packages',  'package_id',   pkgRows),
-    upsert('catalog_methods',   'method_id',    methRows),
+    upsert('catalog_materials',         'material_id',         matRows),
+    upsert('catalog_services',          'service_id',          svcRows),
+    upsert('catalog_packages',          'package_id',          pkgRows),
+    upsert('catalog_methods',           'method_id',           methRows),
+    upsert('catalog_result_parameters', 'result_parameter_id', resParRows),
+    upsert('catalog_sample_forms',      'form_id',             sFormRows),
   ]);
 
   if (itemRows.length) {
     await upsert('catalog_package_items', 'package_id,service_id', itemRows);
   }
+  if (svcRelRows.length) {
+    await upsert('catalog_service_relations', 'source_id,target_id,relation_type', svcRelRows);
+  }
+  if (sFormFldRows.length) {
+    await upsert('catalog_sample_form_fields', 'form_id,field_key', sFormFldRows);
+  }
 
   return {
-    materials:    matRows.length,
-    services:     svcRows.length,
-    packages:     pkgRows.length,
-    packageItems: itemRows.length,
-    methods:      methRows.length,
-    syncedAt:     now,
+    materials:          matRows.length,
+    services:           svcRows.length,
+    packages:           pkgRows.length,
+    packageItems:       itemRows.length,
+    methods:            methRows.length,
+    resultParameters:   resParRows.length,
+    serviceRelations:   svcRelRows.length,
+    sampleForms:        sFormRows.length,
+    sampleFormFields:   sFormFldRows.length,
+    syncedAt:           now,
   };
 }
 
