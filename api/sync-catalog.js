@@ -93,19 +93,27 @@ function toBool(v, defaultVal = false) {
 
 // ─── Головна функція синку ────────────────────────────────────────────────────
 async function syncCatalog(debug = false) {
-  const [svcRaw, pkgRaw, itemRaw, methRaw, matRaw] = await Promise.all([
+  const [svcRaw, pkgRaw, itemRaw, methRaw, matRaw, resParRaw, svcRelRaw, sFormRaw, sFormFldRaw] = await Promise.all([
     gsFetch('Services'),
     gsFetch('Packages'),
     gsFetch('Package Items'),
     gsFetch('Methods'),
     gsFetch('Materials'),
+    gsFetch('Result Parameters'),
+    gsFetch('Service Relations'),
+    gsFetch('Sample Forms'),
+    gsFetch('Sample Form Fields'),
   ]);
 
-  const services  = svcRaw.rows;
-  const packages  = pkgRaw.rows;
-  const pkgItems  = itemRaw.rows;
-  const methods   = methRaw.rows;
-  const materials = matRaw.rows;
+  const services       = svcRaw.rows;
+  const packages       = pkgRaw.rows;
+  const pkgItems       = itemRaw.rows;
+  const methods        = methRaw.rows;
+  const materials      = matRaw.rows;
+  const resultParams   = resParRaw.rows;
+  const serviceRelations = svcRelRaw.rows;
+  const sampleForms    = sFormRaw.rows;
+  const sampleFormFields = sFormFldRaw.rows;
 
   const now = new Date().toISOString();
 
@@ -262,6 +270,26 @@ async function syncCatalog(debug = false) {
         total_rows: methods.length,
         first_row: methods[0] || null,
         filtered: methRows.length,
+      },
+      result_parameters_sheet: {
+        cols: resParRaw.cols,
+        total_rows: resultParams.length,
+        first_row: resultParams[0] || null,
+      },
+      service_relations_sheet: {
+        cols: svcRelRaw.cols,
+        total_rows: serviceRelations.length,
+        first_row: serviceRelations[0] || null,
+      },
+      sample_forms_sheet: {
+        cols: sFormRaw.cols,
+        total_rows: sampleForms.length,
+        first_row: sampleForms[0] || null,
+      },
+      sample_form_fields_sheet: {
+        cols: sFormFldRaw.cols,
+        total_rows: sampleFormFields.length,
+        first_row: sampleFormFields[0] || null,
       },
     };
   }
