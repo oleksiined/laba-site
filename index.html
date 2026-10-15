@@ -6802,11 +6802,12 @@ async function _sbFetch(table, params = '') {
 // ─── Завантаження каталогу з Supabase ─────────────────────────────────────
 async function loadCatalogFromSupabase() {
   try {
-    const [services, packages, pkgItems, methods] = await Promise.all([
+    const [services, packages, pkgItems, methods, materials] = await Promise.all([
       _sbFetch('catalog_services',      'select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,service_id'),
       _sbFetch('catalog_packages',      'select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,package_id'),
       _sbFetch('catalog_package_items', 'select=*'),
       _sbFetch('catalog_methods',       'select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,method_id').catch(e=>{console.warn('methods fetch:',e);return[];}),
+      _sbFetch('catalog_materials',     'select=material_id,name,status,sort_order&order=sort_order.asc.nullslast,material_id').catch(e=>{console.warn('materials fetch:',e);return[];}),
     ]);
 
     if (!services.length && !packages.length) {
@@ -6984,6 +6985,20 @@ async function loadCatalogFromSupabase() {
         methods:  svcMethods[svc.service_id] || [],
       });
     }
+    // ── Показуємо тільки матеріали з Supabase ──
+    if (materials.length) {
+      const _matKeyNorm = { plant: 'plants' };
+      const activeMats = new Set(
+        materials
+          .filter(m => !m.status || m.status === 'active')
+          .map(m => { const k = _matIdToKey[m.material_id]; return _matKeyNorm[k] || k; })
+          .filter(Boolean)
+      );
+      document.querySelectorAll('.mat-grid .mat-btn:not(.other-material)').forEach(btn => {
+        btn.style.display = activeMats.has(btn.dataset.mat) ? '' : 'none';
+      });
+    }
+
     if (typeof buildTasksFromGroups === 'function') try { buildTasksFromGroups(); } catch(e) {}
     if (typeof renderTaskFilter === 'function') try { renderTaskFilter(); } catch(e) {}
     if (typeof render === 'function') try { render(); } catch(e) {}
