@@ -1702,7 +1702,7 @@ main{flex:1}
 
 /* add modal */
 .pkg-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}
-.pkg-opt{border:2px solid var(--bd);border-radius:var(--r-sm);padding:13px;cursor:pointer;transition:all .15s}
+.pkg-opt{border:2px solid var(--bd);border-radius:var(--r-sm);padding:13px;cursor:pointer;transition:all .15s;min-width:0;overflow:hidden;word-break:break-word}
 .pkg-opt:hover{border-color:var(--neon-dark);background:#f5ffe0}
 .pkg-opt.on{border-color:var(--neon-dark);background:#f5ffe0}
 .pkg-opt-name{font-weight:600;font-size:13.5px;margin-bottom:3px}
@@ -6303,7 +6303,7 @@ function copyGroup(k) {
 // ══════════════════════════════════════════
 // РЕНДЕР
 // ══════════════════════════════════════════
-function nc_fmt(n) { return n.toLocaleString('uk-UA') + '\u00a0грн'; }
+function nc_fmt(n) { return n != null ? n.toLocaleString('uk-UA') + '00a0грн' : 'Уточнити'; }
 function nc_noun(n) {
   if (n % 10 === 1 && n % 100 !== 11) return n + ' зразок';
   if ([2,3,4].includes(n%10) && ![12,13,14].includes(n%100)) return n + ' зразки';
@@ -6582,7 +6582,7 @@ function renderAdd() {
       </div>
     </div>
     <div class="add-preview">
-      <div class="add-preview-row"><span style="color:var(--t3)">Попередня вартість</span><span style="font-weight:700">${nc_fmt(NC_CATALOG.packages[nc_A.pkgId].price*nc_A.qty)}</span></div>
+      <div class="add-preview-row"><span style="color:var(--t3)">Попередня вартість</span><span style="font-weight:700">${nc_fmt(NC_CATALOG.packages[nc_A.pkgId].price != null ? NC_CATALOG.packages[nc_A.pkgId].price * nc_A.qty : null)}</span></div>
       <div class="add-preview-note">Додаткові показники можна обрати у кошику</div>
     </div>`;
 }
@@ -6960,7 +6960,7 @@ async function loadCatalogFromSupabase() {
       SERVICES[sk].packages.push({
         code:     pkg.slug || pkg.package_id,
         name:     pkg.name || pkg.package_id,
-        price:    pkg.price || 0,
+        price:    pkg.price,
         material: _matKeyToLabel[mk] || mk,
         days:     pkg.turnaround_value || 5,
         tags:     pkgTags(pkg.package_id), tasks:[], params:[], bundles:[],
