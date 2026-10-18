@@ -149,6 +149,7 @@ async function syncCatalog(debug = false) {
     .filter(r => r.package_id)
     .map(r => ({
       package_id:       r.package_id,
+      package_code:     r.package_code     || null,
       material_id:      r.material_id      || null,
       package_group:    r.package_group    || null,
       name:             r.name             || null,
