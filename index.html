@@ -4458,7 +4458,7 @@ function makeRow(item, type){
     </div>
   </div>
   <div class="service-body ind-body" onclick="event.stopPropagation()">
-    ${item.desc?`<div style="font-size:14px;color:var(--text-soft);margin-bottom:12px;line-height:1.5">${item.desc}</div>`:''}
+    ${item.descRich?`<div style="font-size:14px;color:var(--text-soft);margin-bottom:12px;line-height:1.6;white-space:pre-line;word-break:break-word">${item.descRich}</div>`:''}
     <!-- Мета: дні + протокол + приклад -->
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:${item.methods?.length?'18px':'0'};flex-wrap:wrap;font-size:13px;color:var(--text-soft)">
       ${item.days?`<span style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>${item.days} роб. днів</span>`:''}
@@ -4560,6 +4560,7 @@ function makeRow(item, type){
     </div>
   </div>
   <div class="service-body" onclick="event.stopPropagation()">
+    ${item.descRich?`<div style="font-size:14px;color:var(--text-soft);margin-bottom:14px;line-height:1.6;white-space:pre-line;word-break:break-word">${item.descRich}</div>`:''}
     <!-- 4 кнопки результатів -->
     <div class="srv-result-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;width:fit-content">
       <button class="srv-result-btn srv-result-btn--protocol" onclick="event.preventDefault();showToast('Буде доступно після публікації')">
@@ -6966,7 +6967,7 @@ async function loadCatalogFromSupabase() {
         tags:     pkgTags(pkg.package_id), tasks:[], params:[], bundles:[],
         groups:   pkg.package_group ? [pkg.package_group] : [],
         desc:     pkg.short_description || '',
-        descRich: pkg.short_description || '',
+        descRich: pkg.full_description || pkg.short_description || '',
         popular:  pkg.sort_order != null ? Math.max(0, 100 - pkg.sort_order) : 50,
       });
     }
@@ -6981,6 +6982,7 @@ async function loadCatalogFromSupabase() {
         price:    svc.price,
         material: _matKeyToLabel[mk] || mk,
         desc:     svc.short_description || '',
+        descRich: svc.full_description || svc.short_description || '',
         groups:   svc.group_name ? [svc.group_name] : [],
         methods:  svcMethods[svc.service_id] || [],
       });
