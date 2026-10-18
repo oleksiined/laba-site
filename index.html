@@ -3796,7 +3796,14 @@ function goStep(step) {
   window.scrollTo(0,0);
 }
 
-window.addEventListener('popstate', e => { if(e.state?.page) navigate(e.state.page); });
+window.addEventListener('popstate', e => {
+  if(e.state?.card){
+    // Повернення до розгорнутої картки — просто відкриваємо її
+    openCardFromHash();
+  } else if(e.state?.page){
+    navigate(e.state.page);
+  }
+});
 
 // ═══════════════════════════════════════════════
 // CART
@@ -4090,7 +4097,8 @@ function render(){
   const empty = document.getElementById('emptyState');
   if(empty) empty.classList.toggle('show', !items.length && (srvMat||'')!=='other');
   list.innerHTML = items.map(item => makeRow(item, item._type)).join('');
-  window.scrollTo(0, savedY);
+  // Відкриваємо картку по URL хешу (після першого рендеру каталогу)
+  if(location.hash.startsWith('#card-')) openCardFromHash(); else window.scrollTo(0, savedY);
   document.querySelectorAll('[data-tooltip]').forEach(el=>el.addEventListener('mouseenter',e=>{
     const tip=document.getElementById('siteTooltip');
     if(tip){tip.textContent=el.dataset.tooltip;tip.classList.add('show');positionTip(el);}
@@ -4122,6 +4130,14 @@ function toggleRowExpand(safeCode){
     const svg=arrow.querySelector('svg');
     if(svg) svg.style.transform=row.classList.contains('expanded')?'rotate(180deg)':'';
   }
+  // Оновлюємо URL hash для permalink
+  try {
+    if(row.classList.contains('expanded')){
+      history.pushState({page: currentPage, card: safeCode}, '', '#card-'+safeCode);
+    } else {
+      history.pushState({page: currentPage}, '', '#'+currentPage);
+    }
+  } catch(e){}
   // Синхронізуємо ширину чіпів до ширини рядка кнопок
   if(row.classList.contains('expanded')){
     requestAnimationFrame(()=>{
@@ -4139,6 +4155,18 @@ function toggleRowExpand(safeCode){
       });
     });
   }
+}
+
+function openCardFromHash(){
+  const hash=location.hash;
+  if(!hash.startsWith('#card-')) return;
+  const safeCode=hash.slice(6);
+  const row=document.getElementById('srow-'+safeCode);
+  if(!row) return;
+  if(!row.classList.contains('expanded')) row.classList.add('expanded');
+  const arrow=document.getElementById('sarrow-'+safeCode);
+  if(arrow){ const svg=arrow.querySelector('svg'); if(svg) svg.style.transform='rotate(180deg)'; }
+  setTimeout(()=>row.scrollIntoView({behavior:'smooth',block:'center'}),120);
 }
 
 // Клік на корзину — миттєво додає 1 зразок, показує лічильник
@@ -5976,8 +6004,17 @@ function showToast(msg,ms=2500){
   localStorage.removeItem('laba_cart');
   localStorage.removeItem('laba_notes');
 
-  // Відкриваємо Головну
-  navigate('home');
+  // Відкриваємо сторінку з хешу або Головну
+  const _initHash = location.hash;
+  if(_initHash.startsWith('#card-')){
+    navigate('services');
+  } else if(_initHash && _initHash !== '#'){
+    const _pg = _initHash.slice(1);
+    const _pages=['home','services','about','contacts','checkout','cabinet','calculator','sampling'];
+    if(_pages.includes(_pg)) navigate(_pg); else navigate('home');
+  } else {
+    navigate('home');
+  }
   // Скидаємо матеріал — показуємо всі послуги
   srvMat = ''; currentMaterial = '';
   updateCartUI();
