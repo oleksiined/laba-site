@@ -1202,7 +1202,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 
 
 /* ══ Collapsed service row ══ */
-.srv-collapsed-row{display:flex;align-items:center;gap:12px;padding:14px 16px;min-height:0}
+.srv-collapsed-row{display:grid;grid-template-columns:1fr 320px;gap:12px;padding:14px 16px;align-items:center;min-height:0}
 .srv-collapsed-left{flex:1;min-width:0;overflow:hidden}
 .srv-collapsed-right{flex-shrink:0;text-align:right}
 .srv-collapsed-price{font-size:18px;font-weight:800;color:var(--navy);white-space:nowrap}
@@ -1371,7 +1371,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 
 
 /* ══ Collapsed row — single line alignment (v2: clean, no flex-column) ══ */
-.srv-collapsed-row { display:flex; align-items:center; gap:16px; padding:12px 16px; }
+.srv-collapsed-row { display:grid; grid-template-columns:1fr 320px; gap:16px; padding:12px 16px; align-items:center; }
 .srv-collapsed-left { flex:1; min-width:0; overflow:hidden; display:block; max-width:none; }
 .srv-collapsed-left .service-name { font-size:15px; font-weight:600; color:var(--navy); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; display:block; }
 .srv-collapsed-left .service-short { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; display:block; }
@@ -1384,8 +1384,8 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 
 
 /* ══ Collapsed row — DEFINITIVE layout ══ */
-.srv-collapsed-row { display:flex; align-items:center; gap:12px; padding:14px 16px; }
-.srv-collapsed-left { flex:1 !important; min-width:0 !important; overflow:hidden !important; display:block !important; max-width:none !important; flex-direction:unset !important; }
+.srv-collapsed-row { display:grid; grid-template-columns:1fr 320px; gap:12px; padding:14px 16px; align-items:center; }
+.srv-collapsed-left { overflow:hidden !important; display:block !important; min-width:0 !important; }
 .srv-collapsed-left .service-name { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; display:block; font-size:16px; font-weight:700; color:var(--navy); }
 .srv-collapsed-left .service-short { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; display:block; font-size:12px; color:var(--text-soft); margin-top:2px; }
 
@@ -2213,12 +2213,12 @@ main{flex:1}
   .services-content{padding:0 16px}
 
   /* Service cards — fix 320px min-width that hides names on mobile */
-  .srv-collapsed-row{flex-wrap:wrap!important;gap:4px 8px!important}
-  .srv-collapsed-left{width:100%!important;flex-basis:100%!important;min-width:0!important;max-width:100%!important;overflow:visible!important}
+  .srv-collapsed-row{grid-template-columns:1fr!important;gap:4px!important}
+  .srv-collapsed-left{overflow:visible!important}
   .srv-collapsed-left .service-name{white-space:normal!important;overflow:visible!important;text-overflow:unset!important;font-size:15px!important}
   .srv-collapsed-left .service-short{white-space:normal!important;overflow:visible!important;text-overflow:unset!important}
   .service-code{white-space:nowrap!important}
-  .srv-collapsed-row > div[style*="min-width:320px"]{min-width:unset!important;flex-shrink:1!important;width:100%!important;justify-content:flex-start!important}
+  .srv-collapsed-row > div:last-child{justify-content:flex-start!important}
 
   /* Order success modal — stack vertically */
   #order-success-modal .modal{max-width:100%!important;border-radius:16px!important}
@@ -4420,7 +4420,7 @@ function makeRow(item, type){
       </div>
       <div class="service-name">${item.name}</div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;min-width:320px;justify-content:flex-end" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end" onclick="event.stopPropagation()">
       <!-- grid 2×2: [ціна | лічильник] / [Ціна за 1 зразок | зразків у кошику] -->
       <div style="display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:8px;row-gap:2px;align-items:center">
         <!-- [1,1] ціна -->
@@ -4519,7 +4519,7 @@ function makeRow(item, type){
         ${daysText?`<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>${daysText}</span>`:''}
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;min-width:320px;justify-content:flex-end" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end" onclick="event.stopPropagation()">
       <!-- grid 2×2: [велика ціна | лічильник] / [ціна×qty | N зразків] -->
       <div style="display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:8px;row-gap:2px;align-items:center">
         <!-- [1,1] велика ціна -->
