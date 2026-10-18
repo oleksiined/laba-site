@@ -37,7 +37,7 @@ html{scroll-behavior:smooth}
 }
 
 *,*::before,*::after{font-family:'Manrope',system-ui,sans-serif!important}
-body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh;font-family:'Manrope',system-ui,sans-serif}
+body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh;font-family:'Manrope',system-ui,sans-serif;overflow-x:hidden}
 a{text-decoration:none;color:inherit}
 /* Hide native number input spinners sitewide */
 input[type="number"]{-moz-appearance:textfield;appearance:textfield}
@@ -4420,7 +4420,7 @@ function makeRow(item, type){
       </div>
       <div class="service-name">${item.name}</div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;min-width:320px;justify-content:flex-end" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;min-width:min(320px,100%);justify-content:flex-end" onclick="event.stopPropagation()">
       <!-- grid 2×2: [ціна | лічильник] / [Ціна за 1 зразок | зразків у кошику] -->
       <div style="display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:8px;row-gap:2px;align-items:center">
         <!-- [1,1] ціна -->
@@ -4519,7 +4519,7 @@ function makeRow(item, type){
         ${daysText?`<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>${daysText}</span>`:''}
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;min-width:320px;justify-content:flex-end" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;min-width:min(320px,100%);justify-content:flex-end" onclick="event.stopPropagation()">
       <!-- grid 2×2: [велика ціна | лічильник] / [ціна×qty | N зразків] -->
       <div style="display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:8px;row-gap:2px;align-items:center">
         <!-- [1,1] велика ціна -->
@@ -6978,7 +6978,7 @@ async function loadCatalogFromSupabase() {
       SERVICES[sk].individual.push({
         code:     svc.service_id,
         name:     svc.name || svc.service_id,
-        price:    svc.price || 0,
+        price:    svc.price,
         material: _matKeyToLabel[mk] || mk,
         desc:     svc.short_description || '',
         groups:   svc.group_name ? [svc.group_name] : [],
