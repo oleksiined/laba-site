@@ -1370,10 +1370,10 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .srv-qty-in-cart { white-space:nowrap; font-size:12px; color:var(--t2); font-weight:600; }
 
 
-/* ══ Collapsed row — single line alignment ══ */
+/* ══ Collapsed row — single line alignment (v2: clean, no flex-column) ══ */
 .srv-collapsed-row { display:flex; align-items:center; gap:16px; padding:12px 16px; }
-.srv-collapsed-left { flex:1; min-width:0; max-width:calc(100% - 300px); display:flex; flex-direction:column; justify-content:center; overflow:hidden; }
-.srv-collapsed-left .service-name { font-size:15px; font-weight:600; color:var(--navy); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.srv-collapsed-left { flex:1; min-width:0; overflow:hidden; display:block; max-width:none; }
+.srv-collapsed-left .service-name { font-size:15px; font-weight:600; color:var(--navy); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; display:block; }
 .srv-collapsed-left .service-short { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; display:block; }
 
 
@@ -1383,11 +1383,11 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .srv-price-col-block { display:flex; flex-direction:column; align-items:flex-end; justify-content:center; }
 
 
-/* ══ Collapsed row — final layout ══ */
+/* ══ Collapsed row — DEFINITIVE layout ══ */
 .srv-collapsed-row { display:flex; align-items:center; gap:12px; padding:14px 16px; }
-.srv-collapsed-left { flex:1; min-width:0; overflow:hidden; }
-.srv-collapsed-left .service-name { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:16px; font-weight:700; color:var(--navy); }
-.srv-collapsed-left .service-short { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; font-size:12px; color:var(--text-soft); margin-top:2px; }
+.srv-collapsed-left { flex:1 !important; min-width:0 !important; overflow:hidden !important; display:block !important; max-width:none !important; flex-direction:unset !important; }
+.srv-collapsed-left .service-name { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; display:block; font-size:16px; font-weight:700; color:var(--navy); }
+.srv-collapsed-left .service-short { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; display:block; font-size:12px; color:var(--text-soft); margin-top:2px; }
 
 /* Правий блок: ціна праворуч, лічильник, кнопки — всі по центру */
 .srv-cright { display:flex; align-items:center; gap:8px; flex-shrink:0; }
