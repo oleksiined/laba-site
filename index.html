@@ -4130,10 +4130,11 @@ function toggleRowExpand(safeCode){
     const svg=arrow.querySelector('svg');
     if(svg) svg.style.transform=row.classList.contains('expanded')?'rotate(180deg)':'';
   }
-  // Оновлюємо URL hash для permalink
+  // Оновлюємо URL hash для permalink (використовуємо slug з data-атрибуту)
   try {
+    const slug=row.dataset.slug||safeCode;
     if(row.classList.contains('expanded')){
-      history.pushState({page: currentPage, card: safeCode}, '', '#card-'+safeCode);
+      history.pushState({page: currentPage, card: slug}, '', '#card-'+slug);
     } else {
       history.pushState({page: currentPage}, '', '#'+currentPage);
     }
@@ -4160,10 +4161,12 @@ function toggleRowExpand(safeCode){
 function openCardFromHash(){
   const hash=location.hash;
   if(!hash.startsWith('#card-')) return;
-  const safeCode=hash.slice(6);
-  const row=document.getElementById('srow-'+safeCode);
+  const slug=hash.slice(6);
+  // Шукаємо по data-slug (slug з БД), а не по safeCode
+  const row=document.querySelector('.service-row[data-slug="'+slug+'"]');
   if(!row) return;
   if(!row.classList.contains('expanded')) row.classList.add('expanded');
+  const safeCode=row.id.replace('srow-','');
   const arrow=document.getElementById('sarrow-'+safeCode);
   if(arrow){ const svg=arrow.querySelector('svg'); if(svg) svg.style.transform='rotate(180deg)'; }
   setTimeout(()=>row.scrollIntoView({behavior:'smooth',block:'center'}),120);
@@ -4427,6 +4430,7 @@ function removeFromCart(safeCode){
 function makeRow(item, type){
   const inCart = cart.some(c=>c.code===item.code&&c.type===type);
   const safeCode = item.code.replace(/[^a-zA-Z0-9-]/g,'');
+  const itemSlug = (item.slug||item.code).replace(/[^a-zA-Z0-9-]/g,'');
   const safeName = item.name.replace(/`/g,"'");
   const safeNameJs = safeName.replace(/'/g,"\\'"); // екранований апостроф для inline onclick
   const qty = getRowQty(safeCode);
@@ -4439,7 +4443,7 @@ function makeRow(item, type){
     const alreadyInCart = cart.some(c=>c.type==='sample_ind_group'&&(c.indicators||[]).find(x=>x.code===item.code));
     const groupLabel = item.groups?.length ? item.groups[0] : '';
     return `
-<div class="service-row service-row-ind" id="srow-${safeCode}">
+<div class="service-row service-row-ind" id="srow-${safeCode}" data-slug="${itemSlug}">
   <div class="srv-collapsed-row" onclick="toggleRowExpand('${safeCode}')" style="cursor:pointer">
     <div class="srv-collapsed-left">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
@@ -4534,7 +4538,7 @@ function makeRow(item, type){
   const tagsHtml = item.tags?.length ? `<div class="service-tags">${item.tags.map(t=>{const sym=t?.s||t; const chipData=JSON.stringify({name:t?.name||sym,method:t?.method||null}).replace(/"/g,'&quot;'); return `<span class="service-tag" data-chip-json="${chipData}" style="cursor:help">` + sym + `</span>`;}).join('')}</div>` : '';
 
   return `
-<div class="service-row" id="srow-${safeCode}">
+<div class="service-row" id="srow-${safeCode}" data-slug="${itemSlug}">
   <div class="srv-collapsed-row" onclick="toggleRowExpand('${safeCode}')" style="cursor:pointer">
     <div class="srv-collapsed-left">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
@@ -6997,6 +7001,7 @@ async function loadCatalogFromSupabase() {
       if (!SERVICES[sk]) continue;
       SERVICES[sk].packages.push({
         code:     pkg.slug || pkg.package_id,
+        slug:     pkg.slug || pkg.package_id,
         name:     pkg.name || pkg.package_id,
         price:    pkg.price,
         material: _matKeyToLabel[mk] || mk,
@@ -7015,6 +7020,7 @@ async function loadCatalogFromSupabase() {
       if (!SERVICES[sk]) continue;
       SERVICES[sk].individual.push({
         code:     svc.service_id,
+        slug:     svc.slug || svc.service_id,
         name:     svc.name || svc.service_id,
         price:    svc.price,
         material: _matKeyToLabel[mk] || mk,
