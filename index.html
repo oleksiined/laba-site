@@ -2640,7 +2640,7 @@ main{flex:1}
             <div class="srv-sort-option" data-val="price_asc" onclick="srvSortPick('price_asc','Спочатку дешевші',this)">Спочатку дешевші</div>
             <div class="srv-sort-option" data-val="price_desc" onclick="srvSortPick('price_desc','Спочатку дорожчі',this)">Спочатку дорожчі</div>
             <div class="srv-sort-option" data-val="alpha" onclick="srvSortPick('alpha','За назвою: А–Я',this)">За назвою: А–Я</div>
-            <div class="srv-sort-option" data-val="params_desc" onclick="srvSortPick('params_desc','За строком виконання',this)">За строком виконання</div>
+            <div class="srv-sort-option" data-val="params_desc" onclick="srvSortPick('params_desc','За кількістю досліджень',this)">За кількістю досліджень</div>
           </div>
         </div>
       </div>
@@ -4147,7 +4147,7 @@ function getSrvItems(){
   if(currentSort==='price_asc') items.sort((a,b)=>(a.price||0)-(b.price||0));
   else if(currentSort==='price_desc') items.sort((a,b)=>(b.price||0)-(a.price||0));
   else if(currentSort==='popular') items.sort((a,b)=>(b.popular||0)-(a.popular||0));
-  else if(currentSort==='params_desc') items.sort((a,b)=>(b.params?.length||0)-(a.params?.length||0));
+  else if(currentSort==='params_desc') items.sort((a,b)=>(b.tags?.length||b.params?.length||0)-(a.tags?.length||a.params?.length||0));
   else items.sort((a,b)=>a.name.localeCompare(b.name,'uk'));
   return items;
 }
