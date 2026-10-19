@@ -4526,7 +4526,7 @@ function makeRow(item, type){
         ${item.material?`<div class="srv-material-badge">Матеріал: ${item.material}</div>`:''}
       </div>
       <div class="service-name">${item.name}</div>
-      ${item.desc?`<div class="service-short" style="margin-top:2px">${item.desc}</div>`:''}
+      ${item.desc?`<div class="service-short" style="margin-top:2px;cursor:default" data-tooltip="${(item.descRich||item.desc).replace(/"/g,'&quot;')}">${item.desc}</div>`:''}
       <div class="srv-meta-row" style="margin-top:6px;margin-bottom:0">
         ${indDaysText?`<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>${indDaysText}</span>`:''}
       </div>
@@ -4625,7 +4625,7 @@ function makeRow(item, type){
         ${materialBadge}
       </div>
       <div class="service-name">${item.name}</div>
-      ${item.desc?`<div class="service-short" style="margin-top:2px">${item.desc}</div>`:''}
+      ${item.desc?`<div class="service-short" style="margin-top:2px;cursor:default" data-tooltip="${(item.descRich||item.desc).replace(/"/g,'&quot;')}">${item.desc}</div>`:''}
       <div class="srv-meta-row" style="margin-top:6px;margin-bottom:0">
         ${daysText?`<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>${daysText}</span>`:''}
         ${item.tags?.length?(()=>{const n=item.tags.length;const s=n<5?'дослідження':'досліджень';return `<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M7 10h6M10 7v6" stroke-linecap="round"/></svg>${n} ${s}</span>`;})():''}
