@@ -4511,6 +4511,8 @@ function makeRow(item, type){
     const subtotal = (item.price||0)*qty;
     const alreadyInCart = cart.some(c=>c.type==='sample_ind_group'&&(c.indicators||[]).find(x=>x.code===item.code));
     const groupLabel = item.groups?.length ? item.groups[0] : '';
+    const indDays = item.methods?.[0]?.days || null;
+    const indDaysText = indDays ? `${indDays} роб. днів` : '';
     return `
 <div class="service-row service-row-ind" id="srow-${safeCode}" data-slug="${itemSlug}">
   <div class="srv-collapsed-row" onclick="toggleRowExpand('${safeCode}')" style="cursor:pointer">
@@ -4520,6 +4522,10 @@ function makeRow(item, type){
         ${item.material?`<div class="srv-material-badge">Матеріал: ${item.material}</div>`:''}
       </div>
       <div class="service-name">${item.name}</div>
+      ${item.desc?`<div class="service-short" style="margin-top:2px">${item.desc}</div>`:''}
+      <div class="srv-meta-row" style="margin-top:6px;margin-bottom:0">
+        ${indDaysText?`<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>${indDaysText}</span>`:''}
+      </div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end" onclick="event.stopPropagation()">
       <!-- grid 2×2: [ціна | лічильник] / [Ціна за 1 зразок | зразків у кошику] -->
