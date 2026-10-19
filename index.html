@@ -7000,7 +7000,7 @@ async function loadCatalogFromSupabase() {
       const sk = _matKeyToSvcKey[mk] || mk;
       if (!SERVICES[sk]) continue;
       SERVICES[sk].packages.push({
-        code:        pkg.slug || pkg.package_id,
+        code:        pkg.package_id,
         slug:        pkg.slug || pkg.package_id,
         displayCode: pkg.package_code || '',
         name:        pkg.name || pkg.package_id,
