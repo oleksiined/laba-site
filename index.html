@@ -6265,23 +6265,24 @@ const NC_CATALOG = {
   categories: [],
 };
 
-// Автоматично додаємо всі пакети з SERVICES до NC_CATALOG
-// щоб buildNCFromCart() міг коректно розпізнавати їх за кодом послуги
+// Додаємо alias-записи в NC_CATALOG за package_id
+// (NC_CATALOG може індексуватись за slug, але cart зберігає package_id)
 // Викликається після завантаження каталогу з Supabase
+// НЕ перезаписує існуючі записи — лише додає відсутні ключі
 function populateNCCatalogFromServices() {
-  const matIdToMat = {};
-  if (typeof NC_CATALOG.materials === 'object') {
-    Object.entries(NC_CATALOG.materials).forEach(([k,v]) => { matIdToMat[k] = k; });
-  }
   Object.values(SERVICES).forEach(svcMat => {
     (svcMat.packages || []).forEach(pkg => {
+      if (!pkg.code) return;
+      if (NC_CATALOG.packages[pkg.code]) return; // вже є — не чіпаємо (included заповнений з Supabase)
+      // Шукаємо існуючий запис за slug або іншим ключем
+      const existing = Object.values(NC_CATALOG.packages).find(p => p.id === pkg.code || p.name === pkg.name);
       NC_CATALOG.packages[pkg.code] = {
         id:         pkg.code,
         name:       pkg.name,
         materialId: pkg.material || 'soil',
         price:      pkg.price,
         termDays:   pkg.days || 5,
-        included:   pkg.indicators || [],
+        included:   existing?.included || [],
       };
     });
   });
