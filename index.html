@@ -3969,17 +3969,21 @@ function srvSetMat(mat, btn) {
     renderTaskFilter(); render();
     return;
   }
-  srvMat = mat; srvTask = '';
+  srvMat = mat; srvTask = ''; srvFmt = 'packages'; srvFmtChosen = false; ALL_TASKS = [];
   document.getElementById('seasonalBtn')?.classList.remove('active');
   document.getElementById('allResearchBtn')?.classList.remove('active');
+  document.querySelectorAll('.fmt-tab').forEach(b=>b.classList.remove('active'));
+  const pkgTab = document.querySelector('.fmt-tab[data-fmt="packages"]');
+  if(pkgTab){ pkgTab.classList.add('active'); }
   const ctx = document.getElementById('srvTaskContext');
-  if(ctx) ctx.style.display = srvFmtChosen ? '' : 'none';
+  if(ctx) ctx.style.display = 'none';
   document.querySelectorAll('.mat-btn').forEach(b=>b.classList.remove('active'));
   const activeBtn = btn || document.querySelector(`.mat-btn[data-mat="${mat}"]`);
   if(activeBtn){ activeBtn.classList.add('active'); activeBtn.blur(); }
   const other = document.getElementById('otherMaterialState');
   if(other) other.classList.toggle('show', mat==='other');
   currentMaterial = mat;
+  buildTasksFromGroups();
   renderTaskFilter();
   render();
 }
