@@ -2335,7 +2335,7 @@ main{flex:1}
     <div class="home-search-container">
     <div class="home-search-bar" id="homeSearchBar">
       <span style="color:var(--text-soft);flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></span>
-      <input type="text" placeholder="Назва, показник або код дослідження" id="homeSearchInput" autocomplete="off"
+      <input type="text" placeholder="Назва, дослідження або код аналізу" id="homeSearchInput" autocomplete="off"
         oninput="hsbOnInput(this.value)"
         onkeydown="hsbOnKey(event)">
       <button class="hsb-clear" id="hsbClear" onclick="hsbClear()" tabindex="-1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
@@ -2580,7 +2580,7 @@ main{flex:1}
         <div class="srv-filter-title" style="font-size:16px">Формат послуги</div>
         <div class="fmt-tabs">
           <button class="fmt-tab active" data-fmt="packages" onclick="srvSetFmt('packages',this)">Пакети</button>
-          <button class="fmt-tab" data-fmt="individual" onclick="srvSetFmt('individual',this)">Окремі показники</button>
+          <button class="fmt-tab" data-fmt="individual" onclick="srvSetFmt('individual',this)">Окремі дослідження</button>
         </div>
       </div>
 
@@ -2604,7 +2604,7 @@ main{flex:1}
       <div class="search-row">
         <div class="search-box">
           <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#9CA3AF" stroke-width="2"/><path d="M20 20l-3-3" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/></svg>
-          <input type="text" id="searchInput" placeholder="Шукати аналіз, показник або проблему..." autocomplete="off">
+          <input type="text" id="searchInput" placeholder="Шукати аналіз, дослідження або проблему..." autocomplete="off">
         </div>
       </div>
 
@@ -2649,8 +2649,8 @@ main{flex:1}
 
       <div class="other-material-state" id="otherMaterialState">
         <div class="other-material-icon">💬</div>
-        <div class="other-material-title">Не знайшли потрібний показник?</div>
-        <div class="other-material-desc">Якщо не знайшли потрібний вам показник — звертайтесь до нас. Ми допоможемо уточнити можливість дослідження та підібрати потрібну послугу.</div>
+        <div class="other-material-title">Не знайшли потрібне дослідження?</div>
+        <div class="other-material-desc">Якщо не знайшли потрібне вам дослідження — звертайтесь до нас. Ми допоможемо уточнити можливість аналізу та підібрати потрібну послугу.</div>
         <button class="btn-primary" onclick="openCallModal()">Звʼязатися з нами</button>
       </div>
 
@@ -3705,7 +3705,7 @@ const TASKS_BY_MAT = {
         const idx = pkgs.length + i;
         html += `<div class="hsb-drop-item" data-idx="${idx}" onclick="hsbGoItem('${item.matCode}','${item.id}',${item.isPackage})">
           <div class="hsb-drop-icon">${ICON_INDIVIDUAL}</div>
-          <div><div class="hsb-drop-name">${item.name}</div><div class="hsb-drop-sub">${item.mat} · Окремий показник</div></div>
+          <div><div class="hsb-drop-name">${item.name}</div><div class="hsb-drop-sub">${item.mat} · Окреме дослідження</div></div>
           <div class="hsb-drop-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
         </div>`;
       });
@@ -4624,7 +4624,7 @@ function makeRow(item, type){
       ${item.desc?`<div class="service-short" style="margin-top:2px">${item.desc}</div>`:''}
       <div class="srv-meta-row" style="margin-top:6px;margin-bottom:0">
         ${daysText?`<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>${daysText}</span>`:''}
-        ${item.tags?.length?(()=>{const n=item.tags.length;const s=n===1?'показник':n<5?'показники':'показників';return `<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M7 10h6M10 7v6" stroke-linecap="round"/></svg>${n} ${s}</span>`;})():''}
+        ${item.tags?.length?(()=>{const n=item.tags.length;const s=n<5?'дослідження':'досліджень';return `<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M7 10h6M10 7v6" stroke-linecap="round"/></svg>${n} ${s}</span>`;})():''}
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end" onclick="event.stopPropagation()">
@@ -4694,10 +4694,10 @@ function makeRow(item, type){
     </div>
     <!-- Чіпи елементів пакету -->
     ${tagsHtml ? `<div style="margin-bottom:14px">
-      <div style="font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Показники пакету · ${item.tags.length}</div>
+      <div style="font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Дослідження пакету · ${item.tags.length}</div>
       ${tagsHtml}
     </div>` : (item.params?.length ? `<div style="margin-bottom:14px">
-      <div style="font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Показники пакету · ${item.params.length}</div>
+      <div style="font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Дослідження пакету · ${item.params.length}</div>
       <div class="service-tags">${item.params.map(p=>`<span class="service-tag">${p}</span>`).join('')}</div>
     </div>` : '')}
     <!-- Показники (з тултіпами якщо є indicators) -->
@@ -5356,7 +5356,7 @@ function spRenderRow(idx) {
             value="${s.name}" oninput="samples[${idx}].name=this.value;spUpdateSidebar()">
         </div>
         <div class="sp-tags">
-          <span class="sp-tag-pkg">${s.basePkg} · ${(() => { const pkg = Object.values(SERVICES).flatMap(m=>m.packages||[]).find(p=>p.code===s.itemCode); return pkg?.params?.length || 28; })()} показників</span>
+          <span class="sp-tag-pkg">${s.basePkg} · ${(() => { const pkg = Object.values(SERVICES).flatMap(m=>m.packages||[]).find(p=>p.code===s.itemCode); return pkg?.params?.length || 28; })()} досліджень</span>
           ${isSoil ? `<button class="sp-btn-add" onclick="spTogglePicker(${idx})">+ Додати показники</button>` : ''}
           ${chips}
         </div>
