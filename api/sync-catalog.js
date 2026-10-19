@@ -129,6 +129,7 @@ async function syncCatalog(debug = false) {
       name:                 r.name                 || null,
       short_name:           r.short_name           || null,
       symbol:               r.symbol               || null,
+      chips:                r.chips                || null,
       short_description:    r.short_description    || null,
       price:                r.price != null        ? Number(r.price) : null,
       currency:             r.currency             || 'UAH',

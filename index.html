@@ -6945,16 +6945,20 @@ async function loadCatalogFromSupabase() {
       }
     }
 
-    // ── Build service_id → symbol map + symbol → name map ──
-    const svcSymbol = {};
+    // ── Build service_id → chips[] map (з колонки chips в таблиці Services) ──
+    const svcChips = {}; // service_id → ['chip1', 'chip2', ...]
+    const svcSymbol = {}; // залишаємо для сумісності з popover
     const svcSymbolName = {};
     for (const svc of services) {
-      if (svc.service_id) {
-        // symbol → short_name → перше слово name (щоб чипи завжди були)
-        const sym = svc.symbol || svc.short_name || (svc.name||'').split(' ')[0] || svc.service_id;
-        svcSymbol[svc.service_id] = sym;
-        if (!svcSymbolName[sym]) svcSymbolName[sym] = svc.name || sym;
+      if (!svc.service_id) continue;
+      // chips — рядок через кому: "pH активний, Фосфор (P), K"
+      if (svc.chips) {
+        svcChips[svc.service_id] = svc.chips.split(',').map(c => c.trim()).filter(Boolean);
       }
+      // symbol для popover (залишаємо)
+      const sym = svc.symbol || svc.short_name || svc.service_id;
+      svcSymbol[svc.service_id] = sym;
+      if (!svcSymbolName[sym]) svcSymbolName[sym] = svc.name || sym;
     }
 
     // ── Build method_id → method object + service_id → methods array ──
@@ -6988,25 +6992,21 @@ async function loadCatalogFromSupabase() {
       svcSymbolData[svc.symbol] = { name: svc.name || svc.symbol, method: dm };
     }
 
-    // ── Helper: get unique symbol objects {s, name, method} for a package ──
-    // Використовує method_id з Package Items (точний метод пакета), fallback — дефолт сервісу
+    // ── Helper: get unique chip strings for a package (з колонки chips сервісів) ──
     const pkgTags = (pkgId) => {
       const pis = pkgItemsFull[pkgId] || [];
       const seen = new Set();
-      return pis
-        .filter(pi => {
-          const sym = svcSymbol[pi.service_id];
-          return sym && !seen.has(sym) && seen.add(sym);
-        })
-        .map(pi => {
-          const sym = svcSymbol[pi.service_id];
-          const svcData = svcSymbolData[sym] || {};
-          const method = (pi.method_id && methodById[pi.method_id])
-            || svcDefaultMethod[pi.service_id]
-            || (svcMethods[pi.service_id] || [])[0]
-            || null;
-          return { s: sym, name: svcData.name || sym, method };
-        });
+      const result = [];
+      for (const pi of pis) {
+        const chips = svcChips[pi.service_id] || [];
+        for (const chip of chips) {
+          if (!seen.has(chip)) {
+            seen.add(chip);
+            result.push({ s: chip, name: chip, method: null });
+          }
+        }
+      }
+      return result;
     };
 
     // ── Оновлюємо NC_CATALOG.packages ──
