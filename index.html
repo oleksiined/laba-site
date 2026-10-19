@@ -7088,7 +7088,7 @@ async function loadCatalogFromSupabase() {
         tags:     pkgTags(pkg.package_id), tasks:[], params:[], bundles:[],
         groups:   pkg.package_group ? [pkg.package_group] : [],
         desc:     pkg.short_description || '',
-        descRich: pkg.full_description || '',
+        descRich: pkg.full_description || pkg.short_description || '',
         keywords: pkg.search_keywords || '',
         popular:  pkg.sort_order != null ? Math.max(0, 100 - pkg.sort_order) : 50,
       });
@@ -7106,7 +7106,7 @@ async function loadCatalogFromSupabase() {
         price:    svc.price,
         material: _matKeyToLabel[mk] || mk,
         desc:     svc.short_description || '',
-        descRich: svc.full_description || '',
+        descRich: svc.full_description || svc.short_description || '',
         keywords: svc.search_keywords || '',
         groups:   svc.group_name ? [svc.group_name] : [],
         methods:  svcMethods[svc.service_id] || [],
