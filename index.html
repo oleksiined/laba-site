@@ -4616,6 +4616,7 @@ function makeRow(item, type){
       </div>
       <div class="service-name">${item.name}</div>
       ${item.desc?`<div class="service-short" style="margin-top:2px">${item.desc}</div>`:''}
+      ${tagsHtml ? `<div style="margin-top:6px">${tagsHtml}</div>` : ''}
       <div class="srv-meta-row" style="margin-top:6px;margin-bottom:0">
         ${daysText?`<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>${daysText}</span>`:''}
       </div>
@@ -4686,8 +4687,14 @@ function makeRow(item, type){
       </button>
     </div>
     <!-- Чіпи елементів пакету -->
-    ${tagsHtml ? `<div style="margin-bottom:10px"><div style="font-size:12px;color:var(--text-soft);margin-bottom:6px">${item.tags.length} показників дослідження:</div>${tagsHtml}</div>` : ''}
-    <!-- Показники -->
+    ${tagsHtml ? `<div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Показники пакету · ${item.tags.length}</div>
+      ${tagsHtml}
+    </div>` : (item.params?.length ? `<div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Показники пакету · ${item.params.length}</div>
+      <div class="service-tags">${item.params.map(p=>`<span class="service-tag">${p}</span>`).join('')}</div>
+    </div>` : '')}
+    <!-- Показники (з тултіпами якщо є indicators) -->
     ${(item.indicators?.length||item.params?.length) ? renderParamChips(item) : ''}
     <!-- Приклад протоколу (внизу) -->
     <div style="margin-top:12px">
