@@ -7014,12 +7014,13 @@ async function loadCatalogFromSupabase() {
       const result = [];
       for (const pi of pis) {
         const chips = svcChips[pi.service_id] || [];
-        const sym = svcSymbol[pi.service_id];
-        const sd = svcSymbolData[sym] || {};
+        const _sym = svcSymbol[pi.service_id];
+        const _name = svcSymbolName[_sym] || _sym || chip;
+        const _dm = svcDefaultMethod[pi.service_id] || (svcMethods[pi.service_id] || [])[0] || null;
         for (const chip of chips) {
           if (!seen.has(chip)) {
             seen.add(chip);
-            result.push({ s: chip, name: sd.name || chip, method: sd.method || null });
+            result.push({ s: chip, name: _name || chip, method: _dm });
           }
         }
       }
