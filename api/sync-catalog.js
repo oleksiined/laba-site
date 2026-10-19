@@ -170,9 +170,10 @@ async function syncCatalog(debug = false) {
       synced_at:        now,
     }));
 
-  // ── Methods ──
+  // ── Methods ── (дедублікуємо по method_id — Sheet може мати дублі)
+  const _methSeen = new Set();
   const methRows = methods
-    .filter(r => r.method_id)
+    .filter(r => { if (!r.method_id || _methSeen.has(r.method_id)) return false; _methSeen.add(r.method_id); return true; })
     .map(r => ({
       method_id:               r.method_id,
       service_id:              r.service_id              || null,
