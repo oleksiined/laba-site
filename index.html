@@ -6267,24 +6267,25 @@ const NC_CATALOG = {
 
 // Автоматично додаємо всі пакети з SERVICES до NC_CATALOG
 // щоб buildNCFromCart() міг коректно розпізнавати їх за кодом послуги
-(function() {
-  const matCodeToId = { '01':'soil', '05':'water', '06':'plant', '02':'fertilizer', '03':'seeds', '04':'grain' };
+// Викликається після завантаження каталогу з Supabase
+function populateNCCatalogFromServices() {
+  const matIdToMat = {};
+  if (typeof NC_CATALOG.materials === 'object') {
+    Object.entries(NC_CATALOG.materials).forEach(([k,v]) => { matIdToMat[k] = k; });
+  }
   Object.values(SERVICES).forEach(svcMat => {
     (svcMat.packages || []).forEach(pkg => {
-      if (!NC_CATALOG.packages[pkg.code]) {
-        const prefix = (pkg.code || '').split('-')[0];
-        NC_CATALOG.packages[pkg.code] = {
-          id: pkg.code,
-          name: pkg.name,
-          materialId: matCodeToId[prefix] || 'soil',
-          price: pkg.price,
-          termDays: pkg.days || 5,
-          included: pkg.indicators || [],
-        };
-      }
+      NC_CATALOG.packages[pkg.code] = {
+        id:         pkg.code,
+        name:       pkg.name,
+        materialId: pkg.material || 'soil',
+        price:      pkg.price,
+        termDays:   pkg.days || 5,
+        included:   pkg.indicators || [],
+      };
     });
   });
-})();
+}
 
 function nc_findInd(id) {
   for (const cat of NC_CATALOG.categories) {
@@ -6378,9 +6379,10 @@ function nc_groups() {
   });
   return order.map(k => {
     const g = map.get(k);
-    const p = NC_CATALOG.packages[g.pkg] || NS_CAT.packages[g.pkg] || { price:0, included:[] };
+    const _cartItemLookup = (cart||[]).find(c=>c.code===g.pkg&&c.type==='pkg');
+    const p = NC_CATALOG.packages[g.pkg] || NS_CAT.packages[g.pkg] || _cartItemLookup || { price:0, included:[] };
     const extraCost = g.add.reduce((a, id) => { const i = nc_findInd(id) || ns_findInd(id); return a + (i ? i.price : 0); }, 0);
-    g.unitPrice = p.price + extraCost;
+    g.unitPrice = (p.price || 0) + extraCost;
     g.qty = g.ids.length;
     g.total = g.unitPrice * g.qty;
     return g;
@@ -6390,7 +6392,8 @@ function nc_groups() {
 function nc_totals(gs) {
   let pkgSum = 0, addSum = 0, addSlots = 0;
   gs.forEach(g => {
-    pkgSum += (NC_CATALOG.packages[g.pkg] || { price:0 }).price * g.qty;
+    const _pkg = NC_CATALOG.packages[g.pkg] || (cart||[]).find(c=>c.code===g.pkg&&c.type==='pkg') || { price:0 };
+    pkgSum += (_pkg.price || 0) * g.qty;
     g.add.forEach(id => { const i = nc_findInd(id); if (i) { addSum += i.price * g.qty; addSlots += g.qty; } });
   });
   const sub = pkgSum + addSum;
@@ -6430,7 +6433,7 @@ function copyGroup(k) {
 // ══════════════════════════════════════════
 // РЕНДЕР
 // ══════════════════════════════════════════
-function nc_fmt(n) { return n != null ? n.toLocaleString('uk-UA') + '00a0грн' : 'Уточнити'; }
+function nc_fmt(n) { return n != null ? n.toLocaleString('uk-UA') + ' грн' : 'Уточнити'; }
 function nc_noun(n) {
   if (n % 10 === 1 && n % 100 !== 11) return n + ' зразок';
   if ([2,3,4].includes(n%10) && ![12,13,14].includes(n%100)) return n + ' зразки';
@@ -6491,7 +6494,8 @@ function renderGroups(gs) {
   const stepbarShow = document.querySelector('.nc-stepbar');
   if (stepbarShow) stepbarShow.style.display = '';
   el.innerHTML = gs.map(g => {
-    const p = NC_CATALOG.packages[g.pkg] || { name:'(невідомий пакет)', price:0, termDays:0 };
+    const _cartItem = (cart||[]).find(c => c.code === g.pkg && c.type === 'pkg');
+    const p = NC_CATALOG.packages[g.pkg] || { name: _cartItem?.name || g.pkg || '(невідомий пакет)', price: _cartItem?.price || 0, termDays: 0 };
     const m = NC_CATALOG.materials[g.mat] || { name: g.mat };
     const inds = g.add.map(nc_findInd).filter(Boolean);
     const k = encodeURIComponent(g.sig);
@@ -7137,6 +7141,7 @@ async function loadCatalogFromSupabase() {
       });
     }
 
+    if (typeof populateNCCatalogFromServices === 'function') try { populateNCCatalogFromServices(); } catch(e) {}
     if (typeof buildTasksFromGroups === 'function') try { buildTasksFromGroups(); } catch(e) {}
     if (typeof renderTaskFilter === 'function') try { renderTaskFilter(); } catch(e) {}
     if (typeof render === 'function') try { render(); } catch(e) {}
@@ -8626,11 +8631,12 @@ function buildNCFromCart() {
   const pkgFallback = 'basic_checkup';
   const matMap = { soil:'soil', plant:'plant', water:'water', fertilizer:'fertilizer', seeds:'seeds', grain:'grain' };
   function resolvePackageId(code) {
-    if (!code) return pkgFallback;
+    if (!code) return code || pkgFallback;
     if (NC_CATALOG.packages[code]) return code;
     const clean = code.toLowerCase().replace(/[-\s]/g, '_');
     if (NC_CATALOG.packages[clean]) return clean;
-    return pkgFallback;
+    // Return original code — cart renderer will show package name from cart item if not found
+    return code;
   }
 
   NC_S.samples = [];
