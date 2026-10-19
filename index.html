@@ -7113,7 +7113,7 @@ async function loadCatalogFromSupabase() {
         price:    svc.price,
         material: _matKeyToLabel[mk] || mk,
         desc:     svc.short_description || '',
-        descRich: svc.full_description || svc.short_description || '',
+        descRich: svc.full_description || '',
         keywords: svc.search_keywords || '',
         groups:   svc.group_name ? [svc.group_name] : [],
         methods:  svcMethods[svc.service_id] || [],
