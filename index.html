@@ -7102,7 +7102,7 @@ async function loadCatalogFromSupabase() {
       SERVICES[sk].individual.push({
         code:        svc.service_id,
         slug:        svc.slug || svc.service_id,
-        displayCode: svc.service_code || '',
+        displayCode: svc.service_id || '',
         name:        svc.name || svc.service_id,
         price:    svc.price,
         material: _matKeyToLabel[mk] || mk,
