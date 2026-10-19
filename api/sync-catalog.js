@@ -141,6 +141,7 @@ async function syncCatalog(debug = false) {
       billing_unit:         r.billing_unit         || null,
       vat_included:         toBool(r.vat_included, false),
       min_samples_count:    r.min_samples_count    ? Number(r.min_samples_count) : null,
+      search_keywords:      r.search_keywords      || null,
       synced_at:            now,
     }));
 
@@ -164,6 +165,7 @@ async function syncCatalog(debug = false) {
       is_seasonal:      toBool(r.is_seasonal, false),
       billing_unit:     r.billing_unit     || null,
       vat_included:     toBool(r.vat_included, false),
+      search_keywords:  r.search_keywords  || null,
       synced_at:        now,
     }));
 

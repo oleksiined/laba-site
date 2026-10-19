@@ -4140,7 +4140,7 @@ function getSrvItems(){
     const expandedQ = expandSearchQuery(searchQ);
     const qWords = expandedQ.split(/\s+/).filter(Boolean);
     items=items.filter(i=>{
-      const haystack=(i.name+' '+i.desc+' '+i.descRich+' '+(i.params||[]).join(' ')+' '+(i.groups||[]).join(' ')).toLowerCase();
+      const haystack=(i.name+' '+i.desc+' '+i.descRich+' '+(i.keywords||'')+' '+(i.params||[]).join(' ')+' '+(i.groups||[]).join(' ')).toLowerCase();
       return qWords.some(w=>haystack.includes(w));
     });
   }
@@ -7080,6 +7080,7 @@ async function loadCatalogFromSupabase() {
         groups:   pkg.package_group ? [pkg.package_group] : [],
         desc:     pkg.short_description || '',
         descRich: pkg.full_description || pkg.short_description || '',
+        keywords: pkg.search_keywords || '',
         popular:  pkg.sort_order != null ? Math.max(0, 100 - pkg.sort_order) : 50,
       });
     }
@@ -7097,6 +7098,7 @@ async function loadCatalogFromSupabase() {
         material: _matKeyToLabel[mk] || mk,
         desc:     svc.short_description || '',
         descRich: svc.full_description || svc.short_description || '',
+        keywords: svc.search_keywords || '',
         groups:   svc.group_name ? [svc.group_name] : [],
         methods:  svcMethods[svc.service_id] || [],
       });
