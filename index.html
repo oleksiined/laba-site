@@ -377,6 +377,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .chip-pop-mname{font-size:13px;font-weight:700;color:var(--navy)}
 .chip-pop-std{font-size:12px;color:var(--text-soft);margin-top:2px;margin-bottom:8px}
 .chip-pop-link{font-size:12px;font-weight:600;color:var(--t2);text-decoration:none}
+.chip-pop-desc-text{font-size:12px;color:var(--text);line-height:1.55;max-width:260px}
 .service-header-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
 .service-price{font-size:15px;font-weight:700;color:var(--navy);white-space:nowrap}
 .service-cart-btn{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;color:var(--text-soft);flex-shrink:0;cursor:pointer;transition:border-color .15s,color .15s,background .15s}
@@ -4526,7 +4527,7 @@ function makeRow(item, type){
         ${item.material?`<div class="srv-material-badge">Матеріал: ${item.material}</div>`:''}
       </div>
       <div class="service-name">${item.name}</div>
-      ${item.desc?`<div class="service-short" style="margin-top:2px;cursor:default" data-tooltip="${(item.descRich||item.desc).replace(/"/g,'&quot;')}">${item.desc}</div>`:''}
+      ${item.desc?`<div class="service-short" style="margin-top:2px;cursor:default" data-pkg-desc="${(item.descRich||item.desc).replace(/"/g,'&quot;')}">${item.desc}</div>`:''}
       <div class="srv-meta-row" style="margin-top:6px;margin-bottom:0">
         ${indDaysText?`<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>${indDaysText}</span>`:''}
       </div>
@@ -4625,7 +4626,7 @@ function makeRow(item, type){
         ${materialBadge}
       </div>
       <div class="service-name">${item.name}</div>
-      ${item.desc?`<div class="service-short" style="margin-top:2px;cursor:default" data-tooltip="${(item.descRich||item.desc).replace(/"/g,'&quot;')}">${item.desc}</div>`:''}
+      ${item.desc?`<div class="service-short" style="margin-top:2px;cursor:default" data-pkg-desc="${(item.descRich||item.desc).replace(/"/g,'&quot;')}">${item.desc}</div>`:''}
       <div class="srv-meta-row" style="margin-top:6px;margin-bottom:0">
         ${daysText?`<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>${daysText}</span>`:''}
         ${item.tags?.length?(()=>{const n=item.tags.length;const s=n<5?'дослідження':'досліджень';return `<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M7 10h6M10 7v6" stroke-linecap="round"/></svg>${n} ${s}</span>`;})():''}
@@ -6070,6 +6071,17 @@ function saveOrderToHistory(order) {
     }catch(e){}
   });
   document.addEventListener('mouseout',e=>{ if(e.target.closest('[data-chip-json]')&&_cp)_cp.classList.remove('show'); });
+
+  // ── Pkg description popover (same white style as chipPopover) ──
+  document.addEventListener('mouseover',e=>{
+    const el=e.target.closest('[data-pkg-desc]');
+    if(!el||!_cp)return;
+    _cp.innerHTML=`<div class="chip-pop-desc-text">${el.dataset.pkgDesc}</div>`;
+    _cp.classList.add('show');
+    _positionChipPop(el);
+  });
+  document.addEventListener('mouseout',e=>{ if(e.target.closest('[data-pkg-desc]')&&_cp)_cp.classList.remove('show'); });
+
   document.addEventListener('scroll',()=>{ if(_cp)_cp.classList.remove('show'); },{passive:true});
 })();
 
