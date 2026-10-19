@@ -7073,7 +7073,7 @@ async function loadCatalogFromSupabase() {
     const _matKeyToLabel   = { soil:'Ґрунт', water:'Вода', fertilizer:'Добрива', seeds:'Насіння', grain:'Зерно', plant:'Рослини' };
     Object.values(SERVICES).forEach(s => { s.packages = []; s.individual = []; });
     for (const pkg of packages) {
-      if (pkg.status && pkg.status !== 'active') continue;
+      if (pkg.status !== 'active') continue;
       const mk = _matIdToKey[pkg.material_id] || 'soil';
       const sk = _matKeyToSvcKey[mk] || mk;
       if (!SERVICES[sk]) continue;
@@ -7094,7 +7094,7 @@ async function loadCatalogFromSupabase() {
       });
     }
     for (const svc of services) {
-      if (svc.status && svc.status !== 'active') continue;
+      if (svc.status !== 'active') continue;
       if (svc.orderable_standalone === false) continue;
       const mk = _matIdToKey[svc.material_id] || 'soil';
       const sk = _matKeyToSvcKey[mk] || mk;
