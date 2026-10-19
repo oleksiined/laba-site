@@ -3519,6 +3519,68 @@ let currentFmt = 'all';
 let currentTask = '';
 let currentSort = 'popular';
 let searchQ = '';
+
+// Словник синонімів для пошуку: ключ → масив слів які розширюють запит
+const SEARCH_SYNONYMS = {
+  // Ґрунт
+  'грунт': ['ґрунт', 'грунт', 'земля', 'почва', 'soil'],
+  'ґрунт': ['ґрунт', 'грунт', 'земля', 'почва', 'soil'],
+  'чекап': ['чекап', 'аналіз', 'дослідження', 'перевірка', 'checkup'],
+  'аналіз': ['аналіз', 'дослідження', 'перевірка', 'чекап', 'тест'],
+  // Хімічні елементи та показники
+  'азот': ['азот', 'nitrogen', 'n', 'нітрат', 'нітроген', 'амоній', 'no3', 'nh4'],
+  'нітрат': ['нітрат', 'no3', 'азот', 'nitrogen'],
+  'фосфор': ['фосфор', 'phosphorus', 'p', 'p2o5', 'фосфати'],
+  'калій': ['калій', 'potassium', 'k', 'k2o', 'калі'],
+  'гумус': ['гумус', 'humus', 'органіка', 'органічна речовина', 'org'],
+  'ph': ['ph', 'кислотність', 'реакція', 'лужність', 'кисл'],
+  'кислотність': ['кислотність', 'ph', 'реакція середовища', 'лужність'],
+  'солі': ['солі', 'засоленість', 'ec', 'провідність', 'електропровідність'],
+  'мікроелементи': ['мікроелементи', 'мікро', 'залізо', 'марганець', 'цинк', 'мідь', 'бор', 'fe', 'mn', 'zn', 'cu', 'b'],
+  'залізо': ['залізо', 'fe', 'iron'],
+  'марганець': ['марганець', 'mn', 'manganese'],
+  'цинк': ['цинк', 'zn', 'zinc'],
+  'мідь': ['мідь', 'cu', 'copper'],
+  'бор': ['бор', 'b', 'boron'],
+  'кальцій': ['кальцій', 'ca', 'calcium'],
+  'магній': ['магній', 'mg', 'magnesium'],
+  'сірка': ['сірка', 's', 'sulfur', 'сульфат'],
+  // Вода
+  'вода': ['вода', 'water', 'зрошення', 'полив', 'свердловина', 'криниця'],
+  'питна': ['питна', 'питної якості', 'водопостачання', 'drinking'],
+  // Добрива
+  'добриво': ['добриво', 'добрива', 'fertilizer', 'мінеральне', 'органічне', 'NPK'],
+  'npk': ['npk', 'добриво', 'азот фосфор калій', 'мінеральне'],
+  // Насіння
+  'насіння': ['насіння', 'seed', 'посівний матеріал', 'схожість', 'germination'],
+  'схожість': ['схожість', 'проростання', 'germination', 'схожісь насіння'],
+  // Зерно
+  'зерно': ['зерно', 'grain', 'пшениця', 'кукурудза', 'ячмінь', 'соя', 'соняшник'],
+  'клейковина': ['клейковина', 'gluten', 'білок', 'protein'],
+  // Рослини
+  'рослина': ['рослина', 'рослини', 'plant', 'листя', 'листкова', 'листова діагностика'],
+  'листова': ['листова', 'листова діагностика', 'plant', 'рослини'],
+  // Загальні
+  'базовий': ['базовий', 'базова', 'стандарт', 'основний', 'мінімальний'],
+  'повний': ['повний', 'повна', 'розширений', 'комплексний', 'детальний'],
+  'агрохімія': ['агрохімія', 'агрохімічний', 'agrochemical', 'родючість', 'fertility'],
+  'родючість': ['родючість', 'fertility', 'агрохімія', 'гумус', 'поживні'],
+  'важкі метали': ['важкі метали', 'свинець', 'кадмій', 'pb', 'cd', 'хром', 'cr', 'нікель', 'ni'],
+};
+
+function expandSearchQuery(q) {
+  if(!q) return '';
+  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const expanded = new Set(words);
+  for(const word of words){
+    for(const [key, syns] of Object.entries(SEARCH_SYNONYMS)){
+      if(key.includes(word) || word.includes(key)){
+        syns.forEach(s => expanded.add(s.toLowerCase()));
+      }
+    }
+  }
+  return [...expanded].join(' ');
+}
 let cart = [];
 let paramNotes = {};
 let samples = [];
@@ -4074,7 +4136,14 @@ function getSrvItems(){
   }
   let items = [...pkgs,...inds];
   if(srvTask && srvTask!=='all') items=items.filter(i=>i.groups&&i.groups.includes(srvTask));
-  if(searchQ) items=items.filter(i=>(i.name+' '+i.desc+' '+(i.params||[]).join(' ')).toLowerCase().includes(searchQ));
+  if(searchQ){
+    const expandedQ = expandSearchQuery(searchQ);
+    const qWords = expandedQ.split(/\s+/).filter(Boolean);
+    items=items.filter(i=>{
+      const haystack=(i.name+' '+i.desc+' '+i.descRich+' '+(i.params||[]).join(' ')+' '+(i.groups||[]).join(' ')).toLowerCase();
+      return qWords.some(w=>haystack.includes(w));
+    });
+  }
   if(currentSort==='price_asc') items.sort((a,b)=>(a.price||0)-(b.price||0));
   else if(currentSort==='price_desc') items.sort((a,b)=>(b.price||0)-(a.price||0));
   else if(currentSort==='popular') items.sort((a,b)=>(b.popular||0)-(a.popular||0));
