@@ -4614,7 +4614,7 @@ function makeRow(item, type){
   const paramsCount = item.params?.length || 0;
   const daysText = item.days ? `${item.days} роб. днів` : '';
   const materialBadge = item.material ? `<div class="srv-material-badge">Матеріал: ${item.material}</div>` : '';
-  const tagsHtml = item.tags?.length ? `<div class="service-tags">${item.tags.map(t=>{const sym=t?.s||t; const chipData=JSON.stringify({name:t?.name||sym,tooltip:t?.tooltip||null,method:t?.method||null}).replace(/"/g,'&quot;'); return `<span class="service-tag" data-chip-json="${chipData}" style="cursor:help">` + sym + `</span>`;}).join('')}</div>` : '';
+  const tagsHtml = item.tags?.length ? `<div class="service-tags">${item.tags.map(t=>{const sym=t?.s||t; const chipData=JSON.stringify({name:t?.name||sym,tooltip:t?.tooltip||null,method:t?.method||null}).replace(/"/g,'&quot;'); return `<span class="service-tag" data-chip-json="${chipData}">` + sym + `</span>`;}).join('')}</div>` : '';
 
   return `
 <div class="service-row" id="srow-${safeCode}" data-slug="${itemSlug}">
