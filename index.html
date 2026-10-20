@@ -2408,6 +2408,68 @@ main{flex:1}
 .adm-stub{padding:48px 22px;text-align:center;color:var(--text-soft)}
 .adm-stub-icon{font-size:38px;margin-bottom:10px}
 .adm-stub-title{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:5px}
+/* ── DASHBOARD ── */
+.adm-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+.adm-card-head{font-size:13px;font-weight:600;color:var(--text-dark);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.adm-dash-grid{display:grid;grid-template-columns:1fr 310px;gap:16px;padding:0 20px 20px}
+.adm-dash-col{display:flex;flex-direction:column;gap:16px}
+.adm-stat-bar{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)}
+.adm-stat-bar:last-child{border-bottom:none}
+.adm-stat-bar-lbl{font-size:12.5px;color:var(--text-mid)}
+.adm-stat-bar-val{font-size:12.5px;font-weight:600}
+.adm-dash-act-item{display:flex;gap:8px;padding:4px 0;font-size:11.5px;border-bottom:1px solid var(--border)}
+.adm-dash-act-item:last-child{border-bottom:none}
+.adm-dash-act-dot{width:7px;height:7px;border-radius:50%;background:var(--neon-dark);margin-top:4px;flex-shrink:0}
+/* ── QUICK FILTER CHIPS ── */
+.adm-qchips{padding:0 20px 10px;display:flex;gap:7px;flex-wrap:wrap}
+.adm-qchip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);font-size:12px;color:var(--text-mid);cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.adm-qchip:hover{border-color:var(--neon-dark);color:var(--text-dark)}
+.adm-qchip.active{border-color:var(--navy);background:var(--navy);color:#fff}
+.adm-qchip .adm-qchip-cnt{background:#F3F4F6;color:var(--text-soft);border-radius:10px;padding:0 6px;font-size:11px;font-weight:600}
+.adm-qchip.active .adm-qchip-cnt{background:rgba(255,255,255,.2);color:#fff}
+/* ── MATERIAL PILLS ── */
+.adm-mat{display:inline-block;padding:1px 7px;border-radius:4px;font-size:10.5px;font-weight:500;white-space:nowrap}
+.adm-mat-soil{background:#FEF3C7;color:#92400E}
+.adm-mat-plant{background:#D1FAE5;color:#065F46}
+.adm-mat-water{background:#DBEAFE;color:#1D4ED8}
+.adm-mat-grain{background:#FDE68A;color:#78350F}
+.adm-mat-fert{background:#EDE9FE;color:#5B21B6}
+.adm-mat-oil{background:#FCE7F3;color:#9D174D}
+/* ── SAMPLE STATUS ── */
+.adm-sst-received{background:#ECFDF5;color:#10B981}
+.adm-sst-waiting{background:#FEF9C3;color:#CA8A04}
+.adm-sst-work{background:#EFF6FF;color:#3B82F6}
+.adm-sst-done{background:#ECFDF5;color:#10B981}
+.adm-sst-new{background:#F3F4F6;color:#6B7280}
+/* ── PANEL MULTI-CONTENT ── */
+.adm-panel-body{display:none}
+.adm-panel-body.active{display:block}
+/* ── TESTS LIST ── */
+.adm-test-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px}
+.adm-test-row:last-child{border-bottom:none}
+.adm-test-name{color:var(--text-mid)}
+/* ── CLIENT AVATAR ── */
+.adm-cli-avatar{width:36px;height:36px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+/* ── DOCS ── */
+.adm-doc-type{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:500;background:#F3F4F6;color:#6B7280}
+/* ── SETTINGS ── */
+.adm-sett-wrap{padding:0 20px 20px;max-width:680px}
+.adm-sett-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:14px}
+.adm-sett-card-title{font-size:14px;font-weight:600;color:var(--text-dark);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.adm-sett-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
+.adm-sett-field{display:flex;flex-direction:column;gap:4px}
+.adm-sett-lbl{font-size:11.5px;color:var(--text-soft);font-weight:500}
+.adm-sett-inp{padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;color:var(--text-dark);font-family:inherit;outline:none;background:var(--white);width:100%;box-sizing:border-box}
+.adm-sett-inp:focus{border-color:var(--neon-dark)}
+.adm-sett-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)}
+.adm-sett-toggle-row:last-child{border-bottom:none}
+.adm-sett-toggle-lbl{font-size:13px;color:var(--text-mid)}
+.adm-sett-toggle-sub{font-size:11px;color:var(--text-soft)}
+.adm-sett-save{margin-top:14px;display:flex;gap:8px}
+.adm-btn-primary{padding:8px 16px;background:var(--navy);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s}
+.adm-btn-primary:hover{background:#1a2e5a}
+.adm-btn-sec{padding:8px 16px;background:var(--white);color:var(--text-mid);border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}
+.adm-btn-sec:hover{border-color:var(--navy);color:var(--navy)}
 
 @media(max-width:1100px){
   .adm-panel{position:fixed;right:0;top:0;bottom:0;z-index:300;box-shadow:-4px 0 24px rgba(0,0,0,.12)}
@@ -3314,26 +3376,254 @@ main{flex:1}
         </div>
       </div>
 
-      <!-- STUB TABS -->
+      <!-- ── DASHBOARD TAB ── -->
       <div class="adm-subtab" id="admtab-dashboard">
-        <div class="adm-topbar"><div><div class="adm-page-title">Dashboard</div><div class="adm-page-sub">Загальна аналітика та статистика</div></div></div>
-        <div class="adm-stub"><div class="adm-stub-icon">📊</div><div class="adm-stub-title">Dashboard у розробці</div><div>Тут буде аналітика та ключові метрики</div></div>
+        <div class="adm-topbar">
+          <div><div class="adm-page-title">Dashboard</div><div class="adm-page-sub">Загальна аналітика та статистика</div></div>
+        </div>
+        <div class="adm-stats" style="padding:0 20px 16px">
+          <div class="adm-stat"><div class="adm-stat-val" id="dashN">8</div><div class="adm-stat-lbl">Нові замовлення</div></div>
+          <div class="adm-stat"><div class="adm-stat-val" id="dashW" style="color:#CA8A04">12</div><div class="adm-stat-lbl">Очікують зразки</div></div>
+          <div class="adm-stat"><div class="adm-stat-val" id="dashP" style="color:#3B82F6">14</div><div class="adm-stat-lbl">У роботі</div></div>
+          <div class="adm-stat"><div class="adm-stat-val" id="dashD" style="color:#10B981">28</div><div class="adm-stat-lbl">Готові</div></div>
+        </div>
+        <div class="adm-dash-grid">
+          <div class="adm-card">
+            <div class="adm-card-head">Останні замовлення</div>
+            <table class="adm-table">
+              <thead><tr><th>№ замовлення</th><th>Клієнт</th><th>Зразки</th><th>Статус</th><th>Дата</th></tr></thead>
+              <tbody id="dashRecentBody"></tbody>
+            </table>
+          </div>
+          <div class="adm-dash-col">
+            <div class="adm-card">
+              <div class="adm-card-head">По статусах</div>
+              <div id="dashStatusBreak"></div>
+            </div>
+            <div class="adm-card">
+              <div class="adm-card-head">Остання активність</div>
+              <div id="dashActBody"></div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- ── SAMPLES TAB ── -->
       <div class="adm-subtab" id="admtab-samples">
-        <div class="adm-topbar"><div><div class="adm-page-title">Зразки</div><div class="adm-page-sub">Контроль отримання та обробки зразків</div></div></div>
-        <div class="adm-stub"><div class="adm-stub-icon">🧪</div><div class="adm-stub-title">Зразки у розробці</div><div>Облік та відстеження зразків</div></div>
+        <div class="adm-topbar">
+          <div><div class="adm-page-title">Зразки</div><div class="adm-page-sub">Реєстр зразків — очікувані, отримані та готові</div></div>
+          <button class="adm-btn-primary" onclick="alert('Функція у розробці')">+ Новий зразок</button>
+        </div>
+        <div class="adm-qchips" id="smpQChips">
+          <button class="adm-qchip active" onclick="smpQF('',this)">Всі зразки <span class="adm-qchip-cnt" id="smpCntAll">0</span></button>
+          <button class="adm-qchip" onclick="smpQF('waiting',this)">Очікується <span class="adm-qchip-cnt" id="smpCntWait">0</span></button>
+          <button class="adm-qchip" onclick="smpQF('work',this)">У роботі <span class="adm-qchip-cnt" id="smpCntWork">0</span></button>
+          <button class="adm-qchip" onclick="smpQF('done',this)">Готові <span class="adm-qchip-cnt" id="smpCntDone">0</span></button>
+          <button class="adm-qchip" onclick="smpQF('new',this)">Не отримано <span class="adm-qchip-cnt" id="smpCntNew">0</span></button>
+        </div>
+        <div class="adm-toolbar" style="padding:0 20px 10px">
+          <div class="adm-search-wrap">
+            <svg class="adm-search-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="14" height="14"><circle cx="8.5" cy="8.5" r="5"/><path d="M15 15l-3.5-3.5" stroke-linecap="round"/></svg>
+            <input id="smpSearch" class="adm-search" placeholder="Пошук зразків..." oninput="smpRender()">
+          </div>
+          <select id="smpFStatus" class="adm-select" onchange="smpRender()">
+            <option value="">Статус: Всі</option>
+            <option value="received">Отримано</option>
+            <option value="waiting">Очікується</option>
+            <option value="work">У роботі</option>
+            <option value="done">Готово</option>
+            <option value="new">Не отримано</option>
+          </select>
+          <select id="smpFMat" class="adm-select" onchange="smpRender()">
+            <option value="">Матеріал: Всі</option>
+            <option value="soil">Ґрунт</option>
+            <option value="plant">Рослина</option>
+            <option value="water">Вода</option>
+            <option value="grain">Зерно</option>
+            <option value="fert">Добриво</option>
+            <option value="oil">Масло</option>
+          </select>
+        </div>
+        <div style="padding:0 20px">
+          <div class="adm-table-wrap">
+            <table class="adm-table">
+              <thead><tr>
+                <th style="width:32px"><input type="checkbox" onchange="smpToggleAll(this)"></th>
+                <th onclick="smpSort('id')" style="cursor:pointer">№ зразка ↕</th>
+                <th onclick="smpSort('orderId')" style="cursor:pointer">Замовлення ↕</th>
+                <th>Клієнт</th>
+                <th>Назва зразка</th>
+                <th>Матеріал</th>
+                <th>Пакет</th>
+                <th onclick="smpSort('status')" style="cursor:pointer">Статус ↕</th>
+                <th onclick="smpSort('date')" style="cursor:pointer">Дата ↕</th>
+                <th></th>
+              </tr></thead>
+              <tbody id="smpBody"></tbody>
+            </table>
+          </div>
+          <div class="adm-pag-bar"><span id="smpPagInfo" style="font-size:12px;color:var(--text-soft)"></span><div id="smpPagination" style="display:flex;gap:4px"></div></div>
+        </div>
       </div>
+
+      <!-- ── CLIENTS TAB ── -->
       <div class="adm-subtab" id="admtab-clients">
-        <div class="adm-topbar"><div><div class="adm-page-title">Клієнти</div><div class="adm-page-sub">База клієнтів та контактів</div></div></div>
-        <div class="adm-stub"><div class="adm-stub-icon">👥</div><div class="adm-stub-title">Клієнти у розробці</div><div>CRM-база клієнтів</div></div>
+        <div class="adm-topbar">
+          <div><div class="adm-page-title">Клієнти</div><div class="adm-page-sub">База клієнтів та контрагентів</div></div>
+          <button class="adm-btn-primary" onclick="alert('Функція у розробці')">+ Новий клієнт</button>
+        </div>
+        <div class="adm-toolbar" style="padding:0 20px 12px">
+          <div class="adm-search-wrap">
+            <svg class="adm-search-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="14" height="14"><circle cx="8.5" cy="8.5" r="5"/><path d="M15 15l-3.5-3.5" stroke-linecap="round"/></svg>
+            <input id="cliSearch" class="adm-search" placeholder="Пошук клієнтів..." oninput="cliRender()">
+          </div>
+          <select id="cliFSort" class="adm-select" onchange="cliRender()">
+            <option value="name">Сортування: Назва</option>
+            <option value="orders">Замовлення</option>
+            <option value="amount">Сума</option>
+          </select>
+        </div>
+        <div style="padding:0 20px">
+          <div class="adm-table-wrap">
+            <table class="adm-table">
+              <thead><tr>
+                <th style="width:32px"><input type="checkbox"></th>
+                <th onclick="cliSort('name')" style="cursor:pointer">Клієнт ↕</th>
+                <th>Контактна особа</th>
+                <th>Телефон</th>
+                <th>Email</th>
+                <th onclick="cliSort('orders')" style="cursor:pointer">Замовлень ↕</th>
+                <th onclick="cliSort('amount')" style="cursor:pointer">Загальна сума ↕</th>
+                <th>Останнє замовлення</th>
+                <th></th>
+              </tr></thead>
+              <tbody id="cliBody"></tbody>
+            </table>
+          </div>
+          <div class="adm-pag-bar"><span id="cliPagInfo" style="font-size:12px;color:var(--text-soft)"></span><div id="cliPagination" style="display:flex;gap:4px"></div></div>
+        </div>
       </div>
+
+      <!-- ── DOCUMENTS TAB ── -->
       <div class="adm-subtab" id="admtab-docs">
-        <div class="adm-topbar"><div><div class="adm-page-title">Документи</div><div class="adm-page-sub">Протоколи, акти та інші документи</div></div></div>
-        <div class="adm-stub"><div class="adm-stub-icon">📄</div><div class="adm-stub-title">Документи у розробці</div><div>Протоколи та звіти</div></div>
+        <div class="adm-topbar">
+          <div><div class="adm-page-title">Документи</div><div class="adm-page-sub">Протоколи випробувань, акти відбору, висновки</div></div>
+          <div style="display:flex;gap:8px">
+            <button class="adm-btn-sec" onclick="alert('Функція у розробці')">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M4 16v1a1 1 0 001 1h10a1 1 0 001-1v-1M8 12l4 4 4-4M12 16V4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Експорт
+            </button>
+          </div>
+        </div>
+        <div class="adm-toolbar" style="padding:0 20px 12px">
+          <div class="adm-search-wrap">
+            <svg class="adm-search-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="14" height="14"><circle cx="8.5" cy="8.5" r="5"/><path d="M15 15l-3.5-3.5" stroke-linecap="round"/></svg>
+            <input id="docSearch" class="adm-search" placeholder="Пошук документів..." oninput="docRender()">
+          </div>
+          <select id="docFType" class="adm-select" onchange="docRender()">
+            <option value="">Тип: Всі</option>
+            <option value="protocol">Протокол випробувань</option>
+            <option value="act">Акт відбору зразків</option>
+            <option value="conclusion">Висновок агронома</option>
+          </select>
+          <select id="docFStatus" class="adm-select" onchange="docRender()">
+            <option value="">Статус: Всі</option>
+            <option value="ready">Готово</option>
+            <option value="pending">Формується</option>
+          </select>
+        </div>
+        <div style="padding:0 20px">
+          <div class="adm-table-wrap">
+            <table class="adm-table">
+              <thead><tr>
+                <th style="width:32px"><input type="checkbox"></th>
+                <th onclick="docSort('id')" style="cursor:pointer">№ документа ↕</th>
+                <th>Замовлення</th>
+                <th>Клієнт</th>
+                <th>Тип документа</th>
+                <th onclick="docSort('date')" style="cursor:pointer">Дата ↕</th>
+                <th onclick="docSort('status')" style="cursor:pointer">Статус ↕</th>
+                <th>Дії</th>
+              </tr></thead>
+              <tbody id="docBody"></tbody>
+            </table>
+          </div>
+          <div class="adm-pag-bar"><span id="docPagInfo" style="font-size:12px;color:var(--text-soft)"></span><div id="docPagination" style="display:flex;gap:4px"></div></div>
+        </div>
       </div>
+
+      <!-- ── SETTINGS TAB ── -->
       <div class="adm-subtab" id="admtab-settings">
-        <div class="adm-topbar"><div><div class="adm-page-title">Налаштування</div><div class="adm-page-sub">Параметри системи та профілю</div></div></div>
-        <div class="adm-stub"><div class="adm-stub-icon">⚙️</div><div class="adm-stub-title">Налаштування у розробці</div></div>
+        <div class="adm-topbar">
+          <div><div class="adm-page-title">Налаштування</div><div class="adm-page-sub">Профіль, лабораторія, сповіщення</div></div>
+        </div>
+        <div class="adm-sett-wrap">
+          <!-- Profile -->
+          <div class="adm-sett-card">
+            <div class="adm-sett-card-title">Профіль менеджера</div>
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+              <div style="width:56px;height:56px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0">ІП</div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--text-dark)">Іріна Петренко</div>
+                <div style="font-size:12px;color:var(--text-soft)">Менеджер лабораторії</div>
+              </div>
+            </div>
+            <div class="adm-sett-grid">
+              <div class="adm-sett-field"><label class="adm-sett-lbl">Ім'я та прізвище</label><input class="adm-sett-inp" value="Іріна Петренко"></div>
+              <div class="adm-sett-field"><label class="adm-sett-lbl">Посада</label><input class="adm-sett-inp" value="Менеджер лабораторії"></div>
+              <div class="adm-sett-field"><label class="adm-sett-lbl">Email</label><input class="adm-sett-inp" type="email" value="petrenko@laba.ua"></div>
+              <div class="adm-sett-field"><label class="adm-sett-lbl">Телефон</label><input class="adm-sett-inp" type="tel" value="+380 67 000 00 00"></div>
+            </div>
+            <div class="adm-sett-save"><button class="adm-btn-primary" onclick="alert('Збережено')">Зберегти зміни</button><button class="adm-btn-sec">Скасувати</button></div>
+          </div>
+          <!-- Lab -->
+          <div class="adm-sett-card">
+            <div class="adm-sett-card-title">Лабораторія</div>
+            <div class="adm-sett-grid">
+              <div class="adm-sett-field"><label class="adm-sett-lbl">Назва лабораторії</label><input class="adm-sett-inp" value="LABA — лабораторія Землероб"></div>
+              <div class="adm-sett-field"><label class="adm-sett-lbl">Номер акредитації</label><input class="adm-sett-inp" value="UA-2023-LA-0158"></div>
+              <div class="adm-sett-field"><label class="adm-sett-lbl">Адреса</label><input class="adm-sett-inp" value="м. Черкаси, вул. Лабораторна 1"></div>
+              <div class="adm-sett-field"><label class="adm-sett-lbl">Телефон лабораторії</label><input class="adm-sett-inp" value="+380 472 00 00 00"></div>
+            </div>
+            <div class="adm-sett-save"><button class="adm-btn-primary" onclick="alert('Збережено')">Зберегти зміни</button><button class="adm-btn-sec">Скасувати</button></div>
+          </div>
+          <!-- Notifications -->
+          <div class="adm-sett-card">
+            <div class="adm-sett-card-title">Сповіщення</div>
+            <div class="adm-sett-toggle-row">
+              <div><div class="adm-sett-toggle-lbl">Email при новому замовленні</div><div class="adm-sett-toggle-sub">Надсилати на petrenko@laba.ua</div></div>
+              <input type="checkbox" checked style="width:16px;height:16px;cursor:pointer">
+            </div>
+            <div class="adm-sett-toggle-row">
+              <div><div class="adm-sett-toggle-lbl">Email при отриманні зразків</div><div class="adm-sett-toggle-sub">Підтвердження від клієнта</div></div>
+              <input type="checkbox" checked style="width:16px;height:16px;cursor:pointer">
+            </div>
+            <div class="adm-sett-toggle-row">
+              <div><div class="adm-sett-toggle-lbl">Нагадування про прострочені зразки</div><div class="adm-sett-toggle-sub">Якщо зразки не отримано 3+ дні</div></div>
+              <input type="checkbox" style="width:16px;height:16px;cursor:pointer">
+            </div>
+            <div class="adm-sett-toggle-row">
+              <div><div class="adm-sett-toggle-lbl">SMS клієнту при готовності</div><div class="adm-sett-toggle-sub">Автоматично при статусі «Готово»</div></div>
+              <input type="checkbox" style="width:16px;height:16px;cursor:pointer">
+            </div>
+          </div>
+          <!-- Integrations -->
+          <div class="adm-sett-card">
+            <div class="adm-sett-card-title">Інтеграції</div>
+            <div class="adm-sett-toggle-row">
+              <div><div class="adm-sett-toggle-lbl">Supabase</div><div class="adm-sett-toggle-sub">База даних — підключення активне</div></div>
+              <span class="adm-pill adm-p-done" style="font-size:11px">Підключено</span>
+            </div>
+            <div class="adm-sett-toggle-row">
+              <div><div class="adm-sett-toggle-lbl">Google Sheets</div><div class="adm-sett-toggle-sub">Синхронізація каталогу послуг</div></div>
+              <span class="adm-pill adm-p-done" style="font-size:11px">Активно</span>
+            </div>
+            <div class="adm-sett-toggle-row">
+              <div><div class="adm-sett-toggle-lbl">Vercel</div><div class="adm-sett-toggle-sub">Хостинг — laba.zemlerob.com.ua</div></div>
+              <span class="adm-pill adm-p-done" style="font-size:11px">Активно</span>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div><!-- /adm-content -->
@@ -3347,6 +3637,8 @@ main{flex:1}
       <div class="adm-panel-status-wrap">
         <span class="adm-pill" id="admPanelStat"></span>
       </div>
+      <!-- ORDER body (default) -->
+      <div class="adm-panel-body active" id="admPanelOrder">
 
       <div class="adm-panel-sec">
         <div class="adm-panel-sec-title">Клієнт</div>
@@ -3416,6 +3708,92 @@ main{flex:1}
         </div>
         <div id="admPanelActivity"></div>
       </div>
+      </div><!-- /admPanelOrder -->
+
+      <!-- SAMPLE panel body -->
+      <div class="adm-panel-body" id="admPanelSample">
+        <div class="adm-panel-sec">
+          <div class="adm-panel-sec-title">Зразок</div>
+          <div class="adm-panel-cl-row" style="font-size:12.5px">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 2v5l-4 8h12l-4-8V2"/><path d="M7 2h6" stroke-linecap="round"/></svg>
+            <span id="smpPanelName">—</span>
+          </div>
+          <div class="adm-panel-cl-row" style="font-size:12.5px">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M3 8h14M8 3v14" stroke-linecap="round"/></svg>
+            <span id="smpPanelOrderId" style="color:var(--text-soft)">—</span>
+          </div>
+        </div>
+        <div class="adm-panel-sec">
+          <div class="adm-meta-row">
+            <div class="adm-meta-item"><div class="adm-meta-label">Матеріал</div><div class="adm-meta-val" id="smpPanelMat">—</div></div>
+            <div class="adm-meta-item"><div class="adm-meta-label">Пакет</div><div class="adm-meta-val" id="smpPanelPkg">—</div></div>
+            <div class="adm-meta-item"><div class="adm-meta-label">Дата</div><div class="adm-meta-val" id="smpPanelDate">—</div></div>
+          </div>
+        </div>
+        <div class="adm-panel-sec">
+          <div class="adm-panel-sec-title">Клієнт</div>
+          <div class="adm-panel-cl-row" style="font-size:12.5px">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 17c0-3.3 2.7-6 6-6h4c3.3 0 6 2.7 6 6"/><circle cx="10" cy="7" r="3"/></svg>
+            <span id="smpPanelClient">—</span>
+          </div>
+        </div>
+        <div class="adm-panel-sec">
+          <div class="adm-panel-sec-title">Призначені дослідження (<span id="smpPanelTestCnt">0</span>)</div>
+          <div id="smpPanelTests"></div>
+        </div>
+        <div class="adm-panel-actions">
+          <button class="adm-pbtn adm-pbtn-green" onclick="admActionReceive()">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Позначити отримано
+          </button>
+          <button class="adm-pbtn adm-pbtn-sec" onclick="admActionStatus()">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M4 6h12M4 10h12M4 14h12" stroke-linecap="round"/></svg>
+            Змінити статус
+          </button>
+          <button class="adm-pbtn adm-pbtn-out" onclick="admActionStatus()">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M11 3h6v6M17 3l-8 8M9 5H5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Відкрити замовлення
+          </button>
+        </div>
+        <div class="adm-activity">
+          <div class="adm-act-hd"><div class="adm-panel-sec-title" style="margin-bottom:0">Остання активність</div></div>
+          <div id="smpPanelActivity"></div>
+        </div>
+      </div><!-- /admPanelSample -->
+
+      <!-- CLIENT panel body -->
+      <div class="adm-panel-body" id="admPanelClient">
+        <div class="adm-panel-sec">
+          <div class="adm-panel-sec-title">Клієнт</div>
+          <div class="adm-panel-client-hd">
+            <div class="adm-panel-client-ic" id="cliPanelIcon">ФГ</div>
+            <span id="cliPanelName">—</span>
+          </div>
+          <div class="adm-panel-cl-row"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="7" r="3"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke-linecap="round"/></svg><span id="cliPanelContact">—</span></div>
+          <div class="adm-panel-cl-row"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 6l8 5 8-5"/><rect x="2" y="4" width="16" height="12" rx="2"/></svg><span id="cliPanelEmail">—</span></div>
+          <div class="adm-panel-cl-row"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4l3.5 1L9 7.5l-1.5 1.5a11 11 0 005.5 5.5L14.5 13l2.5 1.5L18 18c-8.3.7-15-6-14-14z" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="cliPanelPhone">—</span></div>
+        </div>
+        <div class="adm-panel-sec">
+          <div class="adm-meta-row">
+            <div class="adm-meta-item"><div class="adm-meta-label">Замовлень</div><div class="adm-meta-val" id="cliPanelOrders">—</div></div>
+            <div class="adm-meta-item"><div class="adm-meta-label">Загальна сума</div><div class="adm-meta-val" id="cliPanelTotal">—</div></div>
+          </div>
+        </div>
+        <div class="adm-panel-sec">
+          <div class="adm-panel-sec-title">Останні замовлення</div>
+          <div id="cliPanelOrders2"></div>
+        </div>
+        <div class="adm-panel-actions">
+          <button class="adm-pbtn adm-pbtn-green" onclick="alert('Функція у розробці')">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>
+            Нове замовлення
+          </button>
+          <button class="adm-pbtn adm-pbtn-sec" onclick="alert('Функція у розробці')">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M13 6l-3 3 3 3M6 13h5a4 4 0 000-8H6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Всі замовлення
+          </button>
+        </div>
+      </div><!-- /admPanelClient -->
     </aside>
 
   </div><!-- /adm-shell -->
@@ -6732,6 +7110,471 @@ function admToggleAll(cb) {
 
 function admActionReceive() { alert('Функцію «Позначити отримано» буде підключено до Supabase'); }
 function admActionStatus()  { alert('Функцію «Змінити статус» буде підключено до Supabase'); }
+
+// ─── PANEL SWITCHER ───────────────────────────
+function _admShowPanel(type) {
+  ['admPanelOrder','admPanelSample','admPanelClient'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('active', id === 'admPanel' + type.charAt(0).toUpperCase() + type.slice(1));
+  });
+}
+
+// ─── SAMPLES DATA + FUNCTIONS ─────────────────
+const _MAT_LABEL = {soil:'Ґрунт',plant:'Рослина',water:'Вода',grain:'Зерно',fert:'Добриво',oil:'Масло'};
+const _MAT_CLASS = {soil:'adm-mat-soil',plant:'adm-mat-plant',water:'adm-mat-water',grain:'adm-mat-grain',fert:'adm-mat-fert',oil:'adm-mat-oil'};
+const _PKG_LABEL = {basic:'Базовий',standard:'Стандартний',extended:'Розширений'};
+const _SST_LABEL = {received:'Отримано',waiting:'Очікується',work:'У роботі',done:'Готово',new:'Не отримано'};
+const _SST_CLASS = {received:'adm-sst-received',waiting:'adm-sst-waiting',work:'adm-sst-work',done:'adm-sst-done',new:'adm-sst-new'};
+
+const _TESTS = {
+  soil: [{n:'pH (сольова витяжка)'},{n:'Органічна речовина'},{n:'Загальний азот (N)'},{n:'Рухомий фосфор (P₂O₅)'},{n:'Рухомий калій (K₂O)'},{n:'Мікроелементи (B, Zn, Mn)'}],
+  grain:[{n:'Вологість'},{n:'Протеїн'},{n:'Клейковина'},{n:'Зольність'},{n:'Натура зерна'}],
+  water:[{n:'pH'},{n:'Жорсткість загальна'},{n:'Нітрати (NO₃)'},{n:'Залізо загальне'},{n:'Мутність'}],
+  plant:[{n:'Азот загальний (N)'},{n:'Фосфор (P)'},{n:'Калій (K)'},{n:'Кальцій (Ca)'},{n:'Магній (Mg)'}],
+  fert: [{n:'Азот загальний'},{n:'Фосфор (P₂O₅)'},{n:'Калій (K₂O)'},{n:'pH суспензії'}],
+  oil:  [{n:'Кислотне число'},{n:'Пероксидне число'},{n:'Вологість та летючі'},{n:'Жирно-кислотний склад'}]
+};
+const _TEST_STATUSES = ['done','done','work','waiting','waiting','waiting'];
+
+const _admSamples = (()=>{
+  const raw = [
+    {orderId:'LAB-2026-00482',client:'ФГ «Вікторія»',short:'ФВ', items:[
+      {n:'Поле 1 (Кукурудза)',mat:'soil',pkg:'standard',st:'received',d:'19.10.2026'},
+      {n:'Поле 2 (Пшениця)',mat:'soil',pkg:'standard',st:'waiting',d:'19.10.2026'},
+      {n:'Поле 3 (Соняшник)',mat:'soil',pkg:'basic',st:'waiting',d:'19.10.2026'},
+      {n:'Поле 4 (Ріпак)',mat:'soil',pkg:'basic',st:'new',d:'19.10.2026'},
+      {n:'Рослина пшениця',mat:'plant',pkg:'basic',st:'new',d:'19.10.2026'},
+      {n:'Рослина кукурудза',mat:'plant',pkg:'basic',st:'new',d:'19.10.2026'},
+    ]},
+    {orderId:'LAB-2026-00481',client:'ТОВ «Агро Плюс»',short:'АП', items:[
+      {n:'Поле А (Ріпак)',mat:'soil',pkg:'extended',st:'received',d:'19.10.2026'},
+      {n:'Поле Б (Кукурудза)',mat:'soil',pkg:'extended',st:'received',d:'19.10.2026'},
+      {n:'Поле В (Пшениця)',mat:'soil',pkg:'standard',st:'work',d:'19.10.2026'},
+      {n:'Поле Г (Соя)',mat:'soil',pkg:'standard',st:'work',d:'19.10.2026'},
+      {n:'Рослина соя',mat:'plant',pkg:'basic',st:'work',d:'19.10.2026'},
+      {n:'Зерно ріпак',mat:'grain',pkg:'basic',st:'done',d:'18.10.2026'},
+    ]},
+    {orderId:'LAB-2026-00480',client:'ПП «Лан Агро»',short:'ЛА', items:[
+      {n:'Поле 1 (Ячмінь)',mat:'soil',pkg:'basic',st:'new',d:'18.10.2026'},
+      {n:'Поле 2 (Просо)',mat:'soil',pkg:'basic',st:'new',d:'18.10.2026'},
+      {n:'Зерно ячмінь',mat:'grain',pkg:'standard',st:'new',d:'18.10.2026'},
+    ]},
+    {orderId:'LAB-2026-00479',client:'ТОВ «Зелений Гай»',short:'ЗГ', items:[
+      {n:'Ставок №1 (вода)',mat:'water',pkg:'standard',st:'received',d:'17.10.2026'},
+      {n:'Ставок №2 (вода)',mat:'water',pkg:'standard',st:'work',d:'17.10.2026'},
+      {n:'Озеро (вода)',mat:'water',pkg:'extended',st:'work',d:'17.10.2026'},
+      {n:'Криниця №1',mat:'water',pkg:'basic',st:'received',d:'17.10.2026'},
+      {n:'Річка (зразок)',mat:'water',pkg:'basic',st:'work',d:'17.10.2026'},
+      {n:'Поле А (полив)',mat:'water',pkg:'basic',st:'waiting',d:'17.10.2026'},
+      {n:'Поле Б (грунт)',mat:'soil',pkg:'basic',st:'received',d:'17.10.2026'},
+      {n:'Поле В (грунт)',mat:'soil',pkg:'basic',st:'work',d:'17.10.2026'},
+    ]},
+    {orderId:'LAB-2026-00478',client:'ФГ «Дніпро»',short:'ФД', items:[
+      {n:'Грунт поле 1',mat:'soil',pkg:'standard',st:'waiting',d:'16.10.2026'},
+      {n:'Грунт поле 2',mat:'soil',pkg:'standard',st:'waiting',d:'16.10.2026'},
+      {n:'Грунт поле 3',mat:'soil',pkg:'basic',st:'new',d:'16.10.2026'},
+      {n:'Добриво КАС-32',mat:'fert',pkg:'basic',st:'waiting',d:'16.10.2026'},
+      {n:'Добриво Аміачна',mat:'fert',pkg:'basic',st:'new',d:'16.10.2026'},
+    ]},
+    {orderId:'LAB-2026-00477',client:'ТОВ «Колос»',short:'КС', items:[
+      {n:'Зерно пшениця',mat:'grain',pkg:'extended',st:'done',d:'15.10.2026'},
+      {n:'Зерно ячмінь',mat:'grain',pkg:'extended',st:'done',d:'15.10.2026'},
+      {n:'Зерно кукурудза',mat:'grain',pkg:'standard',st:'done',d:'15.10.2026'},
+      {n:'Зерно соя',mat:'grain',pkg:'standard',st:'done',d:'15.10.2026'},
+    ]},
+    {orderId:'LAB-2026-00476',client:'ФГ «Соняшник»',short:'СЕ', items:[
+      {n:'Поле 1 (Соняшник)',mat:'soil',pkg:'basic',st:'new',d:'14.10.2026'},
+      {n:'Поле 2 (Ріпак)',mat:'soil',pkg:'basic',st:'new',d:'14.10.2026'},
+      {n:'Поле 3 (Кукурудза)',mat:'soil',pkg:'basic',st:'new',d:'14.10.2026'},
+      {n:'Рослина соняшник',mat:'plant',pkg:'basic',st:'new',d:'14.10.2026'},
+      {n:'Насіння ріпак',mat:'grain',pkg:'basic',st:'new',d:'14.10.2026'},
+      {n:'Рослина ріпак',mat:'plant',pkg:'basic',st:'new',d:'14.10.2026'},
+      {n:'Масло соняшникове',mat:'oil',pkg:'standard',st:'new',d:'14.10.2026'},
+    ]},
+    {orderId:'LAB-2026-00475',client:'ТОВ «Агролідер»',short:'АЛ', items:[
+      {n:'Добриво (зразок 1)',mat:'fert',pkg:'standard',st:'done',d:'13.10.2026'},
+      {n:'Добриво (зразок 2)',mat:'fert',pkg:'standard',st:'done',d:'13.10.2026'},
+    ]},
+    {orderId:'LAB-2026-00474',client:'ФГ «Урожай»',short:'УЖ', items:[
+      {n:'Ґрунт ділянка А',mat:'soil',pkg:'standard',st:'received',d:'12.10.2026'},
+      {n:'Ґрунт ділянка Б',mat:'soil',pkg:'standard',st:'work',d:'12.10.2026'},
+      {n:'Ґрунт ділянка В',mat:'soil',pkg:'standard',st:'work',d:'12.10.2026'},
+      {n:'Ґрунт ділянка Г',mat:'soil',pkg:'basic',st:'work',d:'12.10.2026'},
+      {n:'Ґрунт ділянка Д',mat:'soil',pkg:'basic',st:'received',d:'12.10.2026'},
+      {n:'Рослина (озима)',mat:'plant',pkg:'basic',st:'work',d:'12.10.2026'},
+      {n:'Рослина (ярова)',mat:'plant',pkg:'basic',st:'work',d:'12.10.2026'},
+      {n:'Насіння пшениця',mat:'grain',pkg:'basic',st:'received',d:'12.10.2026'},
+      {n:'Насіння ячмінь',mat:'grain',pkg:'basic',st:'work',d:'12.10.2026'},
+    ]},
+    {orderId:'LAB-2026-00473',client:'ПАТ «Зернотрейд»',short:'ЗТ', items:[
+      {n:'Пшениця партія №1',mat:'grain',pkg:'extended',st:'done',d:'11.10.2026'},
+      {n:'Пшениця партія №2',mat:'grain',pkg:'extended',st:'done',d:'11.10.2026'},
+      {n:'Ячмінь партія №1',mat:'grain',pkg:'extended',st:'done',d:'11.10.2026'},
+    ]},
+  ];
+  let idx = 1;
+  const result = [];
+  raw.forEach(o => o.items.forEach(s => {
+    result.push({
+      id: `SMP-2026-${String(idx++).padStart(4,'0')}`,
+      orderId: o.orderId, client: o.client, short: o.short,
+      name: s.n, mat: s.mat, pkg: s.pkg, status: s.st, date: s.d
+    });
+  }));
+  return result;
+})();
+
+let _smpFilter='', _smpSelId=null, _smpSortF='id', _smpSortA=false, _smpPage=1;
+const _SMP_PER=10;
+
+function smpInit() {
+  _smpFilter=''; _smpSelId=null; _smpPage=1;
+  const si=document.getElementById('smpSearch'); if(si)si.value='';
+  const fs=document.getElementById('smpFStatus'); if(fs)fs.value='';
+  const fm=document.getElementById('smpFMat'); if(fm)fm.value='';
+  document.querySelectorAll('#smpQChips .adm-qchip').forEach((b,i)=>b.classList.toggle('active',i===0));
+  smpUpdateCounts();
+  smpRender();
+}
+
+function smpUpdateCounts() {
+  const st = s => _admSamples.filter(x=>x.status===s).length;
+  document.getElementById('smpCntAll').textContent  = _admSamples.length;
+  document.getElementById('smpCntWait').textContent = st('waiting');
+  document.getElementById('smpCntWork').textContent = st('work');
+  document.getElementById('smpCntDone').textContent = st('done');
+  document.getElementById('smpCntNew').textContent  = _admSamples.filter(x=>x.status==='new'||x.status==='received').length;
+}
+
+function smpQF(status, el) {
+  _smpFilter=status;
+  document.querySelectorAll('#smpQChips .adm-qchip').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const fs=document.getElementById('smpFStatus'); if(fs)fs.value='';
+  _smpPage=1; smpRender();
+}
+
+function _smpFiltered() {
+  let list = [..._admSamples];
+  const q = (document.getElementById('smpSearch')?.value||'').trim().toLowerCase();
+  const fs = document.getElementById('smpFStatus')?.value||'';
+  const fm = document.getElementById('smpFMat')?.value||'';
+  if (q)  list = list.filter(s => s.id.toLowerCase().includes(q)||s.name.toLowerCase().includes(q)||s.client.toLowerCase().includes(q)||s.orderId.toLowerCase().includes(q));
+  if (fs) list = list.filter(s => s.status===fs);
+  else if (_smpFilter) list = list.filter(s => s.status===_smpFilter);
+  if (fm) list = list.filter(s => s.mat===fm);
+  list.sort((a,b)=>{
+    let va=a[_smpSortF]||'', vb=b[_smpSortF]||'';
+    const c=va<vb?-1:va>vb?1:0; return _smpSortA?c:-c;
+  });
+  return list;
+}
+
+function smpRender() {
+  const list=_smpFiltered(), total=list.length;
+  const pc=Math.max(1,Math.ceil(total/_SMP_PER));
+  if(_smpPage>pc)_smpPage=pc;
+  const slice=list.slice((_smpPage-1)*_SMP_PER,_smpPage*_SMP_PER);
+  const body=document.getElementById('smpBody'); if(!body)return;
+  if(!slice.length){
+    body.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:36px;color:var(--text-soft);font-size:13px">Зразків не знайдено</td></tr>`;
+  } else {
+    body.innerHTML=slice.map(s=>`
+      <tr onclick="smpSelect('${s.id}')" class="${_smpSelId===s.id?'adm-row-sel':''}">
+        <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+        <td><div class="adm-order-num">${s.id}</div></td>
+        <td style="color:var(--text-soft);font-size:11.5px">${s.orderId}</td>
+        <td><div class="adm-client-nm">${s.client}</div></td>
+        <td style="font-size:12.5px;color:var(--text-mid)">${s.name}</td>
+        <td><span class="adm-mat ${_MAT_CLASS[s.mat]}">${_MAT_LABEL[s.mat]}</span></td>
+        <td style="font-size:12px;color:var(--text-soft)">${_PKG_LABEL[s.pkg]}</td>
+        <td><span class="adm-pill ${_SST_CLASS[s.status]}">${_SST_LABEL[s.status]}</span></td>
+        <td style="font-size:11.5px;color:var(--text-soft)">${s.date}</td>
+        <td style="color:var(--text-soft)">›</td>
+      </tr>`).join('');
+  }
+  const pi=document.getElementById('smpPagInfo');
+  if(pi)pi.textContent=`Показано ${total?(_smpPage-1)*_SMP_PER+1:0}–${Math.min(_smpPage*_SMP_PER,total)} з ${total} зразків`;
+  const pag=document.getElementById('smpPagination');
+  if(pag){
+    let h=`<button class="adm-pag-btn" onclick="smpGoP(${_smpPage-1})" ${_smpPage<=1?'disabled':''}>‹</button>`;
+    for(let p=1;p<=pc;p++){
+      if(pc<=6||Math.abs(p-_smpPage)<=1||p===1||p===pc)
+        h+=`<button class="adm-pag-btn ${p===_smpPage?'cur':''}" onclick="smpGoP(${p})">${p}</button>`;
+      else if(Math.abs(p-_smpPage)===2)h+=`<span style="padding:0 3px;color:var(--text-soft)">…</span>`;
+    }
+    h+=`<button class="adm-pag-btn" onclick="smpGoP(${_smpPage+1})" ${_smpPage>=pc?'disabled':''}>›</button>`;
+    pag.innerHTML=h;
+  }
+}
+
+function smpGoP(p){const pc=Math.max(1,Math.ceil(_smpFiltered().length/_SMP_PER));_smpPage=Math.max(1,Math.min(p,pc));smpRender();}
+function smpSort(f){if(_smpSortF===f)_smpSortA=!_smpSortA;else{_smpSortF=f;_smpSortA=true;}_smpPage=1;smpRender();}
+function smpToggleAll(cb){document.querySelectorAll('#smpBody input[type=checkbox]').forEach(c=>c.checked=cb.checked);}
+
+function smpSelect(id) {
+  _smpSelId=id; smpRender();
+  const s=_admSamples.find(x=>x.id===id); if(!s)return;
+  const panel=document.getElementById('admPanel'); if(panel)panel.classList.add('open');
+  document.getElementById('admPanelNum').textContent=s.id;
+  const ps=document.getElementById('admPanelStat');
+  if(ps){ps.className='adm-pill '+_SST_CLASS[s.status];ps.textContent=_SST_LABEL[s.status];}
+  _admShowPanel('Sample');
+  document.getElementById('smpPanelName').textContent=s.name;
+  document.getElementById('smpPanelOrderId').textContent=s.orderId;
+  document.getElementById('smpPanelClient').textContent=s.client;
+  document.getElementById('smpPanelMat').innerHTML=`<span class="adm-mat ${_MAT_CLASS[s.mat]}">${_MAT_LABEL[s.mat]}</span>`;
+  document.getElementById('smpPanelPkg').textContent=_PKG_LABEL[s.pkg];
+  document.getElementById('smpPanelDate').textContent=s.date;
+  const tests=_TESTS[s.mat]||_TESTS.soil;
+  document.getElementById('smpPanelTestCnt').textContent=tests.length;
+  document.getElementById('smpPanelTests').innerHTML=tests.map((t,i)=>`
+    <div class="adm-test-row">
+      <span class="adm-test-name">${t.n}</span>
+      <span class="adm-pill ${_admSC[['work','done','done','waiting','waiting','waiting'][i%6]||'waiting']}">${_admSL[['work','done','done','waiting','waiting','waiting'][i%6]||'waiting']}</span>
+    </div>`).join('');
+  document.getElementById('smpPanelActivity').innerHTML=`
+    <div class="adm-act-item"><div class="adm-act-dot"></div><div><div class="adm-act-text">Зразок додано до замовлення</div><div class="adm-act-date">${s.date} 10:00</div></div></div>
+    <div class="adm-act-item"><div class="adm-act-dot"></div><div><div class="adm-act-text">Зразок створено</div><div class="adm-act-date">${s.date} 09:30</div></div></div>`;
+}
+
+// ─── CLIENTS DATA + FUNCTIONS ─────────────────
+const _admClients = (()=>{
+  const map={};
+  _admOrders.forEach(o=>{
+    if(!map[o.client]){
+      map[o.client]={name:o.client,short:o.short,contact:o.contact,phone:o.phone,email:o.email,orders:[],total:0};
+    }
+    const amt=parseInt((o.amount||'0').replace(/[^\d]/g,''));
+    map[o.client].orders.push({id:o.id,date:o.date,status:o.status,amount:o.amount});
+    map[o.client].total+=amt;
+  });
+  return Object.values(map).map(c=>({...c,orderCount:c.orders.length,lastDate:c.orders[0]?.date||'—',totalFmt:c.total.toLocaleString('uk-UA')+' ₴'}));
+})();
+
+let _cliSelId=null, _cliSortF='name', _cliSortA=true, _cliPage=1;
+const _CLI_PER=10;
+
+function cliInit(){_cliSelId=null;_cliPage=1;const si=document.getElementById('cliSearch');if(si)si.value='';cliRender();}
+
+function _cliFiltered(){
+  let list=[..._admClients];
+  const q=(document.getElementById('cliSearch')?.value||'').trim().toLowerCase();
+  const fs=document.getElementById('cliFSort')?.value||'name';
+  if(q)list=list.filter(c=>c.name.toLowerCase().includes(q)||c.contact.toLowerCase().includes(q)||c.email.toLowerCase().includes(q));
+  list.sort((a,b)=>{
+    let va=fs==='orders'?a.orderCount:fs==='amount'?a.total:a.name;
+    let vb=fs==='orders'?b.orderCount:fs==='amount'?b.total:b.name;
+    const c=va<vb?-1:va>vb?1:0; return _cliSortA?c:-c;
+  });
+  return list;
+}
+
+function cliRender(){
+  const list=_cliFiltered(),total=list.length;
+  const pc=Math.max(1,Math.ceil(total/_CLI_PER));
+  if(_cliPage>pc)_cliPage=pc;
+  const slice=list.slice((_cliPage-1)*_CLI_PER,_cliPage*_CLI_PER);
+  const body=document.getElementById('cliBody');if(!body)return;
+  if(!slice.length){
+    body.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:36px;color:var(--text-soft);font-size:13px">Клієнтів не знайдено</td></tr>`;
+  } else {
+    body.innerHTML=slice.map(c=>`
+      <tr onclick="cliSelect('${c.name.replace(/'/g,"\\'")}')">
+        <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="adm-panel-client-ic" style="width:28px;height:28px;font-size:11px;flex-shrink:0">${c.short}</div>
+            <div class="adm-client-nm">${c.name}</div>
+          </div>
+        </td>
+        <td style="font-size:12px;color:var(--text-mid)">${c.contact}</td>
+        <td style="font-size:12px;color:var(--text-soft)">${c.phone}</td>
+        <td style="font-size:12px;color:var(--text-soft)">${c.email}</td>
+        <td style="text-align:center;font-weight:600;color:var(--text-dark)">${c.orderCount}</td>
+        <td style="font-weight:600;color:var(--text-dark)">${c.totalFmt}</td>
+        <td style="font-size:11.5px;color:var(--text-soft)">${c.lastDate}</td>
+        <td style="color:var(--text-soft)">›</td>
+      </tr>`).join('');
+  }
+  const pi=document.getElementById('cliPagInfo');
+  if(pi)pi.textContent=`Показано ${total?(_cliPage-1)*_CLI_PER+1:0}–${Math.min(_cliPage*_CLI_PER,total)} з ${total} клієнтів`;
+  const pag=document.getElementById('cliPagination');
+  if(pag){
+    let h=`<button class="adm-pag-btn" onclick="cliGoP(${_cliPage-1})" ${_cliPage<=1?'disabled':''}>‹</button>`;
+    for(let p=1;p<=pc;p++)h+=`<button class="adm-pag-btn ${p===_cliPage?'cur':''}" onclick="cliGoP(${p})">${p}</button>`;
+    h+=`<button class="adm-pag-btn" onclick="cliGoP(${_cliPage+1})" ${_cliPage>=pc?'disabled':''}>›</button>`;
+    pag.innerHTML=h;
+  }
+}
+
+function cliGoP(p){const pc=Math.max(1,Math.ceil(_cliFiltered().length/_CLI_PER));_cliPage=Math.max(1,Math.min(p,pc));cliRender();}
+function cliSort(f){if(_cliSortF===f)_cliSortA=!_cliSortA;else{_cliSortF=f;_cliSortA=true;}_cliPage=1;cliRender();}
+
+function cliSelect(name) {
+  const c=_admClients.find(x=>x.name===name);if(!c)return;
+  _cliSelId=name;
+  const panel=document.getElementById('admPanel');if(panel)panel.classList.add('open');
+  document.getElementById('admPanelNum').textContent=c.name;
+  const ps=document.getElementById('admPanelStat');if(ps){ps.className='';ps.textContent='';}
+  _admShowPanel('Client');
+  document.getElementById('cliPanelIcon').textContent=c.short;
+  document.getElementById('cliPanelName').textContent=c.name;
+  document.getElementById('cliPanelContact').textContent=c.contact;
+  document.getElementById('cliPanelEmail').textContent=c.email;
+  document.getElementById('cliPanelPhone').textContent=c.phone;
+  document.getElementById('cliPanelOrders').textContent=c.orderCount;
+  document.getElementById('cliPanelTotal').textContent=c.totalFmt;
+  document.getElementById('cliPanelOrders2').innerHTML=c.orders.slice(0,4).map(o=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px">
+      <span style="color:var(--text-soft)">${o.id}</span>
+      <span class="adm-pill ${_admSC[o.status]}">${_admSL[o.status]}</span>
+      <span style="color:var(--text-soft)">${o.date}</span>
+    </div>`).join('');
+}
+
+// ─── DOCUMENTS DATA + FUNCTIONS ───────────────
+const _admDocs = (()=>{
+  const types=['protocol','protocol','act','protocol','conclusion'];
+  const typeL={protocol:'Протокол випробувань',act:'Акт відбору зразків',conclusion:'Висновок агронома'};
+  const doneOrders=_admOrders.filter(o=>o.status==='done'||o.status==='work');
+  const result=[];
+  let idx=1;
+  doneOrders.forEach(o=>{
+    const t=types[idx%types.length];
+    result.push({id:`DOC-2026-${String(idx++).padStart(5,'0')}`,orderId:o.id,client:o.client,type:t,typeL:typeL[t],date:o.date,status:o.status==='done'?'ready':'pending'});
+    if(o.status==='done'){
+      const t2='act';
+      result.push({id:`DOC-2026-${String(idx++).padStart(5,'0')}`,orderId:o.id,client:o.client,type:t2,typeL:typeL[t2],date:o.date,status:'ready'});
+    }
+  });
+  return result;
+})();
+
+let _docSortF='date',_docSortA=false,_docPage=1;
+const _DOC_PER=10;
+
+function docInit(){_docPage=1;const si=document.getElementById('docSearch');if(si)si.value='';const ft=document.getElementById('docFType');if(ft)ft.value='';const fs=document.getElementById('docFStatus');if(fs)fs.value='';docRender();}
+
+function _docFiltered(){
+  let list=[..._admDocs];
+  const q=(document.getElementById('docSearch')?.value||'').trim().toLowerCase();
+  const ft=document.getElementById('docFType')?.value||'';
+  const fs=document.getElementById('docFStatus')?.value||'';
+  if(q)list=list.filter(d=>d.id.toLowerCase().includes(q)||d.orderId.toLowerCase().includes(q)||d.client.toLowerCase().includes(q));
+  if(ft)list=list.filter(d=>d.type===ft);
+  if(fs)list=list.filter(d=>d.status===fs);
+  list.sort((a,b)=>{const va=a[_docSortF]||'',vb=b[_docSortF]||'';const c=va<vb?-1:va>vb?1:0;return _docSortA?c:-c;});
+  return list;
+}
+
+function docRender(){
+  const list=_docFiltered(),total=list.length;
+  const pc=Math.max(1,Math.ceil(total/_DOC_PER));
+  if(_docPage>pc)_docPage=pc;
+  const slice=list.slice((_docPage-1)*_DOC_PER,_docPage*_DOC_PER);
+  const body=document.getElementById('docBody');if(!body)return;
+  if(!slice.length){
+    body.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:36px;color:var(--text-soft);font-size:13px">Документів не знайдено</td></tr>`;
+  } else {
+    body.innerHTML=slice.map(d=>`
+      <tr>
+        <td><input type="checkbox"></td>
+        <td><div class="adm-order-num">${d.id}</div></td>
+        <td style="font-size:11.5px;color:var(--text-soft)">${d.orderId}</td>
+        <td><div class="adm-client-nm">${d.client}</div></td>
+        <td><span class="adm-doc-type">${d.typeL}</span></td>
+        <td style="font-size:11.5px;color:var(--text-soft)">${d.date}</td>
+        <td><span class="adm-pill ${d.status==='ready'?'adm-p-done':'adm-p-wait'}">${d.status==='ready'?'Готово':'Формується'}</span></td>
+        <td>
+          <div style="display:flex;gap:5px">
+            <button class="adm-pbtn adm-pbtn-sec" style="padding:3px 8px;font-size:11px" onclick="alert('Завантаження у розробці')">↓ Завантажити</button>
+            <button class="adm-pbtn adm-pbtn-out" style="padding:3px 8px;font-size:11px" onclick="alert('Надсилання у розробці')">✉ Надіслати</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+  const pi=document.getElementById('docPagInfo');
+  if(pi)pi.textContent=`Показано ${total?(_docPage-1)*_DOC_PER+1:0}–${Math.min(_docPage*_DOC_PER,total)} з ${total} документів`;
+  const pag=document.getElementById('docPagination');
+  if(pag){
+    let h=`<button class="adm-pag-btn" onclick="docGoP(${_docPage-1})" ${_docPage<=1?'disabled':''}>‹</button>`;
+    for(let p=1;p<=pc;p++)h+=`<button class="adm-pag-btn ${p===_docPage?'cur':''}" onclick="docGoP(${p})">${p}</button>`;
+    h+=`<button class="adm-pag-btn" onclick="docGoP(${_docPage+1})" ${_docPage>=pc?'disabled':''}>›</button>`;
+    pag.innerHTML=h;
+  }
+}
+
+function docGoP(p){const pc=Math.max(1,Math.ceil(_docFiltered().length/_DOC_PER));_docPage=Math.max(1,Math.min(p,pc));docRender();}
+function docSort(f){if(_docSortF===f)_docSortA=!_docSortA;else{_docSortF=f;_docSortA=true;}_docPage=1;docRender();}
+
+// ─── DASHBOARD INIT ────────────────────────────
+function dashInit(){
+  const cnt=s=>_admOrders.filter(o=>o.status===s).length;
+  document.getElementById('dashN').textContent=cnt('new');
+  document.getElementById('dashW').textContent=cnt('waiting');
+  document.getElementById('dashP').textContent=cnt('work');
+  document.getElementById('dashD').textContent=cnt('done');
+  // Recent orders (last 5)
+  const body=document.getElementById('dashRecentBody');
+  if(body)body.innerHTML=_admOrders.slice(0,5).map(o=>`
+    <tr onclick="admSwitch('orders',document.getElementById('adm-navbtn-orders'));admSelect('${o.id}')" style="cursor:pointer">
+      <td><div class="adm-order-num">${o.id}</div></td>
+      <td><div class="adm-client-nm">${o.client}</div></td>
+      <td style="text-align:center">${o.samples}</td>
+      <td><span class="adm-pill ${_admSC[o.status]}">${_admSL[o.status]}</span></td>
+      <td style="font-size:11.5px;color:var(--text-soft)">${o.date}</td>
+    </tr>`).join('');
+  // Status breakdown
+  const bk=document.getElementById('dashStatusBreak');
+  if(bk){
+    const total=_admOrders.length;
+    bk.innerHTML=[
+      {l:'Нові',s:'new',c:'#6B7280'},
+      {l:'Очікують зразки',s:'waiting',c:'#CA8A04'},
+      {l:'У роботі',s:'work',c:'#3B82F6'},
+      {l:'Готові',s:'done',c:'#10B981'},
+    ].map(x=>{
+      const n=cnt(x.s); const pct=total?Math.round(n/total*100):0;
+      return `<div class="adm-stat-bar">
+        <span class="adm-stat-bar-lbl">${x.l}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:80px;height:5px;border-radius:3px;background:#F3F4F6;overflow:hidden"><div style="width:${pct}%;height:100%;background:${x.c};border-radius:3px"></div></div>
+          <span class="adm-stat-bar-val" style="color:${x.c};min-width:20px;text-align:right">${n}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  // Activity (last 6 events from orders)
+  const act=document.getElementById('dashActBody');
+  if(act){
+    const events=[];
+    _admOrders.slice(0,6).forEach(o=>{ if(o.activity?.length) events.push({t:o.activity[0].t,d:o.activity[0].d,client:o.client}); });
+    act.innerHTML=events.slice(0,5).map(e=>`
+      <div class="adm-dash-act-item">
+        <div class="adm-dash-act-dot"></div>
+        <div><div style="color:var(--text-mid)">${e.t}</div><div style="color:var(--text-soft);margin-top:1px">${e.d}</div></div>
+      </div>`).join('');
+  }
+}
+
+// ─── UPDATE admSwitch TO INIT TABS ─────────────
+const _origAdmSwitch = admSwitch;
+admSwitch = function(tab, btn) {
+  _origAdmSwitch(tab, btn);
+  admClosePanel();
+  if (tab==='dashboard') dashInit();
+  if (tab==='samples')   { smpInit(); }
+  if (tab==='clients')   { cliInit(); }
+  if (tab==='docs')      { docInit(); }
+};
+
+// ─── UPDATE admClosePanel TO RESTORE ORDER PANEL ─
+const _origAdmClose = admClosePanel;
+admClosePanel = function() {
+  _origAdmClose();
+  _admShowPanel('Order');
+};
 
 // ═══════════════════════════════════════════════
 // TOOLTIP
