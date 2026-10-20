@@ -6064,8 +6064,7 @@ function saveOrderToHistory(order) {
       const d=JSON.parse(el.dataset.chipJson);
       const m=d.method;
       _cp.innerHTML=`<div class="chip-pop-name">${d.name}</div>`+
-        (d.tooltip?`<div class="chip-pop-desc-text" style="margin-bottom:${m?'10px':'0'}">${d.tooltip}</div>`:'')+
-        (m?`<div class="chip-pop-label">Метод дослідження</div><div class="chip-pop-mname">${m.name}</div><div class="chip-pop-std">${m.std||''}</div><div style="margin-top:8px"><a class="chip-pop-link" href="#" onclick="return false">Докладніше про метод →</a></div>`:'');
+        (d.tooltip?`<div class="chip-pop-desc-text">${d.tooltip}</div>`:'');
       _cp.classList.add('show');
       _positionChipPop(el);
     }catch(e){}
@@ -6978,7 +6977,7 @@ async function loadCatalogFromSupabase() {
     for (const chip of serviceChips) {
       if (!chip.service_id || !chip.label) continue;
       if (!svcChips[chip.service_id]) svcChips[chip.service_id] = [];
-      svcChips[chip.service_id].push({ label: chip.label, tooltip: chip.tooltip_title || null, sort_order: chip.sort_order ?? 9999 });
+      svcChips[chip.service_id].push({ label: chip.label, tooltip: chip.tooltip_title || null, sort_order: chip.sort_order != null ? Number(chip.sort_order) : 9999 });
     }
     const svcSymbol = {}; // залишаємо для сумісності з popover
     const svcSymbolName = {};
@@ -7035,7 +7034,7 @@ async function loadCatalogFromSupabase() {
           if (!seen.has(key)) {
             seen.add(key);
             const _name = svcSymbolName[_sym] || _sym || key;
-            result.push({ s: key, name: _name || key, tooltip: chip.tooltip || null, sort_order: chip.sort_order ?? 9999, method: _dm });
+            result.push({ s: key, name: _name || key, tooltip: chip.tooltip || null, sort_order: chip.sort_order != null ? Number(chip.sort_order) : 9999 });
           }
         }
       }
