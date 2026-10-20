@@ -9,12 +9,11 @@
       "schedule": "0 5 * * *"
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "has": [{ "type": "host", "value": "admin.laba.zemlerob.com.ua" }],
-      "destination": "/admin.html"
-    },
-    { "source": "/", "destination": "/index.html" }
+      "src":  "/(.*)",
+      "has":  [{ "type": "host", "value": "admin\\.laba\\.zemlerob\\.com\\.ua" }],
+      "dest": "/admin.html"
+    }
   ]
 }
