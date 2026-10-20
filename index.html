@@ -4597,7 +4597,7 @@ function makeRow(item, type){
         <input type="radio" name="method-${safeCode}" value="${m.id}" ${i===0?'checked':''} style="display:none">
         <div class="ind-method-radio">${i===0?'<svg viewBox="0 0 20 20" width="16" height="16"><circle cx="10" cy="10" r="8" fill="var(--navy)" opacity=".15"/><circle cx="10" cy="10" r="4" fill="var(--navy)"/></svg>':'<svg viewBox="0 0 20 20" width="16" height="16"><circle cx="10" cy="10" r="8" stroke="var(--border)" stroke-width="1.5" fill="none"/></svg>'}</div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:14px;font-weight:700;color:var(--navy)">${m.name}</div>
+          <div style="font-size:14px;font-weight:700;color:var(--navy);white-space:nowrap">${m.name}</div>
           ${m.std && m.std !== m.name ? `<div style="font-size:12px;color:var(--text-soft);margin-top:1px">${m.std}</div>` : ''}
         </div>
         ${m.tag?`<span style="font-size:12px;color:var(--text-soft);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:2px 10px;white-space:nowrap">${m.tag}</span>`:''}
