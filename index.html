@@ -4614,7 +4614,7 @@ function makeRow(item, type){
   const paramsCount = item.params?.length || 0;
   const daysText = item.days ? `${item.days} роб. днів` : '';
   const materialBadge = item.material ? `<div class="srv-material-badge">Матеріал: ${item.material}</div>` : '';
-  const tagsHtml = item.tags?.length ? `<div class="service-tags">${item.tags.map(t=>{const sym=t?.s||t; const chipData=JSON.stringify({name:t?.name||sym,method:t?.method||null}).replace(/"/g,'&quot;'); return `<span class="service-tag" data-chip-json="${chipData}" style="cursor:help">` + sym + `</span>`;}).join('')}</div>` : '';
+  const tagsHtml = item.tags?.length ? `<div class="service-tags">${item.tags.map(t=>{const sym=t?.s||t; const chipData=JSON.stringify({name:t?.name||sym,tooltip:t?.tooltip||null,method:t?.method||null}).replace(/"/g,'&quot;'); return `<span class="service-tag" data-chip-json="${chipData}" style="cursor:help">` + sym + `</span>`;}).join('')}</div>` : '';
 
   return `
 <div class="service-row" id="srow-${safeCode}" data-slug="${itemSlug}">
@@ -6064,6 +6064,7 @@ function saveOrderToHistory(order) {
       const d=JSON.parse(el.dataset.chipJson);
       const m=d.method;
       _cp.innerHTML=`<div class="chip-pop-name">${d.name}</div>`+
+        (d.tooltip?`<div class="chip-pop-desc-text" style="margin-bottom:${m?'10px':'0'}">${d.tooltip}</div>`:'')+
         (m?`<div class="chip-pop-label">Метод дослідження</div><div class="chip-pop-mname">${m.name}</div><div class="chip-pop-std">${m.std||''}</div><div style="margin-top:8px"><a class="chip-pop-link" href="#" onclick="return false">Докладніше про метод →</a></div>`:'');
       _cp.classList.add('show');
       _positionChipPop(el);
@@ -6945,12 +6946,13 @@ async function _sbFetch(table, params = '') {
 // ─── Завантаження каталогу з Supabase ─────────────────────────────────────
 async function loadCatalogFromSupabase() {
   try {
-    const [services, packages, pkgItems, methods, materials] = await Promise.all([
+    const [services, packages, pkgItems, methods, materials, serviceChips] = await Promise.all([
       _sbFetch('catalog_services',      'select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,service_id'),
       _sbFetch('catalog_packages',      'select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,package_id'),
       _sbFetch('catalog_package_items', 'select=*'),
       _sbFetch('catalog_methods',       'select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,method_id').catch(e=>{console.warn('methods fetch:',e);return[];}),
       _sbFetch('catalog_materials',     'select=material_id,name,status,sort_order&order=sort_order.asc.nullslast,material_id').catch(e=>{console.warn('materials fetch:',e);return[];}),
+      _sbFetch('catalog_service_chips', 'select=*&order=sort_order.asc.nullslast,label').catch(e=>{console.warn('service_chips fetch:',e);return[];}),
     ]);
 
     if (!services.length && !packages.length) {
@@ -6971,16 +6973,17 @@ async function loadCatalogFromSupabase() {
       }
     }
 
-    // ── Build service_id → chips[] map (з колонки chips в таблиці Services) ──
-    const svcChips = {}; // service_id → ['chip1', 'chip2', ...]
+    // ── Build service_id → chips[] map (з таблиці catalog_service_chips) ──
+    const svcChips = {}; // service_id → [{label, tooltip, sort_order}, ...]
+    for (const chip of serviceChips) {
+      if (!chip.service_id || !chip.label) continue;
+      if (!svcChips[chip.service_id]) svcChips[chip.service_id] = [];
+      svcChips[chip.service_id].push({ label: chip.label, tooltip: chip.tooltip_title || null, sort_order: chip.sort_order ?? 9999 });
+    }
     const svcSymbol = {}; // залишаємо для сумісності з popover
     const svcSymbolName = {};
     for (const svc of services) {
       if (!svc.service_id) continue;
-      // chips — рядок через кому: "pH активний, Фосфор (P), K"
-      if (svc.chips) {
-        svcChips[svc.service_id] = svc.chips.split(',').map(c => c.trim()).filter(Boolean);
-      }
       // symbol для popover (залишаємо)
       const sym = svc.symbol || svc.short_name || svc.service_id;
       svcSymbol[svc.service_id] = sym;
@@ -7018,7 +7021,7 @@ async function loadCatalogFromSupabase() {
       svcSymbolData[svc.symbol] = { name: svc.name || svc.symbol, method: dm };
     }
 
-    // ── Helper: get unique chip strings for a package (з колонки chips сервісів) ──
+    // ── Helper: get unique chip objects for a package (з catalog_service_chips) ──
     const pkgTags = (pkgId) => {
       const pis = pkgItemsFull[pkgId] || [];
       const seen = new Set();
@@ -7026,15 +7029,17 @@ async function loadCatalogFromSupabase() {
       for (const pi of pis) {
         const chips = svcChips[pi.service_id] || [];
         const _sym = svcSymbol[pi.service_id];
-        const _name = svcSymbolName[_sym] || _sym || chip;
         const _dm = svcDefaultMethod[pi.service_id] || (svcMethods[pi.service_id] || [])[0] || null;
         for (const chip of chips) {
-          if (!seen.has(chip)) {
-            seen.add(chip);
-            result.push({ s: chip, name: _name || chip, method: _dm });
+          const key = chip.label;
+          if (!seen.has(key)) {
+            seen.add(key);
+            const _name = svcSymbolName[_sym] || _sym || key;
+            result.push({ s: key, name: _name || key, tooltip: chip.tooltip || null, sort_order: chip.sort_order ?? 9999, method: _dm });
           }
         }
       }
+      result.sort((a, b) => a.sort_order - b.sort_order);
       return result;
     };
 

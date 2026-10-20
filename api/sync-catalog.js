@@ -93,7 +93,7 @@ function toBool(v, defaultVal = false) {
 
 // ─── Головна функція синку ────────────────────────────────────────────────────
 async function syncCatalog(debug = false) {
-  const [svcRaw, pkgRaw, itemRaw, methRaw, matRaw, resParRaw, svcRelRaw, sFormRaw, sFormFldRaw] = await Promise.all([
+  const [svcRaw, pkgRaw, itemRaw, methRaw, matRaw, resParRaw, svcRelRaw, sFormRaw, sFormFldRaw, svcChipsRaw] = await Promise.all([
     gsFetch('Services'),
     gsFetch('Packages'),
     gsFetch('Package Items'),
@@ -103,6 +103,7 @@ async function syncCatalog(debug = false) {
     gsFetch('Service Relations'),
     gsFetch('Sample Forms'),
     gsFetch('Sample Form Fields'),
+    gsFetch('Service Chips'),
   ]);
 
   const services       = svcRaw.rows;
@@ -114,6 +115,7 @@ async function syncCatalog(debug = false) {
   const serviceRelations = svcRelRaw.rows;
   const sampleForms      = sFormRaw.rows;
   const sampleFormFields = sFormFldRaw.rows;
+  const serviceChips     = svcChipsRaw.rows;
 
   const now = new Date().toISOString();
 
@@ -363,6 +365,17 @@ async function syncCatalog(debug = false) {
       synced_at:    now,
     }));
 
+  // ── Service Chips ──
+  const svcChipRows = serviceChips
+    .filter(r => r.service_id && r.label)
+    .map(r => ({
+      service_id:    r.service_id,
+      label:         r.label,
+      tooltip_title: r.tooltip_title || null,
+      sort_order:    r.sort_order != null ? Number(r.sort_order) : null,
+      synced_at:     now,
+    }));
+
   // DELETE всіх таблиць і вставляємо нові (повна заміна — дзеркало Sheet)
   await Promise.all([
     sbRequest('DELETE', 'catalog_materials?material_id=neq.__none__',                      null).catch(() => {}),
@@ -374,6 +387,7 @@ async function syncCatalog(debug = false) {
     sbRequest('DELETE', 'catalog_service_relations?source_id=neq.__none__',                null).catch(() => {}),
     sbRequest('DELETE', 'catalog_sample_forms?form_id=neq.__none__',                       null).catch(() => {}),
     sbRequest('DELETE', 'catalog_sample_form_fields?form_id=neq.__none__',                 null).catch(() => {}),
+    sbRequest('DELETE', 'catalog_service_chips?service_id=neq.__none__',                   null).catch(() => {}),
   ]);
 
   await Promise.all([
@@ -394,6 +408,9 @@ async function syncCatalog(debug = false) {
   if (sFormFldRows.length) {
     await upsert('catalog_sample_form_fields', 'form_id,field_key', sFormFldRows);
   }
+  if (svcChipRows.length) {
+    await upsert('catalog_service_chips', 'service_id,label', svcChipRows);
+  }
 
   return {
     materials:          matRows.length,
@@ -405,6 +422,7 @@ async function syncCatalog(debug = false) {
     serviceRelations:   svcRelRows.length,
     sampleForms:        sFormRows.length,
     sampleFormFields:   sFormFldRows.length,
+    serviceChips:       svcChipRows.length,
     syncedAt:           now,
   };
 }
