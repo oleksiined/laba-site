@@ -4587,7 +4587,7 @@ function makeRow(item, type){
     </div>
     ${item.methods?.length===1?`
     <!-- Один метод — статичний блок -->
-    <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:10px;margin-top:20px">Метод дослідження</div>
+    <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:10px">Метод дослідження</div>
     <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;background:#fff;margin-bottom:10px">
       <div style="min-width:0">
         <div style="font-size:14px;font-weight:700;color:var(--navy)">${item.methods[0].name}</div>
@@ -4598,7 +4598,7 @@ function makeRow(item, type){
     `:''}
     ${item.methods?.length>1?`
     <!-- Вибір методу -->
-    <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px;margin-top:20px">Оберіть метод дослідження</div>
+    <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px">Оберіть метод дослідження</div>
     <div style="font-size:13px;color:var(--text-soft);margin-bottom:12px">Метод впливає на строк виконання та інтерпретацію результату</div>
     <div class="ind-methods-list" id="methods-${safeCode}">
       ${item.methods.map((m,i)=>`
