@@ -7023,23 +7023,19 @@ async function loadCatalogFromSupabase() {
     // ── Helper: get unique chip objects for a package (з catalog_service_chips) ──
     const pkgTags = (pkgId) => {
       const pis = pkgItemsFull[pkgId] || [];
-      const seen = new Set();
-      const result = [];
+      // Collect all chips across all services, keeping lowest sort_order per label
+      const byLabel = {}; // label → best chip entry
       for (const pi of pis) {
         const chips = svcChips[pi.service_id] || [];
-        const _sym = svcSymbol[pi.service_id];
-        const _dm = svcDefaultMethod[pi.service_id] || (svcMethods[pi.service_id] || [])[0] || null;
         for (const chip of chips) {
           const key = chip.label;
-          if (!seen.has(key)) {
-            seen.add(key);
-            const _name = svcSymbolName[_sym] || _sym || key;
-            result.push({ s: key, name: _name || key, tooltip: chip.tooltip || null, sort_order: chip.sort_order != null ? Number(chip.sort_order) : 9999 });
+          const so = chip.sort_order != null ? Number(chip.sort_order) : 9999;
+          if (!byLabel[key] || so < byLabel[key].sort_order) {
+            byLabel[key] = { s: key, name: key, tooltip: chip.tooltip || null, sort_order: so };
           }
         }
       }
-      result.sort((a, b) => a.sort_order - b.sort_order);
-      return result;
+      return Object.values(byLabel).sort((a, b) => a.sort_order - b.sort_order);
     };
 
     // ── Оновлюємо NC_CATALOG.packages ──
