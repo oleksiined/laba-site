@@ -4707,11 +4707,17 @@ function makeRow(item, type){
     ${(item.indicators?.length||item.params?.length) ? renderParamChips(item) : ''}
     <!-- Приклад протоколу (внизу) -->
     <div style="margin-top:12px">
-      <button class="srv-protocol-btn" onclick="event.preventDefault();showToast('Приклад протоколу буде доступний після публікації')">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"/><path d="M8 7h4M8 10h4M8 13h2" stroke-linecap="round"/></svg>
-        Подивитися приклад результату
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11 3h6v6M17 3l-8 8M8 5H5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
+      ${item.exampleUrl
+        ? `<a class="srv-protocol-btn" href="${item.exampleUrl}" target="_blank" rel="noopener" style="text-decoration:none">
+             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"/><path d="M8 7h4M8 10h4M8 13h2" stroke-linecap="round"/></svg>
+             Подивитися приклад результату
+             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11 3h6v6M17 3l-8 8M8 5H5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+           </a>`
+        : `<button class="srv-protocol-btn" onclick="event.preventDefault();showToast('Приклад результату буде доступний незабаром')">
+             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"/><path d="M8 7h4M8 10h4M8 13h2" stroke-linecap="round"/></svg>
+             Подивитися приклад результату
+             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11 3h6v6M17 3l-8 8M8 5H5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+           </button>`}
     </div>
   </div>
 </div>`;
@@ -7125,10 +7131,11 @@ async function loadCatalogFromSupabase() {
         days:     pkg.turnaround_value || 5,
         tags:     pkgTags(pkg.package_id), tasks:[], params:[], bundles:[],
         groups:   pkg.package_group ? [pkg.package_group] : [],
-        desc:     pkg.short_description || '',
-        descRich: pkg.full_description || pkg.short_description || '',
-        keywords: pkg.search_keywords || '',
-        popular:  pkg.sort_order != null ? Math.max(0, 100 - pkg.sort_order) : 50,
+        desc:           pkg.short_description || '',
+        descRich:       pkg.full_description || pkg.short_description || '',
+        keywords:       pkg.search_keywords || '',
+        popular:        pkg.sort_order != null ? Math.max(0, 100 - pkg.sort_order) : 50,
+        exampleUrl:     pkg.report_example_url || null,
       });
     }
     for (const svc of services) {
@@ -7144,11 +7151,12 @@ async function loadCatalogFromSupabase() {
         name:        svc.name || svc.service_id,
         price:    svc.price,
         material: _matKeyToLabel[mk] || mk,
-        desc:     svc.short_description || '',
-        descRich: svc.full_description || '',
-        keywords: svc.search_keywords || '',
-        groups:   svc.group_name ? [svc.group_name] : [],
-        methods:  svcMethods[svc.service_id] || [],
+        desc:       svc.short_description || '',
+        descRich:   svc.full_description || '',
+        keywords:   svc.search_keywords || '',
+        groups:     svc.group_name ? [svc.group_name] : [],
+        methods:    svcMethods[svc.service_id] || [],
+        exampleUrl: svc.report_example_url || null,
       });
     }
     // ── Показуємо тільки матеріали з Supabase ──
