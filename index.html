@@ -4144,7 +4144,7 @@ function getSrvItems(){
     const expandedQ = expandSearchQuery(searchQ);
     const qWords = expandedQ.split(/\s+/).filter(Boolean);
     items=items.filter(i=>{
-      const haystack=(i.name+' '+i.desc+' '+i.descRich+' '+(i.keywords||'')+' '+(i.params||[]).join(' ')+' '+(i.groups||[]).join(' ')).toLowerCase();
+      const haystack=(i.name+' '+i.desc+' '+i.descRich+' '+(i.keywords||'')+' '+(i.params||[]).join(' ')+' '+(i.groups||[]).join(' ')+' '+(i.tags||[]).map(t=>((t?.s||t)+' '+(t?.tooltip||''))).join(' ')).toLowerCase();
       return qWords.some(w=>haystack.includes(w));
     });
   }
@@ -7116,6 +7116,9 @@ async function loadCatalogFromSupabase() {
     const _matKeyToSvcKey  = { soil:'soil', water:'water', fertilizer:'fertilizer', seeds:'seeds', grain:'grain', plant:'plants' };
     const _matKeyToLabel   = { soil:'Ґрунт', water:'Вода', fertilizer:'Добрива', seeds:'Насіння', grain:'Зерно', plant:'Рослини' };
     Object.values(SERVICES).forEach(s => { s.packages = []; s.individual = []; });
+    // Build service lookup for package keyword enrichment
+    const svcById = {};
+    for (const svc of services) { if (svc.service_id) svcById[svc.service_id] = svc; }
     for (const pkg of packages) {
       if (pkg.status !== 'active') continue;
       const mk = _matIdToKey[pkg.material_id] || 'soil';
@@ -7133,7 +7136,7 @@ async function loadCatalogFromSupabase() {
         groups:   pkg.package_group ? [pkg.package_group] : [],
         desc:           pkg.short_description || '',
         descRich:       pkg.full_description || pkg.short_description || '',
-        keywords:       pkg.search_keywords || '',
+        keywords:       [pkg.search_keywords||'', ...(pkgItemsFull[pkg.package_id]||[]).map(pi=>{ const s=svcById[pi.service_id]; return s ? (s.name||'') + ' ' + (s.short_description||'') + ' ' + (s.search_keywords||'') : ''; })].join(' '),
         popular:        pkg.sort_order != null ? Math.max(0, 100 - pkg.sort_order) : 50,
         exampleUrl:     pkg.report_example_url || null,
       });
