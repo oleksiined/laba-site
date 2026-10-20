@@ -212,15 +212,22 @@ async function syncCatalog(debug = false) {
     }));
 
   // ── Package Items ──
-  const itemRows = pkgItems
+  // Deduplicate by (package_id, service_id) — keep last occurrence per key
+  // to avoid "ON CONFLICT DO UPDATE command cannot affect a row a second time"
+  const itemMap = new Map();
+  pkgItems
     .filter(r => r.package_id && r.service_id)
-    .map(r => ({
-      package_id:    r.package_id,
-      service_id:    r.service_id,
-      method_id:     r.method_id     || null,
-      display_order: r.display_order ? Number(r.display_order) : null,
-      required:      toBool(r.required, true),
-    }));
+    .forEach(r => {
+      const key = `${r.package_id}::${r.service_id}`;
+      itemMap.set(key, {
+        package_id:    r.package_id,
+        service_id:    r.service_id,
+        method_id:     r.method_id     || null,
+        display_order: r.display_order ? Number(r.display_order) : null,
+        required:      toBool(r.required, true),
+      });
+    });
+  const itemRows = [...itemMap.values()];
 
   // ── Materials ──
   const matRows = materials
