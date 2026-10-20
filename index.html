@@ -368,7 +368,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .service-short{font-size:12px;color:var(--text-soft);line-height:1.5;max-width:100%}
 .service-tags{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap}
 .service-tag{font-size:11px;padding:4px 10px;border-radius:6px;background:#f2f2f2;color:#555;border:1.5px solid #d4d4d4;font-weight:600;cursor:default;user-select:none}
-#chipPopover{position:fixed;z-index:2100;display:none;background:#fff;border:1.5px solid var(--border);border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.13);padding:14px 16px;min-width:210px;max-width:270px;pointer-events:none;cursor:default;user-select:none}
+#chipPopover{position:fixed;z-index:2100;display:none;background:#fff;border:1.5px solid var(--border);border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.13);padding:14px 16px;min-width:210px;max-width:270px;cursor:default;user-select:none}
 #chipPopover.show{display:block}
 .chip-pop-name{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px}
 .chip-pop-label{font-size:11px;font-weight:600;color:var(--t2);text-transform:none;letter-spacing:0;margin-bottom:3px}
@@ -6049,6 +6049,9 @@ function saveOrderToHistory(order) {
 
   // ── Chip popover (rich popup for package service chips) ──
   const _cp = document.getElementById('chipPopover');
+  let _cpHideTimer = null;
+  function _cpCancelHide(){ if(_cpHideTimer){clearTimeout(_cpHideTimer);_cpHideTimer=null;} }
+  function _cpScheduleHide(){ _cpHideTimer=setTimeout(()=>{ if(_cp)_cp.classList.remove('show'); },120); }
   function _positionChipPop(el){
     if(!_cp)return;
     const r=el.getBoundingClientRect();
@@ -6058,6 +6061,7 @@ function saveOrderToHistory(order) {
     _cp.style.left=left+'px'; _cp.style.top=top+'px';
   }
   document.addEventListener('mouseover',e=>{
+    if(e.target.closest('#chipPopover')){ _cpCancelHide(); return; }
     const el=e.target.closest('[data-chip-json]');
     if(!el||!_cp)return;
     try{
@@ -6066,11 +6070,14 @@ function saveOrderToHistory(order) {
       _cp.innerHTML=
         (d.tooltip?`<div class="chip-pop-desc-text" style="margin-bottom:${m?'10px':'0'}">${d.tooltip}</div>`:'')+
         (m?`<div class="chip-pop-label">Метод дослідження</div><div class="chip-pop-mname">${m.name}</div>${m.std&&m.std!==m.name?`<div class="chip-pop-std">${m.std}</div>`:''}<div style="margin-top:8px"><a class="chip-pop-link" href="#" onclick="return false">Докладніше про метод →</a></div>`:'');
+      _cpCancelHide();
       _cp.classList.add('show');
       _positionChipPop(el);
     }catch(e){}
   });
-  document.addEventListener('mouseout',e=>{ if(e.target.closest('[data-chip-json]')&&_cp)_cp.classList.remove('show'); });
+  document.addEventListener('mouseout',e=>{
+    if(e.target.closest('[data-chip-json]')||e.target.closest('#chipPopover')) _cpScheduleHide();
+  });
 
   // ── Pkg description popover (same white style as chipPopover) ──
   document.addEventListener('mouseover',e=>{
