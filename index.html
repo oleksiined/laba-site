@@ -3745,9 +3745,18 @@ const TASKS_BY_MAT = {
   };
 
   window.hsbSubmit = function() {
-    const val = (document.getElementById('homeSearchInput')||{}).value || '';
-    searchQ = val; goServices();
+    const val = ((document.getElementById('homeSearchInput')||{}).value || '').trim();
     hsbCloseDropdown();
+    if (!val) { goServices(); return; }
+    // Navigate to research page with search query preserved
+    srvMat=''; srvFmt='all'; srvTask='all'; searchQ=val; currentMaterial='';
+    navigate('services');
+    setTimeout(()=>{
+      const si = document.getElementById('searchInput'); if(si) si.value=val;
+      document.querySelectorAll('.mat-btn,.fmt-tab').forEach(b=>b.classList.remove('active'));
+      document.getElementById('allResearchBtn')?.classList.add('active');
+      renderTaskFilter(); render();
+    }, 50);
   };
 
   window.hsbClear = function() {
@@ -4589,7 +4598,7 @@ function makeRow(item, type){
     `:''}
     ${item.methods?.length>1?`
     <!-- Вибір методу -->
-    <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px">Оберіть метод дослідження</div>
+    <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px;margin-top:-10px">Оберіть метод дослідження</div>
     <div style="font-size:13px;color:var(--text-soft);margin-bottom:12px">Метод впливає на строк виконання та інтерпретацію результату</div>
     <div class="ind-methods-list" id="methods-${safeCode}">
       ${item.methods.map((m,i)=>`
@@ -4673,28 +4682,17 @@ function makeRow(item, type){
   </div>
   <div class="service-body" onclick="event.stopPropagation()">
     <!-- 4 кнопки результатів -->
-    <div class="srv-result-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;width:fit-content">
-      <button class="srv-result-btn srv-result-btn--protocol" onclick="event.preventDefault();showToast('Буде доступно після публікації')">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"/><path d="M8 7h4M8 10h4M8 13h2" stroke-linecap="round"/></svg>
-        Протокол
-        <div class="srv-btn-tip"><div class="srv-btn-tip-title">Протокол</div><div class="srv-btn-tip-desc">Офіційний документ з печаткою та підписом. Містить результати всіх показників із зазначенням методики та НД.</div></div>
-      </button>
-      <button class="srv-result-btn srv-result-btn--compare" onclick="event.preventDefault();showToast('Буде доступно після публікації')">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="10" width="3" height="7" rx="1"/><rect x="8.5" y="6" width="3" height="11" rx="1"/><rect x="14" y="3" width="3" height="14" rx="1"/></svg>
-        Порівняльний звіт
-        <div class="srv-btn-tip"><div class="srv-btn-tip-title">Порівняльний звіт</div><div class="srv-btn-tip-desc">Динаміка показників у часі: порівняння з попередніми аналізами того ж поля або зразка.</div></div>
-      </button>
-      <button class="srv-result-btn srv-result-btn--reco" onclick="event.preventDefault();showToast('Буде доступно після публікації')">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3c0 0-5 3-5 8a5 5 0 0010 0c0-5-5-8-5-8z"/><path d="M10 11v3M8 17h4" stroke-linecap="round"/></svg>
-        Рекомендації
-        <div class="srv-btn-tip"><div class="srv-btn-tip-title">Рекомендації</div><div class="srv-btn-tip-desc">Агрономічні поради на основі результатів: дози добрив, заходи з покращення родючості ґрунту.</div></div>
-      </button>
-      <button class="srv-result-btn srv-result-btn--interp" onclick="event.preventDefault();showToast('Буде доступно після публікації')">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2a5 5 0 015 5c0 2.5-1.5 4-2.5 5H7.5C6.5 11 5 9.5 5 7a5 5 0 015-5z"/><path d="M7.5 15h5M8.5 18h3" stroke-linecap="round"/></svg>
-        Інтерпретація
-        <div class="srv-btn-tip"><div class="srv-btn-tip-title">Інтерпретація</div><div class="srv-btn-tip-desc">Пояснення результатів простою мовою: що означають значення, які є відхилення та ризики.</div></div>
-      </button>
-    </div>
+    ${(()=>{
+      const dl = item.deliverables;
+      const show = (key) => !dl || dl.includes(key);
+      const btns = [
+        show('protocol') ? `<button class="srv-result-btn srv-result-btn--protocol" onclick="event.preventDefault();showToast('Буде доступно після публікації')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"/><path d="M8 7h4M8 10h4M8 13h2" stroke-linecap="round"/></svg>Протокол<div class="srv-btn-tip"><div class="srv-btn-tip-title">Протокол</div><div class="srv-btn-tip-desc">Офіційний документ з печаткою та підписом. Містить результати всіх показників із зазначенням методики та НД.</div></div></button>` : '',
+        show('comparison_report') ? `<button class="srv-result-btn srv-result-btn--compare" onclick="event.preventDefault();showToast('Буде доступно після публікації')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="10" width="3" height="7" rx="1"/><rect x="8.5" y="6" width="3" height="11" rx="1"/><rect x="14" y="3" width="3" height="14" rx="1"/></svg>Порівняльний звіт<div class="srv-btn-tip"><div class="srv-btn-tip-title">Порівняльний звіт</div><div class="srv-btn-tip-desc">Динаміка показників у часі: порівняння з попередніми аналізами того ж поля або зразка.</div></div></button>` : '',
+        show('recommendations') ? `<button class="srv-result-btn srv-result-btn--reco" onclick="event.preventDefault();showToast('Буде доступно після публікації')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3c0 0-5 3-5 8a5 5 0 0010 0c0-5-5-8-5-8z"/><path d="M10 11v3M8 17h4" stroke-linecap="round"/></svg>Рекомендації<div class="srv-btn-tip"><div class="srv-btn-tip-title">Рекомендації</div><div class="srv-btn-tip-desc">Агрономічні поради на основі результатів: дози добрив, заходи з покращення родючості ґрунту.</div></div></button>` : '',
+        show('interpretation') ? `<button class="srv-result-btn srv-result-btn--interp" onclick="event.preventDefault();showToast('Буде доступно після публікації')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2a5 5 0 015 5c0 2.5-1.5 4-2.5 5H7.5C6.5 11 5 9.5 5 7a5 5 0 015-5z"/><path d="M7.5 15h5M8.5 18h3" stroke-linecap="round"/></svg>Інтерпретація<div class="srv-btn-tip"><div class="srv-btn-tip-title">Інтерпретація</div><div class="srv-btn-tip-desc">Пояснення результатів простою мовою: що означають значення, які є відхилення та ризики.</div></div></button>` : '',
+      ].filter(Boolean).join('');
+      return btns ? `<div class="srv-result-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;width:fit-content">${btns}</div>` : '';
+    })()}
     <!-- Чіпи елементів пакету -->
     ${tagsHtml ? `<div style="margin-bottom:14px">
       <div style="font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Дослідження пакету · ${item.tags.length}</div>
@@ -7136,9 +7134,10 @@ async function loadCatalogFromSupabase() {
         groups:   pkg.package_group ? [pkg.package_group] : [],
         desc:           pkg.short_description || '',
         descRich:       pkg.full_description || pkg.short_description || '',
-        keywords:       [pkg.search_keywords||'', ...(pkgItemsFull[pkg.package_id]||[]).map(pi=>{ const s=svcById[pi.service_id]; return s ? (s.name||'') + ' ' + (s.short_description||'') + ' ' + (s.search_keywords||'') : ''; })].join(' '),
+        keywords:       [pkg.search_keywords||'', ...(pkgItemsFull[pkg.package_id]||[]).map(pi=>{ const s=svcById[pi.service_id]; return s ? (s.name||'') + ' ' + (s.search_keywords||'') : ''; }), ...(pkgItemsFull[pkg.package_id]||[]).flatMap(pi=>(svcChips[pi.service_id]||[]).map(c=>c.label||''))].join(' '),
         popular:        pkg.sort_order != null ? Math.max(0, 100 - pkg.sort_order) : 50,
         exampleUrl:     pkg.report_example_url || null,
+        deliverables:   pkg.result_deliverables ? pkg.result_deliverables.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean) : null,
       });
     }
     for (const svc of services) {

@@ -171,6 +171,7 @@ async function syncCatalog(debug = false) {
       vat_included:     toBool(r.vat_included, false),
       search_keywords:      r.search_keywords      || null,
       report_example_url:   r.report_example_url   || null,
+      result_deliverables:  r.result_deliverables  || null,
       synced_at:            now,
     }));
 
