@@ -2446,6 +2446,80 @@ main{flex:1}
 .adm-panel-body.active{display:block}
 /* ── TESTS LIST ── */
 .adm-test-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px}
+/* KPI cards redesign */
+.adm-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:0 20px 16px}
+.adm-kpi-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;cursor:pointer;transition:box-shadow .15s,border-color .15s}
+.adm-kpi-card:hover{border-color:#c7d0dc;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.adm-kpi-card.active{border-color:var(--navy);box-shadow:0 0 0 2px rgba(26,54,93,.1)}
+.adm-kpi-left{flex:1}
+.adm-kpi-label{font-size:12px;color:var(--text-soft);margin-bottom:6px;font-weight:500}
+.adm-kpi-val{font-size:26px;font-weight:700;color:var(--text-dark);line-height:1;margin-bottom:5px}
+.adm-kpi-trend{font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:3px}
+.adm-kpi-trend.up{color:#10B981}.adm-kpi-trend.down{color:#EF4444}
+.adm-kpi-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.adm-kpi-icon svg{width:20px;height:20px}
+.adm-kpi-icon.kpi-gray{background:#F3F4F6;color:#6B7280}
+.adm-kpi-icon.kpi-yellow{background:#FEF9C3;color:#CA8A04}
+.adm-kpi-icon.kpi-blue{background:#EFF6FF;color:#3B82F6}
+.adm-kpi-icon.kpi-green{background:#ECFDF5;color:#10B981}
+/* Table amount column */
+.adm-amount{font-weight:600;color:var(--text-dark);white-space:nowrap}
+/* Filter bar improvements */
+.adm-filter-date{padding:7px 11px;border:1.5px solid var(--border);border-radius:7px;font-size:12.5px;color:var(--text-mid);background:var(--white);cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.adm-filter-date svg{width:14px;height:14px;opacity:.6}
+.adm-filter-icon-btn{padding:7px 9px;border:1.5px solid var(--border);border-radius:7px;background:var(--white);cursor:pointer;color:var(--text-soft);display:flex;align-items:center}
+.adm-filter-icon-btn svg{width:15px;height:15px}
+/* Panel full redesign */
+.adm-panel-hd2{padding:14px 16px 0}
+.adm-panel-hd2-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.adm-panel-hd2-num{font-size:15px;font-weight:700;color:var(--text-dark)}
+.adm-panel-hd2-meta{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:12px;color:var(--text-soft)}
+.adm-panel-hd2-client{font-size:13px;font-weight:600;color:var(--text-dark)}
+.adm-panel-menu-btn{width:30px;height:30px;border-radius:7px;border:1.5px solid var(--border);background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-soft)}
+/* Panel tabs */
+.adm-ptabs{display:flex;border-bottom:2px solid var(--border);padding:0 16px;margin:10px 0 0;gap:0}
+.adm-ptab{padding:7px 12px;font-size:12.5px;font-weight:500;color:var(--text-soft);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:color .15s,border-color .15s}
+.adm-ptab.active{color:var(--navy);border-bottom-color:var(--navy);font-weight:600}
+.adm-ptab-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--navy);color:#fff;font-size:9.5px;font-weight:700;margin-left:4px}
+.adm-ptab-body{display:none;padding:14px 16px 16px;overflow-y:auto;flex:1}
+.adm-ptab-body.active{display:block}
+/* Order info section */
+.adm-oi-section{margin-bottom:14px}
+.adm-oi-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-soft);margin-bottom:8px}
+.adm-oi-row{display:flex;margin-bottom:6px;gap:8px;font-size:12.5px}
+.adm-oi-lbl{color:var(--text-soft);min-width:90px;flex-shrink:0}
+.adm-oi-val{color:var(--text-dark);font-weight:500;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.adm-pdv-badge{padding:1px 5px;background:#DBEAFE;color:#1D4ED8;border-radius:4px;font-size:10px;font-weight:700}
+.adm-oi-link{color:var(--navy);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+/* Mini stats row */
+.adm-mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.adm-mini-stat{background:var(--white);padding:10px 12px;text-align:center}
+.adm-mini-stat-val{font-size:17px;font-weight:700;color:var(--text-dark);line-height:1.1}
+.adm-mini-stat-lbl{font-size:10.5px;color:var(--text-soft);margin-top:3px;display:flex;align-items:center;justify-content:center;gap:4px}
+.adm-mini-stat-lbl svg{width:12px;height:12px;opacity:.6}
+/* Steps progress */
+.adm-steps-wrap{margin-bottom:14px}
+.adm-steps-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-soft);margin-bottom:10px}
+.adm-steps{display:flex;align-items:flex-start;gap:0;position:relative}
+.adm-step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}
+.adm-step-line{position:absolute;top:11px;left:50%;right:-50%;height:2px;background:var(--border);z-index:0}
+.adm-step:last-child .adm-step-line{display:none}
+.adm-step-dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;z-index:1;flex-shrink:0;font-size:9px}
+.adm-step-dot.done{background:#10B981;border-color:#10B981;color:#fff}
+.adm-step-dot.cur{background:var(--white);border-color:var(--navy);color:var(--navy)}
+.adm-step-lbl{font-size:10px;color:var(--text-soft);margin-top:5px;text-align:center;line-height:1.2}
+.adm-step-sub{font-size:9.5px;color:var(--text-soft);text-align:center;margin-top:1px;font-style:italic}
+.adm-step-lbl.done{color:var(--text-mid)}.adm-step-lbl.cur{color:var(--navy);font-weight:600}
+.adm-step-line.done{background:#10B981}
+/* Note CTA */
+.adm-note-cta{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;border:1.5px dashed var(--border);border-radius:9px;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:8px}
+.adm-note-cta:hover{border-color:var(--navy);background:#F8FAFF}
+.adm-note-cta-left{display:flex;align-items:center;gap:10px}
+.adm-note-cta-ic{width:32px;height:32px;border-radius:8px;background:#F0F4FF;color:var(--navy);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.adm-note-cta-ic svg{width:16px;height:16px}
+.adm-note-cta-title{font-size:12.5px;font-weight:600;color:var(--text-dark)}
+.adm-note-cta-sub{font-size:11px;color:var(--text-soft);margin-top:1px}
+.adm-note-cta-arr{color:var(--text-soft);font-size:16px}
 .adm-test-row:last-child{border-bottom:none}
 .adm-test-name{color:var(--text-mid)}
 /* ── CLIENT AVATAR ── */
@@ -3274,56 +3348,72 @@ main{flex:1}
         <div class="adm-topbar">
           <div>
             <div class="adm-page-title">Замовлення</div>
-            <div class="adm-page-sub">Обробка замовлень на аналізи. Контроль зразків, оплати та статусів.</div>
+            <div class="adm-page-sub">Керуйте замовленнями та відстежуйте етапи обробки</div>
           </div>
           <div class="adm-topbar-actions">
             <button class="adm-btn adm-btn-ghost">
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4h12M4 8h8M4 12h4" stroke-linecap="round"/></svg>
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="15" height="15"><path d="M10 13V4M6 9l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16h12" stroke-linecap="round"/></svg>
               Експорт
             </button>
             <button class="adm-btn adm-btn-primary" onclick="navigate('services')">
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>
               Нове замовлення
             </button>
           </div>
         </div>
 
-        <!-- Stats -->
-        <div class="adm-stats-row">
-          <div class="adm-stat" onclick="admStatFilter('new',this)">
-            <div class="adm-stat-icon ic-gray">
+        <!-- KPI cards -->
+        <div class="adm-kpi-row">
+          <div class="adm-kpi-card" onclick="admStatFilter('',this)" id="kpiAll">
+            <div class="adm-kpi-left">
+              <div class="adm-kpi-label">Всього замовлень</div>
+              <div class="adm-kpi-val" id="admStatAll">128</div>
+              <div class="adm-kpi-trend up">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12"><path d="M10 4l6 6H4l6-6z"/></svg>
+                <span id="admKpiTrendAll">+12%</span>
+              </div>
+            </div>
+            <div class="adm-kpi-icon kpi-gray">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"/><path d="M8 7h4M8 10h4M8 13h2" stroke-linecap="round"/></svg>
             </div>
-            <div>
-              <div class="adm-stat-num" id="admStatNew">8</div>
-              <div class="adm-stat-label">Нові замовлення</div>
-            </div>
           </div>
-          <div class="adm-stat" onclick="admStatFilter('waiting',this)">
-            <div class="adm-stat-icon ic-yellow">
+          <div class="adm-kpi-card" onclick="admStatFilter('waiting',this)" id="kpiWait">
+            <div class="adm-kpi-left">
+              <div class="adm-kpi-label">Очікують зразки</div>
+              <div class="adm-kpi-val" id="admStatWait">18</div>
+              <div class="adm-kpi-trend up">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12"><path d="M10 4l6 6H4l6-6z"/></svg>
+                <span>+5%</span>
+              </div>
+            </div>
+            <div class="adm-kpi-icon kpi-yellow">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l2.5 2.5" stroke-linecap="round"/></svg>
             </div>
-            <div>
-              <div class="adm-stat-num" id="admStatWait">12</div>
-              <div class="adm-stat-label">Очікують зразки</div>
-            </div>
           </div>
-          <div class="adm-stat" onclick="admStatFilter('work',this)">
-            <div class="adm-stat-icon ic-blue">
+          <div class="adm-kpi-card" onclick="admStatFilter('work',this)" id="kpiWork">
+            <div class="adm-kpi-left">
+              <div class="adm-kpi-label">У роботі</div>
+              <div class="adm-kpi-val" id="admStatWork">32</div>
+              <div class="adm-kpi-trend up">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12"><path d="M10 4l6 6H4l6-6z"/></svg>
+                <span>+9%</span>
+              </div>
+            </div>
+            <div class="adm-kpi-icon kpi-blue">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 3v8l-2 4h8l-2-4V3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 3h4" stroke-linecap="round"/></svg>
             </div>
-            <div>
-              <div class="adm-stat-num" id="admStatWork">14</div>
-              <div class="adm-stat-label">У роботі</div>
-            </div>
           </div>
-          <div class="adm-stat" onclick="admStatFilter('done',this)">
-            <div class="adm-stat-icon ic-green">
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="7"/><path d="M7 10l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="adm-kpi-card" onclick="admStatFilter('done',this)" id="kpiDone">
+            <div class="adm-kpi-left">
+              <div class="adm-kpi-label">Готові</div>
+              <div class="adm-kpi-val" id="admStatDone">58</div>
+              <div class="adm-kpi-trend up">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12"><path d="M10 4l6 6H4l6-6z"/></svg>
+                <span>+15%</span>
+              </div>
             </div>
-            <div>
-              <div class="adm-stat-num" id="admStatDone">28</div>
-              <div class="adm-stat-label">Готові</div>
+            <div class="adm-kpi-icon kpi-green">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="7"/><path d="M7 10l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
           </div>
         </div>
@@ -3332,9 +3422,9 @@ main{flex:1}
         <div class="adm-table-wrap">
           <div class="adm-table-card">
             <div class="adm-toolbar">
-              <div class="adm-search-wrap">
+              <div class="adm-search-wrap" style="flex:1;max-width:320px">
                 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="5"/><path d="M16 16l-3-3" stroke-linecap="round"/></svg>
-                <input type="text" id="admSearchIn" placeholder="Пошук за номером або клієнтом…" oninput="admRender()">
+                <input type="text" id="admSearchIn" placeholder="Пошук замовлень, клієнтів, зразків…" oninput="admRender()">
               </div>
               <select class="adm-filter-sel" id="admFStatus" onchange="admRender()">
                 <option value="">Статус: Всі</option>
@@ -3350,6 +3440,13 @@ main{flex:1}
                 <option value="unpaid">Не оплачено</option>
                 <option value="partial">Частково</option>
               </select>
+              <button class="adm-filter-date">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="14" height="13" rx="2"/><path d="M7 2v4M13 2v4M3 9h14" stroke-linecap="round"/></svg>
+                Дата
+              </button>
+              <button class="adm-filter-icon-btn">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h12M6 10h8M8 15h4" stroke-linecap="round"/></svg>
+              </button>
             </div>
             <div style="overflow-x:auto">
               <table class="adm-table">
@@ -3358,11 +3455,12 @@ main{flex:1}
                     <th style="width:36px"><input type="checkbox" id="admSelAll" onchange="admToggleAll(this)"></th>
                     <th class="sort" onclick="admSort('id')">№ замовлення <span id="admSortId"></span></th>
                     <th class="sort" onclick="admSort('client')">Клієнт <span id="admSortClient"></span></th>
-                    <th>Зразки</th>
+                    <th class="sort" onclick="admSort('samples')">Зразки <span></span></th>
                     <th class="sort" onclick="admSort('payment')">Оплата <span id="admSortPayment"></span></th>
                     <th class="sort" onclick="admSort('status')">Статус <span id="admSortStatus"></span></th>
                     <th class="sort" onclick="admSort('date')">Дата <span id="admSortDate"></span></th>
-                    <th style="width:30px"></th>
+                    <th class="sort" onclick="admSort('amountRaw')">Сума <span></span></th>
+                    <th style="width:28px"></th>
                   </tr>
                 </thead>
                 <tbody id="admOrdersBody"></tbody>
@@ -3630,84 +3728,159 @@ main{flex:1}
 
     <!-- ── RIGHT DETAIL PANEL ── -->
     <aside class="adm-panel" id="admPanel">
-      <div class="adm-panel-head">
-        <span class="adm-panel-num" id="admPanelNum">—</span>
-        <button class="adm-panel-x" onclick="admClosePanel()">✕</button>
+      <!-- Panel header (shared) -->
+      <div class="adm-panel-hd2">
+        <div class="adm-panel-hd2-top">
+          <span class="adm-panel-hd2-num" id="admPanelNum">—</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="adm-pill" id="admPanelStat"></span>
+            <button class="adm-panel-menu-btn" title="Меню">⋯</button>
+            <button class="adm-panel-x" onclick="admClosePanel()">✕</button>
+          </div>
+        </div>
+        <div class="adm-panel-hd2-meta">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><rect x="3" y="4" width="14" height="13" rx="2"/><path d="M7 2v4M13 2v4M3 9h14" stroke-linecap="round"/></svg>
+          <span id="admPanelDate2">—</span>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><circle cx="10" cy="7" r="3"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke-linecap="round"/></svg>
+          <span id="admPanelCName2" class="adm-panel-hd2-client">—</span>
+        </div>
       </div>
-      <div class="adm-panel-status-wrap">
-        <span class="adm-pill" id="admPanelStat"></span>
-      </div>
+
       <!-- ORDER body (default) -->
       <div class="adm-panel-body active" id="admPanelOrder">
+        <!-- tabs nav -->
+        <div class="adm-ptabs" id="admOrderTabs">
+          <div class="adm-ptab active" onclick="admPanelTab('general',this)">Загальна</div>
+          <div class="adm-ptab" onclick="admPanelTab('samples',this)">Зразки<span class="adm-ptab-badge" id="admPTabSCount">0</span></div>
+          <div class="adm-ptab" onclick="admPanelTab('payment',this)">Оплата</div>
+          <div class="adm-ptab" onclick="admPanelTab('docs',this)">Документи</div>
+          <div class="adm-ptab" onclick="admPanelTab('history',this)">Історія</div>
+        </div>
 
-      <div class="adm-panel-sec">
-        <div class="adm-panel-sec-title">Клієнт</div>
-        <div class="adm-panel-client-hd">
-          <div class="adm-panel-client-ic" id="admPanelCIcon">ФГ</div>
-          <span id="admPanelCName">—</span>
-        </div>
-        <div class="adm-panel-cl-row">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="7" r="3"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke-linecap="round"/></svg>
-          <span id="admPanelCContact">—</span>
-        </div>
-        <div class="adm-panel-cl-row">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 6l8 5 8-5"/><rect x="2" y="4" width="16" height="12" rx="2"/></svg>
-          <span id="admPanelCEmail">—</span>
-        </div>
-        <div class="adm-panel-cl-row">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4l3.5 1L9 7.5l-1.5 1.5a11 11 0 005.5 5.5L14.5 13l2.5 1.5L18 18c-8.3.7-15-6-14-14z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span id="admPanelCPhone">—</span>
-        </div>
-      </div>
-
-      <div class="adm-panel-sec">
-        <div class="adm-meta-row">
-          <div class="adm-meta-item">
-            <div class="adm-meta-label">Сума</div>
-            <div class="adm-meta-val" id="admPanelAmount">—</div>
+        <!-- TAB: Загальна -->
+        <div class="adm-ptab-body active" id="admOTab-general">
+          <!-- Інформація про замовлення -->
+          <div class="adm-oi-section">
+            <div class="adm-oi-section-title">Інформація про замовлення</div>
+            <div class="adm-oi-row">
+              <span class="adm-oi-lbl">Клієнт</span>
+              <span class="adm-oi-val"><span class="adm-oi-link" id="admOIClient">—</span>
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="12" height="12"><path d="M11 3h6v6M17 3l-8 8M9 5H5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </div>
+            <div class="adm-oi-row">
+              <span class="adm-oi-lbl">Тип платника</span>
+              <span class="adm-oi-val" id="admOIPayerType">—</span>
+            </div>
+            <div class="adm-oi-row">
+              <span class="adm-oi-lbl">Контактна особа</span>
+              <span class="adm-oi-val" id="admOIContact">—</span>
+            </div>
+            <div class="adm-oi-row">
+              <span class="adm-oi-lbl">Реквізити</span>
+              <span class="adm-oi-val" id="admOIReqs">—</span>
+            </div>
+            <div class="adm-oi-row">
+              <span class="adm-oi-lbl">Доставка</span>
+              <span class="adm-oi-val" id="admOIDelivery">—</span>
+            </div>
           </div>
-          <div class="adm-meta-item">
-            <div class="adm-meta-label">Оплата</div>
-            <div class="adm-meta-val" id="admPanelPayStatus">—</div>
+          <!-- Mini stats -->
+          <div class="adm-mini-stats">
+            <div class="adm-mini-stat">
+              <div class="adm-mini-stat-val" id="admMSamples">0</div>
+              <div class="adm-mini-stat-lbl">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 3v8l-2 4h8l-2-4V3"/><path d="M7 3h6" stroke-linecap="round"/></svg>
+                Зразків
+              </div>
+            </div>
+            <div class="adm-mini-stat">
+              <div class="adm-mini-stat-val" id="admMStudies">0</div>
+              <div class="adm-mini-stat-lbl">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h12M4 10h12M4 14h6" stroke-linecap="round"/></svg>
+                Досліджень
+              </div>
+            </div>
+            <div class="adm-mini-stat">
+              <div class="adm-mini-stat-val" id="admMAmount">—</div>
+              <div class="adm-mini-stat-lbl">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="14" height="11" rx="2"/><path d="M3 9h14" stroke-linecap="round"/><circle cx="10" cy="13" r="1.5" fill="currentColor" stroke="none"/></svg>
+                Сума
+              </div>
+            </div>
           </div>
-          <div class="adm-meta-item">
-            <div class="adm-meta-label">Дата</div>
-            <div class="adm-meta-val" id="admPanelDate">—</div>
+          <!-- Steps progress -->
+          <div class="adm-steps-wrap">
+            <div class="adm-steps-title">Етапи замовлення</div>
+            <div class="adm-steps" id="admSteps">
+              <!-- filled by JS -->
+            </div>
+          </div>
+          <!-- Note CTA -->
+          <div class="adm-note-cta" onclick="alert('Функцію приміток буде підключено до Supabase')">
+            <div class="adm-note-cta-left">
+              <div class="adm-note-cta-ic">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M7 7h6M7 10h6M7 13h3" stroke-linecap="round"/></svg>
+              </div>
+              <div>
+                <div class="adm-note-cta-title">Додати примітку для клієнта</div>
+                <div class="adm-note-cta-sub">Інформація буде доступна в особистому кабінеті</div>
+              </div>
+            </div>
+            <span class="adm-note-cta-arr">›</span>
           </div>
         </div>
-      </div>
 
-      <div class="adm-panel-sec">
-        <div class="adm-samples-hd">
-          <div class="adm-panel-sec-title" style="margin-bottom:0">Зразки (<span id="admPanelSCount">0</span>)</div>
-          <span class="adm-samples-all">Всі ›</span>
+        <!-- TAB: Зразки -->
+        <div class="adm-ptab-body" id="admOTab-samples">
+          <div id="admPanelSamples" style="display:flex;flex-direction:column;gap:0"></div>
+          <div style="margin-top:10px">
+            <button class="adm-pbtn adm-pbtn-green" onclick="admActionReceive()">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Позначити отримано
+            </button>
+          </div>
         </div>
-        <div id="admPanelSamples"></div>
-      </div>
 
-      <div class="adm-panel-actions">
-        <button class="adm-pbtn adm-pbtn-green" onclick="admActionReceive()">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Позначити отримано
-        </button>
-        <button class="adm-pbtn adm-pbtn-sec" onclick="admActionStatus()">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M4 6h12M4 10h12M4 14h12" stroke-linecap="round"/></svg>
-          Змінити статус
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="11" height="11"><path d="M5 8l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <button class="adm-pbtn adm-pbtn-out">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M11 3h6v6M17 3l-8 8M9 5H5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Відкрити деталі
-        </button>
-      </div>
-
-      <div class="adm-activity">
-        <div class="adm-act-hd">
-          <div class="adm-panel-sec-title" style="margin-bottom:0">Останні дії</div>
-          <span class="adm-act-all">Всі ›</span>
+        <!-- TAB: Оплата -->
+        <div class="adm-ptab-body" id="admOTab-payment">
+          <div class="adm-oi-section">
+            <div class="adm-oi-section-title">Оплата</div>
+            <div class="adm-oi-row"><span class="adm-oi-lbl">Статус</span><span class="adm-oi-val" id="admPayStatFull">—</span></div>
+            <div class="adm-oi-row"><span class="adm-oi-lbl">Сума</span><span class="adm-oi-val" id="admPayAmount2">—</span></div>
+            <div class="adm-oi-row"><span class="adm-oi-lbl">Дата рахунку</span><span class="adm-oi-val" id="admPayDate">—</span></div>
+          </div>
+          <button class="adm-pbtn adm-pbtn-sec" onclick="alert('Надсилання рахунку — підключити до Supabase')">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M2 6l8 5 8-5"/><rect x="2" y="4" width="16" height="12" rx="2"/></svg>
+            Надіслати рахунок
+          </button>
         </div>
-        <div id="admPanelActivity"></div>
-      </div>
+
+        <!-- TAB: Документи -->
+        <div class="adm-ptab-body" id="admOTab-docs">
+          <div style="color:var(--text-soft);font-size:13px;padding:20px 0;text-align:center">
+            Документи формуватимуться після завершення аналізу
+          </div>
+        </div>
+
+        <!-- TAB: Історія -->
+        <div class="adm-ptab-body" id="admOTab-history">
+          <div class="adm-activity" style="padding:0">
+            <div id="admPanelActivity"></div>
+          </div>
+        </div>
+
+        <!-- Bottom action bar -->
+        <div class="adm-panel-actions" style="border-top:1px solid var(--border);margin:0;padding:12px 16px">
+          <button class="adm-pbtn adm-pbtn-sec" onclick="admActionStatus()">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M4 6h12M4 10h12M4 14h12" stroke-linecap="round"/></svg>
+            Змінити статус
+          </button>
+          <button class="adm-pbtn adm-pbtn-out">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M11 3h6v6M17 3l-8 8M9 5H5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Відкрити деталі
+          </button>
+        </div>
       </div><!-- /admPanelOrder -->
 
       <!-- SAMPLE panel body -->
@@ -6894,49 +7067,94 @@ function saveOrderToHistory(order) {
 // ADMIN CABINET
 // ═══════════════════════════════════════════════
 const _admOrders = [
-  { id:'LAB-2026-00482', client:'ФГ «Вікторія»', short:'ФВ', contact:'Іваненко Сергій Петрович', phone:'+380 67 123 45 67', email:'ivanenko@fg-viktoria.ua', samples:6, payment:'pending', status:'waiting', date:'19.10.2026', amount:'2 187 ₴',
-    samplesList:[{id:'S01',name:'Поле 1 (Кукурудза)',st:'received'},{id:'S02',name:'Поле 2 (Пшениця)',st:'pending'},{id:'S03',name:'Поле 3 (Соняшник)',st:'pending'},{id:'S04',name:'Поле 4 (Ріпак)',st:'new'}],
+  { id:'LAB-2026-00482', client:'ФГ «Вікторія»', short:'ФВ', contact:'Іваненко Сергій Петрович', phone:'+380 67 123 45 67', email:'ivanenko@fg-viktoria.ua',
+    companyType:'Юридична особа', pdv:true, edrpou:'12345678', companyFull:'ТОВ «Вікторія»',
+    delivery:'Нова Пошта, відділення №12',
+    samples:6, studies:28, payment:'paid', status:'work', date:'19.10.2026', amount:'2 187 ₴', amountRaw:2187,
+    samplesList:[{id:'S01',name:'Поле 1 (Кукурудза)',st:'received'},{id:'S02',name:'Поле 2 (Пшениця)',st:'pending'},{id:'S03',name:'Поле 3 (Соняшник)',st:'pending'},{id:'S04',name:'Поле 4 (Ріпак)',st:'new'},{id:'S05',name:'Рослина пшениця',st:'new'},{id:'S06',name:'Рослина кукурудза',st:'new'}],
     activity:[{t:'Зразок S01 отримано',d:'19.10.2026 14:32'},{t:'Рахунок надіслано клієнту',d:'19.10.2026 10:15'},{t:'Замовлення створено',d:'19.10.2026 09:41'}]},
-  { id:'LAB-2026-00481', client:'ТОВ «Агро Плюс»', short:'АП', contact:'Ковальчук Марина Іванівна', phone:'+380 50 234 56 78', email:'kovalchuk@agroplus.ua', samples:12, payment:'paid', status:'work', date:'19.10.2026', amount:'4 560 ₴',
+  { id:'LAB-2026-00481', client:'ТОВ «Агро Плюс»', short:'АП', contact:'Ковальчук Марина Іванівна', phone:'+380 50 234 56 78', email:'kovalchuk@agroplus.ua',
+    companyType:'Юридична особа', pdv:true, edrpou:'87654321', companyFull:'ТОВ «Агро Плюс»',
+    delivery:'Самовивіз, м. Черкаси',
+    samples:12, studies:52, payment:'partial', status:'waiting', date:'19.10.2026', amount:'4 320 ₴', amountRaw:4320,
     samplesList:[{id:'S01',name:'Поле А (Ріпак)',st:'received'},{id:'S02',name:'Поле Б (Кукурудза)',st:'received'},{id:'S03',name:'Поле В (Пшениця)',st:'received'},{id:'S04',name:'Поле Г (Соя)',st:'received'}],
     activity:[{t:'Зразки S01–S12 прийнято',d:'19.10.2026 11:00'},{t:'Аналіз розпочато',d:'19.10.2026 09:00'}]},
-  { id:'LAB-2026-00480', client:'ПП «Лан Агро»', short:'ЛА', contact:'Шевченко Олег Миколайович', phone:'+380 63 345 67 89', email:'shevchenko@lanagro.ua', samples:3, payment:'partial', status:'new', date:'18.10.2026', amount:'890 ₴',
-    samplesList:[{id:'S01',name:'Поле 1 (Ячмінь)',st:'new'},{id:'S02',name:'Поле 2 (Просо)',st:'new'}],
+  { id:'LAB-2026-00480', client:'ПП «Лан Агро»', short:'ЛА', contact:'Шевченко Олег Миколайович', phone:'+380 63 345 67 89', email:'shevchenko@lanagro.ua',
+    companyType:'ФОП', pdv:false, edrpou:'3456789012', companyFull:'ФОП Шевченко О.М.',
+    delivery:'Нова Пошта, відділення №5',
+    samples:3, studies:12, payment:'unpaid', status:'new', date:'18.10.2026', amount:'980 ₴', amountRaw:980,
+    samplesList:[{id:'S01',name:'Поле 1 (Ячмінь)',st:'new'},{id:'S02',name:'Поле 2 (Просо)',st:'new'},{id:'S03',name:'Зерно ячмінь',st:'new'}],
     activity:[{t:'Замовлення створено',d:'18.10.2026 16:30'}]},
-  { id:'LAB-2026-00479', client:'ТОВ «Зелений Гай»', short:'ЗГ', contact:'Петренко Василь Андрійович', phone:'+380 97 456 78 90', email:'petrenko@zelenygay.ua', samples:8, payment:'paid', status:'work', date:'17.10.2026', amount:'3 200 ₴',
+  { id:'LAB-2026-00479', client:'ТОВ «Зелений Гай»', short:'ЗГ', contact:'Петренко Василь Андрійович', phone:'+380 97 456 78 90', email:'petrenko@zelenygay.ua',
+    companyType:'Юридична особа', pdv:true, edrpou:'55667788', companyFull:'ТОВ «Зелений Гай»',
+    delivery:'Укрпошта, відділення №3',
+    samples:8, studies:35, payment:'paid', status:'work', date:'17.10.2026', amount:'3 560 ₴', amountRaw:3560,
     samplesList:[{id:'S01',name:'Ставок №1 (вода)',st:'received'},{id:'S02',name:'Ставок №2 (вода)',st:'received'},{id:'S03',name:'Озеро (вода)',st:'received'}],
     activity:[{t:'Аналіз виконано на 60%',d:'18.10.2026 14:00'},{t:'Зразки S01–S08 отримано',d:'17.10.2026 16:00'}]},
-  { id:'LAB-2026-00478', client:'ФГ «Дніпро»', short:'ФД', contact:'Мельник Тетяна Сергіївна', phone:'+380 66 567 89 01', email:'melnyk@dniprofg.ua', samples:5, payment:'pending', status:'waiting', date:'16.10.2026', amount:'1 750 ₴',
+  { id:'LAB-2026-00478', client:'ФГ «Дніпро»', short:'ФД', contact:'Мельник Тетяна Сергіївна', phone:'+380 66 567 89 01', email:'melnyk@dniprofg.ua',
+    companyType:'ФОП', pdv:false, edrpou:'2233445566', companyFull:'ФОП Мельник Т.С.',
+    delivery:'Нова Пошта, відділення №1',
+    samples:5, studies:20, payment:'pending', status:'waiting', date:'16.10.2026', amount:'1 240 ₴', amountRaw:1240,
     samplesList:[{id:'S01',name:'Грунт поле 1',st:'pending'},{id:'S02',name:'Грунт поле 2',st:'pending'},{id:'S03',name:'Грунт поле 3',st:'new'}],
     activity:[{t:'Рахунок надіслано',d:'16.10.2026 12:00'},{t:'Замовлення прийнято',d:'16.10.2026 10:20'}]},
-  { id:'LAB-2026-00477', client:'ТОВ «Колос»', short:'КС', contact:'Сидоренко Іван Петрович', phone:'+380 63 678 90 12', email:'sydorenko@kolos.ua', samples:4, payment:'paid', status:'done', date:'15.10.2026', amount:'2 100 ₴',
+  { id:'LAB-2026-00477', client:'ТОВ «Колос»', short:'КС', contact:'Сидоренко Іван Петрович', phone:'+380 63 678 90 12', email:'sydorenko@kolos.ua',
+    companyType:'Юридична особа', pdv:true, edrpou:'99887766', companyFull:'ТОВ «Колос»',
+    delivery:'Самовивіз, смт Звенигородка',
+    samples:4, studies:18, payment:'paid', status:'done', date:'15.10.2026', amount:'2 760 ₴', amountRaw:2760,
     samplesList:[{id:'S01',name:'Зерно пшениця',st:'received'},{id:'S02',name:'Зерно ячмінь',st:'received'},{id:'S03',name:'Зерно кукурудза',st:'received'},{id:'S04',name:'Зерно соя',st:'received'}],
     activity:[{t:'Протоколи надіслано клієнту',d:'17.10.2026 10:00'},{t:'Аналіз завершено',d:'17.10.2026 09:30'}]},
-  { id:'LAB-2026-00476', client:'ФГ «Соняшник»', short:'СЕ', contact:'Коваленко Андрій Олексійович', phone:'+380 97 789 01 23', email:'kovalenko@sonyashnyk.ua', samples:7, payment:'unpaid', status:'new', date:'14.10.2026', amount:'2 380 ₴',
+  { id:'LAB-2026-00476', client:'ФГ «Соняшник»', short:'СЕ', contact:'Коваленко Андрій Олексійович', phone:'+380 97 789 01 23', email:'kovalenko@sonyashnyk.ua',
+    companyType:'ФОП', pdv:false, edrpou:'1122334455', companyFull:'ФОП Коваленко А.О.',
+    delivery:'Нова Пошта, відділення №8',
+    samples:7, studies:28, payment:'unpaid', status:'new', date:'14.10.2026', amount:'3 110 ₴', amountRaw:3110,
     samplesList:[{id:'S01',name:'Поле 1 (Соняшник)',st:'new'},{id:'S02',name:'Поле 2 (Ріпак)',st:'new'},{id:'S03',name:'Поле 3 (Кукурудза)',st:'new'}],
     activity:[{t:'Замовлення отримано',d:'14.10.2026 09:00'}]},
-  { id:'LAB-2026-00475', client:'ТОВ «Агролідер»', short:'АЛ', contact:'Бондаренко Наталія Юріївна', phone:'+380 50 890 12 34', email:'bondarenko@agroleader.ua', samples:2, payment:'paid', status:'done', date:'13.10.2026', amount:'780 ₴',
+  { id:'LAB-2026-00475', client:'ТОВ «Агролідер»', short:'АЛ', contact:'Бондаренко Наталія Юріївна', phone:'+380 50 890 12 34', email:'bondarenko@agroleader.ua',
+    companyType:'Юридична особа', pdv:true, edrpou:'44556677', companyFull:'ТОВ «Агролідер»',
+    delivery:'Кур\'єр компанії',
+    samples:2, studies:8, payment:'paid', status:'done', date:'13.10.2026', amount:'890 ₴', amountRaw:890,
     samplesList:[{id:'S01',name:'Добриво (зразок 1)',st:'received'},{id:'S02',name:'Добриво (зразок 2)',st:'received'}],
     activity:[{t:'Протоколи надіслано',d:'14.10.2026 15:00'},{t:'Аналіз завершено',d:'14.10.2026 14:00'}]},
-  { id:'LAB-2026-00474', client:'ФГ «Урожай»', short:'УЖ', contact:'Дмитренко Олексій Вікторович', phone:'+380 66 901 23 45', email:'dmytrenko@urozhay.ua', samples:9, payment:'paid', status:'work', date:'12.10.2026', amount:'3 960 ₴',
+  { id:'LAB-2026-00474', client:'ПП «Вектор»', short:'ВК', contact:'Дмитренко Олексій Вікторович', phone:'+380 66 901 23 45', email:'dmytrenko@vektor.ua',
+    companyType:'ФОП', pdv:false, edrpou:'9988776655', companyFull:'ФОП Дмитренко О.В.',
+    delivery:'Нова Пошта, відділення №4',
+    samples:10, studies:44, payment:'paid', status:'work', date:'12.10.2026', amount:'5 430 ₴', amountRaw:5430,
     samplesList:[{id:'S01',name:'Грунт ділянка А',st:'received'},{id:'S02',name:'Грунт ділянка Б',st:'received'},{id:'S03',name:'Грунт ділянка В',st:'received'}],
-    activity:[{t:'Лабораторні дослідження розпочато',d:'13.10.2026 08:00'},{t:'Зразки S01–S09 отримано',d:'12.10.2026 17:00'}]},
-  { id:'LAB-2026-00473', client:'ПАТ «Зернотрейд»', short:'ЗТ', contact:'Романенко Сергій Олегович', phone:'+380 63 012 34 56', email:'romanenko@zernotreyd.ua', samples:15, payment:'partial', status:'done', date:'11.10.2026', amount:'5 250 ₴',
+    activity:[{t:'Лабораторні дослідження розпочато',d:'13.10.2026 08:00'},{t:'Зразки S01–S10 отримано',d:'12.10.2026 17:00'}]},
+  { id:'LAB-2026-00473', client:'ТОВ «Родючість»', short:'РД', contact:'Романенко Сергій Олегович', phone:'+380 63 012 34 56', email:'romanenko@rodyuchist.ua',
+    companyType:'Юридична особа', pdv:true, edrpou:'66778899', companyFull:'ТОВ «Родючість»',
+    delivery:'Самовивіз, м. Умань',
+    samples:6, studies:24, payment:'partial', status:'done', date:'11.10.2026', amount:'2 980 ₴', amountRaw:2980,
     samplesList:[{id:'S01',name:'Пшениця партія №1',st:'received'},{id:'S02',name:'Пшениця партія №2',st:'received'},{id:'S03',name:'Ячмінь партія №1',st:'received'}],
     activity:[{t:'Звіт надіслано клієнту',d:'12.10.2026 17:00'},{t:'Аналіз завершено',d:'12.10.2026 15:30'}]},
-  { id:'LAB-2026-00472', client:'ФГ «Степове»', short:'СТ', contact:'Гриценко Людмила Петрівна', phone:'+380 67 234 56 78', email:'hrytsenko@stepove.ua', samples:4, payment:'paid', status:'done', date:'10.10.2026', amount:'1 420 ₴',
+  { id:'LAB-2026-00472', client:'ФГ «Степове»', short:'СТ', contact:'Гриценко Людмила Петрівна', phone:'+380 67 234 56 78', email:'hrytsenko@stepove.ua',
+    companyType:'ФОП', pdv:false, edrpou:'1234567890', companyFull:'ФОП Гриценко Л.П.',
+    delivery:'Нова Пошта, відділення №2',
+    samples:4, studies:16, payment:'paid', status:'done', date:'10.10.2026', amount:'1 420 ₴', amountRaw:1420,
     samplesList:[{id:'S01',name:'Ґрунт поле 5',st:'received'},{id:'S02',name:'Ґрунт поле 6',st:'received'},{id:'S03',name:'Насіння кукурудза',st:'received'}],
     activity:[{t:'Протоколи завантажено',d:'11.10.2026 11:00'},{t:'Аналіз завершено',d:'11.10.2026 09:20'}]},
-  { id:'LAB-2026-00471', client:'ТОВ «Зелена Нива»', short:'ЗН', contact:'Кравченко Михайло Данилович', phone:'+380 50 345 67 89', email:'kravchenko@zelenaniva.ua', samples:6, payment:'pending', status:'waiting', date:'09.10.2026', amount:'2 040 ₴',
+  { id:'LAB-2026-00471', client:'ТОВ «Зелена Нива»', short:'ЗН', contact:'Кравченко Михайло Данилович', phone:'+380 50 345 67 89', email:'kravchenko@zelenaniva.ua',
+    companyType:'Юридична особа', pdv:true, edrpou:'11223344', companyFull:'ТОВ «Зелена Нива»',
+    delivery:'Укрпошта, відділення №7',
+    samples:6, studies:24, payment:'pending', status:'waiting', date:'09.10.2026', amount:'2 040 ₴', amountRaw:2040,
     samplesList:[{id:'S01',name:'Поле 1 (Пшениця)',st:'pending'},{id:'S02',name:'Поле 2 (Соя)',st:'pending'},{id:'S03',name:'Поле 3 (Ячмінь)',st:'new'}],
     activity:[{t:'Кур\'єр виїхав',d:'10.10.2026 10:00'},{t:'Замовлення підтверджено',d:'09.10.2026 16:00'}]},
-  { id:'LAB-2026-00470', client:'ПП «Хліборобський»', short:'ХЛ', contact:'Ткаченко Ірина Василівна', phone:'+380 97 456 78 90', email:'tkachenko@khliborobsky.ua', samples:3, payment:'unpaid', status:'new', date:'08.10.2026', amount:'1 050 ₴',
+  { id:'LAB-2026-00470', client:'ПП «Хліборобський»', short:'ХЛ', contact:'Ткаченко Ірина Василівна', phone:'+380 97 456 78 90', email:'tkachenko@khliborobsky.ua',
+    companyType:'ФОП', pdv:false, edrpou:'9876543210', companyFull:'ФОП Ткаченко І.В.',
+    delivery:'Нова Пошта, відділення №6',
+    samples:3, studies:10, payment:'unpaid', status:'new', date:'08.10.2026', amount:'1 050 ₴', amountRaw:1050,
     samplesList:[{id:'S01',name:'Зерно пшениця',st:'new'},{id:'S02',name:'Зерно ячмінь',st:'new'}],
     activity:[{t:'Заявку отримано',d:'08.10.2026 14:00'}]},
-  { id:'LAB-2026-00469', client:'ТОВ «Агромаш»', short:'АМ', contact:'Попов Дмитро Іванович', phone:'+380 63 567 89 01', email:'popov@agromash.ua', samples:5, payment:'paid', status:'done', date:'07.10.2026', amount:'1 875 ₴',
+  { id:'LAB-2026-00469', client:'ТОВ «Агромаш»', short:'АМ', contact:'Попов Дмитро Іванович', phone:'+380 63 567 89 01', email:'popov@agromash.ua',
+    companyType:'Юридична особа', pdv:true, edrpou:'55443322', companyFull:'ТОВ «Агромаш»',
+    delivery:'Самовивіз, м. Кропивницький',
+    samples:5, studies:20, payment:'paid', status:'done', date:'07.10.2026', amount:'1 875 ₴', amountRaw:1875,
     samplesList:[{id:'S01',name:'Масло (проба 1)',st:'received'},{id:'S02',name:'Масло (проба 2)',st:'received'},{id:'S03',name:'Масло (проба 3)',st:'received'}],
     activity:[{t:'Висновки надіслано',d:'08.10.2026 12:00'},{t:'Аналіз завершено',d:'08.10.2026 10:30'}]},
-  { id:'LAB-2026-00468', client:'ФГ «Прометей»', short:'ПР', contact:'Кузьменко Олена Борисівна', phone:'+380 66 678 90 12', email:'kuzmenko@prometey.ua', samples:8, payment:'paid', status:'work', date:'06.10.2026', amount:'3 600 ₴',
+  { id:'LAB-2026-00468', client:'ФГ «Прометей»', short:'ПР', contact:'Кузьменко Олена Борисівна', phone:'+380 66 678 90 12', email:'kuzmenko@prometey.ua',
+    companyType:'ФОП', pdv:false, edrpou:'6677889900', companyFull:'ФОП Кузьменко О.Б.',
+    delivery:'Кур\'єр компанії',
+    samples:8, studies:36, payment:'paid', status:'work', date:'06.10.2026', amount:'3 600 ₴', amountRaw:3600,
     samplesList:[{id:'S01',name:'Ґрунт поле А',st:'received'},{id:'S02',name:'Ґрунт поле Б',st:'received'},{id:'S03',name:'Ґрунт поле В',st:'received'}],
     activity:[{t:'Дослідження в процесі',d:'08.10.2026 08:00'},{t:'Зразки S01–S08 прийнято',d:'07.10.2026 15:30'}]},
 ];
@@ -6959,6 +7177,13 @@ function admInit() {
   const si = document.getElementById('admSearchIn'); if(si) si.value='';
   const fs = document.getElementById('admFStatus'); if(fs) fs.value='';
   const fp = document.getElementById('admFPay'); if(fp) fp.value='';
+  // Update KPI counters
+  const all  = _admOrders.length;
+  const wait = _admOrders.filter(o=>o.status==='waiting'||o.status==='new').length;
+  const work = _admOrders.filter(o=>o.status==='work').length;
+  const done = _admOrders.filter(o=>o.status==='done').length;
+  const setT = (id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  setT('admStatAll',all); setT('admStatWait',wait); setT('admStatWork',work); setT('admStatDone',done);
   admRender();
 }
 
@@ -6984,8 +7209,8 @@ function _admFiltered() {
   if (fp) list = list.filter(o => o.payment === fp);
   if (_admFilter) list = list.filter(o => o.status === _admFilter);
   list.sort((a,b)=>{
-    let va = _admSortF==='client'?a.client : _admSortF==='status'?a.status : _admSortF==='payment'?a.payment : a.id;
-    let vb = _admSortF==='client'?b.client : _admSortF==='status'?b.status : _admSortF==='payment'?b.payment : b.id;
+    let va = _admSortF==='client'?a.client : _admSortF==='status'?a.status : _admSortF==='payment'?a.payment : _admSortF==='amountRaw'?a.amountRaw : a.id;
+    let vb = _admSortF==='client'?b.client : _admSortF==='status'?b.status : _admSortF==='payment'?b.payment : _admSortF==='amountRaw'?b.amountRaw : b.id;
     const c = va<vb?-1:va>vb?1:0;
     return _admSortA ? c : -c;
   });
@@ -7001,7 +7226,7 @@ function admRender() {
   const body = document.getElementById('admOrdersBody');
   if (!body) return;
   if (!slice.length) {
-    body.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:36px 16px;color:var(--text-soft);font-size:13px">Замовлень не знайдено</td></tr>`;
+    body.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:36px 16px;color:var(--text-soft);font-size:13px">Замовлень не знайдено</td></tr>`;
   } else {
     body.innerHTML = slice.map(o=>`
       <tr onclick="admSelect('${o.id}')" class="${_admSelId===o.id?'adm-row-sel':''}">
@@ -7012,6 +7237,7 @@ function admRender() {
         <td><span class="adm-pill ${_admPC[o.payment]}">${_admPL[o.payment]}</span></td>
         <td><span class="adm-pill ${_admSC[o.status]}">${_admSL[o.status]}</span></td>
         <td style="color:var(--text-soft);font-size:11.5px;white-space:nowrap">${o.date}</td>
+        <td style="font-weight:600;color:var(--text-dark);white-space:nowrap">${o.amount}</td>
         <td style="color:var(--text-soft)">›</td>
       </tr>`).join('');
   }
@@ -7045,8 +7271,14 @@ function admSort(f) {
 }
 
 function admStatFilter(status, el) {
-  if (_admFilter===status) { _admFilter=''; document.querySelectorAll('.adm-stat').forEach(s=>s.classList.remove('active')); }
-  else { _admFilter=status; document.querySelectorAll('.adm-stat').forEach(s=>s.classList.remove('active')); if(el)el.classList.add('active'); }
+  if (_admFilter===status) {
+    _admFilter='';
+    document.querySelectorAll('.adm-kpi-card,.adm-stat').forEach(s=>s.classList.remove('active'));
+  } else {
+    _admFilter=status;
+    document.querySelectorAll('.adm-kpi-card,.adm-stat').forEach(s=>s.classList.remove('active'));
+    if(el)el.classList.add('active');
+  }
   _admPage=1; admRender();
 }
 
@@ -7066,18 +7298,60 @@ function admSelect(id) {
   if (!o) return;
   const panel = document.getElementById('admPanel');
   if (panel) panel.classList.add('open');
-  document.getElementById('admPanelNum').textContent = o.id;
+  _admShowPanel('Order');
+
+  // Header
+  const setT=(i,v)=>{const e=document.getElementById(i);if(e)e.textContent=v;};
+  const setH=(i,v)=>{const e=document.getElementById(i);if(e)e.innerHTML=v;};
+  setT('admPanelNum', o.id);
   const ps = document.getElementById('admPanelStat');
   if (ps) { ps.className='adm-pill '+_admSC[o.status]; ps.textContent=_admSL[o.status]; }
-  document.getElementById('admPanelCIcon').textContent = o.short;
-  document.getElementById('admPanelCName').textContent = o.client;
-  document.getElementById('admPanelCContact').textContent = o.contact;
-  document.getElementById('admPanelCEmail').textContent = o.email;
-  document.getElementById('admPanelCPhone').textContent = o.phone;
-  document.getElementById('admPanelAmount').textContent = o.amount;
-  document.getElementById('admPanelDate').textContent = o.date;
-  document.getElementById('admPanelPayStatus').innerHTML = `<span class="adm-pill ${_admPC[o.payment]}">${_admPL[o.payment]}</span>`;
-  document.getElementById('admPanelSCount').textContent = o.samples;
+  setT('admPanelDate2', o.date);
+  setT('admPanelCName2', o.client);
+
+  // Tab badge: sample count
+  setT('admPTabSCount', o.samples);
+
+  // ── Загальна tab ──
+  // Client info section
+  setH('admOIClient', `${o.client}<br><span style="font-weight:400;color:var(--text-soft);font-size:12px">${o.contact}</span>`);
+  // Payer type with optional PDV badge
+  setH('admOIPayerType', o.companyType + (o.pdv ? ' <span class="adm-pdv-badge">ПДВ</span>' : ''));
+  // Contact
+  setH('admOIContact', `<a href="tel:${o.phone}" style="color:var(--navy);text-decoration:none">${o.phone}</a><br><a href="mailto:${o.email}" style="color:var(--navy);text-decoration:none;font-size:11.5px">${o.email}</a>`);
+  // ЄДРПОУ + company full name
+  setH('admOIReqs', `ЄДРПОУ: <b>${o.edrpou}</b> &nbsp;·&nbsp; ${o.companyFull}`);
+  // Delivery
+  setT('admOIDelivery', o.delivery || '—');
+
+  // Mini stats
+  setT('admMSamples', o.samples);
+  setT('admMStudies', o.studies || (o.samples * 5));
+  setT('admMAmount', o.amount);
+
+  // Progress steps
+  const steps = [
+    {label:'Замовлення',key:'new'},
+    {label:'Очікування',key:'waiting'},
+    {label:'У роботі',key:'work'},
+    {label:'Готово',key:'done'},
+    {label:'Закрито',key:'closed'}
+  ];
+  const statusOrder = ['new','waiting','work','done','closed'];
+  const curIdx = statusOrder.indexOf(o.status);
+  const stepsEl = document.getElementById('admSteps');
+  if (stepsEl) {
+    stepsEl.innerHTML = steps.map((s,i)=>{
+      const done2 = i < curIdx;
+      const cur2  = i === curIdx;
+      const dotCls = done2?'adm-step-dot done':cur2?'adm-step-dot cur':'adm-step-dot';
+      const icon   = done2?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>':cur2?`<span style="width:7px;height:7px;border-radius:50%;background:var(--navy);display:block"></span>`:'';
+      const lineHtml = i<steps.length-1?`<div class="adm-step-line" style="${done2||cur2?'background:var(--navy)':''}"></div>`:'';
+      return `<div class="adm-step">${lineHtml}<div class="${dotCls}">${icon}</div><div class="adm-step-lbl" style="font-size:10px;color:${cur2?'var(--navy)':done2?'#10B981':'var(--text-soft)'};text-align:center;margin-top:4px;font-weight:${cur2||done2?'600':'400'}">${s.label}</div></div>`;
+    }).join('');
+  }
+
+  // ── Зразки tab ──
   const sampEl = document.getElementById('admPanelSamples');
   if (sampEl) {
     sampEl.innerHTML = o.samplesList.map(s=>`
@@ -7087,6 +7361,14 @@ function admSelect(id) {
         <span class="adm-sample-pill ${s.st==='received'?'adm-sp-ok':s.st==='pending'?'adm-sp-wait':'adm-sp-new'}">${s.st==='received'?'Отримано':s.st==='pending'?'Очікується':'Нове'}</span>
       </div>`).join('');
   }
+
+  // ── Оплата tab ──
+  const payStatMap = {paid:'Оплачено',pending:'Очікує оплати',partial:'Частково',unpaid:'Не оплачено'};
+  setH('admPayStatFull', `<span class="adm-pill ${_admPC[o.payment]}">${_admPL[o.payment]}</span>`);
+  setT('admPayAmount2', o.amount);
+  setT('admPayDate', o.payment==='paid'?o.date:'—');
+
+  // ── Історія tab ──
   const actEl = document.getElementById('admPanelActivity');
   if (actEl) {
     actEl.innerHTML = o.activity.map(a=>`
@@ -7095,12 +7377,28 @@ function admSelect(id) {
         <div><div class="adm-act-text">${a.t}</div><div class="adm-act-date">${a.d}</div></div>
       </div>`).join('');
   }
+
+  // Reset to first tab
+  admPanelTab('general');
+}
+
+function admPanelTab(tab, el) {
+  document.querySelectorAll('.adm-ptab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.adm-ptab-body').forEach(b=>b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  else {
+    const tabs = document.querySelectorAll('.adm-ptab');
+    tabs.forEach(t=>{ if(t.dataset.tab===tab) t.classList.add('active'); });
+  }
+  const body = document.getElementById('admOTab-'+tab);
+  if (body) body.classList.add('active');
 }
 
 function admClosePanel() {
   _admSelId = null;
   const panel = document.getElementById('admPanel');
   if (panel) panel.classList.remove('open');
+  _admShowPanel('Order');
   admRender();
 }
 
