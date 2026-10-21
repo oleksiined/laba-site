@@ -6849,10 +6849,13 @@ async function submitQuickOrder() {
       body:    JSON.stringify(payload),
     });
 
-    const result = await apiRes.json().catch(() => ({}));
-    console.log('Quick order result:', result);
+    let result = {};
+    try { result = await apiRes.json(); } catch(_) {}
+    console.warn('[QO] /api/order →', apiRes.status, JSON.stringify(result));
 
-    if (!apiRes.ok && !result.ok) {
+    // Treat as success if we got an orderNum back (even with partial errors),
+    // or if HTTP 2xx. Only throw on true failure (no orderNum + non-2xx).
+    if (!result.orderNum && !apiRes.ok) {
       throw new Error(result.error || `HTTP ${apiRes.status}`);
     }
 
@@ -6876,7 +6879,10 @@ async function submitQuickOrder() {
       const ft = document.querySelector('.qo-ft');
       if (ft) ft.parentNode.insertBefore(errEl, ft);
     }
-    errEl.textContent = 'Помилка при збереженні. Спробуйте ще раз.';
+    const errMsg = err.message || '';
+    errEl.textContent = errMsg.startsWith('HTTP') || errMsg.length > 60
+      ? 'Помилка при збереженні. Перевірте консоль браузера (F12) та спробуйте ще раз.'
+      : `Помилка: ${errMsg}. Спробуйте ще раз.`;
   }
 }
 function closeOrderSuccess() {
