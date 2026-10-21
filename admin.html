@@ -1104,8 +1104,8 @@ function _mapOrder(o) {
   const samplesArr = Array.isArray(o.samples) ? o.samples : [];
   const pkgMap = { basic:'basic', standard:'standard', extended:'extended', 'Базовий':'basic', 'Стандартний':'standard', 'Розширений':'extended' };
   const samplesList = samplesArr.map((s,i) => ({
-    id:   s.label || `S${pad(i+1)}`,
-    name: s.name || s.label || `Зразок ${i+1}`,
+    id:   `Зразок ${i+1}`,
+    name: s.name && s.name !== `Зразок ${i+1}` ? s.name : '',
     st:   'new',
     pkg:  pkgMap[s.packageId] || pkgMap[s.pkg] || 'basic',
   }));
@@ -1382,8 +1382,7 @@ function admSelect(id) {
   if (sampEl) {
     sampEl.innerHTML = o.samplesList.map(s=>`
       <div class="adm-sample-row">
-        <span class="adm-sample-id">${s.id}</span>
-        <span class="adm-sample-name">${s.name}</span>
+        <span class="adm-sample-id">${s.id}${s.name ? ' · ' + s.name : ''}</span>
         <span class="adm-sample-pill ${s.st==='received'?'adm-sp-ok':s.st==='pending'?'adm-sp-wait':'adm-sp-new'}">${s.st==='received'?'Отримано':s.st==='pending'?'Очікується':'Нове'}</span>
       </div>`).join('');
   }
