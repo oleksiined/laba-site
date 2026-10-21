@@ -4611,7 +4611,7 @@ function makeRow(item, type){
   const safeCode = item.code.replace(/[^a-zA-Z0-9-]/g,'');
   const itemSlug = (item.slug||item.code).replace(/[^a-zA-Z0-9-]/g,'');
   const safeName = item.name.replace(/`/g,"'");
-  const safeNameJs = safeName.replace(/'/g,"\\'"); // екранований апостроф для inline onclick
+  const safeNameJs = safeName.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); // екранування для inline onclick
   const qty = getRowQty(safeCode);
   const subtotal = (item.price||0)*qty;
 
