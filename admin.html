@@ -1132,7 +1132,7 @@ function _mapOrder(o) {
   const samplesList = samplesArr.map((s,i) => ({
     id:   `Зразок ${i+1}`,
     name: (s.label || s.name || '').replace(`Зразок ${i+1}`, '').trim(),
-    st:   'new',
+    st:   s.st || 'new',
     pkg:  pkgMap[s.packageId] || pkgMap[s.pkg] || 'basic',
   }));
 
@@ -1162,7 +1162,7 @@ function _mapOrder(o) {
     samples:     samplesArr.length,
     studies,
     payment,
-    status:      'new',
+    status:      o.status || 'new',
     date,
     amount:      Number(o.total||0).toLocaleString('uk-UA') + ' ₴',
     amountRaw:   Number(o.total||0),
@@ -1511,11 +1511,17 @@ async function _admUpdate(id, fields) {
 
 // Reload orders and re-select the given order id
 async function _admReload(selectId) {
-  await admLoad();
-  admRender();
-  if (selectId) {
-    const o = _admOrders.find(x => x.id === selectId);
-    if (o) admSelect(selectId);
+  try {
+    await admLoad();
+    admRender();
+    if (selectId) {
+      const o = _admOrders.find(x => x.id === selectId);
+      if (o) admSelect(selectId);
+    }
+  } finally {
+    // Always re-enable the confirm button so it's never stuck in disabled state
+    const btn = document.getElementById('admBtnConfirm');
+    if (btn && btn.disabled) btn.disabled = false;
   }
 }
 
@@ -1539,7 +1545,7 @@ async function admActionReceive() {
     // We need the raw Supabase rows — fetch from orders-list and find this order
     const listRes = await fetch('https://laba.zemlerob.com.ua/api/orders-list');
     const listData = await listRes.json();
-    const rawOrder = (listData.orders || []).find(x => x.id === o.id);
+    const rawOrder = (listData.orders || []).find(x => x.id === o.dbId);
     if (!rawOrder) throw new Error('Order not found');
 
     const rawSamples = (rawOrder.samples || []).map(s => ({ ...s, st: 'received' }));
