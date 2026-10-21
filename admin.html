@@ -1147,7 +1147,7 @@ function _mapOrder(o) {
   const pkgMap = { basic:'basic', standard:'standard', extended:'extended', 'Базовий':'basic', 'Стандартний':'standard', 'Розширений':'extended' };
   const samplesList = samplesArr.map((s,i) => ({
     id:   `Зразок ${i+1}`,
-    name: s.name && s.name !== `Зразок ${i+1}` ? s.name : '',
+    name: (s.label || s.name || '').replace(`Зразок ${i+1}`, '').trim(),
     st:   'new',
     pkg:  pkgMap[s.packageId] || pkgMap[s.pkg] || 'basic',
   }));
@@ -1562,7 +1562,7 @@ function _buildSamples() {
     (o.samplesList || []).forEach(s => {
       const smpNum = idx++;
       const smpLabel = `Зразок ${smpNum}`;
-      const smpName  = s.name && s.name !== smpLabel ? s.name : '';
+      const smpName  = (s.label || s.name || '').replace(smpLabel, '').trim();
       _admSamples.push({
         id:      `SMP-${o.date ? o.date.split('.').reverse().join('-').slice(0,4) : '2026'}-${String(smpNum).padStart(4,'0')}`,
         orderId: o.id,
