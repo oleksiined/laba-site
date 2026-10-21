@@ -769,15 +769,15 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           </div>
         </div>
 
-        <!-- KPI stats — same style as Orders tab -->
-        <div class="adm-kpi-row">
-          <div class="adm-kpi-card" onclick="smpKpiF('',this)" id="smpKpiAll">
+        <!-- KPI stats — 6 cards, same visual style as Orders tab -->
+        <div class="adm-kpi-row" style="grid-template-columns:repeat(6,1fr);gap:10px">
+          <div class="adm-kpi-card active" onclick="smpKpiF('',this)" id="smpKpiAll">
             <div class="adm-kpi-left">
-              <div class="adm-kpi-label">Всього зразків</div>
+              <div class="adm-kpi-label">Всього</div>
               <div class="adm-kpi-val" id="smpCntAll">0</div>
             </div>
             <div class="adm-kpi-icon kpi-gray">
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="2" width="10" height="16" rx="1.5"/><circle cx="10" cy="8" r="2.5"/><path d="M7 14h6" stroke-linecap="round"/></svg>
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="2" width="10" height="16" rx="1.5"/><circle cx="10" cy="8" r="2"/><path d="M7 14h6" stroke-linecap="round"/></svg>
             </div>
           </div>
           <div class="adm-kpi-card" onclick="smpKpiF('new',this)" id="smpKpiNew">
@@ -787,6 +787,24 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
             </div>
             <div class="adm-kpi-icon kpi-yellow">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l2.5 2.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="adm-kpi-card" onclick="smpKpiF('received',this)" id="smpKpiRcv">
+            <div class="adm-kpi-left">
+              <div class="adm-kpi-label">Отримано</div>
+              <div class="adm-kpi-val" id="smpCntRcv">0</div>
+            </div>
+            <div class="adm-kpi-icon" style="background:#F0FDF4;color:#16A34A">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 10l4 4 10-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="adm-kpi-card" onclick="smpKpiF('accepted',this)" id="smpKpiAcc">
+            <div class="adm-kpi-left">
+              <div class="adm-kpi-label">Прийнято</div>
+              <div class="adm-kpi-val" id="smpCntAcc">0</div>
+            </div>
+            <div class="adm-kpi-icon" style="background:#EDE9FE;color:#7C3AED">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 3l2.5 4.5L18 8.5l-4 3.8 1 5.2L10 15l-5 2.5 1-5.2L2 8.5l5.5-1L10 3z" stroke-linejoin="round"/></svg>
             </div>
           </div>
           <div class="adm-kpi-card" onclick="smpKpiF('work',this)" id="smpKpiWork">
@@ -2337,6 +2355,8 @@ function smpUpdateCounts() {
   const setEl = (id,v) => { const e=document.getElementById(id); if(e)e.textContent=v; };
   setEl('smpCntAll',  _admSamples.length);
   setEl('smpCntNew',  st('new'));
+  setEl('smpCntRcv',  st('received'));
+  setEl('smpCntAcc',  st('accepted'));
   setEl('smpCntWork', st('work'));
   setEl('smpCntDone', st('done'));
 }
