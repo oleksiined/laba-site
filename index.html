@@ -3596,6 +3596,7 @@ let extrasTempSel = {};
 // DATA
 // ═══════════════════════════════════════════════
 const _PKG_NAMES = {}; // safeCode -> { name, price } — уникаємо inline JS з назвами що містять лапки
+const _IND_METHODS = {}; // safeCode -> [methods array] — методи окремих показників
 const SERVICES = {
   soil:       { label: 'Ґрунт',   matCode:'01', packages:[], individual:[] },
   water:      { label: 'Вода',    matCode:'05', packages:[], individual:[] },
@@ -4479,7 +4480,8 @@ function inputIndQty(safeCode, val){
 // --- Expanded individual: method select + bottom panel ---
 const indSelectedMethod = {}; // safeCode -> method obj
 
-function selectIndMethod(safeCode, method, labelEl){
+function selectIndMethod(safeCode, methodIdx, labelEl){
+  const method = (_IND_METHODS[safeCode]||[])[methodIdx] || {price:0};
   indSelectedMethod[safeCode] = method;
   // Оновлюємо виділення
   const list = document.getElementById('methods-'+safeCode);
@@ -4706,8 +4708,8 @@ function makeRow(item, type){
     <div class="ind-methods-wrap"><div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px">Оберіть метод дослідження</div>
     <div style="font-size:13px;color:var(--text-soft);margin-bottom:12px">Метод впливає на строк виконання та інтерпретацію результату</div>
     <div class="ind-methods-list" id="methods-${safeCode}">
-      ${item.methods.map((m,i)=>`
-      <label class="ind-method-item ${i===0?'selected':''}" onclick="selectIndMethod('${safeCode}',${JSON.stringify(m).replace(/"/g,'&quot;')},this)">
+      ${(_IND_METHODS[safeCode]=item.methods,item.methods).map((m,i)=>`
+      <label class="ind-method-item ${i===0?'selected':''}" onclick="selectIndMethod('${safeCode}',${i},this)">
         <input type="radio" name="method-${safeCode}" value="${m.id}" ${i===0?'checked':''} style="display:none">
         <div class="ind-method-radio">${i===0?'<svg viewBox="0 0 20 20" width="16" height="16"><circle cx="10" cy="10" r="8" fill="var(--navy)" opacity=".15"/><circle cx="10" cy="10" r="4" fill="var(--navy)"/></svg>':'<svg viewBox="0 0 20 20" width="16" height="16"><circle cx="10" cy="10" r="8" stroke="var(--border)" stroke-width="1.5" fill="none"/></svg>'}</div>
         <div style="flex:1;min-width:0">
@@ -4933,7 +4935,7 @@ function openQAModal(code,type,price,btn,name){
     lft.innerHTML=`<div class="qamodal-subhead">Схожі пакети</div>`+sims.map(s=>`
       <div class="qasim-item">
         <div class="qasim-info"><div class="qasim-name">${s.name}</div><div class="qasim-price">${s.price?.toLocaleString('uk-UA')||'—'} грн</div></div>
-        <button class="qasim-add" onclick="qaSimilarAdd('${s.code}','pkg',${s.price||0},'${s.name.replace(/'/g,"\'")}',this)">+ Додати</button>
+        <button class="qasim-add" onclick="qaSimilarAdd('${s.code}',this)">+ Додати</button>
       </div>`).join('') || '<div style="font-size:13px;color:var(--text-soft)">Немає схожих</div>';
   }
 }
@@ -4952,7 +4954,7 @@ function qaAddToCart(){
 
 function qaOrder(){ qaAddToCart(); setTimeout(()=>goStep('samples'),300); }
 function qaConsult(){ closeQAModal(); openCallModal(); }
-function qaSimilarAdd(code,type,price,name,btn){ if(!cart.some(c=>c.code===code)){cart.push({code,type,price,name,notes:[],qty:1});btn.classList.add('added');btn.textContent='✓';saveCart();updateCartUI();} }
+function qaSimilarAdd(code,btn){ const _n=_PKG_NAMES[code.replace(/[^a-zA-Z0-9-]/g,'')]||{}; if(!cart.some(c=>c.code===code)){cart.push({code,type:'pkg',price:_n.price||0,name:_n.name||code,notes:[],qty:1});btn.classList.add('added');btn.textContent='✓';saveCart();updateCartUI();} }
 
 // ═══════════════════════════════════════════════
 // ADD INDIVIDUAL INDICATOR MODAL
@@ -7969,6 +7971,8 @@ function lookupEdrpou() {
     resEl.innerHTML = `<div style="color:var(--red);font-size:13.5px">⚠️ Компанію не знайдено. Перевірте код або заповніть реквізити вручну.</div>`;
     return;
   }
+  // Зберігаємо для applyEdrpouStored щоб не вставляти рядки в onclick
+  window._pendingEdrpou = { code, company: data.company, ipn: data.ipn, address: data.address };
   // found → fill and show preview
   resEl.style.display = 'block';
   resEl.innerHTML = `
@@ -7977,19 +7981,24 @@ function lookupEdrpou() {
   <p style="font-size:13px;color:var(--t3)">ЄДРПОУ: ${code} · ІПН: ${data.ipn}</p>
   <p style="font-size:13px;color:var(--t3);margin-top:2px">${data.address}</p>
 </div>
-<button class="btn-primary" style="width:100%;margin-top:12px" onclick="applyEdrpou('${code}','${data.company}','${data.ipn}','${data.address}')">
+<button class="btn-primary" style="width:100%;margin-top:12px" onclick="applyEdrpouStored()">
   Застосувати реквізити
 </button>`;
 }
 
-function applyEdrpou(code, company, ipn, address) {
-  NCO.legal.edrpou = code;
-  NCO.legal.company = company;
-  NCO.legal.ipn = ipn;
-  NCO.legal.address = address;
+function applyEdrpouStored() {
+  const d = window._pendingEdrpou||{};
+  NCO.legal.edrpou = d.code||'';
+  NCO.legal.company = d.company||'';
+  NCO.legal.ipn = d.ipn||'';
+  NCO.legal.address = d.address||'';
   setPayer('legal');
   closeEdrpouModal();
   toast('Реквізити заповнено за ЄДРПОУ');
+}
+function applyEdrpou(code, company, ipn, address) {
+  window._pendingEdrpou = {code,company,ipn,address};
+  applyEdrpouStored();
 }
 
 // Enter key in ЄДРПОУ input
