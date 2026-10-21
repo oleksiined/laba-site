@@ -81,6 +81,8 @@ html{scroll-behavior:smooth}
 .adm-btn-ghost{background:var(--white);color:var(--text-mid);border:1.5px solid var(--border)}
 .adm-btn-ghost:hover{background:var(--bg)}
 .adm-btn svg{width:13px;height:13px}
+.adm-row-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:5px;font-size:11.5px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:var(--white);color:var(--text-mid);font-family:inherit;transition:all .1s;white-space:nowrap}
+.adm-row-btn:hover{border-color:var(--navy);color:var(--navy)}
 
 /* Stats row */
 .adm-stats-row{display:flex;gap:0;padding:18px 22px 0;flex-shrink:0}
@@ -1057,48 +1059,64 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
       <!-- ── DOCUMENTS TAB ── -->
       <div class="adm-subtab" id="admtab-docs">
         <div class="adm-topbar">
-          <div><div class="adm-page-title">Документи</div><div class="adm-page-sub">Протоколи випробувань, акти відбору, висновки</div></div>
-          <div style="display:flex;gap:8px">
-            <button class="adm-btn-sec" onclick="alert('Функція у розробці')">
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M4 16v1a1 1 0 001 1h10a1 1 0 001-1v-1M8 12l4 4 4-4M12 16V4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div>
+            <div class="adm-page-title">Документи</div>
+            <div class="adm-page-sub">Протоколи випробувань, акти відбору, висновки</div>
+          </div>
+          <div class="adm-topbar-actions">
+            <button class="adm-btn adm-btn-ghost" onclick="alert('Функція у розробці')">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="15" height="15"><path d="M10 13V4M6 9l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16h12" stroke-linecap="round"/></svg>
               Експорт
             </button>
           </div>
         </div>
-        <div class="adm-toolbar" style="padding:0 20px 12px">
-          <div class="adm-search-wrap">
-            <svg class="adm-search-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="14" height="14"><circle cx="8.5" cy="8.5" r="5"/><path d="M15 15l-3.5-3.5" stroke-linecap="round"/></svg>
-            <input id="docSearch" class="adm-search" placeholder="Пошук документів..." oninput="docRender()">
+
+        <!-- Table card -->
+        <div class="adm-table-wrap">
+          <div class="adm-table-card">
+            <div class="adm-toolbar">
+              <div class="adm-search-wrap" style="flex:1;max-width:320px">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="5"/><path d="M16 16l-3-3" stroke-linecap="round"/></svg>
+                <input type="text" id="docSearch" placeholder="Пошук документів, замовлень, клієнтів…" oninput="docRender()">
+              </div>
+              <select class="adm-filter-sel" id="docFType" onchange="docRender()">
+                <option value="">Тип: Всі</option>
+                <option value="protocol">Протокол випробувань</option>
+                <option value="act">Акт відбору зразків</option>
+                <option value="conclusion">Висновок агронома</option>
+                <option value="invoice">Рахунок</option>
+                <option value="contract">Договір</option>
+              </select>
+              <select class="adm-filter-sel" id="docFStatus" onchange="docRender()">
+                <option value="">Статус: Всі</option>
+                <option value="ready">Готово</option>
+                <option value="sent">Надіслано</option>
+                <option value="signing">Очікує підпису</option>
+                <option value="draft">Чернетка</option>
+              </select>
+            </div>
+            <div style="overflow-x:auto">
+              <table class="adm-table">
+                <thead>
+                  <tr>
+                    <th style="width:36px"><input type="checkbox" id="docSelAll" onchange="docToggleAll(this)"></th>
+                    <th class="sort" onclick="docSort('id')">№ документа <span id="docSortId"></span></th>
+                    <th class="sort" onclick="docSort('order')">Замовлення <span id="docSortOrder"></span></th>
+                    <th>Клієнт</th>
+                    <th class="sort" onclick="docSort('type')">Тип документа <span id="docSortType"></span></th>
+                    <th class="sort" onclick="docSort('date')">Дата <span id="docSortDate"></span></th>
+                    <th class="sort" onclick="docSort('status')">Статус <span id="docSortStatus"></span></th>
+                    <th style="width:130px">Дії</th>
+                  </tr>
+                </thead>
+                <tbody id="docBody"></tbody>
+              </table>
+            </div>
+            <div class="adm-table-foot">
+              <span class="adm-pag-info" id="docPagInfo"></span>
+              <div class="adm-pag" id="docPagination"></div>
+            </div>
           </div>
-          <select id="docFType" class="adm-select" onchange="docRender()">
-            <option value="">Тип: Всі</option>
-            <option value="protocol">Протокол випробувань</option>
-            <option value="act">Акт відбору зразків</option>
-            <option value="conclusion">Висновок агронома</option>
-          </select>
-          <select id="docFStatus" class="adm-select" onchange="docRender()">
-            <option value="">Статус: Всі</option>
-            <option value="ready">Готово</option>
-            <option value="pending">Формується</option>
-          </select>
-        </div>
-        <div style="padding:0 20px">
-          <div class="adm-table-wrap">
-            <table class="adm-table">
-              <thead><tr>
-                <th style="width:32px"><input type="checkbox"></th>
-                <th onclick="docSort('id')" style="cursor:pointer">№ документа ↕</th>
-                <th>Замовлення</th>
-                <th>Клієнт</th>
-                <th>Тип документа</th>
-                <th onclick="docSort('date')" style="cursor:pointer">Дата ↕</th>
-                <th onclick="docSort('status')" style="cursor:pointer">Статус ↕</th>
-                <th>Дії</th>
-              </tr></thead>
-              <tbody id="docBody"></tbody>
-            </table>
-          </div>
-          <div class="adm-pag-bar"><span id="docPagInfo" style="font-size:12px;color:var(--text-soft)"></span><div id="docPagination" style="display:flex;gap:4px"></div></div>
         </div>
       </div>
 
@@ -1827,6 +1845,7 @@ function admSwitch(tab, btn) {
     const b2 = document.getElementById('adm-navbtn-' + tab);
     if (b2) b2.classList.add('active');
   }
+  if (tab === 'docs') { docRender(); if(typeof docUpdateQF==='function') docUpdateQF(); }
 }
 
 function _admFiltered() {
@@ -3151,6 +3170,147 @@ admClosePanel = function() {
     t.setAttribute('title',t.dataset._tt);delete t.dataset._tt;
     tt.style.opacity='0';
   });
+})();
+
+// ── Documents tab ──
+(function(){
+  const DOCS = [
+    {id:'ДОК-2024-015',order:'ЗАМ-2024-042',client:'ФГ "Зоря"',type:'protocol',typeLabel:'Протокол випробувань',date:'2024-11-08',status:'ready'},
+    {id:'ДОК-2024-014',order:'ЗАМ-2024-041',client:'ТОВ "АгроСвіт"',type:'act',typeLabel:'Акт відбору зразків',date:'2024-11-07',status:'sent'},
+    {id:'ДОК-2024-013',order:'ЗАМ-2024-040',client:'ФОП Ковальчук М.І.',type:'conclusion',typeLabel:'Висновок агронома',date:'2024-11-06',status:'signing'},
+    {id:'ДОК-2024-012',order:'ЗАМ-2024-039',client:'СФГ "Колос"',type:'invoice',typeLabel:'Рахунок',date:'2024-11-05',status:'ready'},
+    {id:'ДОК-2024-011',order:'ЗАМ-2024-038',client:'ФГ "Урожай"',type:'protocol',typeLabel:'Протокол випробувань',date:'2024-11-04',status:'sent'},
+    {id:'ДОК-2024-010',order:'ЗАМ-2024-037',client:'ТОВ "Нива"',type:'contract',typeLabel:'Договір',date:'2024-11-03',status:'signing'},
+    {id:'ДОК-2024-009',order:'ЗАМ-2024-036',client:'ФОП Мельник О.В.',type:'act',typeLabel:'Акт відбору зразків',date:'2024-11-02',status:'draft'},
+    {id:'ДОК-2024-008',order:'ЗАМ-2024-035',client:'СФГ "Степ"',type:'protocol',typeLabel:'Протокол випробувань',date:'2024-11-01',status:'ready'},
+    {id:'ДОК-2024-007',order:'ЗАМ-2024-034',client:'ТОВ "Лан"',type:'invoice',typeLabel:'Рахунок',date:'2024-10-31',status:'ready'},
+    {id:'ДОК-2024-006',order:'ЗАМ-2024-033',client:'ФГ "Добробут"',type:'conclusion',typeLabel:'Висновок агронома',date:'2024-10-30',status:'draft'},
+    {id:'ДОК-2024-005',order:'ЗАМ-2024-032',client:'ФОП Бондаренко С.Л.',type:'protocol',typeLabel:'Протокол випробувань',date:'2024-10-29',status:'sent'},
+    {id:'ДОК-2024-004',order:'ЗАМ-2024-031',client:'СФГ "Перлина"',type:'act',typeLabel:'Акт відбору зразків',date:'2024-10-28',status:'signing'},
+    {id:'ДОК-2024-003',order:'ЗАМ-2024-030',client:'ТОВ "Зернятко"',type:'contract',typeLabel:'Договір',date:'2024-10-27',status:'ready'},
+    {id:'ДОК-2024-002',order:'ЗАМ-2024-029',client:'ФГ "Схід"',type:'invoice',typeLabel:'Рахунок',date:'2024-10-26',status:'draft'},
+    {id:'ДОК-2024-001',order:'ЗАМ-2024-028',client:'ТОВ "Агрокорм"',type:'protocol',typeLabel:'Протокол випробувань',date:'2024-10-25',status:'ready'},
+  ];
+
+  const STATUS_CFG = {
+    ready:   {label:'Готово',           cls:'adm-p-done'},
+    sent:    {label:'Надіслано',        cls:'adm-p-work'},
+    signing: {label:'Очікує підпису',   cls:'adm-p-pend'},
+    draft:   {label:'Чернетка',         cls:'adm-p-new'},
+  };
+
+  let _sortKey='date', _sortDir=-1, _page=1;
+  const PER_PAGE=10;
+
+  function _filtered(){
+    const q=(document.getElementById('docSearch')||{}).value||'';
+    const ft=(document.getElementById('docFType')||{}).value||'';
+    const fs=(document.getElementById('docFStatus')||{}).value||'';
+    const ql=q.toLowerCase();
+    return DOCS.filter(d=>{
+      if(ft && d.type!==ft) return false;
+      if(fs && d.status!==fs) return false;
+      if(ql && !d.id.toLowerCase().includes(ql) && !d.order.toLowerCase().includes(ql) && !d.client.toLowerCase().includes(ql) && !d.typeLabel.toLowerCase().includes(ql)) return false;
+      return true;
+    });
+  }
+
+  window.docSort=function(key){
+    if(_sortKey===key) _sortDir*=-1; else {_sortKey=key;_sortDir=-1;}
+    ['id','order','type','date','status'].forEach(k=>{
+      const el=document.getElementById('docSort'+k.charAt(0).toUpperCase()+k.slice(1));
+      if(el) el.textContent='';
+    });
+    const el=document.getElementById('docSort'+key.charAt(0).toUpperCase()+key.slice(1));
+    if(el) el.textContent=_sortDir>0?'↑':'↓';
+    _page=1; docRender();
+  };
+
+  window.docToggleAll=function(cb){
+    document.querySelectorAll('#docBody .doc-chk').forEach(c=>c.checked=cb.checked);
+  };
+
+  window.docRender=function(){
+    const tbody=document.getElementById('docBody');
+    const pagInfo=document.getElementById('docPagInfo');
+    const pagDiv=document.getElementById('docPagination');
+    if(!tbody) return;
+
+    let rows=[..._filtered()];
+    rows.sort((a,b)=>{
+      let av=a[_sortKey]||'', bv=b[_sortKey]||'';
+      return av<bv?-_sortDir:av>bv?_sortDir:0;
+    });
+
+    const total=rows.length;
+    const pages=Math.max(1,Math.ceil(total/PER_PAGE));
+    if(_page>pages) _page=pages;
+    const slice=rows.slice((_page-1)*PER_PAGE, _page*PER_PAGE);
+
+    tbody.innerHTML=slice.map(d=>{
+      const sc=STATUS_CFG[d.status]||{label:d.status,cls:'adm-badge-gray'};
+      const dateStr=d.date.split('-').reverse().join('.');
+      return `<tr>
+        <td><input type="checkbox" class="doc-chk"></td>
+        <td><span style="font-weight:600;color:var(--green)">${d.id}</span></td>
+        <td>${d.order}</td>
+        <td>${d.client}</td>
+        <td>${d.typeLabel}</td>
+        <td>${dateStr}</td>
+        <td><span class="adm-pill ${sc.cls}">${sc.label}</span></td>
+        <td>
+          <div style="display:flex;gap:4px">
+            <button class="adm-row-btn" title="Завантажити" onclick="alert('Завантаження: ${d.id}')">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M10 13V4M6 9l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16h12" stroke-linecap="round"/></svg>
+              Завантажити
+            </button>
+            <button class="adm-row-btn" title="Відправити" onclick="alert('Відправка: ${d.id}')">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M3 10l14-7-7 14v-7H3z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Відправити
+            </button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+
+    if(pagInfo) pagInfo.textContent=total?`Показано ${(_page-1)*PER_PAGE+1}–${Math.min(_page*PER_PAGE,total)} з ${total} документів`:'Документів не знайдено';
+
+    if(pagDiv){
+      let h='';
+      const maxBtn=7;
+      if(pages<=1){pagDiv.innerHTML='';return;}
+      h+=`<button class="adm-pag-btn${_page===1?' adm-pag-dis':''}" onclick="docPage(${_page-1})">‹</button>`;
+      for(let i=1;i<=pages;i++){
+        if(pages>maxBtn&&i>2&&i<pages-1&&Math.abs(i-_page)>1){if(i===3||i===pages-2)h+='<span style="padding:0 4px;color:var(--text-soft)">…</span>';continue;}
+        h+=`<button class="adm-pag-btn${i===_page?' adm-pag-active':''}" onclick="docPage(${i})">${i}</button>`;
+      }
+      h+=`<button class="adm-pag-btn${_page===pages?' adm-pag-dis':''}" onclick="docPage(${_page+1})">›</button>`;
+      pagDiv.innerHTML=h;
+    }
+  };
+
+  window.docPage=function(p){
+    const pages=Math.max(1,Math.ceil(_filtered().length/PER_PAGE));
+    _page=Math.max(1,Math.min(p,pages));
+    docRender();
+  };
+
+  // Update sidebar quick-filter counts when on docs tab
+  window.docUpdateQF=function(){
+    // Docs tab uses the same quick-filter sidebar — update counts to docs counts
+    const all=DOCS.length;
+    const draft=DOCS.filter(d=>d.status==='draft').length;
+    const signing=DOCS.filter(d=>d.status==='signing').length;
+    const readySent=DOCS.filter(d=>d.status==='ready'||d.status==='sent').length;
+    const cAll=document.getElementById('admQfCountAll');
+    const cNew=document.getElementById('admQfCountNew');
+    const cWork=document.getElementById('admQfCountWork');
+    const cDone=document.getElementById('admQfCountDone');
+    if(cAll) cAll.textContent=all;
+    if(cNew) cNew.textContent=draft;
+    if(cWork) cWork.textContent=signing;
+    if(cDone) cDone.textContent=readySent;
+  };
 })();
 
 // ── Login gate ──
