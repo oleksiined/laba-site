@@ -269,8 +269,8 @@ html{scroll-behavior:smooth}
 /* Order info section */
 .adm-oi-section{margin-bottom:14px}
 .adm-oi-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-soft);margin-bottom:8px}
-.adm-oi-row{display:flex;margin-bottom:6px;gap:8px;font-size:12.5px}
-.adm-oi-lbl{color:var(--text-soft);min-width:90px;flex-shrink:0}
+.adm-oi-row{display:grid;grid-template-columns:120px 1fr;margin-bottom:7px;gap:8px;font-size:12.5px;align-items:baseline}
+.adm-oi-lbl{color:var(--text-soft);font-weight:400}
 .adm-oi-val{color:var(--text-dark);font-weight:500;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
 .adm-pdv-badge{padding:1px 5px;background:#DBEAFE;color:#1D4ED8;border-radius:4px;font-size:10px;font-weight:700}
 .adm-oi-link{color:var(--navy);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
@@ -1382,9 +1382,9 @@ function admSelect(id) {
   if (!o.companyType || o.companyType === 'Фізична особа') {
     setT('admOIReqs', '—');
   } else if (o.companyType === 'ФОП') {
-    setH('admOIReqs', o.edrpou && o.edrpou !== '—' ? `РНОКПП: <b>${o.edrpou}</b>` : '—');
+    setT('admOIReqs', o.edrpou && o.edrpou !== '—' ? o.edrpou : '—');
   } else {
-    setH('admOIReqs', o.edrpou && o.edrpou !== '—' ? `ЄДРПОУ: <b>${o.edrpou}</b>` : '—');
+    setT('admOIReqs', o.edrpou && o.edrpou !== '—' ? o.edrpou : '—');
   }
 
   // Status cards
