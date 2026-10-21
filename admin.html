@@ -475,6 +475,31 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
 .sp-tbl td{padding:5px 6px;border-bottom:1px solid #f0f2f4;color:var(--text-mid)}
 .sp-tbl td:nth-child(2){color:#2563EB;font-weight:500}
 .sp-tbl td:last-child{color:var(--text-soft)}
+/* ── CLIENTS REDESIGN ── */
+.cli-type-badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.cli-type-legal{background:#EFF6FF;color:#2563EB}
+.cli-type-fop{background:#FEF9C3;color:#92400E}
+.cli-type-phys{background:#F3F4F6;color:#374151}
+.cli-status-active{background:#ECFDF5;color:#059669;border-radius:12px;padding:2px 9px;font-size:11.5px;font-weight:600}
+.cli-status-arch{background:#F3F4F6;color:#6B7280;border-radius:12px;padding:2px 9px;font-size:11.5px;font-weight:600}
+.cli-portal-yes{background:#ECFDF5;color:#059669;border-radius:12px;padding:1px 8px;font-size:11.5px;font-weight:600}
+.cli-portal-no{background:#F3F4F6;color:#9CA3AF;border-radius:12px;padding:1px 8px;font-size:11.5px;font-weight:600}
+.cli-contact-card{padding:8px 0;border-bottom:1px solid #f0f2f4}
+.cli-contact-card:last-child{border-bottom:none}
+.cli-contact-name{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.cli-contact-info{font-size:12px;color:var(--text-soft);line-height:1.6}
+.cli-role-badge{font-size:10px;font-weight:700;background:#EFF6FF;color:#2563EB;padding:1px 7px;border-radius:9px}
+.cli-role-acc{font-size:10px;font-weight:700;background:#FEF9C3;color:#92400E;padding:1px 7px;border-radius:9px}
+.cli-portal-badge{font-size:10px;font-weight:700;background:#ECFDF5;color:#059669;padding:1px 7px;border-radius:9px}
+.cli-portal-no-badge{font-size:10px;font-weight:700;background:#F3F4F6;color:#9CA3AF;padding:1px 7px;border-radius:9px}
+.cli-order-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f2f4;font-size:12px}
+.cli-order-row:last-child{border-bottom:none}
+.cli-order-id{color:#2563EB;font-weight:600}
+.cli-order-date{color:var(--text-soft)}
+.cli-doc-chips{display:flex;gap:8px;flex-wrap:wrap;padding:4px 0}
+.cli-doc-chip{background:#F3F4F6;border-radius:8px;padding:4px 10px;font-size:12px;color:var(--navy);display:flex;align-items:center;gap:5px}
+.cli-doc-chip span{font-weight:700;color:#2563EB}
+.cli-info-note{background:#EFF6FF;border-radius:8px;padding:8px 10px;font-size:11.5px;color:#1D4ED8;margin-top:8px;display:flex;align-items:flex-start;gap:6px}
 /* ── SAMPLES REDESIGN ── */
 .adm-smp-kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:0;padding:0 20px 16px;flex-shrink:0}
 .adm-smp-kpi{background:var(--white);border:1px solid var(--border);padding:13px 15px;cursor:pointer;transition:border-color .12s,background .12s;position:relative;user-select:none}
@@ -911,39 +936,125 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
 
       <!-- ── CLIENTS TAB ── -->
       <div class="adm-subtab" id="admtab-clients">
+        <!-- Topbar -->
         <div class="adm-topbar">
-          <div><div class="adm-page-title">Клієнти</div><div class="adm-page-sub">База клієнтів та контрагентів</div></div>
-          <button class="adm-btn-primary" onclick="alert('Функція у розробці')">+ Новий клієнт</button>
+          <div>
+            <div class="adm-page-title">Клієнти</div>
+            <div class="adm-page-sub">Єдиний реєстр замовників LABA — юридичні особи, ФОП та фізичні особи.</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="adm-btn adm-btn-ghost" onclick="alert('Функція у розробці')">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M4 16v1a1 1 0 001 1h10a1 1 0 001-1v-1M8 12l4 4 4-4M12 16V4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Експорт
+            </button>
+            <button class="adm-btn adm-btn-primary" onclick="alert('Функція у розробці')">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>
+              Новий клієнт
+            </button>
+          </div>
         </div>
+
+        <!-- KPI Cards (5) -->
+        <div class="adm-kpi-row" style="grid-template-columns:repeat(5,1fr);gap:10px;padding:16px 20px">
+          <div class="adm-kpi-card active" onclick="cliKpiFilter('',this)" id="cliKpiAll">
+            <div class="adm-kpi-left">
+              <div class="adm-kpi-label">Всього клієнтів</div>
+              <div class="adm-kpi-val" id="cliCntAll">0</div>
+            </div>
+            <div class="adm-kpi-icon kpi-gray">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 7a3 3 0 11-6 0 3 3 0 016 0zM3 17c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="adm-kpi-card" onclick="cliKpiFilter('active',this)" id="cliKpiActive">
+            <div class="adm-kpi-left">
+              <div class="adm-kpi-label">Активні</div>
+              <div class="adm-kpi-val" id="cliCntActive">0</div>
+              <div class="adm-kpi-trend up">↑ +12%</div>
+            </div>
+            <div class="adm-kpi-icon kpi-green">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="7"/><path d="M7 10l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="adm-kpi-card" onclick="cliKpiFilter('portal',this)" id="cliKpiPortal">
+            <div class="adm-kpi-left">
+              <div class="adm-kpi-label">Є особистий кабінет</div>
+              <div class="adm-kpi-val" id="cliCntPortal">0</div>
+              <div class="adm-kpi-trend up">↑ +8%</div>
+            </div>
+            <div class="adm-kpi-icon" style="background:#FEF9C3;color:#CA8A04">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="6" width="14" height="10" rx="2"/><path d="M13 6V5a3 3 0 00-6 0v1" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="adm-kpi-card" onclick="cliKpiFilter('new',this)" id="cliKpiNew">
+            <div class="adm-kpi-left">
+              <div class="adm-kpi-label">Нові за місяць</div>
+              <div class="adm-kpi-val" id="cliCntNew">0</div>
+              <div class="adm-kpi-trend up">↑ +20%</div>
+            </div>
+            <div class="adm-kpi-icon kpi-blue">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="adm-kpi-card" onclick="cliKpiFilter('archived',this)" id="cliKpiArch">
+            <div class="adm-kpi-left">
+              <div class="adm-kpi-label">Архівні</div>
+              <div class="adm-kpi-val" id="cliCntArch">0</div>
+              <div class="adm-kpi-trend up">↑ +5%</div>
+            </div>
+            <div class="adm-kpi-icon kpi-gray">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 5h14M5 5v11a1 1 0 001 1h8a1 1 0 001-1V5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 9h4" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter toolbar -->
         <div class="adm-toolbar" style="padding:0 20px 12px">
           <div class="adm-search-wrap">
             <svg class="adm-search-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="14" height="14"><circle cx="8.5" cy="8.5" r="5"/><path d="M15 15l-3.5-3.5" stroke-linecap="round"/></svg>
-            <input id="cliSearch" class="adm-search" placeholder="Пошук клієнтів..." oninput="cliRender()">
+            <input id="cliSearch" class="adm-search" placeholder="Пошук за назвою, ЄДРПОУ, ІПН, email, телефоном..." oninput="cliRender()">
           </div>
-          <select id="cliFSort" class="adm-select" onchange="cliRender()">
-            <option value="name">Сортування: Назва</option>
-            <option value="orders">Замовлення</option>
-            <option value="amount">Сума</option>
+          <select id="cliFType" class="adm-select" onchange="cliRender()">
+            <option value="">Тип: Всі</option>
+            <option value="legal">Юридична особа</option>
+            <option value="fop">ФОП</option>
+            <option value="phys">Фізична особа</option>
+          </select>
+          <select id="cliFStatus" class="adm-select" onchange="cliRender()">
+            <option value="">Статус: Всі</option>
+            <option value="active">Активний</option>
+            <option value="archived">Архівний</option>
+          </select>
+          <select id="cliFPortal" class="adm-select" onchange="cliRender()">
+            <option value="">Кабінет: Всі</option>
+            <option value="yes">Є доступ</option>
+            <option value="no">Немає</option>
           </select>
         </div>
-        <div style="padding:0 20px">
-          <div class="adm-table-wrap">
+
+        <!-- Table -->
+        <div class="adm-table-wrap" style="padding:0 20px">
+          <div class="adm-table-card">
             <table class="adm-table">
               <thead><tr>
                 <th style="width:32px"><input type="checkbox"></th>
-                <th onclick="cliSort('name')" style="cursor:pointer">Клієнт ↕</th>
+                <th>№ клієнта</th>
+                <th>Назва / ПІБ</th>
+                <th>Тип</th>
+                <th>ЄДРПОУ / ІПН</th>
                 <th>Контактна особа</th>
-                <th>Телефон</th>
-                <th>Email</th>
-                <th onclick="cliSort('orders')" style="cursor:pointer">Замовлень ↕</th>
-                <th onclick="cliSort('amount')" style="cursor:pointer">Загальна сума ↕</th>
-                <th>Останнє замовлення</th>
-                <th></th>
+                <th>Контакти</th>
+                <th style="text-align:center">Замовлень</th>
+                <th>Кабінет</th>
+                <th>Статус</th>
+                <th style="width:36px"></th>
               </tr></thead>
               <tbody id="cliBody"></tbody>
             </table>
           </div>
-          <div class="adm-pag-bar"><span id="cliPagInfo" style="font-size:12px;color:var(--text-soft)"></span><div id="cliPagination" style="display:flex;gap:4px"></div></div>
+          <div class="adm-pag-bar">
+            <span id="cliPagInfo" style="font-size:12px;color:var(--text-soft)"></span>
+            <div id="cliPagination" style="display:flex;gap:4px"></div>
+          </div>
         </div>
       </div>
 
@@ -1461,36 +1572,102 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
       </div><!-- /admPanelSample -->
 
       <!-- CLIENT panel body -->
-      <div class="adm-panel-body" id="admPanelClient">
-        <div class="adm-panel-sec">
-          <div class="adm-panel-sec-title">Клієнт</div>
-          <div class="adm-panel-client-hd">
-            <div class="adm-panel-client-ic" id="cliPanelIcon">ФГ</div>
-            <span id="cliPanelName">—</span>
+      <div class="adm-panel-body" id="admPanelClient" style="gap:0">
+        <!-- Scrollable content -->
+        <div style="flex:1;overflow-y:auto;min-height:0">
+
+          <!-- Основна інформація -->
+          <div class="sp-sec">
+            <div class="sp-sec-hd">
+              <span class="sp-sec-title">Основна інформація</span>
+              <button class="sp-sec-btn" onclick="alert('Функція у розробці')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><path d="M11.5 2.5l2 2-8 8-3 .5.5-3 8-7.5z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Редагувати
+              </button>
+            </div>
+            <div class="sp-row"><span class="sp-lbl">Назва клієнта</span><span class="sp-val fw" id="cliPanelName">—</span></div>
+            <div class="sp-row"><span class="sp-lbl">Тип</span><span class="sp-val" id="cliPanelType">—</span></div>
+            <div class="sp-row"><span class="sp-lbl">ЄДРПОУ</span><span class="sp-val" id="cliPanelEdrpou">—</span></div>
+            <div class="sp-row"><span class="sp-lbl">Адреса</span><span class="sp-val" id="cliPanelAddr">—</span></div>
+            <div class="sp-row"><span class="sp-lbl">Статус</span><span class="sp-val" id="cliPanelStatus">—</span></div>
           </div>
-          <div class="adm-panel-cl-row"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="7" r="3"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke-linecap="round"/></svg><span id="cliPanelContact">—</span></div>
-          <div class="adm-panel-cl-row"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 6l8 5 8-5"/><rect x="2" y="4" width="16" height="12" rx="2"/></svg><span id="cliPanelEmail">—</span></div>
-          <div class="adm-panel-cl-row"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4l3.5 1L9 7.5l-1.5 1.5a11 11 0 005.5 5.5L14.5 13l2.5 1.5L18 18c-8.3.7-15-6-14-14z" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="cliPanelPhone">—</span></div>
-        </div>
-        <div class="adm-panel-sec">
-          <div class="adm-meta-row">
-            <div class="adm-meta-item"><div class="adm-meta-label">Замовлень</div><div class="adm-meta-val" id="cliPanelOrders">—</div></div>
-            <div class="adm-meta-item"><div class="adm-meta-label">Загальна сума</div><div class="adm-meta-val" id="cliPanelTotal">—</div></div>
+
+          <!-- Контактні особи -->
+          <div class="sp-sec">
+            <div class="sp-sec-hd">
+              <span class="sp-sec-title">Контактні особи <span class="sp-badge" id="cliPanelContactCnt">0</span></span>
+              <button class="sp-sec-btn" onclick="alert('Функція у розробці')">+ Додати</button>
+            </div>
+            <div id="cliPanelContacts"></div>
           </div>
-        </div>
-        <div class="adm-panel-sec">
-          <div class="adm-panel-sec-title">Останні замовлення</div>
-          <div id="cliPanelOrders2"></div>
-        </div>
-        <div class="adm-panel-actions">
-          <button class="adm-pbtn adm-pbtn-green" onclick="alert('Функція у розробці')">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>
+
+          <!-- Особистий кабінет і доступ -->
+          <div class="sp-sec">
+            <div class="sp-sec-hd">
+              <span class="sp-sec-title">Особистий кабінет і доступ</span>
+              <button class="sp-sec-btn" onclick="alert('Функція у розробці')">Керувати доступом</button>
+            </div>
+            <div class="sp-row"><span class="sp-lbl">Основний користувач</span><span class="sp-val" id="cliPanelUsr">—</span></div>
+            <div class="sp-row"><span class="sp-lbl">Email входу</span><span class="sp-val" id="cliPanelPortalEmail">—</span></div>
+            <div class="sp-row"><span class="sp-lbl">Статус доступу</span><span class="sp-val" id="cliPanelPortalStat">—</span></div>
+            <div class="sp-row"><span class="sp-lbl">Доступ до замовлень</span><span class="sp-val fw" id="cliPanelPortalOrders">—</span></div>
+            <div class="cli-info-note" id="cliPanelPortalNote" style="display:none">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" style="flex-shrink:0;margin-top:1px"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+              <span id="cliPanelPortalNoteText"></span>
+            </div>
+          </div>
+
+          <!-- Останні замовлення -->
+          <div class="sp-sec">
+            <div class="sp-sec-hd">
+              <span class="sp-sec-title">Останні замовлення</span>
+              <button class="sp-sec-btn" onclick="alert('Функція у розробці')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="11" height="11"><path d="M3 8h10M9 5l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Відкрити
+              </button>
+            </div>
+            <div id="cliPanelOrders2"></div>
+          </div>
+
+          <!-- Документи -->
+          <div class="sp-sec">
+            <div class="sp-sec-hd">
+              <span class="sp-sec-title">Документи</span>
+              <button class="sp-sec-btn" onclick="alert('Функція у розробці')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="11" height="11"><path d="M3 8h10M9 5l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Переглянути
+              </button>
+            </div>
+            <div class="cli-doc-chips" id="cliPanelDocs"></div>
+          </div>
+
+          <!-- Примітки -->
+          <div class="sp-sec">
+            <div class="sp-sec-hd">
+              <span class="sp-sec-title">Примітки</span>
+              <button class="sp-sec-btn" onclick="alert('Функція у розробці')">+ Додати</button>
+            </div>
+            <div id="cliPanelNotes" style="font-size:12px;color:var(--text-soft);padding:4px 0">Немає приміток.</div>
+          </div>
+
+        </div><!-- /scrollable -->
+
+        <!-- Actions -->
+        <div style="padding:14px 16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;flex-shrink:0">
+          <button onclick="alert('Функція у розробці')" style="width:100%;padding:12px;background:#10B981;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="15" height="15"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>
             Нове замовлення
           </button>
-          <button class="adm-pbtn adm-pbtn-sec" onclick="alert('Функція у розробці')">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M13 6l-3 3 3 3M6 13h5a4 4 0 000-8H6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Всі замовлення
-          </button>
+          <div style="display:flex;gap:8px">
+            <button onclick="alert('Функція у розробці')" style="flex:1;padding:9px 12px;background:#fff;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M7 10h6" stroke-linecap="round"/></svg>
+              Відкрити клієнта
+            </button>
+            <button onclick="alert('Функція у розробці')" style="flex:1;padding:9px 12px;background:#fff;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;color:#6B7280;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M3 5h14M5 5v11a1 1 0 001 1h8a1 1 0 001-1V5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 9h4" stroke-linecap="round"/></svg>
+              Архівувати
+            </button>
+          </div>
         </div>
       </div><!-- /admPanelClient -->
     </aside>
@@ -2624,11 +2801,34 @@ function smpExport() {
 // Clients derived from real orders (populated by _buildClients after admLoad)
 let _admClients = [];
 
+// Client type map for demo enrichment
+const _CLI_TYPES = ['legal','legal','fop','phys','fop','legal','legal','fop','phys','legal'];
+const _CLI_TYPE_LABELS = {legal:'Юридична особа',fop:'ФОП',phys:'Фізична особа'};
+const _CLI_EDRPOU = ['41234567','39876543','—','3124509876','40111223','36789012','2987654321','42345678','38555111','37771234'];
+
 function _buildClients() {
   const map={};
   _admOrders.forEach(o=>{
     if(!map[o.client]){
-      map[o.client]={name:o.client,short:o.short,contact:o.contact,phone:o.phone,email:o.email,orders:[],total:0};
+      const idx=Object.keys(map).length;
+      const hasPortal=idx%3!==2;
+      const typeKey=_CLI_TYPES[idx%_CLI_TYPES.length];
+      const edrpou=typeKey==='phys'?'—':_CLI_EDRPOU[idx%_CLI_EDRPOU.length];
+      map[o.client]={
+        name:o.client,short:o.short,contact:o.contact,phone:o.phone,email:o.email,
+        orders:[],total:0,
+        id:`CL-2026-${String(idx+1).padStart(4,'0')}`,
+        type:typeKey,edrpou:edrpou,
+        addr:'м. Київ, вул. Прикладна, '+String(idx*7+1),
+        status:idx===8?'archived':'active',
+        hasPortal:hasPortal,
+        portalUsr:hasPortal?`USR-${String(100000+idx+42).padStart(6,'0')}`:'—',
+        portalEmail:hasPortal?o.email:'—',
+        portalStatus:hasPortal?'Підтверджено':'—',
+        contacts:[
+          {name:o.contact,phone:o.phone,email:o.email,role:'main',hasPortal:hasPortal}
+        ]
+      };
     }
     map[o.client].orders.push({id:o.id,date:o.date,status:o.status,amount:o.amount});
     map[o.client].total+=o.amountRaw||0;
@@ -2636,77 +2836,151 @@ function _buildClients() {
   _admClients=Object.values(map).map(c=>({...c,orderCount:c.orders.length,lastDate:c.orders[0]?.date||'—',totalFmt:c.total.toLocaleString('uk-UA')+' ₴'}));
 }
 
-let _cliSelId=null, _cliSortF='lastOrder', _cliSortA=false, _cliPage=1;
-const _CLI_PER=10;
+let _cliSelId=null, _cliKpiFilter='', _cliPage=1;
+const _CLI_PER=25;
 
-function cliInit(){_cliSelId=null;_cliPage=1;const si=document.getElementById('cliSearch');if(si)si.value='';cliRender();}
+function cliInit(){_cliSelId=null;_cliPage=1;const si=document.getElementById('cliSearch');if(si)si.value='';cliUpdateCounts();cliRender();}
+
+function cliUpdateCounts(){
+  const s=f=>_admClients.filter(f).length;
+  const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  setEl('cliCntAll',_admClients.length);
+  setEl('cliCntActive',s(c=>c.status==='active'));
+  setEl('cliCntPortal',s(c=>c.hasPortal));
+  setEl('cliCntNew',Math.max(1,Math.round(_admClients.length*0.1)));
+  setEl('cliCntArch',s(c=>c.status==='archived'));
+}
+
+function cliKpiFilter(f,btn){
+  _cliKpiFilter=f;_cliPage=1;
+  document.querySelectorAll('#admtab-clients .adm-kpi-card').forEach(el=>el.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  cliRender();
+}
 
 function _cliFiltered(){
   let list=[..._admClients];
   const q=(document.getElementById('cliSearch')?.value||'').trim().toLowerCase();
-  const fs=document.getElementById('cliFSort')?.value||'name';
-  if(q)list=list.filter(c=>c.name.toLowerCase().includes(q)||c.contact.toLowerCase().includes(q)||c.email.toLowerCase().includes(q));
-  list.sort((a,b)=>{
-    let va=fs==='orders'?a.orderCount:fs==='amount'?a.total:a.name;
-    let vb=fs==='orders'?b.orderCount:fs==='amount'?b.total:b.name;
-    const c=va<vb?-1:va>vb?1:0; return _cliSortA?c:-c;
-  });
+  const ft=document.getElementById('cliFType')?.value||'';
+  const fs=document.getElementById('cliFStatus')?.value||'';
+  const fp=document.getElementById('cliFPortal')?.value||'';
+  if(q)list=list.filter(c=>c.name.toLowerCase().includes(q)||c.contact.toLowerCase().includes(q)||c.email.toLowerCase().includes(q)||c.edrpou.includes(q));
+  if(ft)list=list.filter(c=>c.type===ft);
+  if(fs)list=list.filter(c=>c.status===fs);
+  if(fp==='yes')list=list.filter(c=>c.hasPortal);
+  if(fp==='no')list=list.filter(c=>!c.hasPortal);
+  if(_cliKpiFilter==='active')list=list.filter(c=>c.status==='active');
+  if(_cliKpiFilter==='archived')list=list.filter(c=>c.status==='archived');
+  if(_cliKpiFilter==='portal')list=list.filter(c=>c.hasPortal);
+  list.sort((a,b)=>a.name.localeCompare(b.name,'uk'));
   return list;
 }
 
+const _CLI_TYPE_CSS={legal:'cli-type-legal',fop:'cli-type-fop',phys:'cli-type-phys'};
+
 function cliRender(){
   const list=_cliFiltered(),total=list.length;
+  const start=(_cliPage-1)*_CLI_PER, page=list.slice(start,start+_CLI_PER);
   const body=document.getElementById('cliBody');if(!body)return;
-  if(!list.length){
-    body.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:36px;color:var(--text-soft);font-size:13px">Клієнтів не знайдено</td></tr>`;
+  if(!page.length){
+    body.innerHTML=`<tr><td colspan="11" style="text-align:center;padding:36px;color:var(--text-soft);font-size:13px">Клієнтів не знайдено</td></tr>`;
   } else {
-    body.innerHTML=list.map(c=>`
+    body.innerHTML=page.map(c=>`
       <tr onclick="cliSelect('${c.name.replace(/'/g,"\\'")}')">
         <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+        <td style="font-weight:600;color:#2563EB;font-size:12.5px">${c.id}</td>
         <td>
           <div style="display:flex;align-items:center;gap:8px">
             <div class="adm-panel-client-ic" style="width:28px;height:28px;font-size:11px;flex-shrink:0">${c.short}</div>
-            <div class="adm-client-nm">${c.name}</div>
+            <span class="adm-client-nm">${c.name}</span>
           </div>
         </td>
+        <td><span class="cli-type-badge ${_CLI_TYPE_CSS[c.type]}">${_CLI_TYPE_LABELS[c.type]}</span></td>
+        <td style="font-size:12px;color:var(--text-mid)">${c.edrpou}</td>
         <td style="font-size:12px;color:var(--text-mid)">${c.contact}</td>
-        <td style="font-size:12px;color:var(--text-soft)">${c.phone}</td>
-        <td style="font-size:12px;color:var(--text-soft)">${c.email}</td>
-        <td style="text-align:center;font-weight:600;color:var(--text-dark)">${c.orderCount}</td>
-        <td style="font-weight:600;color:var(--text-dark)">${c.totalFmt}</td>
-        <td style="font-size:11.5px;color:var(--text-soft)">${c.lastDate}</td>
-        <td style="color:var(--text-soft)">›</td>
+        <td style="font-size:11.5px;color:var(--text-soft)">
+          <div>${c.phone}</div>
+          <div style="color:#2563EB">${c.email}</div>
+        </td>
+        <td style="text-align:center;font-weight:700;color:var(--text-dark)">${c.orderCount}</td>
+        <td><span class="${c.hasPortal?'cli-portal-yes':'cli-portal-no'}">${c.hasPortal?'Є доступ':'Немає'}</span></td>
+        <td><span class="${c.status==='active'?'cli-status-active':'cli-status-arch'}">${c.status==='active'?'Активний':'Архівний'}</span></td>
+        <td style="color:var(--text-soft);font-size:16px;text-align:center">···</td>
       </tr>`).join('');
   }
   const pi=document.getElementById('cliPagInfo');
-  if(pi)pi.textContent=`${total} клієнтів`;
+  if(pi)pi.textContent=`Показано ${Math.min(start+1,total)}–${Math.min(start+_CLI_PER,total)} з ${total} клієнтів`;
+  // pagination
+  const pc=Math.max(1,Math.ceil(total/_CLI_PER));
   const pag=document.getElementById('cliPagination');
-  if(pag)pag.innerHTML='';
+  if(pag){
+    let h='';
+    const btn=(p,label,dis)=>`<button onclick="cliGoP(${p})" style="min-width:30px;height:30px;padding:0 8px;border-radius:6px;border:1px solid var(--border);background:${p===_cliPage?'var(--navy)':'var(--white)'};color:${p===_cliPage?'#fff':'var(--text-mid)'};font-size:12px;cursor:pointer;${dis?'opacity:.4;cursor:default':''}">${label}</button>`;
+    h+=btn(_cliPage-1,'‹',_cliPage===1);
+    for(let i=1;i<=Math.min(pc,5);i++)h+=btn(i,i,false);
+    h+=btn(_cliPage+1,'›',_cliPage===pc);
+    pag.innerHTML=h;
+  }
 }
 
 function cliGoP(p){const pc=Math.max(1,Math.ceil(_cliFiltered().length/_CLI_PER));_cliPage=Math.max(1,Math.min(p,pc));cliRender();}
-function cliSort(f){if(_cliSortF===f)_cliSortA=!_cliSortA;else{_cliSortF=f;_cliSortA=true;}_cliPage=1;cliRender();}
 
 function cliSelect(name) {
   const c=_admClients.find(x=>x.name===name);if(!c)return;
-  _cliSelId=name;
+  _cliSelId=name;cliRender();
   const panel=document.getElementById('admPanel');if(panel)panel.classList.add('open');
-  document.getElementById('admPanelNum').textContent=c.name;
-  const ps=document.getElementById('admPanelStat');if(ps){ps.className='';ps.textContent='';}
+  // panel header
+  document.getElementById('admPanelNum').textContent=c.id;
+  const ps=document.getElementById('admPanelStat');
+  if(ps){ps.className='adm-pill '+(c.status==='active'?'pill-green':'pill-gray');ps.textContent=c.status==='active'?'Активний':'Архівний';}
+  const d2=document.getElementById('admPanelDate2');if(d2)d2.textContent='';
+  const cn2=document.getElementById('admPanelCName2');
+  if(cn2)cn2.textContent=_CLI_TYPE_LABELS[c.type]+' • ЄДРПОУ '+c.edrpou;
   _admShowPanel('Client');
-  document.getElementById('cliPanelIcon').textContent=c.short;
+  // Основна інформація
   document.getElementById('cliPanelName').textContent=c.name;
-  document.getElementById('cliPanelContact').textContent=c.contact;
-  document.getElementById('cliPanelEmail').textContent=c.email;
-  document.getElementById('cliPanelPhone').textContent=c.phone;
-  document.getElementById('cliPanelOrders').textContent=c.orderCount;
-  document.getElementById('cliPanelTotal').textContent=c.totalFmt;
-  document.getElementById('cliPanelOrders2').innerHTML=c.orders.slice(0,4).map(o=>`
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px">
-      <span style="color:var(--text-soft)">${o.id}</span>
-      <span class="adm-pill ${_admSC[o.status]}">${_admSL[o.status]}</span>
-      <span style="color:var(--text-soft)">${o.date}</span>
+  document.getElementById('cliPanelType').innerHTML=`<span class="cli-type-badge ${_CLI_TYPE_CSS[c.type]}">${_CLI_TYPE_LABELS[c.type]}</span>`;
+  document.getElementById('cliPanelEdrpou').textContent=c.edrpou;
+  document.getElementById('cliPanelAddr').textContent=c.addr;
+  document.getElementById('cliPanelStatus').innerHTML=`<span class="${c.status==='active'?'cli-status-active':'cli-status-arch'}">${c.status==='active'?'Активний':'Архівний'}</span>`;
+  // Контактні особи
+  document.getElementById('cliPanelContactCnt').textContent=c.contacts.length;
+  document.getElementById('cliPanelContacts').innerHTML=c.contacts.map(ct=>`
+    <div class="cli-contact-card">
+      <div class="cli-contact-name">
+        ${ct.name}
+        <span class="${ct.role==='main'?'cli-role-badge':'cli-role-acc'}">${ct.role==='main'?'Основний контакт':'Бухгалтерія'}</span>
+        <span class="${ct.hasPortal?'cli-portal-badge':'cli-portal-no-badge'}">${ct.hasPortal?'Є кабінет':'Без кабінету'}</span>
+      </div>
+      <div class="cli-contact-info">
+        ${ct.phone}<br>${ct.email}
+      </div>
     </div>`).join('');
+  // Кабінет
+  document.getElementById('cliPanelUsr').textContent=c.portalUsr;
+  document.getElementById('cliPanelPortalEmail').textContent=c.portalEmail;
+  document.getElementById('cliPanelPortalStat').innerHTML=c.hasPortal?`<span style="color:#059669;font-weight:600">Підтверджено</span>`:'<span style="color:#9CA3AF">Немає доступу</span>';
+  document.getElementById('cliPanelPortalOrders').textContent=c.hasPortal?c.orderCount:'—';
+  const note=document.getElementById('cliPanelPortalNote');
+  const noteText=document.getElementById('cliPanelPortalNoteText');
+  if(c.hasPortal && c.orderCount>5){
+    note.style.display='flex';
+    noteText.textContent='У МУР користувач бачить лише замовлення з підтвердженою оплатою.';
+  } else { note.style.display='none'; }
+  // Останні замовлення
+  document.getElementById('cliPanelOrders2').innerHTML=c.orders.slice(0,4).map(o=>`
+    <div class="cli-order-row">
+      <span class="cli-order-id">${o.id}</span>
+      <span class="cli-order-date">${o.date}</span>
+      <span class="adm-pill ${_admSC[o.status]||''}">${_admSL[o.status]||o.status}</span>
+    </div>`).join('');
+  // Документи
+  const docN=[{l:'Договір',n:Math.floor(Math.random()*3)+1},{l:'Рахунки',n:Math.floor(Math.random()*8)+2},{l:'Акти',n:Math.floor(Math.random()*6)+1}];
+  document.getElementById('cliPanelDocs').innerHTML=docN.map(d=>`
+    <div class="cli-doc-chip">
+      ${d.l} <span>${d.n}</span>
+    </div>`).join('');
+  document.getElementById('cliPanelNotes').textContent='Немає приміток.';
 }
 
 // ─── DOCUMENTS DATA + FUNCTIONS ───────────────
