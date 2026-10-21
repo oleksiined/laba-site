@@ -3595,6 +3595,7 @@ let extrasTempSel = {};
 // ═══════════════════════════════════════════════
 // DATA
 // ═══════════════════════════════════════════════
+const _PKG_NAMES = {}; // safeCode -> { name, price } — уникаємо inline JS з назвами що містять лапки
 const SERVICES = {
   soil:       { label: 'Ґрунт',   matCode:'01', packages:[], individual:[] },
   water:      { label: 'Вода',    matCode:'05', packages:[], individual:[] },
@@ -4332,8 +4333,10 @@ function openCardFromHash(){
 }
 
 // Клік на корзину — миттєво додає 1 зразок, показує лічильник
-function clickCartIcon(safeCode, name, price, event){
+function clickCartIcon(safeCode, event){
   event.stopPropagation();
+  const _n = _PKG_NAMES[safeCode]||{};
+  const name = _n.name||safeCode, price = _n.price||0;
   const idx = cart.findIndex(c=>c.code===safeCode&&c.type==='pkg');
   if(idx<0){
     cart.push({code:safeCode,type:'pkg',price,name,notes:[],qty:1});
@@ -4423,9 +4426,10 @@ function clickIndCartIcon(safeCode, name, price, qty, event){
 
 // Клік на іконку окремого показника — відкриває модал "Куди додати"
 // Після вибору у модалі — ховаємо іконку, показуємо лічильник
-function clickIndIcon(safeCode, name, price, event){
+function clickIndIcon(safeCode, event){
   event.stopPropagation();
-  openAddIndModal(safeCode, name, price, 1);
+  const _n = _PKG_NAMES[safeCode]||{};
+  openAddIndModal(safeCode, _n.name||safeCode, _n.price||0, 1);
 }
 
 function showIndCounter(safeCode, qty){
@@ -4441,7 +4445,9 @@ function showIndCounter(safeCode, qty){
   if(decBtn) decBtn.disabled = (qty||1)<=1;
 }
 
-function changeIndQty(safeCode, delta, name, price){
+function changeIndQty(safeCode, delta){
+  const _n = _PKG_NAMES[safeCode]||{};
+  const price = _n.price||0;
   // Для окремих показників — відкриваємо модал з новою кількістю
   const inp = document.getElementById('cqty-'+safeCode);
   const cur = parseInt(inp?.value||'1')||1;
@@ -4456,7 +4462,9 @@ function changeIndQty(safeCode, delta, name, price){
   if(totalEl) totalEl.textContent = 'Разом: '+(price*newQty).toLocaleString('uk-UA')+' грн';
 }
 
-function inputIndQty(safeCode, val, name, price){
+function inputIndQty(safeCode, val){
+  const _n = _PKG_NAMES[safeCode]||{};
+  const price = _n.price||0;
   const v = Math.max(1, parseInt(val)||1);
   const inp = document.getElementById('cqty-'+safeCode);
   if(inp) inp.value = v;
@@ -4610,8 +4618,8 @@ function makeRow(item, type){
   const inCart = cart.some(c=>c.code===item.code&&c.type===type);
   const safeCode = item.code.replace(/[^a-zA-Z0-9-]/g,'');
   const itemSlug = (item.slug||item.code).replace(/[^a-zA-Z0-9-]/g,'');
-  const safeName = item.name.replace(/`/g,"'");
-  const safeNameJs = safeName.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); // екранування для inline onclick
+  // Зберігаємо назву і ціну в словнику — не передаємо в inline onclick щоб уникнути проблем зі спецсимволами
+  _PKG_NAMES[safeCode] = { name: item.name, price: item.price||0 };
   const qty = getRowQty(safeCode);
   const subtotal = (item.price||0)*qty;
 
@@ -4646,15 +4654,15 @@ function makeRow(item, type){
         <div style="display:flex;align-items:center;gap:6px">
           <div class="srv-qty-inline ${alreadyInCart?'open':''}" id="czone-${safeCode}" style="flex-direction:row;align-items:center">
             <div class="srv-qty-counter-sm">
-              <button id="cdec-${safeCode}" onclick="changeIndQty('${safeCode}',-1,'${safeNameJs}',${item.price||0})" disabled>−</button>
+              <button id="cdec-${safeCode}" onclick="changeIndQty('${safeCode}',-1)" disabled>−</button>
               <input id="cqty-${safeCode}" type="number" value="1" min="1" max="9999"
-                oninput="inputIndQty('${safeCode}',this.value,'${safeNameJs}',${item.price||0})">
-              <button onclick="changeIndQty('${safeCode}',1,'${safeNameJs}',${item.price||0})">+</button>
+                oninput="inputIndQty('${safeCode}',this.value)">
+              <button onclick="changeIndQty('${safeCode}',1)">+</button>
             </div>
           </div>
           <button class="srv-cart-icon" id="cicon-${safeCode}"
             style="${alreadyInCart?'display:none':''}"
-            onclick="clickIndIcon('${safeCode}','${safeNameJs}',${item.price||0},event)"
+            onclick="clickIndIcon('${safeCode}',event)"
             title="Додати до зразків">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
           </button>
@@ -4753,7 +4761,7 @@ function makeRow(item, type){
           </div>
           <button class="srv-cart-icon" id="cicon-${safeCode}"
             style="${inCart?'display:none':''}"
-            onclick="clickCartIcon('${safeCode}','${safeNameJs}',${item.price||0},event)"
+            onclick="clickCartIcon('${safeCode}',event)"
             title="Додати в кошик">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
           </button>
