@@ -1187,8 +1187,8 @@ async function admLoad() {
   admInit();
 }
 
-const _admSL = { new:'Нове', waiting:'Очікує зразки', work:'У роботі', done:'Готово' };
-const _admSC = { new:'adm-p-new', waiting:'adm-p-wait', work:'adm-p-work', done:'adm-p-done' };
+const _admSL = { new:'Нове', waiting:'Очікує зразки', work:'У роботі', done:'Готово', closed:'Закрито', cancelled:'Скасовано' };
+const _admSC = { new:'adm-p-new', waiting:'adm-p-wait', work:'adm-p-work', done:'adm-p-done', closed:'adm-p-done', cancelled:'adm-p-unpa' };
 const _admPL = { paid:'Оплачено', pending:'Очікується', unpaid:'Не оплачено', partial:'Частково' };
 const _admPC = { paid:'adm-p-paid', pending:'adm-p-pend', unpaid:'adm-p-unpa', partial:'adm-p-part' };
 
@@ -1497,19 +1497,107 @@ function admToggleAll(cb) {
   document.querySelectorAll('#admOrdersBody input[type=checkbox]').forEach(c=>c.checked=cb.checked);
 }
 
-function admActionReceive() { alert('Функцію «Позначити отримано» буде підключено до Supabase'); }
-function admActionStatus()  { alert('Функцію «Змінити статус» буде підключено до Supabase'); }
-function admActionConfirm() {
-  const o = _admOrders.find(x=>x.id===_admSelId);
-  if (!o) return;
-  const next = {new:'waiting',waiting:'work',work:'done',done:'closed'};
-  if (!next[o.status]) return;
-  alert(`Перехід статусу: ${_admSL[o.status]} → ${_admSL[next[o.status]]}\n\n(Буде підключено до Supabase)`);
+// ─── Supabase order update helper ────────────────────────────────────────────
+async function _admUpdate(id, fields) {
+  const res = await fetch('https://laba.zemlerob.com.ua/api/order-update', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, ...fields }),
+  });
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || 'Update failed');
 }
-function admActionEdit()    { alert('Редагування замовлення буде підключено до Supabase'); }
-function admActionCancel()  {
-  if (confirm('Скасувати замовлення? Цю дію не можна відмінити.'))
-    alert('Скасування буде підключено до Supabase');
+
+// Reload orders and re-select the given order id
+async function _admReload(selectId) {
+  await admLoad();
+  admRender();
+  if (selectId) {
+    const o = _admOrders.find(x => x.id === selectId);
+    if (o) admSelect(selectId);
+  }
+}
+
+async function admActionReceive() {
+  const o = _admOrders.find(x => x.id === _admSelId);
+  if (!o) return;
+
+  // Build updated samples with all statuses set to 'received'
+  // We need to patch the raw Supabase samples array
+  // Fetch fresh order to get current JSONB samples
+  const btn = event?.currentTarget;
+  if (btn) { btn.disabled = true; btn.textContent = 'Зберігаємо…'; }
+
+  try {
+    // Mark all samples as received in the samplesList
+    const updatedSamples = (o.samplesList || []).map(s => ({ ...s, st: 'received' }));
+    // Update local model immediately
+    o.samplesList = updatedSamples;
+
+    // Build the raw samples payload for Supabase (same structure as stored)
+    // We need the raw Supabase rows — fetch from orders-list and find this order
+    const listRes = await fetch('https://laba.zemlerob.com.ua/api/orders-list');
+    const listData = await listRes.json();
+    const rawOrder = (listData.orders || []).find(x => x.id === o.id);
+    if (!rawOrder) throw new Error('Order not found');
+
+    const rawSamples = (rawOrder.samples || []).map(s => ({ ...s, st: 'received' }));
+
+    // Determine if all samples received → advance status from waiting→work
+    const newStatus = o.status === 'waiting' ? 'work' : o.status;
+
+    const updatePayload = { id: o.id, samples: rawSamples };
+    if (newStatus !== o.status) updatePayload.status = newStatus;
+
+    await _admUpdate(o.id, updatePayload);
+    await _admReload(o.id);
+  } catch (err) {
+    alert('Помилка: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'Позначити отримано'; }
+  }
+}
+
+function admActionStatus()  { alert('Функцію «Змінити статус» буде підключено'); }
+
+async function admActionConfirm() {
+  const o = _admOrders.find(x => x.id === _admSelId);
+  if (!o) return;
+  const next = { new:'waiting', waiting:'work', work:'done', done:'closed' };
+  if (!next[o.status]) return;
+
+  const btn = document.getElementById('admBtnConfirm');
+  const lbl = document.getElementById('admBtnConfirmLabel');
+  if (btn) btn.disabled = true;
+  if (lbl) lbl.textContent = 'Зберігаємо…';
+
+  try {
+    await _admUpdate(o.id, { status: next[o.status] });
+    await _admReload(o.id);
+  } catch (err) {
+    alert('Помилка: ' + err.message);
+    if (btn) btn.disabled = false;
+    if (lbl) lbl.textContent = document.getElementById('admBtnConfirmLabel')?.dataset?.label || 'Підтвердити';
+  }
+}
+
+function admActionEdit()    { alert('Редагування замовлення буде підключено пізніше'); }
+
+async function admActionCancel() {
+  if (!confirm('Скасувати замовлення? Цю дію не можна відмінити.')) return;
+  const o = _admOrders.find(x => x.id === _admSelId);
+  if (!o) return;
+
+  const btn = event?.currentTarget;
+  if (btn) { btn.disabled = true; btn.textContent = 'Скасовуємо…'; }
+
+  try {
+    await _admUpdate(o.id, { status: 'cancelled' });
+    await _admReload(null);
+    document.getElementById('admOrderPanel').style.display = 'none';
+  } catch (err) {
+    alert('Помилка: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'Скасувати'; }
+  }
 }
 
 // ─── PANEL SWITCHER ───────────────────────────
