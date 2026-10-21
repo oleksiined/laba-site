@@ -1150,6 +1150,7 @@ async function admLoad() {
     _admOrders = [];
   }
   _buildSamples();
+  _buildClients();
   admInit();
 }
 
@@ -1590,18 +1591,20 @@ function smpSelect(id) {
 }
 
 // ─── CLIENTS DATA + FUNCTIONS ─────────────────
-const _admClients = (()=>{
+// Clients derived from real orders (populated by _buildClients after admLoad)
+let _admClients = [];
+
+function _buildClients() {
   const map={};
   _admOrders.forEach(o=>{
     if(!map[o.client]){
       map[o.client]={name:o.client,short:o.short,contact:o.contact,phone:o.phone,email:o.email,orders:[],total:0};
     }
-    const amt=parseInt((o.amount||'0').replace(/[^\d]/g,''));
     map[o.client].orders.push({id:o.id,date:o.date,status:o.status,amount:o.amount});
-    map[o.client].total+=amt;
+    map[o.client].total+=o.amountRaw||0;
   });
-  return Object.values(map).map(c=>({...c,orderCount:c.orders.length,lastDate:c.orders[0]?.date||'—',totalFmt:c.total.toLocaleString('uk-UA')+' ₴'}));
-})();
+  _admClients=Object.values(map).map(c=>({...c,orderCount:c.orders.length,lastDate:c.orders[0]?.date||'—',totalFmt:c.total.toLocaleString('uk-UA')+' ₴'}));
+}
 
 let _cliSelId=null, _cliSortF='name', _cliSortA=true, _cliPage=1;
 const _CLI_PER=10;
