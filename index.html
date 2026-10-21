@@ -6786,6 +6786,10 @@ async function submitQuickOrder() {
   const btn = document.querySelector('.qo-submit-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Зберігаємо...'; }
 
+  // Clear any previous error
+  const prevErr = document.getElementById('qo-error-msg');
+  if (prevErr) prevErr.remove();
+
   try {
     const gs  = nc_groups();
     const tt  = nc_totals(gs);
@@ -6796,41 +6800,8 @@ async function submitQuickOrder() {
     const rnd = String(Math.floor(Math.random() * 9000) + 1000);
     const orderNum = `LAB-${yy}${mm}${dd}-${rnd}`;
 
-    const orderPayload = {
-      order_number:   orderNum,
-      status:         'new',
-      payer_type:     'private',
-      client_name:    name,
-      client_phone:   phone,
-      client_email:   email,
-      client_farm:    null,
-      company_name:   null,
-      edrpou:         null,
-      delivery_type:  'nova_poshta',
-      delivery_ttn:   null,
-      comment:        null,
-      total_amount:   tt.grand,
-      payment_status: 'unpaid',
-      samples_count:  NC_S.samples.length,
-      created_at:     now.toISOString(),
-    };
-
-    // Insert order
-    const orderRes = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
-      method:  'POST',
-      headers: {
-        'apikey':        SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'Content-Type':  'application/json',
-        'Prefer':        'return=representation',
-      },
-      body: JSON.stringify(orderPayload),
-    });
-    if (!orderRes.ok) throw new Error(await orderRes.text());
-    const [order] = await orderRes.json();
-
-    // Build samples rows
-    const sampRows = NC_S.samples.map((s, i) => {
+    // Build samples list for /api/order payload
+    const samplesPayload = NC_S.samples.map((s, i) => {
       const pkg    = NC_CATALOG.packages[s.packageId] || NS_CAT?.packages?.[s.packageId] || {};
       const mat    = NC_CATALOG.materials[s.materialId] || NS_CAT?.materials?.[s.materialId] || {};
       const extras = (s.additionalIndicatorIds || []).map(id => {
@@ -6839,45 +6810,73 @@ async function submitQuickOrder() {
       });
       const extraPrice = extras.reduce((sum, e) => sum + (e.price || 0), 0);
       return {
-        order_id:          order.id,
-        sample_number:     `${orderNum}-${String(i + 1).padStart(2, '0')}`,
-        name:              s.name || `Зразок ${i + 1}`,
-        material:          mat.name || s.materialId || '',
-        base_package_code: s.packageId || '',
-        base_package_name: pkg.name || s.packageId || '',
-        base_price:        pkg.price || 0,
-        extras:            extras,
-        total_price:       (pkg.price || 0) + extraPrice,
-        status:            'awaiting',
+        num:          i + 1,
+        name:         s.name || `Зразок ${i + 1}`,
+        material:     mat.name || s.materialId || '',
+        packageCode:  s.packageId || '',
+        packageName:  pkg.name || s.packageId || '',
+        basePrice:    pkg.price || 0,
+        extras,
+        totalPrice:   (pkg.price || 0) + extraPrice,
       };
     });
 
-    if (sampRows.length) {
-      const sampRes = await fetch(`${SUPABASE_URL}/rest/v1/samples`, {
-        method:  'POST',
-        headers: {
-          'apikey':        SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          'Content-Type':  'application/json',
-          'Prefer':        'return=minimal',
-        },
-        body: JSON.stringify(sampRows),
-      });
-      if (!sampRes.ok) throw new Error(await sampRes.text());
+    // /api/order expects the same format as the full checkout
+    const payload = {
+      orderNum,
+      client: {
+        name,
+        phone,
+        email,
+        payerType: 'private',
+      },
+      samples: samplesPayload,
+      items:   gs.map(g => {
+        const p = NC_CATALOG.packages[g.pkg] || NS_CAT?.packages?.[g.pkg] || { name: g.pkg, price: 0 };
+        return { name: p.name, qty: g.qty, price: g.unitPrice };
+      }),
+      delivery: { type: 'nova_poshta' },
+      payment:  { method: 'bank' },
+      promo:    NC_S.promo || null,
+      discount: NC_S.promoDiscount || 0,
+      total:    tt.grand,
+      notes:    'Швидке замовлення з кошика',
+    };
+
+    const apiRes = await fetch('/api/order', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    });
+
+    const result = await apiRes.json().catch(() => ({}));
+    console.log('Quick order result:', result);
+
+    if (!apiRes.ok && !result.ok) {
+      throw new Error(result.error || `HTTP ${apiRes.status}`);
     }
 
     // Success
     closeQuickOrder();
     const numEl = document.getElementById('order-success-num');
-    if (numEl) numEl.textContent = orderNum;
+    if (numEl) numEl.textContent = result.orderNum || orderNum;
     const sm = document.getElementById('order-success-modal');
     if (sm) sm.classList.remove('hidden');
     nc_clearCart && nc_clearCart();
 
   } catch (err) {
     console.error('Quick order error:', err);
-    toast('Помилка при збереженні. Спробуйте ще раз.');
     if (btn) { btn.disabled = false; btn.textContent = 'Підтвердити замовлення →'; }
+    // Show error inside modal so it's visible
+    let errEl = document.getElementById('qo-error-msg');
+    if (!errEl) {
+      errEl = document.createElement('p');
+      errEl.id = 'qo-error-msg';
+      errEl.style.cssText = 'color:#dc2626;font-size:13px;text-align:center;margin:8px 0 0;';
+      const ft = document.querySelector('.qo-ft');
+      if (ft) ft.parentNode.insertBefore(errEl, ft);
+    }
+    errEl.textContent = 'Помилка при збереженні. Спробуйте ще раз.';
   }
 }
 function closeOrderSuccess() {
