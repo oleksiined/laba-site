@@ -1168,7 +1168,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M14.5 3.5l2 2-10 10-3 1 1-3 10-10z" stroke-linecap="round" stroke-linejoin="round"/></svg>
               Редагувати
             </button>
-            <button class="adm-pbtn adm-pbtn-red" onclick="admActionCancel()" style="flex:1;justify-content:center">
+            <button id="admBtnCancel" class="adm-pbtn adm-pbtn-red" onclick="admActionCancel()" style="flex:1;justify-content:center">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M6 6l8 8M14 6l-8 8" stroke-linecap="round"/></svg>
               Скасувати
             </button>
@@ -1587,6 +1587,19 @@ function admSelect(id) {
     confirmBtn.style.opacity = (o.status === 'closed' || o.status === 'cancelled') ? '0.5' : '';
   }
 
+  // Cancel / Restore button
+  const cancelBtn = document.getElementById('admBtnCancel');
+  if (cancelBtn) {
+    const isCancelled = o.status === 'cancelled';
+    cancelBtn.className = 'adm-pbtn ' + (isCancelled ? 'adm-pbtn-sec' : 'adm-pbtn-red');
+    cancelBtn.onclick = isCancelled ? admActionRestore : admActionCancel;
+    cancelBtn.innerHTML = isCancelled
+      ? `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M4 10a6 6 0 1 0 1.5-4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 4v3h3" stroke-linecap="round" stroke-linejoin="round"/></svg> Відновити`
+      : `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M6 6l8 8M14 6l-8 8" stroke-linecap="round"/></svg> Скасувати`;
+    cancelBtn.style.flex = '1';
+    cancelBtn.style.justifyContent = 'center';
+  }
+
   // Mini stats
   setT('admMSamples', o.samples);
   setT('admMStudies', o.studies || (o.samples * 5));
@@ -1921,6 +1934,21 @@ async function admActionConfirm() {
 }
 
 function admActionEdit()    { alert('Редагування замовлення буде підключено пізніше'); }
+
+async function admActionRestore() {
+  if (!confirm('Відновити замовлення зі статусу «Скасовано»?')) return;
+  const o = _admOrders.find(x => x.id === _admSelId);
+  if (!o) return;
+  const btn = document.getElementById('admBtnCancel');
+  if (btn) { btn.disabled = true; btn.textContent = 'Відновлення…'; }
+  try {
+    await _admUpdate(o.dbId, { status: 'new' });
+    await _admReload(_admSelId);
+  } catch (err) {
+    alert('Помилка: ' + err.message);
+    if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M4 10a6 6 0 1 0 1.5-4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 4v3h3" stroke-linecap="round" stroke-linejoin="round"/></svg> Відновити'; }
+  }
+}
 
 async function admActionCancel() {
   if (!confirm('Скасувати замовлення? Цю дію не можна відмінити.')) return;
