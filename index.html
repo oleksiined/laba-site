@@ -6990,7 +6990,6 @@ function nc_cancelPromo() {
 function goCheckout() { nc_goToSamples(); }
 function nc_clearCart() {
   if (!NC_S.samples.length && !cart.length) { toast('Кошик вже порожній'); return; }
-  if (!confirm('Очистити кошик? Всі вибрані послуги та зразки буде видалено.')) return;
   NC_S.samples = [];
   NC_S.promo = '';
   NC_S.promoDiscount = 0;
