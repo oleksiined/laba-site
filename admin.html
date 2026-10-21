@@ -305,6 +305,25 @@ html{scroll-behavior:smooth}
 .adm-note-cta-arr{color:var(--text-soft);font-size:16px}
 .adm-test-row:last-child{border-bottom:none}
 .adm-test-name{color:var(--text-mid)}
+/* Status cards */
+.adm-status-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.adm-status-card{background:var(--bg);border:1.5px solid var(--border);border-radius:9px;padding:10px 12px}
+.adm-status-card-lbl{font-size:10.5px;color:var(--text-soft);margin-bottom:5px;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.adm-status-card-val{line-height:1}
+/* Business rules callout */
+.adm-biz-rules{background:#F0F4FF;border:1.5px solid #C7D7FF;border-radius:9px;padding:11px 12px;margin-bottom:14px}
+.adm-biz-rules-title{font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.adm-biz-rules-title svg{width:13px;height:13px;flex-shrink:0}
+.adm-biz-rules ul{margin:0;padding-left:15px;list-style:disc}
+.adm-biz-rules ul li{font-size:11.5px;color:#2A3F7A;line-height:1.45;margin-bottom:3px}
+.adm-biz-rules ul li:last-child{margin-bottom:0}
+/* Client note block */
+.adm-client-note{background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:9px;padding:11px 12px;margin-bottom:14px}
+.adm-client-note-title{font-size:10.5px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+.adm-client-note-text{font-size:12.5px;color:#78350F;line-height:1.45}
+/* Red / danger button */
+.adm-pbtn-red{background:#FEF2F2;color:#DC2626;border:1.5px solid #FECACA}
+.adm-pbtn-red:hover{background:#FEE2E2;border-color:#FCA5A5}
 /* ── CLIENT AVATAR ── */
 .adm-cli-avatar{width:36px;height:36px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
 /* ── DOCS ── */
@@ -868,25 +887,27 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
             <div class="adm-oi-section-title">Інформація про замовлення</div>
             <div class="adm-oi-row">
               <span class="adm-oi-lbl">Клієнт</span>
-              <span class="adm-oi-val"><span class="adm-oi-link" id="admOIClient">—</span>
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="12" height="12"><path d="M11 3h6v6M17 3l-8 8M9 5H5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-            </div>
-            <div class="adm-oi-row">
-              <span class="adm-oi-lbl">Тип платника</span>
-              <span class="adm-oi-val" id="admOIPayerType">—</span>
+              <span class="adm-oi-val"><span class="adm-oi-link" id="admOIClient">—</span></span>
             </div>
             <div class="adm-oi-row">
               <span class="adm-oi-lbl">Контактна особа</span>
               <span class="adm-oi-val" id="admOIContact">—</span>
             </div>
             <div class="adm-oi-row">
-              <span class="adm-oi-lbl">Реквізити</span>
+              <span class="adm-oi-lbl">ЄДРПОУ / ІПН</span>
               <span class="adm-oi-val" id="admOIReqs">—</span>
             </div>
             <div class="adm-oi-row">
-              <span class="adm-oi-lbl">Доставка</span>
-              <span class="adm-oi-val" id="admOIDelivery">—</span>
+              <span class="adm-oi-lbl">Телефон</span>
+              <span class="adm-oi-val" id="admOIPhone">—</span>
+            </div>
+            <div class="adm-oi-row">
+              <span class="adm-oi-lbl">Email</span>
+              <span class="adm-oi-val" id="admOIEmail">—</span>
+            </div>
+            <div class="adm-oi-row">
+              <span class="adm-oi-lbl">Тип платника</span>
+              <span class="adm-oi-val" id="admOIPayerType">—</span>
             </div>
           </div>
           <!-- Mini stats -->
@@ -913,6 +934,17 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
               </div>
             </div>
           </div>
+          <!-- Status cards -->
+          <div class="adm-status-cards">
+            <div class="adm-status-card">
+              <div class="adm-status-card-lbl">Статус замовлення</div>
+              <div class="adm-status-card-val" id="admSCOrder">—</div>
+            </div>
+            <div class="adm-status-card">
+              <div class="adm-status-card-lbl">Статус оплати</div>
+              <div class="adm-status-card-val" id="admSCPay">—</div>
+            </div>
+          </div>
           <!-- Steps progress -->
           <div class="adm-steps-wrap">
             <div class="adm-steps-title">Етапи замовлення</div>
@@ -920,18 +952,22 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
               <!-- filled by JS -->
             </div>
           </div>
-          <!-- Note CTA -->
-          <div class="adm-note-cta" onclick="alert('Функцію приміток буде підключено до Supabase')">
-            <div class="adm-note-cta-left">
-              <div class="adm-note-cta-ic">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M7 7h6M7 10h6M7 13h3" stroke-linecap="round"/></svg>
-              </div>
-              <div>
-                <div class="adm-note-cta-title">Додати примітку для клієнта</div>
-                <div class="adm-note-cta-sub">Інформація буде доступна в особистому кабінеті</div>
-              </div>
+          <!-- Business rules -->
+          <div class="adm-biz-rules">
+            <div class="adm-biz-rules-title">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="8"/><path d="M10 9v5M10 7h.01" stroke-linecap="round"/></svg>
+              Бізнес-правила
             </div>
-            <span class="adm-note-cta-arr">›</span>
+            <ul>
+              <li>Роботи розпочинаються лише після повної оплати замовлення</li>
+              <li>Усі поля замовлення можна редагувати до початку першого дослідження</li>
+              <li>Завершення замовлення виконується вручну співробітником лабораторії</li>
+            </ul>
+          </div>
+          <!-- Client note -->
+          <div class="adm-client-note" id="admClientNote" style="display:none">
+            <div class="adm-client-note-title">Примітка клієнта</div>
+            <div class="adm-client-note-text" id="admClientNoteText"></div>
           </div>
         </div>
 
@@ -975,15 +1011,21 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
         </div>
 
         <!-- Bottom action bar -->
-        <div class="adm-panel-actions" style="border-top:1px solid var(--border);margin:0;padding:12px 16px">
-          <button class="adm-pbtn adm-pbtn-sec" onclick="admActionStatus()">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M4 6h12M4 10h12M4 14h12" stroke-linecap="round"/></svg>
-            Змінити статус
+        <div style="border-top:1px solid var(--border);padding:12px 16px;display:flex;flex-direction:column;gap:7px">
+          <button class="adm-pbtn adm-pbtn-green" id="admBtnConfirm" onclick="admActionConfirm()" style="width:100%;justify-content:center;font-size:13px;padding:10px 16px">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="14" height="14"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span id="admBtnConfirmLabel">Підтвердити замовлення</span>
           </button>
-          <button class="adm-pbtn adm-pbtn-out">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M11 3h6v6M17 3l-8 8M9 5H5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Відкрити деталі
-          </button>
+          <div style="display:flex;gap:7px">
+            <button class="adm-pbtn adm-pbtn-sec" onclick="admActionEdit()" style="flex:1;justify-content:center">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M14.5 3.5l2 2-10 10-3 1 1-3 10-10z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Редагувати
+            </button>
+            <button class="adm-pbtn adm-pbtn-red" onclick="admActionCancel()" style="flex:1;justify-content:center">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M6 6l8 8M14 6l-8 8" stroke-linecap="round"/></svg>
+              Скасувати
+            </button>
+          </div>
         </div>
       </div><!-- /admPanelOrder -->
 
@@ -1328,41 +1370,67 @@ function admSelect(id) {
 
   // ── Загальна tab ──
   // Client info section
-  setH('admOIClient', `${o.client}<br><span style="font-weight:400;color:var(--text-soft);font-size:12px">${o.contact}</span>`);
+  setT('admOIClient', o.client || '—');
+  setT('admOIContact', o.contact || '—');
+  // Phone
+  setH('admOIPhone', o.phone ? `<a href="tel:${o.phone}" style="color:var(--navy);text-decoration:none">${o.phone}</a>` : '—');
+  // Email
+  setH('admOIEmail', o.email ? `<a href="mailto:${o.email}" style="color:var(--navy);text-decoration:none">${o.email}</a>` : '—');
   // Payer type with optional PDV badge
-  setH('admOIPayerType', o.companyType + (o.pdv ? ' <span class="adm-pdv-badge">ПДВ</span>' : ''));
-  // Contact
-  setH('admOIContact', `<a href="tel:${o.phone}" style="color:var(--navy);text-decoration:none">${o.phone}</a><br><a href="mailto:${o.email}" style="color:var(--navy);text-decoration:none;font-size:11.5px">${o.email}</a>`);
-  // Реквізити (тільки для юр. особи / ФОП)
-  if (o.companyType === 'Фізична особа') {
-    setH('admOIReqs', '—');
+  setH('admOIPayerType', (o.companyType || '—') + (o.pdv ? ' <span class="adm-pdv-badge">ПДВ</span>' : ''));
+  // ЄДРПОУ / ІПН
+  if (!o.companyType || o.companyType === 'Фізична особа') {
+    setT('admOIReqs', '—');
   } else if (o.companyType === 'ФОП') {
-    const reqParts = [];
-    if (o.edrpou && o.edrpou !== '—') reqParts.push(`РНОКПП: <b>${o.edrpou}</b>`);
-    if (o.legalAddress && o.legalAddress !== '—') reqParts.push(o.legalAddress);
-    setH('admOIReqs', reqParts.join(' &nbsp;·&nbsp; ') || '—');
+    setH('admOIReqs', o.edrpou && o.edrpou !== '—' ? `РНОКПП: <b>${o.edrpou}</b>` : '—');
   } else {
-    const reqParts = [];
-    if (o.edrpou && o.edrpou !== '—') reqParts.push(`ЄДРПОУ: <b>${o.edrpou}</b>`);
-    if (o.companyFull && o.companyFull !== '—') reqParts.push(o.companyFull);
-    if (o.legalAddress && o.legalAddress !== '—') reqParts.push(o.legalAddress);
-    setH('admOIReqs', reqParts.join(' &nbsp;·&nbsp; ') || '—');
+    setH('admOIReqs', o.edrpou && o.edrpou !== '—' ? `ЄДРПОУ: <b>${o.edrpou}</b>` : '—');
   }
-  // Delivery
-  setT('admOIDelivery', o.delivery || '—');
+
+  // Status cards
+  setH('admSCOrder', `<span class="adm-pill ${_admSC[o.status]}">${_admSL[o.status]}</span>`);
+  setH('admSCPay', `<span class="adm-pill ${_admPC[o.payment]}">${_admPL[o.payment]}</span>`);
+
+  // Client note
+  const noteEl = document.getElementById('admClientNote');
+  const noteTextEl = document.getElementById('admClientNoteText');
+  if (noteEl && noteTextEl) {
+    if (o.notes && o.notes.trim()) {
+      noteEl.style.display = '';
+      noteTextEl.textContent = o.notes;
+    } else {
+      noteEl.style.display = 'none';
+    }
+  }
+
+  // Primary action button label based on status
+  const confirmBtn = document.getElementById('admBtnConfirm');
+  const confirmLbl = document.getElementById('admBtnConfirmLabel');
+  if (confirmBtn && confirmLbl) {
+    const btnMap = {
+      new: 'Підтвердити замовлення',
+      waiting: 'Зразки отримано',
+      work: 'Позначити готовим',
+      done: 'Завершити замовлення',
+      closed: 'Замовлення завершено'
+    };
+    confirmLbl.textContent = btnMap[o.status] || 'Підтвердити замовлення';
+    confirmBtn.disabled = o.status === 'closed' || o.status === 'cancelled';
+    confirmBtn.style.opacity = (o.status === 'closed' || o.status === 'cancelled') ? '0.5' : '';
+  }
 
   // Mini stats
   setT('admMSamples', o.samples);
   setT('admMStudies', o.studies || (o.samples * 5));
   setT('admMAmount', o.amount);
 
-  // Progress steps
+  // Progress steps (MVP statuses)
   const steps = [
-    {label:'Замовлення',key:'new'},
-    {label:'Очікування',key:'waiting'},
+    {label:'Нове',key:'new'},
+    {label:'Очікує зразки',key:'waiting'},
     {label:'У роботі',key:'work'},
-    {label:'Готово',key:'done'},
-    {label:'Закрито',key:'closed'}
+    {label:'Готове',key:'done'},
+    {label:'Завершено',key:'closed'}
   ];
   const statusOrder = ['new','waiting','work','done','closed'];
   const curIdx = statusOrder.indexOf(o.status);
@@ -1434,6 +1502,18 @@ function admToggleAll(cb) {
 
 function admActionReceive() { alert('Функцію «Позначити отримано» буде підключено до Supabase'); }
 function admActionStatus()  { alert('Функцію «Змінити статус» буде підключено до Supabase'); }
+function admActionConfirm() {
+  const o = _admOrders.find(x=>x.id===_admSelId);
+  if (!o) return;
+  const next = {new:'waiting',waiting:'work',work:'done',done:'closed'};
+  if (!next[o.status]) return;
+  alert(`Перехід статусу: ${_admSL[o.status]} → ${_admSL[next[o.status]]}\n\n(Буде підключено до Supabase)`);
+}
+function admActionEdit()    { alert('Редагування замовлення буде підключено до Supabase'); }
+function admActionCancel()  {
+  if (confirm('Скасувати замовлення? Цю дію не можна відмінити.'))
+    alert('Скасування буде підключено до Supabase');
+}
 
 // ─── PANEL SWITCHER ───────────────────────────
 function _admShowPanel(type) {
