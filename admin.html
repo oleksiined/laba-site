@@ -1878,38 +1878,43 @@ async function admActionReceive() {
   const o = _admOrders.find(x => x.id === _admSelId);
   if (!o) return;
 
-  // Build updated samples with all statuses set to 'received'
-  // We need to patch the raw Supabase samples array
-  // Fetch fresh order to get current JSONB samples
-  const btn = event?.currentTarget;
-  if (btn) { btn.disabled = true; btn.textContent = 'Зберігаємо…'; }
+  // Collect checked sample indices
+  const checked = [...document.querySelectorAll('.adm-samp-cb:checked')].map(cb => parseInt(cb.dataset.idx));
+  if (!checked.length) { alert('Виберіть хоча б один зразок'); return; }
+
+  // Use the receive button from the DOM (not event.currentTarget which may be stale)
+  const btn = document.querySelector('#admOTab-samples .adm-samp-actions .adm-pbtn-green');
+  if (btn) { btn.disabled = true; btn.innerHTML = 'Зберігаємо…'; }
 
   try {
-    // Mark all samples as received in the samplesList
-    const updatedSamples = (o.samplesList || []).map(s => ({ ...s, st: 'received' }));
-    // Update local model immediately
-    o.samplesList = updatedSamples;
-
-    // Build the raw samples payload for Supabase (same structure as stored)
-    // We need the raw Supabase rows — fetch from orders-list and find this order
     const listRes = await fetch('https://laba.zemlerob.com.ua/api/orders-list');
     const listData = await listRes.json();
     const rawOrder = (listData.orders || []).find(x => x.id === o.dbId);
     if (!rawOrder) throw new Error('Order not found');
 
-    const rawSamples = (rawOrder.samples || []).map(s => ({ ...s, st: 'received' }));
+    // Only mark selected indices as received, leave others unchanged
+    const rawSamples = (rawOrder.samples || []).map((s, i) => {
+      if (checked.includes(i)) return { ...s, st: 'received', updated_at: new Date().toISOString() };
+      return s;
+    });
 
-    // Determine if all samples received → advance status from waiting→work
-    const newStatus = o.status === 'waiting' ? 'work' : o.status;
+    // If ALL samples are now received/accepted/work/done → advance status from waiting→work
+    const allReceived = rawSamples.every(s => ['received','accepted','work','done'].includes(s.st));
+    const newStatus = (o.status === 'waiting' && allReceived) ? 'work' : o.status;
 
-    const updatePayload = { id: o.dbId, samples: rawSamples };
+    const updatePayload = { samples: rawSamples };
     if (newStatus !== o.status) updatePayload.status = newStatus;
 
     await _admUpdate(o.dbId, updatePayload);
-    await _admReload(o.id);
+
+    // Show success state briefly, then reload
+    if (btn) { btn.innerHTML = '✓ Позначено'; btn.style.background = '#059669'; }
+    setTimeout(async () => {
+      await _admReload(o.id);
+    }, 800);
   } catch (err) {
     alert('Помилка: ' + err.message);
-    if (btn) { btn.disabled = false; btn.textContent = 'Позначити отримано'; }
+    if (btn) { btn.disabled = false; btn.innerHTML = '✓ Позначити отримання'; btn.style.background = ''; }
   }
 }
 
