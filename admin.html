@@ -452,6 +452,29 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
 .adm-login-btn{padding:14px;background:#CCFF00;border:none;border-radius:10px;font-size:15px;font-weight:700;color:#111;cursor:pointer;font-family:inherit;transition:background .15s}
 .adm-login-btn:hover{background:#b8e600}
 
+/* ── SAMPLE PANEL ── */
+.sp-sec{padding:14px 16px;border-bottom:1px solid var(--border)}
+.sp-sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sp-sec-title{font-size:13px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px}
+.sp-sec-btn{display:flex;align-items:center;gap:4px;font-size:12px;color:#2563EB;background:none;border:none;cursor:pointer;padding:3px 7px;border-radius:6px;font-weight:500}
+.sp-sec-btn:hover{background:#EFF6FF}
+.sp-row{display:flex;align-items:baseline;padding:3px 0;font-size:12.5px}
+.sp-lbl{width:140px;flex-shrink:0;color:#2563EB;font-size:12px}
+.sp-val{color:var(--navy);font-weight:500;flex:1}
+.sp-val.fw{font-weight:700}
+.sp-task{color:#EF4444;font-weight:600}
+.sp-badge{background:var(--navy);color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.sp-badge-dark{background:#374151;color:#fff;border-radius:9px;padding:0 6px;font-size:10px;font-weight:700;line-height:18px;display:inline-block}
+.sp-pkg-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 0}
+.sp-pkg-label{font-size:12.5px;font-weight:600;color:var(--navy);white-space:nowrap}
+.sp-extra-chips{display:flex;flex-wrap:wrap;gap:5px;flex:1}
+.sp-extra-chip{padding:2px 9px;border-radius:12px;background:#EFF6FF;color:#2563EB;font-size:11.5px;font-weight:600;border:none}
+.sp-pkg-cnt{background:#F3F4F6;border:1px solid var(--border);border-radius:7px;padding:1px 8px;font-size:12px;font-weight:600;color:var(--navy);white-space:nowrap}
+.sp-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.sp-tbl th{font-size:10px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.3px;padding:5px 6px;border-bottom:1px solid var(--border);text-align:left}
+.sp-tbl td{padding:5px 6px;border-bottom:1px solid #f0f2f4;color:var(--text-mid)}
+.sp-tbl td:nth-child(2){color:#2563EB;font-weight:500}
+.sp-tbl td:last-child{color:var(--text-soft)}
 /* ── SAMPLES REDESIGN ── */
 .adm-smp-kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:0;padding:0 20px 16px;flex-shrink:0}
 .adm-smp-kpi{background:var(--white);border:1px solid var(--border);padding:13px 15px;cursor:pointer;transition:border-color .12s,background .12s;position:relative;user-select:none}
@@ -1320,65 +1343,57 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
       </div><!-- /admPanelOrder -->
 
       <!-- SAMPLE panel body -->
-      <div class="adm-panel-body" id="admPanelSample">
+      <div class="adm-panel-body" id="admPanelSample" style="display:flex;flex-direction:column;gap:0;overflow-y:auto">
 
         <!-- Основна інформація -->
-        <div class="smp-info-sec">
-          <div class="smp-info-hd">Основна інформація</div>
-          <div class="smp-info-row">
-            <span class="smp-info-lbl">Назва зразка</span>
-            <span class="smp-info-val" id="smpPanelName">—</span>
+        <div class="sp-sec">
+          <div class="sp-sec-hd">
+            <span class="sp-sec-title">Основна інформація</span>
+            <button class="sp-sec-btn" onclick="alert('Функція у розробці')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><path d="M11.5 2.5l2 2-8 8-3 .5.5-3 8-7.5z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Редагувати
+            </button>
           </div>
-          <div class="smp-info-row">
-            <span class="smp-info-lbl">Матеріал</span>
-            <span class="smp-info-val" id="smpPanelMat">—</span>
-          </div>
-          <div class="smp-info-row">
-            <span class="smp-info-lbl">Клієнт</span>
-            <span class="smp-info-val" id="smpPanelClient">—</span>
-          </div>
-          <div class="smp-info-row">
-            <span class="smp-info-lbl">Замовлення</span>
-            <span class="smp-info-val" id="smpPanelOrderId" style="color:var(--text-soft);text-decoration:underline;cursor:pointer" onclick="smpOpenOrder()">—</span>
-          </div>
-          <div class="smp-info-row">
-            <span class="smp-info-lbl">Дата відбору</span>
-            <span class="smp-info-val" id="smpPanelDate">—</span>
-          </div>
-          <div class="smp-info-row">
-            <span class="smp-info-lbl">Дата отримання</span>
-            <span class="smp-info-val" id="smpPanelDateRcv">—</span>
-          </div>
-          <div class="smp-info-row">
-            <span class="smp-info-lbl">Дата прийняття</span>
-            <span class="smp-info-val" id="smpPanelDateAcc">—</span>
-          </div>
-          <div class="smp-info-row">
-            <span class="smp-info-lbl">Пакет</span>
-            <span class="smp-info-val" id="smpPanelPkg">—</span>
+          <div class="sp-row"><span class="sp-lbl">Назва зразка</span><span class="sp-val fw" id="smpPanelName">—</span></div>
+          <div class="sp-row"><span class="sp-lbl">Матеріал</span><span class="sp-val" id="smpPanelMat">—</span></div>
+          <div class="sp-row"><span class="sp-lbl">Локація</span><span class="sp-val" id="smpPanelClient">—</span></div>
+          <div class="sp-row"><span class="sp-lbl">Дата відбору</span><span class="sp-val" id="smpPanelDate">—</span></div>
+          <div class="sp-row"><span class="sp-lbl">Дата отримання</span><span class="sp-val" id="smpPanelDateRcv">—</span></div>
+          <div class="sp-row"><span class="sp-lbl">Дата прийняття</span><span class="sp-val" id="smpPanelDateAcc">—</span></div>
+          <div class="sp-row">
+            <span class="sp-lbl">Статус</span>
+            <span class="sp-val" style="display:flex;align-items:center;gap:8px">
+              <span id="smpPanelStatRow">—</span>
+              <span id="smpPanelUpdated" style="font-size:11px;color:var(--text-soft)"></span>
+            </span>
           </div>
         </div>
 
-        <!-- Призначені дослідження -->
-        <div class="smp-info-sec">
-          <div class="smp-studies-hd">
-            <div class="smp-studies-title">
+        <!-- Призначені дослідження (пакет + чіпи) -->
+        <div class="sp-sec">
+          <div class="sp-sec-hd">
+            <span class="sp-sec-title" style="display:flex;align-items:center;gap:6px">
               Призначені дослідження
-              <span class="smp-studies-badge" id="smpPanelTestCnt">0</span>
-            </div>
-            <button class="adm-add-study-btn" onclick="alert('Функція у розробці')">+ Додати</button>
+              <span class="sp-badge" id="smpPanelTestCnt">0</span>
+            </span>
+            <button class="sp-sec-btn" onclick="alert('Функція у розробці')">+ Додати</button>
           </div>
-          <div class="smp-pkg-row">
-            <div class="smp-pkg-name">
-              <div class="smp-pkg-ico">
-                <svg viewBox="0 0 16 16" fill="none" stroke="#111" stroke-width="1.5" width="10" height="10"><path d="M2 5l6-3 6 3v6l-6 3-6-3z" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 2v12M2 5l6 3 6-3" stroke-linecap="round"/></svg>
-              </div>
-              <span id="smpPanelPkgName">Базовий</span>
-            </div>
-            <span class="smp-pkg-cnt" id="smpPanelPkgCnt">0</span>
+          <div class="sp-pkg-row" id="smpPanelPkgRow">
+            <span class="sp-pkg-label" id="smpPanelPkgName">—</span>
+            <div class="sp-extra-chips" id="smpPanelExtras"></div>
+            <span class="sp-pkg-cnt" id="smpPanelPkgCnt"></span>
           </div>
-          <div class="smp-extra-chips" id="smpPanelExtras"></div>
-          <table class="smp-study-tbl">
+        </div>
+
+        <!-- Список призначених досліджень -->
+        <div class="sp-sec">
+          <div class="sp-sec-hd">
+            <span class="sp-sec-title">Список призначених досліджень
+              <span class="sp-badge-dark" id="smpPanelTestCnt2">0</span>
+            </span>
+            <button class="sp-sec-btn" onclick="alert('Функція у розробці')">+ Додати</button>
+          </div>
+          <table class="sp-tbl">
             <thead><tr>
               <th>№</th><th>ID послуги</th><th>Назва дослідження</th><th>Тип</th>
             </tr></thead>
@@ -1387,34 +1402,39 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
         </div>
 
         <!-- Лабораторія та завдання -->
-        <div class="smp-info-sec">
-          <div class="smp-info-hd">Лабораторія та завдання</div>
-          <div class="smp-lab-row">
-            <select class="smp-lab-sel" id="smpPanelLab">
-              <option value="">Лабораторія</option>
-              <option value="dnipro">Дніпро</option>
-              <option value="kyiv">Київ</option>
-            </select>
-            <select class="smp-lab-sel" id="smpPanelTask">
-              <option value="">Завдання</option>
-            </select>
+        <div class="sp-sec">
+          <div class="sp-sec-hd">
+            <span class="sp-sec-title">Лабораторія та завдання</span>
+            <button class="sp-sec-btn" onclick="alert('Функція у розробці')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><path d="M8 2v12M2 8h12" stroke-linecap="round"/></svg>
+              Перемістити
+            </button>
           </div>
+          <div class="sp-row"><span class="sp-lbl">Лабораторія</span><span class="sp-val" id="smpPanelLab">—</span></div>
+          <div class="sp-row"><span class="sp-lbl">Лабораторне завдання</span><span class="sp-val sp-task" id="smpPanelTask">Не створено</span></div>
         </div>
 
         <!-- Примітки -->
-        <div class="smp-info-sec">
-          <div class="smp-info-hd">Примітки</div>
-          <textarea class="smp-notes-inp" id="smpPanelNotes" placeholder="Додати примітку..."></textarea>
+        <div class="sp-sec" style="flex:1">
+          <div class="sp-sec-hd">
+            <span class="sp-sec-title">Примітки</span>
+            <button class="sp-sec-btn" onclick="smpAddNote()">+ Додати</button>
+          </div>
+          <div id="smpPanelNotes" style="font-size:12px;color:var(--text-soft);padding:4px 0">Немає приміток.</div>
         </div>
 
         <!-- Actions -->
-        <div class="smp-actions-new">
-          <div class="smp-act-row">
-            <button class="smp-act-form-btn" onclick="smpFormTask()">Сформувати завдання</button>
-            <div class="smp-status-wrap">
-              <button class="smp-status-btn" onclick="smpChangeStatus(event)">
+        <div style="padding:14px 16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;flex-shrink:0">
+          <button onclick="smpFormTask()" style="width:100%;padding:12px;background:#10B981;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M7 10h6M10 7v6" stroke-linecap="round"/></svg>
+            Сформувати завдання
+          </button>
+          <div style="display:flex;gap:8px">
+            <div style="position:relative;flex:1">
+              <button onclick="smpChangeStatus(event)" style="width:100%;padding:9px 12px;background:#fff;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="14" height="14"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2 2" stroke-linecap="round"/></svg>
                 Змінити статус
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M4 6l4 4 4-4" stroke-linecap="round"/></svg>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10"><path d="M4 6l4 4 4-4" stroke-linecap="round"/></svg>
               </button>
               <div class="smp-status-dd" id="smpStatusDd">
                 <div class="smp-status-dd-item" onclick="smpApplyStatus('new')">Не отримано</div>
@@ -1426,7 +1446,10 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
                 <div class="smp-status-dd-item" onclick="smpApplyStatus('cancelled')">Скасовано</div>
               </div>
             </div>
-            <button class="smp-order-btn" onclick="smpOpenOrder()">Відкрити замовлення</button>
+            <button onclick="smpOpenOrder()" style="padding:9px 12px;background:#fff;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;color:var(--navy);cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="14" height="14"><path d="M7 13L14 6M14 6H9M14 6v5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Відкрити замовлення
+            </button>
           </div>
         </div>
 
@@ -2469,50 +2492,63 @@ function smpSelect(id) {
   const ps=document.getElementById('admPanelStat');
   if(ps){ps.className='adm-pill '+(_SST_CLASS[s.status]||'');ps.textContent=_SST_LABEL[s.status]||s.status;}
   const pd=document.getElementById('admPanelDate2'); if(pd)pd.textContent=s.date;
-  const pc=document.getElementById('admPanelCName2'); if(pc)pc.textContent=s.client;
+  const pc=document.getElementById('admPanelCName2'); if(pc)pc.textContent=s.orderId;
   _admShowPanel('Sample');
+  const set=(eid,v)=>{const e=document.getElementById(eid);if(e)e.textContent=v||'—';};
+  const setH=(eid,v)=>{const e=document.getElementById(eid);if(e)e.innerHTML=v;};
   // Основна інформація
-  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v||'—';};
-  const setH=(id,v)=>{const e=document.getElementById(id);if(e)e.innerHTML=v||'—';};
   set('smpPanelName', s.displayName||s.label||s.id);
-  setH('smpPanelMat', `<span class="adm-mat ${_MAT_CLASS[s.mat]||''}">${_MAT_LABEL[s.mat]||s.mat}</span>`);
+  setH('smpPanelMat', `<span class="adm-mat ${_MAT_CLASS[s.mat]||''}">${_MAT_LABEL[s.mat]||s.mat||'—'}</span>`);
   set('smpPanelClient', s.client);
-  set('smpPanelOrderId', s.orderId);
-  set('smpPanelDate', s.date);
+  set('smpPanelDate', s.date||'—');
   set('smpPanelDateRcv', s.receivedDate||'—');
   set('smpPanelDateAcc', s.acceptedDate||'—');
-  set('smpPanelPkg', _PKG_LABEL[s.pkg]||s.pkg);
+  // Статус з часом оновлення
+  setH('smpPanelStatRow', `<span class="adm-pill ${_SST_CLASS[s.status]||''}">${_SST_LABEL[s.status]||s.status}</span>`);
+  const now = new Date();
+  set('smpPanelUpdated', `Оновлено: ${now.toLocaleDateString('uk-UA')}, ${now.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})}`);
   // Призначені дослідження
   const order = _admOrders.find(o=>o.id===s.orderId);
   const items = (order && order.items) ? order.items : s.items || [];
+  const pkgLabel = _PKG_LABEL[s.pkg]||s.pkg||'—';
+  // Пакет секція
+  const pkgRow = document.getElementById('smpPanelPkgRow');
+  if(pkgRow){
+    const pkgCnt = items.filter(t=>t.type==='package'||t.type==='пакет'||!t.type).length;
+    const extras = [];
+    items.forEach(t=>{ if((t.type==='extra'||t.type==='окреме'||t.extra) && t.name && !extras.includes(t.name)) extras.push(t.name); });
+    document.getElementById('smpPanelPkgName').textContent = 'Пакет: ' + pkgLabel;
+    const extEl = document.getElementById('smpPanelExtras');
+    if(extEl) extEl.innerHTML = extras.map(e=>`<span class="sp-extra-chip">${e}</span>`).join('');
+    set('smpPanelPkgCnt', items.length||'');
+  }
   set('smpPanelTestCnt', items.length);
-  // Package name + count
-  const pkgLabel = _PKG_LABEL[s.pkg]||s.pkg||'Базовий';
-  set('smpPanelPkgName', pkgLabel);
-  document.getElementById('smpPanelPkgCnt').textContent = items.length;
-  // Extra chips (all unique categories/types from items, if any)
-  const extras = [];
-  items.forEach(t=>{ if(t.category && !extras.includes(t.category)) extras.push(t.category); });
-  const extEl = document.getElementById('smpPanelExtras');
-  if(extEl) extEl.innerHTML = extras.length ? extras.map(e=>`<span class="smp-extra-chip">${e}</span>`).join('') : '';
-  // Studies table
+  set('smpPanelTestCnt2', items.length);
+  // Таблиця досліджень
   const tbody = document.getElementById('smpPanelTests');
   if(tbody){
     if(items.length){
-      tbody.innerHTML=items.map((t,i)=>`
-        <tr>
-          <td style="color:var(--text-soft)">${i+1}</td>
-          <td style="font-size:10.5px;color:var(--text-soft);font-family:monospace">${t.id||'—'}</td>
-          <td>${t.name||t.n||'—'}${t.qty>1?' × '+t.qty:''}</td>
-          <td style="color:var(--text-soft);font-size:11px">${t.type||t.category||'—'}</td>
-        </tr>`).join('');
+      tbody.innerHTML=items.map((t,i)=>`<tr>
+        <td style="color:var(--text-soft);width:24px">${i+1}</td>
+        <td>${t.id||'SRV-'+(String(i+1).padStart(3,'0'))}</td>
+        <td>${t.name||t.n||'—'}${t.pkg?' ('+(_PKG_LABEL[t.pkg]||t.pkg)+')':''}</td>
+        <td>${t.type==='extra'||t.extra?'Окреме':'Пакет'}</td>
+      </tr>`).join('');
     } else {
-      tbody.innerHTML=`<tr><td colspan="4" style="color:var(--text-soft);font-size:12px;padding:10px 6px">Дослідження не вказані</td></tr>`;
+      tbody.innerHTML=`<tr><td colspan="4" style="color:var(--text-soft);font-size:12px;padding:10px 6px;text-align:center">Дослідження не вказані</td></tr>`;
     }
   }
-  // Clear notes
-  const notes=document.getElementById('smpPanelNotes'); if(notes)notes.value='';
+  // Лабораторія та завдання
+  set('smpPanelLab', s.lab||'Лаб. №1');
+  set('smpPanelTask', s.task||'Не створено');
+  const taskEl = document.getElementById('smpPanelTask');
+  if(taskEl) taskEl.className = 'sp-val' + (s.task ? '' : ' sp-task');
+  // Примітки
+  const notesEl = document.getElementById('smpPanelNotes');
+  if(notesEl) notesEl.textContent = s.notes||'Немає приміток.';
 }
+
+function smpAddNote() { alert('Функція у розробці'); }
 
 // Samples action buttons
 function smpFormTask() {
