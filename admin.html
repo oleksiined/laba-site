@@ -144,7 +144,7 @@ html{scroll-behavior:smooth}
 .adm-pag-btn[disabled]{opacity:.35;cursor:default}
 
 /* Right detail panel */
-.adm-panel{width:420px;flex-shrink:0;background:var(--white);border-left:1px solid var(--border);overflow-y:auto;display:none;flex-direction:column}
+.adm-panel{width:420px;flex-shrink:0;background:var(--white);border-left:1px solid var(--border);overflow-y:hidden;display:none;flex-direction:column;height:100%}
 .adm-panel.open{display:flex}
 .adm-panel-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .adm-panel-num{font-size:13.5px;font-weight:700;color:var(--navy)}
@@ -259,7 +259,7 @@ html{scroll-behavior:smooth}
 .adm-sst-new{background:#F3F4F6;color:#6B7280}
 /* ── PANEL MULTI-CONTENT ── */
 .adm-panel-body{display:none}
-.adm-panel-body.active{display:block}
+.adm-panel-body.active{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto}
 /* ── TESTS LIST ── */
 .adm-test-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px}
 /* KPI cards redesign */
@@ -286,14 +286,14 @@ html{scroll-behavior:smooth}
 .adm-filter-icon-btn{padding:7px 9px;border:1.5px solid var(--border);border-radius:7px;background:var(--white);cursor:pointer;color:var(--text-soft);display:flex;align-items:center}
 .adm-filter-icon-btn svg{width:15px;height:15px}
 /* Panel full redesign */
-.adm-panel-hd2{padding:14px 16px 0}
+.adm-panel-hd2{padding:14px 16px 0;flex-shrink:0}
 .adm-panel-hd2-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .adm-panel-hd2-num{font-size:15px;font-weight:700;color:var(--text-dark)}
 .adm-panel-hd2-meta{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:12px;color:var(--text-soft)}
 .adm-panel-hd2-client{font-size:13px;font-weight:600;color:var(--text-dark)}
 .adm-panel-menu-btn{width:30px;height:30px;border-radius:7px;border:1.5px solid var(--border);background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-soft)}
 /* Panel tabs */
-.adm-ptabs{display:flex;border-bottom:2px solid var(--border);padding:0 16px;margin:10px 0 0;gap:0}
+.adm-ptabs{display:flex;border-bottom:2px solid var(--border);padding:0 16px;margin:10px 0 0;gap:0;flex-shrink:0}
 .adm-ptab{padding:7px 12px;font-size:12.5px;font-weight:500;color:var(--text-soft);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:color .15s,border-color .15s}
 .adm-ptab.active{color:var(--navy);border-bottom-color:var(--navy);font-weight:600}
 .adm-ptab-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--navy);color:#fff;font-size:9.5px;font-weight:700;margin-left:4px}
@@ -1343,7 +1343,10 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
       </div><!-- /admPanelOrder -->
 
       <!-- SAMPLE panel body -->
-      <div class="adm-panel-body" id="admPanelSample" style="display:flex;flex-direction:column;gap:0;overflow-y:auto">
+      <div class="adm-panel-body" id="admPanelSample" style="gap:0">
+
+        <!-- Scrollable content -->
+        <div style="flex:1;overflow-y:auto;min-height:0">
 
         <!-- Основна інформація -->
         <div class="sp-sec">
@@ -1415,13 +1418,15 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
         </div>
 
         <!-- Примітки -->
-        <div class="sp-sec" style="flex:1">
+        <div class="sp-sec">
           <div class="sp-sec-hd">
             <span class="sp-sec-title">Примітки</span>
             <button class="sp-sec-btn" onclick="smpAddNote()">+ Додати</button>
           </div>
           <div id="smpPanelNotes" style="font-size:12px;color:var(--text-soft);padding:4px 0">Немає приміток.</div>
         </div>
+
+        </div><!-- /scrollable content -->
 
         <!-- Actions -->
         <div style="padding:14px 16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;flex-shrink:0">
