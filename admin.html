@@ -342,9 +342,36 @@ html{scroll-behavior:smooth}
 
 
 body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh;overflow-x:hidden}
+
+/* ── Login screen ── */
+.adm-login{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999}
+.adm-login-card{background:#fff;border-radius:16px;padding:40px;width:340px;box-shadow:0 4px 32px rgba(0,0,0,.08);display:flex;flex-direction:column;gap:20px}
+.adm-login-brand{text-align:center;line-height:1}
+.adm-login-brand-name{display:block;font-size:32px;font-weight:900;color:#111;letter-spacing:-1px}
+.adm-login-brand-sub{display:block;font-size:13px;color:#999;margin-top:4px;font-weight:400}
+.adm-login-field{display:flex;flex-direction:column;gap:6px}
+.adm-login-label{font-size:13px;color:#666;font-weight:500}
+.adm-login-input{padding:12px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-size:15px;outline:none;font-family:inherit;transition:border-color .15s}
+.adm-login-input:focus{border-color:#111}
+.adm-login-btn{padding:14px;background:#CCFF00;border:none;border-radius:10px;font-size:15px;font-weight:700;color:#111;cursor:pointer;font-family:inherit;transition:background .15s}
+.adm-login-btn:hover{background:#b8e600}
 </style>
 </head>
 <body>
+
+<div class="adm-login" id="admLoginScreen">
+  <div class="adm-login-card">
+    <div class="adm-login-brand">
+      <span class="adm-login-brand-name">LABA</span>
+      <span class="adm-login-brand-sub">Панель управління</span>
+    </div>
+    <div class="adm-login-field">
+      <label class="adm-login-label" for="admPassInput">Пароль</label>
+      <input type="password" class="adm-login-input" id="admPassInput" placeholder="Введіть пароль" autocomplete="current-password">
+    </div>
+    <button class="adm-login-btn" onclick="admDoLogin()">Увійти →</button>
+  </div>
+</div>
 
   <div class="adm-shell">
 
@@ -1049,98 +1076,78 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
   </div><!-- /adm-shell -->
 
 <script>
-const _admOrders = [
-  { id:'LAB-2026-00482', client:'ФГ «Вікторія»', short:'ФВ', contact:'Іваненко Сергій Петрович', phone:'+380 67 123 45 67', email:'ivanenko@fg-viktoria.ua',
-    companyType:'Юридична особа', pdv:true, edrpou:'12345678', companyFull:'ТОВ «Вікторія»',
-    delivery:'Нова Пошта, відділення №12',
-    samples:6, studies:28, payment:'paid', status:'work', date:'19.10.2026', amount:'2 187 ₴', amountRaw:2187,
-    samplesList:[{id:'S01',name:'Поле 1 (Кукурудза)',st:'received'},{id:'S02',name:'Поле 2 (Пшениця)',st:'pending'},{id:'S03',name:'Поле 3 (Соняшник)',st:'pending'},{id:'S04',name:'Поле 4 (Ріпак)',st:'new'},{id:'S05',name:'Рослина пшениця',st:'new'},{id:'S06',name:'Рослина кукурудза',st:'new'}],
-    activity:[{t:'Зразок S01 отримано',d:'19.10.2026 14:32'},{t:'Рахунок надіслано клієнту',d:'19.10.2026 10:15'},{t:'Замовлення створено',d:'19.10.2026 09:41'}]},
-  { id:'LAB-2026-00481', client:'ТОВ «Агро Плюс»', short:'АП', contact:'Ковальчук Марина Іванівна', phone:'+380 50 234 56 78', email:'kovalchuk@agroplus.ua',
-    companyType:'Юридична особа', pdv:true, edrpou:'87654321', companyFull:'ТОВ «Агро Плюс»',
-    delivery:'Самовивіз, м. Черкаси',
-    samples:12, studies:52, payment:'partial', status:'waiting', date:'19.10.2026', amount:'4 320 ₴', amountRaw:4320,
-    samplesList:[{id:'S01',name:'Поле А (Ріпак)',st:'received'},{id:'S02',name:'Поле Б (Кукурудза)',st:'received'},{id:'S03',name:'Поле В (Пшениця)',st:'received'},{id:'S04',name:'Поле Г (Соя)',st:'received'}],
-    activity:[{t:'Зразки S01–S12 прийнято',d:'19.10.2026 11:00'},{t:'Аналіз розпочато',d:'19.10.2026 09:00'}]},
-  { id:'LAB-2026-00480', client:'ПП «Лан Агро»', short:'ЛА', contact:'Шевченко Олег Миколайович', phone:'+380 63 345 67 89', email:'shevchenko@lanagro.ua',
-    companyType:'ФОП', pdv:false, edrpou:'3456789012', companyFull:'ФОП Шевченко О.М.',
-    delivery:'Нова Пошта, відділення №5',
-    samples:3, studies:12, payment:'unpaid', status:'new', date:'18.10.2026', amount:'980 ₴', amountRaw:980,
-    samplesList:[{id:'S01',name:'Поле 1 (Ячмінь)',st:'new'},{id:'S02',name:'Поле 2 (Просо)',st:'new'},{id:'S03',name:'Зерно ячмінь',st:'new'}],
-    activity:[{t:'Замовлення створено',d:'18.10.2026 16:30'}]},
-  { id:'LAB-2026-00479', client:'ТОВ «Зелений Гай»', short:'ЗГ', contact:'Петренко Василь Андрійович', phone:'+380 97 456 78 90', email:'petrenko@zelenygay.ua',
-    companyType:'Юридична особа', pdv:true, edrpou:'55667788', companyFull:'ТОВ «Зелений Гай»',
-    delivery:'Укрпошта, відділення №3',
-    samples:8, studies:35, payment:'paid', status:'work', date:'17.10.2026', amount:'3 560 ₴', amountRaw:3560,
-    samplesList:[{id:'S01',name:'Ставок №1 (вода)',st:'received'},{id:'S02',name:'Ставок №2 (вода)',st:'received'},{id:'S03',name:'Озеро (вода)',st:'received'}],
-    activity:[{t:'Аналіз виконано на 60%',d:'18.10.2026 14:00'},{t:'Зразки S01–S08 отримано',d:'17.10.2026 16:00'}]},
-  { id:'LAB-2026-00478', client:'ФГ «Дніпро»', short:'ФД', contact:'Мельник Тетяна Сергіївна', phone:'+380 66 567 89 01', email:'melnyk@dniprofg.ua',
-    companyType:'ФОП', pdv:false, edrpou:'2233445566', companyFull:'ФОП Мельник Т.С.',
-    delivery:'Нова Пошта, відділення №1',
-    samples:5, studies:20, payment:'pending', status:'waiting', date:'16.10.2026', amount:'1 240 ₴', amountRaw:1240,
-    samplesList:[{id:'S01',name:'Грунт поле 1',st:'pending'},{id:'S02',name:'Грунт поле 2',st:'pending'},{id:'S03',name:'Грунт поле 3',st:'new'}],
-    activity:[{t:'Рахунок надіслано',d:'16.10.2026 12:00'},{t:'Замовлення прийнято',d:'16.10.2026 10:20'}]},
-  { id:'LAB-2026-00477', client:'ТОВ «Колос»', short:'КС', contact:'Сидоренко Іван Петрович', phone:'+380 63 678 90 12', email:'sydorenko@kolos.ua',
-    companyType:'Юридична особа', pdv:true, edrpou:'99887766', companyFull:'ТОВ «Колос»',
-    delivery:'Самовивіз, смт Звенигородка',
-    samples:4, studies:18, payment:'paid', status:'done', date:'15.10.2026', amount:'2 760 ₴', amountRaw:2760,
-    samplesList:[{id:'S01',name:'Зерно пшениця',st:'received'},{id:'S02',name:'Зерно ячмінь',st:'received'},{id:'S03',name:'Зерно кукурудза',st:'received'},{id:'S04',name:'Зерно соя',st:'received'}],
-    activity:[{t:'Протоколи надіслано клієнту',d:'17.10.2026 10:00'},{t:'Аналіз завершено',d:'17.10.2026 09:30'}]},
-  { id:'LAB-2026-00476', client:'ФГ «Соняшник»', short:'СЕ', contact:'Коваленко Андрій Олексійович', phone:'+380 97 789 01 23', email:'kovalenko@sonyashnyk.ua',
-    companyType:'ФОП', pdv:false, edrpou:'1122334455', companyFull:'ФОП Коваленко А.О.',
-    delivery:'Нова Пошта, відділення №8',
-    samples:7, studies:28, payment:'unpaid', status:'new', date:'14.10.2026', amount:'3 110 ₴', amountRaw:3110,
-    samplesList:[{id:'S01',name:'Поле 1 (Соняшник)',st:'new'},{id:'S02',name:'Поле 2 (Ріпак)',st:'new'},{id:'S03',name:'Поле 3 (Кукурудза)',st:'new'}],
-    activity:[{t:'Замовлення отримано',d:'14.10.2026 09:00'}]},
-  { id:'LAB-2026-00475', client:'ТОВ «Агролідер»', short:'АЛ', contact:'Бондаренко Наталія Юріївна', phone:'+380 50 890 12 34', email:'bondarenko@agroleader.ua',
-    companyType:'Юридична особа', pdv:true, edrpou:'44556677', companyFull:'ТОВ «Агролідер»',
-    delivery:'Кур\'єр компанії',
-    samples:2, studies:8, payment:'paid', status:'done', date:'13.10.2026', amount:'890 ₴', amountRaw:890,
-    samplesList:[{id:'S01',name:'Добриво (зразок 1)',st:'received'},{id:'S02',name:'Добриво (зразок 2)',st:'received'}],
-    activity:[{t:'Протоколи надіслано',d:'14.10.2026 15:00'},{t:'Аналіз завершено',d:'14.10.2026 14:00'}]},
-  { id:'LAB-2026-00474', client:'ПП «Вектор»', short:'ВК', contact:'Дмитренко Олексій Вікторович', phone:'+380 66 901 23 45', email:'dmytrenko@vektor.ua',
-    companyType:'ФОП', pdv:false, edrpou:'9988776655', companyFull:'ФОП Дмитренко О.В.',
-    delivery:'Нова Пошта, відділення №4',
-    samples:10, studies:44, payment:'paid', status:'work', date:'12.10.2026', amount:'5 430 ₴', amountRaw:5430,
-    samplesList:[{id:'S01',name:'Грунт ділянка А',st:'received'},{id:'S02',name:'Грунт ділянка Б',st:'received'},{id:'S03',name:'Грунт ділянка В',st:'received'}],
-    activity:[{t:'Лабораторні дослідження розпочато',d:'13.10.2026 08:00'},{t:'Зразки S01–S10 отримано',d:'12.10.2026 17:00'}]},
-  { id:'LAB-2026-00473', client:'ТОВ «Родючість»', short:'РД', contact:'Романенко Сергій Олегович', phone:'+380 63 012 34 56', email:'romanenko@rodyuchist.ua',
-    companyType:'Юридична особа', pdv:true, edrpou:'66778899', companyFull:'ТОВ «Родючість»',
-    delivery:'Самовивіз, м. Умань',
-    samples:6, studies:24, payment:'partial', status:'done', date:'11.10.2026', amount:'2 980 ₴', amountRaw:2980,
-    samplesList:[{id:'S01',name:'Пшениця партія №1',st:'received'},{id:'S02',name:'Пшениця партія №2',st:'received'},{id:'S03',name:'Ячмінь партія №1',st:'received'}],
-    activity:[{t:'Звіт надіслано клієнту',d:'12.10.2026 17:00'},{t:'Аналіз завершено',d:'12.10.2026 15:30'}]},
-  { id:'LAB-2026-00472', client:'ФГ «Степове»', short:'СТ', contact:'Гриценко Людмила Петрівна', phone:'+380 67 234 56 78', email:'hrytsenko@stepove.ua',
-    companyType:'ФОП', pdv:false, edrpou:'1234567890', companyFull:'ФОП Гриценко Л.П.',
-    delivery:'Нова Пошта, відділення №2',
-    samples:4, studies:16, payment:'paid', status:'done', date:'10.10.2026', amount:'1 420 ₴', amountRaw:1420,
-    samplesList:[{id:'S01',name:'Ґрунт поле 5',st:'received'},{id:'S02',name:'Ґрунт поле 6',st:'received'},{id:'S03',name:'Насіння кукурудза',st:'received'}],
-    activity:[{t:'Протоколи завантажено',d:'11.10.2026 11:00'},{t:'Аналіз завершено',d:'11.10.2026 09:20'}]},
-  { id:'LAB-2026-00471', client:'ТОВ «Зелена Нива»', short:'ЗН', contact:'Кравченко Михайло Данилович', phone:'+380 50 345 67 89', email:'kravchenko@zelenaniva.ua',
-    companyType:'Юридична особа', pdv:true, edrpou:'11223344', companyFull:'ТОВ «Зелена Нива»',
-    delivery:'Укрпошта, відділення №7',
-    samples:6, studies:24, payment:'pending', status:'waiting', date:'09.10.2026', amount:'2 040 ₴', amountRaw:2040,
-    samplesList:[{id:'S01',name:'Поле 1 (Пшениця)',st:'pending'},{id:'S02',name:'Поле 2 (Соя)',st:'pending'},{id:'S03',name:'Поле 3 (Ячмінь)',st:'new'}],
-    activity:[{t:'Кур\'єр виїхав',d:'10.10.2026 10:00'},{t:'Замовлення підтверджено',d:'09.10.2026 16:00'}]},
-  { id:'LAB-2026-00470', client:'ПП «Хліборобський»', short:'ХЛ', contact:'Ткаченко Ірина Василівна', phone:'+380 97 456 78 90', email:'tkachenko@khliborobsky.ua',
-    companyType:'ФОП', pdv:false, edrpou:'9876543210', companyFull:'ФОП Ткаченко І.В.',
-    delivery:'Нова Пошта, відділення №6',
-    samples:3, studies:10, payment:'unpaid', status:'new', date:'08.10.2026', amount:'1 050 ₴', amountRaw:1050,
-    samplesList:[{id:'S01',name:'Зерно пшениця',st:'new'},{id:'S02',name:'Зерно ячмінь',st:'new'}],
-    activity:[{t:'Заявку отримано',d:'08.10.2026 14:00'}]},
-  { id:'LAB-2026-00469', client:'ТОВ «Агромаш»', short:'АМ', contact:'Попов Дмитро Іванович', phone:'+380 63 567 89 01', email:'popov@agromash.ua',
-    companyType:'Юридична особа', pdv:true, edrpou:'55443322', companyFull:'ТОВ «Агромаш»',
-    delivery:'Самовивіз, м. Кропивницький',
-    samples:5, studies:20, payment:'paid', status:'done', date:'07.10.2026', amount:'1 875 ₴', amountRaw:1875,
-    samplesList:[{id:'S01',name:'Масло (проба 1)',st:'received'},{id:'S02',name:'Масло (проба 2)',st:'received'},{id:'S03',name:'Масло (проба 3)',st:'received'}],
-    activity:[{t:'Висновки надіслано',d:'08.10.2026 12:00'},{t:'Аналіз завершено',d:'08.10.2026 10:30'}]},
-  { id:'LAB-2026-00468', client:'ФГ «Прометей»', short:'ПР', contact:'Кузьменко Олена Борисівна', phone:'+380 66 678 90 12', email:'kuzmenko@prometey.ua',
-    companyType:'ФОП', pdv:false, edrpou:'6677889900', companyFull:'ФОП Кузьменко О.Б.',
-    delivery:'Кур\'єр компанії',
-    samples:8, studies:36, payment:'paid', status:'work', date:'06.10.2026', amount:'3 600 ₴', amountRaw:3600,
-    samplesList:[{id:'S01',name:'Ґрунт поле А',st:'received'},{id:'S02',name:'Ґрунт поле Б',st:'received'},{id:'S03',name:'Ґрунт поле В',st:'received'}],
-    activity:[{t:'Дослідження в процесі',d:'08.10.2026 08:00'},{t:'Зразки S01–S08 прийнято',d:'07.10.2026 15:30'}]},
-];
+// Orders loaded from API (replaces static mock data)
+let _admOrders = [];
+
+// Map Supabase order row → admin panel format
+function _mapOrder(o) {
+  const dt  = new Date(o.created_at);
+  const pad = n => String(n).padStart(2,'0');
+  const date = `${pad(dt.getDate())}.${pad(dt.getMonth()+1)}.${dt.getFullYear()}`;
+  const time = `${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+
+  const clientName = o.company || o.name || 'Невідомо';
+  const words = clientName.replace(/[«»"']/g,'').trim().split(/\s+/).filter(Boolean);
+  const short = words.length >= 2
+    ? (words[0][0] + words[1][0]).toUpperCase()
+    : clientName.replace(/[^А-ЯA-Z]/gi,'').slice(0,2).toUpperCase() || '??';
+
+  const delType   = o.delivery?.type;
+  const delLabels = { nova_poshta:"Нова Пошта", courier:"Кур'єр компанії", pickup:"Самовивіз" };
+  let delivery    = delLabels[delType] || delType || '—';
+  if (o.delivery?.address) delivery += ', ' + o.delivery.address;
+  if (o.delivery?.city)    delivery += ', ' + o.delivery.city;
+
+  const payMap  = { invoice:'unpaid', cash:'pending' };
+  const payment = payMap[o.payment] || 'unpaid';
+
+  const samplesArr  = Array.isArray(o.samples) ? o.samples : [];
+  const samplesList = samplesArr.map((s,i) => ({
+    id:   s.label || `S${pad(i+1)}`,
+    name: [s.label, s.crop, s.field].filter(Boolean).join(', ') || `Зразок ${i+1}`,
+    st:   'new',
+  }));
+
+  const studies = (Array.isArray(o.items) ? o.items : [])
+    .reduce((sum,it) => sum + (Number(it.qty)||1), 0) || samplesArr.length;
+
+  return {
+    id:          o.order_num || o.id,
+    client:      clientName,
+    short,
+    contact:     o.name || '—',
+    phone:       o.phone || '—',
+    email:       o.email || '—',
+    companyType: o.company ? 'Юридична особа' : 'Фізична особа',
+    pdv:         false,
+    edrpou:      '—',
+    companyFull: o.company || o.name || '—',
+    delivery,
+    samples:     samplesArr.length,
+    studies,
+    payment,
+    status:      'new',
+    date,
+    amount:      Number(o.total||0).toLocaleString('uk-UA') + ' ₴',
+    amountRaw:   Number(o.total||0),
+    samplesList,
+    activity:    [{ t:'Замовлення створено', d:`${date} ${time}` }],
+  };
+}
+
+// Fetch orders from backend and re-init
+async function admLoad() {
+  try {
+    const res  = await fetch('https://laba.zemlerob.com.ua/api/orders-list');
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    _admOrders = (data.orders || []).map(_mapOrder);
+  } catch (err) {
+    console.warn('admLoad error:', err.message);
+    _admOrders = [];
+  }
+  admInit();
+}
 
 const _admSL = { new:'Нове', waiting:'Очікує зразки', work:'У роботі', done:'Готово' };
 const _admSC = { new:'adm-p-new', waiting:'adm-p-wait', work:'adm-p-work', done:'adm-p-done' };
@@ -1887,9 +1894,21 @@ admClosePanel = function() {
   });
 })();
 
-// Auto-init on load
+// ── Login gate ──
+function admDoLogin() {
+  sessionStorage.setItem('_admAuth', '1');
+  document.getElementById('admLoginScreen').style.display = 'none';
+  admLoad();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  admInit();
+  const passIn = document.getElementById('admPassInput');
+  if (passIn) passIn.addEventListener('keydown', e => { if (e.key === 'Enter') admDoLogin(); });
+
+  if (sessionStorage.getItem('_admAuth') === '1') {
+    document.getElementById('admLoginScreen').style.display = 'none';
+    admLoad();
+  }
 });
 </script>
 </body>
