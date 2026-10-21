@@ -1791,6 +1791,9 @@ input,select{font-family:inherit}
 main{flex:1}
 .container{max-width:1240px;margin:0 auto;padding:24px 24px 48px}
 .page-grid{display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start}
+.page-grid>*{min-width:0}
+.sample-body-grid{min-width:0}
+.res-panel,.add-panel{min-width:0;overflow:hidden}
 
 /* page header */
 .page-hd{margin-bottom:16px}
@@ -1866,7 +1869,7 @@ main{flex:1}
 .search-inp:focus{border-color:var(--neon-dark)}
 .cat-sel{padding:7px 10px;border:1.5px solid var(--bd);border-radius:var(--r-sm);font-size:13.5px;color:var(--t2);outline:none;background:#fff;cursor:pointer;transition:border-color .15s;appearance:auto;flex-shrink:0}
 .cat-sel:focus{border-color:var(--neon-dark)}
-.ind-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ind-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;min-width:0}
 .add-ind-btn{display:flex;align-items:center;gap:7px;padding:8px 10px;border:1.5px solid var(--bd);border-radius:var(--r-sm);background:#fff;font-size:13px;color:var(--t2);transition:all .15s;text-align:left;width:100%}
 .add-ind-btn:hover{border-color:var(--neon-dark);background:#f5ffe0;color:var(--t1)}
 .add-ind-btn .plus-ic{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--bd);color:var(--t2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;line-height:1;transition:all .15s}
@@ -1973,6 +1976,7 @@ main{flex:1}
 .page-title{font-size:26px;font-weight:700;margin-bottom:4px}
 .page-sub{font-size:14px;color:var(--t3)}
 .page-grid{display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start}
+.page-grid>*{min-width:0}
 
 /* ── FORM CARDS ── */
 .form-card{background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:22px 24px;margin-bottom:12px}
