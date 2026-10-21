@@ -196,6 +196,13 @@ html{scroll-behavior:smooth}
 .adm-ss-cnc{background:#F3F4F6;color:#6B7280}
 .adm-samp-menu-btn{background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:15px;padding:1px 6px;border-radius:4px;line-height:1;letter-spacing:1px}
 .adm-samp-menu-btn:hover{background:var(--bg);color:var(--navy)}
+/* ── Sample status dropdown ── */
+.adm-st-dropdown{position:fixed;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.13);z-index:9999;min-width:200px;padding:5px 0;overflow:hidden}
+.adm-st-dd-item{display:flex;align-items:center;gap:9px;padding:8px 14px;cursor:pointer;font-size:12.5px;color:var(--navy);transition:background .1s}
+.adm-st-dd-item:hover{background:#f5f7fa}
+.adm-st-dd-item.active-st{background:#f0fdf4}
+.adm-st-dd-sep{height:1px;background:var(--border);margin:4px 0}
+.adm-pbtn-sec:disabled{opacity:.4;cursor:not-allowed}
 .adm-samp-actions{border-top:1px solid var(--border);padding:10px 14px;display:flex;gap:6px;flex-shrink:0}
 .adm-panel-actions{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:7px}
 .adm-pbtn{display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 14px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .1s}
@@ -1058,7 +1065,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
               Позначити отримання
             </button>
-            <button class="adm-pbtn adm-pbtn-sec" onclick="admActionSampleStatus(event)" style="font-size:12px;padding:8px 10px">
+            <button id="admBtnSampStatus" class="adm-pbtn adm-pbtn-sec" onclick="admActionSampleStatus(event)" disabled style="font-size:12px;padding:8px 10px">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2 2" stroke-linecap="round"/></svg>
               Змінити статус
             </button>
@@ -1685,6 +1692,11 @@ const _admSSL = { new:'Очікується', received:'Отримано', accep
 const _admSSC = { new:'adm-ss-new', received:'adm-ss-rcv', accepted:'adm-ss-acc', work:'adm-ss-wrk', done:'adm-ss-done', rejected:'adm-ss-rej', cancelled:'adm-ss-cnc' };
 
 function _admRenderSamplesTab(o) {
+  // Reset status button state
+  const stBtn = document.getElementById('admBtnSampStatus');
+  if (stBtn) { stBtn.disabled = true; stBtn.textContent = ''; stBtn.style.color = '';
+    stBtn.innerHTML = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2 2" stroke-linecap="round"/></svg> Змінити статус';
+  }
   const sl = o.samplesList || [];
   const total    = sl.length;
   const received = sl.filter(s=>['received','accepted','work','done'].includes(s.st)).length;
@@ -1718,7 +1730,7 @@ function _admRenderSamplesTab(o) {
       const mat   = s.material || '—';
       const dt    = s.updatedAt ? s.updatedAt.slice(0,10).split('-').reverse().join('.') : o.date;
       return `<tr>
-        <td><input type="checkbox" class="adm-samp-cb" data-idx="${i}" style="width:13px;height:13px;cursor:pointer"></td>
+        <td><input type="checkbox" class="adm-samp-cb" data-idx="${i}" onchange="admSampCbChange()" style="width:13px;height:13px;cursor:pointer"></td>
         <td><span class="adm-samp-num">${s.num}</span></td>
         <td><span class="adm-samp-nm">${s.name||'—'}</span></td>
         <td><span class="adm-samp-mat">${mat}</span></td>
@@ -1732,11 +1744,91 @@ function _admRenderSamplesTab(o) {
 
 function admSampToggleAll(cb) {
   document.querySelectorAll('.adm-samp-cb').forEach(c=>{ c.checked = cb.checked; });
+  admSampCbChange();
+}
+
+function admSampCbChange() {
+  const anyChecked = document.querySelector('.adm-samp-cb:checked');
+  const stBtn = document.getElementById('admBtnSampStatus');
+  if (stBtn) stBtn.disabled = !anyChecked;
 }
 
 function admActionSampleStatus(e) {
-  // Placeholder — will implement status change dropdown
-  alert('Зміна статусу зразків — у розробці');
+  const checked = [...document.querySelectorAll('.adm-samp-cb:checked')].map(cb => parseInt(cb.dataset.idx));
+  if (!checked.length) return;
+
+  // Close any existing dropdown
+  document.querySelectorAll('.adm-st-dropdown').forEach(d=>d.remove());
+
+  const statuses = [
+    { st:'new',       cls:'adm-ss-new',  lbl:'Очікується' },
+    { st:'received',  cls:'adm-ss-rcv',  lbl:'Отримано' },
+    { st:'accepted',  cls:'adm-ss-acc',  lbl:'Прийнято' },
+    { st:'work',      cls:'adm-ss-wrk',  lbl:'У роботі' },
+    { st:'done',      cls:'adm-ss-done', lbl:'Готовий' },
+    { st:'rejected',  cls:'adm-ss-rej',  lbl:'Відхилено' },
+    { st:'cancelled', cls:'adm-ss-cnc',  lbl:'Скасовано' },
+  ];
+
+  const dd = document.createElement('div');
+  dd.className = 'adm-st-dropdown';
+
+  const count = checked.length;
+  const hdr = document.createElement('div');
+  hdr.style.cssText = 'padding:7px 14px 5px;font-size:10px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px';
+  hdr.textContent = `Встановити статус (${count} зр.)`;
+  dd.appendChild(hdr);
+
+  const sep = document.createElement('div'); sep.className='adm-st-dd-sep'; dd.appendChild(sep);
+
+  statuses.forEach(({st, cls, lbl}) => {
+    const item = document.createElement('div');
+    item.className = 'adm-st-dd-item';
+    item.innerHTML = `<span class="adm-ss-pill ${cls}" style="font-size:10px">${lbl}</span>`;
+    item.onclick = () => { dd.remove(); admApplySampleStatus(checked, st); };
+    dd.appendChild(item);
+  });
+
+  // Position below the button
+  const btn = e.currentTarget || e.target;
+  const rect = btn.getBoundingClientRect();
+  dd.style.top  = (rect.bottom + 4) + 'px';
+  dd.style.left = Math.max(4, rect.left - 80) + 'px';
+  document.body.appendChild(dd);
+
+  // Close on outside click
+  const close = ev => { if (!dd.contains(ev.target)) { dd.remove(); document.removeEventListener('click', close, true); } };
+  setTimeout(() => document.addEventListener('click', close, true), 10);
+}
+
+async function admApplySampleStatus(indices, newSt) {
+  const o = _admOrders.find(x => x.id === _admSelId);
+  if (!o) return;
+
+  const stBtn = document.getElementById('admBtnSampStatus');
+  if (stBtn) { stBtn.disabled = true; stBtn.textContent = 'Зберігаємо…'; }
+
+  try {
+    const listRes = await fetch('https://laba.zemlerob.com.ua/api/orders-list');
+    const listData = await listRes.json();
+    const rawOrder = (listData.orders || []).find(x => x.id === o.dbId);
+    if (!rawOrder) throw new Error('Order not found');
+
+    const rawSamples = (rawOrder.samples || []).map((s, i) => {
+      if (indices.includes(i)) return { ...s, st: newSt, updated_at: new Date().toISOString() };
+      return s;
+    });
+
+    await _admUpdate(o.dbId, { samples: rawSamples });
+
+    if (stBtn) { stBtn.textContent = '✓ Збережено'; stBtn.style.color = '#059669'; }
+    setTimeout(async () => {
+      await _admReload(o.id);
+    }, 700);
+  } catch (err) {
+    alert('Помилка: ' + err.message);
+    if (stBtn) { stBtn.disabled = false; stBtn.textContent = 'Змінити статус'; stBtn.style.color = ''; }
+  }
 }
 
 function admActionOpenSample() {
