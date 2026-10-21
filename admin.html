@@ -490,11 +490,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           <div class="adm-kpi-card" onclick="admStatFilter('',this)" id="kpiAll">
             <div class="adm-kpi-left">
               <div class="adm-kpi-label">Всього замовлень</div>
-              <div class="adm-kpi-val" id="admStatAll">128</div>
-              <div class="adm-kpi-trend up">
-                <svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12"><path d="M10 4l6 6H4l6-6z"/></svg>
-                <span id="admKpiTrendAll">+12%</span>
-              </div>
+              <div class="adm-kpi-val" id="admStatAll">0</div>
             </div>
             <div class="adm-kpi-icon kpi-gray">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"/><path d="M8 7h4M8 10h4M8 13h2" stroke-linecap="round"/></svg>
@@ -503,11 +499,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           <div class="adm-kpi-card" onclick="admStatFilter('waiting',this)" id="kpiWait">
             <div class="adm-kpi-left">
               <div class="adm-kpi-label">Очікують зразки</div>
-              <div class="adm-kpi-val" id="admStatWait">18</div>
-              <div class="adm-kpi-trend up">
-                <svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12"><path d="M10 4l6 6H4l6-6z"/></svg>
-                <span>+5%</span>
-              </div>
+              <div class="adm-kpi-val" id="admStatWait">0</div>
             </div>
             <div class="adm-kpi-icon kpi-yellow">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l2.5 2.5" stroke-linecap="round"/></svg>
@@ -516,11 +508,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           <div class="adm-kpi-card" onclick="admStatFilter('work',this)" id="kpiWork">
             <div class="adm-kpi-left">
               <div class="adm-kpi-label">У роботі</div>
-              <div class="adm-kpi-val" id="admStatWork">32</div>
-              <div class="adm-kpi-trend up">
-                <svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12"><path d="M10 4l6 6H4l6-6z"/></svg>
-                <span>+9%</span>
-              </div>
+              <div class="adm-kpi-val" id="admStatWork">0</div>
             </div>
             <div class="adm-kpi-icon kpi-blue">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 3v8l-2 4h8l-2-4V3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 3h4" stroke-linecap="round"/></svg>
@@ -529,11 +517,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           <div class="adm-kpi-card" onclick="admStatFilter('done',this)" id="kpiDone">
             <div class="adm-kpi-left">
               <div class="adm-kpi-label">Готові</div>
-              <div class="adm-kpi-val" id="admStatDone">58</div>
-              <div class="adm-kpi-trend up">
-                <svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12"><path d="M10 4l6 6H4l6-6z"/></svg>
-                <span>+15%</span>
-              </div>
+              <div class="adm-kpi-val" id="admStatDone">0</div>
             </div>
             <div class="adm-kpi-icon kpi-green">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="7"/><path d="M7 10l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1215,7 +1199,20 @@ let _admSortA  = false;
 let _admPage   = 1;
 const _ADM_PER = 8;
 
+function admUpdateKpi() {
+  const all = _admOrders.length;
+  const wait = _admOrders.filter(o=>o.status==='waiting').length;
+  const work = _admOrders.filter(o=>o.status==='work').length;
+  const done = _admOrders.filter(o=>o.status==='done').length;
+  const set = (id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('admStatAll', all);
+  set('admStatWait', wait);
+  set('admStatWork', work);
+  set('admStatDone', done);
+}
+
 function admInit() {
+  admUpdateKpi();
   admSwitch('orders', document.getElementById('adm-navbtn-orders'));
   _admFilter = ''; _admSelId = null; _admPage = 1;
   const si = document.getElementById('admSearchIn'); if(si) si.value='';
