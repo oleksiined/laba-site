@@ -473,7 +473,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
 .sp-tbl{width:100%;border-collapse:collapse;font-size:12px}
 .sp-tbl th{font-size:10px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.3px;padding:5px 6px;border-bottom:1px solid var(--border);text-align:left}
 .sp-tbl td{padding:5px 6px;border-bottom:1px solid #f0f2f4;color:var(--text-mid)}
-.sp-tbl td:nth-child(2){color:#2563EB;font-weight:500}
+.sp-tbl td:nth-child(2){color:var(--navy);font-weight:500}
 .sp-tbl td:last-child{color:var(--text-soft)}
 /* ── CLIENTS REDESIGN ── */
 .cli-type-badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11.5px;font-weight:600;white-space:nowrap}
@@ -499,7 +499,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
 .cli-doc-chips{display:flex;gap:8px;flex-wrap:wrap;padding:4px 0}
 .cli-doc-chip{background:#F3F4F6;border-radius:8px;padding:4px 10px;font-size:12px;color:var(--navy);display:flex;align-items:center;gap:5px}
 .cli-doc-chip span{font-weight:700;color:#2563EB}
-.cli-info-note{background:#EFF6FF;border-radius:8px;padding:8px 10px;font-size:11.5px;color:#1D4ED8;margin-top:8px;display:flex;align-items:flex-start;gap:6px}
+.cli-info-note{background:#F3F4F6;border-radius:8px;padding:8px 10px;font-size:11.5px;color:var(--text-mid);margin-top:8px;display:flex;align-items:flex-start;gap:6px}
 /* ── SAMPLES REDESIGN ── */
 .adm-smp-kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:0;padding:0 20px 16px;flex-shrink:0}
 .adm-smp-kpi{background:var(--white);border:1px solid var(--border);padding:13px 15px;cursor:pointer;transition:border-color .12s,background .12s;position:relative;user-select:none}
@@ -969,7 +969,6 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
             <div class="adm-kpi-left">
               <div class="adm-kpi-label">Активні</div>
               <div class="adm-kpi-val" id="cliCntActive">0</div>
-              <div class="adm-kpi-trend up">↑ +12%</div>
             </div>
             <div class="adm-kpi-icon kpi-green">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="7"/><path d="M7 10l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -979,7 +978,6 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
             <div class="adm-kpi-left">
               <div class="adm-kpi-label">Є особистий кабінет</div>
               <div class="adm-kpi-val" id="cliCntPortal">0</div>
-              <div class="adm-kpi-trend up">↑ +8%</div>
             </div>
             <div class="adm-kpi-icon" style="background:#FEF9C3;color:#CA8A04">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="6" width="14" height="10" rx="2"/><path d="M13 6V5a3 3 0 00-6 0v1" stroke-linecap="round"/></svg>
@@ -989,7 +987,6 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
             <div class="adm-kpi-left">
               <div class="adm-kpi-label">Нові за місяць</div>
               <div class="adm-kpi-val" id="cliCntNew">0</div>
-              <div class="adm-kpi-trend up">↑ +20%</div>
             </div>
             <div class="adm-kpi-icon kpi-blue">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>
@@ -999,7 +996,6 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
             <div class="adm-kpi-left">
               <div class="adm-kpi-label">Архівні</div>
               <div class="adm-kpi-val" id="cliCntArch">0</div>
-              <div class="adm-kpi-trend up">↑ +5%</div>
             </div>
             <div class="adm-kpi-icon kpi-gray">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 5h14M5 5v11a1 1 0 001 1h8a1 1 0 001-1V5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 9h4" stroke-linecap="round"/></svg>
