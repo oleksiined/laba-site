@@ -3380,7 +3380,7 @@ main{flex:1}
         <div style="background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:24px">
           <h3 style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:16px">Передавання зразків</h3>
           <div style="display:flex;flex-direction:column;gap:8px">
-            <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--bd);border-radius:var(--r-sm);cursor:pointer" onclick="navigate('sampling')">
+            <a href="https://novaposhta.ua" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--bd);border-radius:var(--r-sm);cursor:pointer;text-decoration:none">
               <div style="width:40px;height:40px;background:#f4f6fb;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="7" width="14" height="10" rx="2" stroke="var(--t3)" stroke-width="1.5"/><path d="M7 7V5a3 3 0 016 0v2" stroke="var(--t3)" stroke-width="1.5" stroke-linecap="round"/></svg>
               </div>
@@ -3389,7 +3389,7 @@ main{flex:1}
                 <div style="font-size:12.5px;color:var(--t3)">Відділення № 120, м. Київ, отримувач LABA</div>
               </div>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="var(--t3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
+            </a>
 
           </div>
           <a href="#" onclick="navigate('sampling');return false" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:13px;color:var(--t3);text-decoration:none">
@@ -3910,15 +3910,29 @@ function openCart(){
   const body=document.getElementById('cartBody');
   if(!body)return;
   if(!cart.length){body.innerHTML='<p class="cart-empty-msg">Додайте послуги для замовлення</p>';return;}
-  body.innerHTML=cart.map((item,i)=>`
-    <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
-      <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:600;color:var(--navy)">${item.name}</div>
-        <div style="font-size:11px;color:var(--text-soft)">${item.code} · ${getCartQty(item)} зр.</div>
+  body.innerHTML=cart.map((item,i)=>{
+    const qty = getCartQty(item);
+    return `
+    <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--navy)">${item.name}</div>
+          <div style="font-size:11px;color:var(--text-soft)">${item.code}</div>
+        </div>
+        <div style="font-size:13px;font-weight:700;color:var(--navy);white-space:nowrap" id="cdrawer-price-${i}">${((item.price||0)*qty).toLocaleString('uk-UA')} грн</div>
+        <button onclick="removeCartItem(${i});openCart()" style="background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:14px;padding:0 2px" title="Видалити">✕</button>
       </div>
-      <div style="font-size:13px;font-weight:700;color:var(--navy);white-space:nowrap">${((item.price||0)*getCartQty(item)).toLocaleString('uk-UA')} грн</div>
-      <button onclick="removeCartItem(${i});openCart()" style="background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:14px;padding:0 2px">✕</button>
-    </div>`).join('');
+      <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+        <button onclick="cartDrawerDec(${i})" style="width:26px;height:26px;border:1px solid var(--border);border-radius:6px;background:var(--bg);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--navy);flex-shrink:0" title="${qty<=1?'Видалити':'Зменшити'}">${qty<=1?'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="11" height="11"><polyline points="2,4 14,4"/><path d="M5 4V3h6v1M6 7v5M10 7v5" stroke-linecap="round"/><rect x="3" y="4" width="10" height="9" rx="1.5"/></svg>':'−'}</button>
+        <input type="number" value="${qty}" min="1" max="9999" data-cart-idx="${i}"
+          style="width:46px;height:26px;border:1px solid var(--border);border-radius:6px;text-align:center;font-size:13px;font-weight:700;color:var(--navy);background:var(--white);outline:none;-moz-appearance:textfield"
+          oninput="cartDrawerInput(${i},this.value)"
+          onblur="cartDrawerBlur(${i},this)">
+        <button onclick="cartDrawerInc(${i})" style="width:26px;height:26px;border:1px solid var(--border);border-radius:6px;background:var(--bg);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--navy);flex-shrink:0">+</button>
+        <span style="font-size:11px;color:var(--text-soft)">зр.</span>
+      </div>
+    </div>`;
+  }).join('');
   const footer=document.getElementById('cartFooter');
   const total=document.getElementById('cartTotal');
   const grand=cart.reduce((s,c)=>s+(c.price||0)*getCartQty(c),0);
@@ -3929,6 +3943,66 @@ function closeCart(){
   document.getElementById('cartOverlay')?.classList.remove('open');
   document.getElementById('cartDrawer')?.classList.remove('open');
   document.body.style.overflow='';
+}
+
+function _cartDrawerRefreshItem(idx) {
+  const item = cart[idx];
+  if (!item) { openCart(); return; }
+  const qty = getCartQty(item);
+  const priceEl = document.getElementById('cdrawer-price-' + idx);
+  if (priceEl) priceEl.textContent = ((item.price||0)*qty).toLocaleString('uk-UA') + ' грн';
+  const inp = document.querySelector(`input[data-cart-idx="${idx}"]`);
+  if (inp && parseInt(inp.value) !== qty) inp.value = qty;
+  const decBtn = inp && inp.previousElementSibling;
+  if (decBtn) {
+    const isOne = qty <= 1;
+    decBtn.title = isOne ? 'Видалити' : 'Зменшити';
+    decBtn.innerHTML = isOne
+      ? '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="11" height="11"><polyline points="2,4 14,4"/><path d="M5 4V3h6v1M6 7v5M10 7v5" stroke-linecap="round"/><rect x="3" y="4" width="10" height="9" rx="1.5"/></svg>'
+      : '−';
+  }
+  const total = document.getElementById('cartTotal');
+  const grand = cart.reduce((s,c) => s+(c.price||0)*getCartQty(c), 0);
+  if (total) total.textContent = grand.toLocaleString('uk-UA') + ' грн';
+  updateCartUI();
+}
+
+function cartDrawerDec(idx) {
+  const item = cart[idx];
+  if (!item) return;
+  const cur = getCartQty(item);
+  if (cur <= 1) { cart.splice(idx, 1); saveCart(); updateCartUI(); openCart(); return; }
+  item.qty = cur - 1;
+  saveCart();
+  _cartDrawerRefreshItem(idx);
+}
+
+function cartDrawerInc(idx) {
+  const item = cart[idx];
+  if (!item) return;
+  item.qty = Math.min(9999, getCartQty(item) + 1);
+  saveCart();
+  _cartDrawerRefreshItem(idx);
+}
+
+function cartDrawerInput(idx, val) {
+  const item = cart[idx];
+  if (!item) return;
+  const v = parseInt(val) || 0;
+  if (v < 1) return; // wait for blur to clamp
+  item.qty = Math.min(9999, v);
+  saveCart();
+  _cartDrawerRefreshItem(idx);
+}
+
+function cartDrawerBlur(idx, inp) {
+  const item = cart[idx];
+  if (!item) return;
+  const v = Math.max(1, Math.min(9999, parseInt(inp.value) || 1));
+  item.qty = v;
+  inp.value = v;
+  saveCart();
+  _cartDrawerRefreshItem(idx);
 }
 
 function updateCartUI(){
@@ -4283,7 +4357,15 @@ function syncCollapsedQty(safeCode){
   const inp = document.getElementById('cqty-'+safeCode);
   if(inp) inp.value = qty||1;
   const decBtn = document.getElementById('cdec-'+safeCode);
-  if(decBtn) decBtn.disabled = (qty||1)<=1;
+  if(decBtn) {
+    decBtn.disabled = false;
+    const isOne = (qty||1) <= 1;
+    decBtn.title = isOne ? 'Видалити з кошика' : 'Зменшити';
+    decBtn.style.color = isOne ? '#EF4444' : '';
+    decBtn.innerHTML = isOne
+      ? '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><polyline points="2,4 14,4"/><path d="M5 4V3h6v1M6 7v5M10 7v5" stroke-linecap="round"/><rect x="3" y="4" width="10" height="9" rx="1.5"/></svg>'
+      : '−';
+  }
   const label = document.getElementById('cqty-label-'+safeCode);
   if(label) label.textContent = qty ? 'зразків у кошику' : '';
   const mainEl = document.getElementById('cprice-main-'+safeCode);
@@ -4307,11 +4389,23 @@ function syncCollapsedQty(safeCode){
 function changeCollapsedQty(safeCode, delta){
   const idx = cart.findIndex(c=>c.code===safeCode&&c.type==='pkg');
   if(idx<0) return;
-  const newQty = Math.max(1, Math.min(9999, getCartQty(cart[idx])+delta));
+  const cur = getCartQty(cart[idx]);
+  // При qty=1 та натисканні − → видалити з кошика
+  if (delta < 0 && cur <= 1) {
+    cart.splice(idx, 1);
+    saveCart(); updateCartUI();
+    // Ховаємо лічильник, показуємо іконку кошика
+    const zone = document.getElementById('czone-'+safeCode);
+    const icon = document.getElementById('cicon-'+safeCode);
+    if (zone) zone.classList.remove('open');
+    if (icon) icon.style.display='';
+    syncCollapsedQty(safeCode);
+    return;
+  }
+  const newQty = Math.min(9999, cur + delta);
   cart[idx].qty = newQty;
   saveCart(); updateCartUI();
   syncCollapsedQty(safeCode);
-  // Якщо qty стало 0 — прибрати з кошика (але мін 1 тому не буває)
 }
 
 function inputCollapsedQty(safeCode, val){
@@ -4652,7 +4746,7 @@ function makeRow(item, type){
         <div style="display:flex;align-items:center;gap:6px">
           <div class="srv-qty-inline ${inCart?'open':''}" id="czone-${safeCode}" style="flex-direction:row;align-items:center">
             <div class="srv-qty-counter-sm">
-              <button id="cdec-${safeCode}" onclick="changeCollapsedQty('${safeCode}',-1)" ${qty<=1?'disabled':''}>−</button>
+              <button id="cdec-${safeCode}" onclick="changeCollapsedQty('${safeCode}',-1)" title="${qty<=1?'Видалити з кошика':'Зменшити'}" style="${qty<=1?'color:#EF4444':''}">${qty<=1?'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><polyline points="2,4 14,4"/><path d="M5 4V3h6v1M6 7v5M10 7v5" stroke-linecap="round"/><rect x="3" y="4" width="10" height="9" rx="1.5"/></svg>':'−'}</button>
               <input id="cqty-${safeCode}" type="number" value="${qty}" min="1" max="9999" oninput="inputCollapsedQty('${safeCode}',this.value)">
               <button onclick="changeCollapsedQty('${safeCode}',1)">+</button>
             </div>
@@ -6783,6 +6877,7 @@ function nc_cancelPromo() {
 function goCheckout() { nc_goToSamples(); }
 function nc_clearCart() {
   if (!NC_S.samples.length && !cart.length) { toast('Кошик вже порожній'); return; }
+  if (!confirm('Очистити кошик? Всі вибрані послуги та зразки буде видалено.')) return;
   NC_S.samples = [];
   NC_S.promo = '';
   NC_S.promoDiscount = 0;
@@ -7083,7 +7178,7 @@ async function loadCatalogFromSupabase() {
       if (!group || svc.orderable_standalone === false) continue;
       if (!catMap.has(group)) {
         catMap.set(group, {
-          id:    group.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, ''),
+          id:    group,
           name:  group,
           items: [],
         });
@@ -7218,7 +7313,7 @@ const NS = {
   // per-sample apply mode: 'one' | 'all'
   applyMode: { s1:'one', s2:'one', s3:'one' },
   // per-sample category filter + search
-  catFilter: { s1:'micro', s2:'all', s3:'all' },
+  catFilter: { s1:'all', s2:'all', s3:'all' },
   search:    { s1:'',     s2:'',   s3:'' },
   promo: '',
   promoDiscount: 0,
@@ -7341,6 +7436,9 @@ function setCatFilter(sampleId, val) {
 function setSearch(sampleId, val) {
   NS.search[sampleId] = val;
   renderAddPanel(sampleId);
+  // Restore focus and cursor position after re-render
+  const inp = document.getElementById(`search-inp-${sampleId}`);
+  if (inp) { inp.focus(); const len = inp.value.length; inp.setSelectionRange(len, len); }
 }
 
 // ══════════════════════════════════════════
@@ -7492,7 +7590,7 @@ function renderAddPanel(sid) {
   Додати показники
 </div>
 <div class="search-row">
-  <input class="search-inp" type="text" placeholder="Пошук показника"
+  <input class="search-inp" id="search-inp-${sid}" type="text" placeholder="Пошук показника"
          value="${NS.search[sid] || ''}"
          oninput="setSearch('${sid}', this.value)">
   <select class="cat-sel" onchange="setCatFilter('${sid}', this.value)">${catOpts}</select>
