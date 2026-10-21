@@ -769,37 +769,43 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           </div>
         </div>
 
-        <!-- 6 KPI stats -->
-        <div class="adm-smp-kpi-row">
-          <div class="adm-smp-kpi active" onclick="smpKpiF('',this)" id="smpKpiAll">
-            <div class="adm-smp-kpi-lbl">Всього</div>
-            <div class="adm-smp-kpi-val" id="smpCntAll">0</div>
-            <div class="adm-smp-kpi-trend">зразків</div>
+        <!-- KPI stats — same style as Orders tab -->
+        <div class="adm-kpi-row">
+          <div class="adm-kpi-card" onclick="smpKpiF('',this)" id="smpKpiAll">
+            <div class="adm-kpi-left">
+              <div class="adm-kpi-label">Всього зразків</div>
+              <div class="adm-kpi-val" id="smpCntAll">0</div>
+            </div>
+            <div class="adm-kpi-icon kpi-gray">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="2" width="10" height="16" rx="1.5"/><circle cx="10" cy="8" r="2.5"/><path d="M7 14h6" stroke-linecap="round"/></svg>
+            </div>
           </div>
-          <div class="adm-smp-kpi" onclick="smpKpiF('new',this)" id="smpKpiNew">
-            <div class="adm-smp-kpi-lbl">Очікується</div>
-            <div class="adm-smp-kpi-val" id="smpCntNew">0</div>
-            <div class="adm-smp-kpi-trend up">не отримано</div>
+          <div class="adm-kpi-card" onclick="smpKpiF('new',this)" id="smpKpiNew">
+            <div class="adm-kpi-left">
+              <div class="adm-kpi-label">Нові</div>
+              <div class="adm-kpi-val" id="smpCntNew">0</div>
+            </div>
+            <div class="adm-kpi-icon kpi-yellow">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l2.5 2.5" stroke-linecap="round"/></svg>
+            </div>
           </div>
-          <div class="adm-smp-kpi" onclick="smpKpiF('received',this)" id="smpKpiRcv">
-            <div class="adm-smp-kpi-lbl">Отримано</div>
-            <div class="adm-smp-kpi-val" id="smpCntRcv">0</div>
-            <div class="adm-smp-kpi-trend">у лабораторії</div>
+          <div class="adm-kpi-card" onclick="smpKpiF('work',this)" id="smpKpiWork">
+            <div class="adm-kpi-left">
+              <div class="adm-kpi-label">У роботі</div>
+              <div class="adm-kpi-val" id="smpCntWork">0</div>
+            </div>
+            <div class="adm-kpi-icon kpi-blue">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 3v8l-2 4h8l-2-4V3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 3h4" stroke-linecap="round"/></svg>
+            </div>
           </div>
-          <div class="adm-smp-kpi" onclick="smpKpiF('accepted',this)" id="smpKpiAcc">
-            <div class="adm-smp-kpi-lbl">Прийнято</div>
-            <div class="adm-smp-kpi-val" id="smpCntAcc">0</div>
-            <div class="adm-smp-kpi-trend">підтверджено</div>
-          </div>
-          <div class="adm-smp-kpi" onclick="smpKpiF('work',this)" id="smpKpiWork">
-            <div class="adm-smp-kpi-lbl">У роботі</div>
-            <div class="adm-smp-kpi-val" id="smpCntWork">0</div>
-            <div class="adm-smp-kpi-trend">дослідження</div>
-          </div>
-          <div class="adm-smp-kpi" onclick="smpKpiF('done',this)" id="smpKpiDone">
-            <div class="adm-smp-kpi-lbl">Готові</div>
-            <div class="adm-smp-kpi-val" id="smpCntDone">0</div>
-            <div class="adm-smp-kpi-trend up">завершено</div>
+          <div class="adm-kpi-card" onclick="smpKpiF('done',this)" id="smpKpiDone">
+            <div class="adm-kpi-left">
+              <div class="adm-kpi-label">Готові</div>
+              <div class="adm-kpi-val" id="smpCntDone">0</div>
+            </div>
+            <div class="adm-kpi-icon kpi-green">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="7"/><path d="M7 10l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
           </div>
         </div>
 
@@ -2320,7 +2326,7 @@ function smpInit() {
   const fm=document.getElementById('smpFMat'); if(fm)fm.value='';
   const fl=document.getElementById('smpFLab'); if(fl)fl.value='';
   // reset KPI cards
-  document.querySelectorAll('.adm-smp-kpi').forEach((k,i)=>k.classList.toggle('active',i===0));
+  document.querySelectorAll('#admtab-samples .adm-kpi-card').forEach((k,i)=>k.classList.toggle('active',i===0));
   smpUpdateCounts();
   _smpUpdateSidebar();
   smpRender();
@@ -2328,24 +2334,16 @@ function smpInit() {
 
 function smpUpdateCounts() {
   const st = s => _admSamples.filter(x=>x.status===s).length;
-  const set = (id,v) => { const e=document.getElementById(id); if(e)e.textContent=v; };
-  const total = _admSamples.length;
-  const nw  = st('new');
-  const rcv = st('received');
-  const acc = st('accepted');
-  const wrk = st('work');
-  const dn  = st('done');
-  set('smpCntAll',  total);
-  set('smpCntNew',  nw);
-  set('smpCntRcv',  rcv);
-  set('smpCntAcc',  acc);
-  set('smpCntWork', wrk);
-  set('smpCntDone', dn);
+  const setEl = (id,v) => { const e=document.getElementById(id); if(e)e.textContent=v; };
+  setEl('smpCntAll',  _admSamples.length);
+  setEl('smpCntNew',  st('new'));
+  setEl('smpCntWork', st('work'));
+  setEl('smpCntDone', st('done'));
 }
 
 function smpKpiF(status, el) {
   _smpFilter = status;
-  document.querySelectorAll('.adm-smp-kpi').forEach(k=>k.classList.remove('active'));
+  document.querySelectorAll('#admtab-samples .adm-kpi-card').forEach(k=>k.classList.remove('active'));
   if(el) el.classList.add('active');
   const fs=document.getElementById('smpFStatus'); if(fs)fs.value='';
   _smpPage=1; smpRender();
