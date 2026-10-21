@@ -1140,6 +1140,7 @@ function _mapOrder(o) {
     amount:      Number(o.total||0).toLocaleString('uk-UA') + ' ₴',
     amountRaw:   Number(o.total||0),
     samplesList,
+    items:       Array.isArray(o.items) ? o.items : [],
     activity:    [{ t:'Замовлення створено', d:`${date} ${time}` }],
   };
 }
@@ -1494,12 +1495,13 @@ function _buildSamples() {
         pkg:     s.pkg || 'basic',
         status:  s.st || 'new',
         date:    o.date,
+        items:   o.items || [],
       });
     });
   });
 }
 
-let _smpFilter='', _smpSelId=null, _smpSortF='id', _smpSortA=false, _smpPage=1;
+let _smpFilter='', _smpSelId=null, _smpSortF='date', _smpSortA=false, _smpPage=1;
 const _SMP_PER=10;
 
 function smpInit() {
@@ -1547,14 +1549,11 @@ function _smpFiltered() {
 
 function smpRender() {
   const list=_smpFiltered(), total=list.length;
-  const pc=Math.max(1,Math.ceil(total/_SMP_PER));
-  if(_smpPage>pc)_smpPage=pc;
-  const slice=list.slice((_smpPage-1)*_SMP_PER,_smpPage*_SMP_PER);
   const body=document.getElementById('smpBody'); if(!body)return;
-  if(!slice.length){
+  if(!list.length){
     body.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:36px;color:var(--text-soft);font-size:13px">Зразків не знайдено</td></tr>`;
   } else {
-    body.innerHTML=slice.map(s=>`
+    body.innerHTML=list.map(s=>`
       <tr onclick="smpSelect('${s.id}')" class="${_smpSelId===s.id?'adm-row-sel':''}">
         <td><input type="checkbox" onclick="event.stopPropagation()"></td>
         <td><div class="adm-order-num">${s.id}</div></td>
@@ -1569,18 +1568,9 @@ function smpRender() {
       </tr>`).join('');
   }
   const pi=document.getElementById('smpPagInfo');
-  if(pi)pi.textContent=`Показано ${total?(_smpPage-1)*_SMP_PER+1:0}–${Math.min(_smpPage*_SMP_PER,total)} з ${total} зразків`;
+  if(pi)pi.textContent=`${total} зразків`;
   const pag=document.getElementById('smpPagination');
-  if(pag){
-    let h=`<button class="adm-pag-btn" onclick="smpGoP(${_smpPage-1})" ${_smpPage<=1?'disabled':''}>‹</button>`;
-    for(let p=1;p<=pc;p++){
-      if(pc<=6||Math.abs(p-_smpPage)<=1||p===1||p===pc)
-        h+=`<button class="adm-pag-btn ${p===_smpPage?'cur':''}" onclick="smpGoP(${p})">${p}</button>`;
-      else if(Math.abs(p-_smpPage)===2)h+=`<span style="padding:0 3px;color:var(--text-soft)">…</span>`;
-    }
-    h+=`<button class="adm-pag-btn" onclick="smpGoP(${_smpPage+1})" ${_smpPage>=pc?'disabled':''}>›</button>`;
-    pag.innerHTML=h;
-  }
+  if(pag)pag.innerHTML='';
 }
 
 function smpGoP(p){const pc=Math.max(1,Math.ceil(_smpFiltered().length/_SMP_PER));_smpPage=Math.max(1,Math.min(p,pc));smpRender();}
@@ -1601,16 +1591,20 @@ function smpSelect(id) {
   document.getElementById('smpPanelMat').innerHTML=`<span class="adm-mat ${_MAT_CLASS[s.mat]}">${_MAT_LABEL[s.mat]}</span>`;
   document.getElementById('smpPanelPkg').textContent=_PKG_LABEL[s.pkg];
   document.getElementById('smpPanelDate').textContent=s.date;
-  const tests=_TESTS[s.mat]||_TESTS.soil;
-  document.getElementById('smpPanelTestCnt').textContent=tests.length;
-  // Статус досліджень залежить від статусу зразку:
-  // new/waiting → всі "Очікує зразки", work → всі "У роботі", done → всі "Готово"
+  // Дослідження — беремо з реальних items замовлення
+  const order = _admOrders.find(o=>o.id===s.orderId);
+  const items = (order && order.items) ? order.items : s.items || [];
   const testSt = s.status==='done' ? 'done' : s.status==='work' ? 'work' : 'waiting';
-  document.getElementById('smpPanelTests').innerHTML=tests.map(t=>`
-    <div class="adm-test-row">
-      <span class="adm-test-name">${t.n}</span>
-      <span class="adm-pill ${_admSC[testSt]}">${_admSL[testSt]}</span>
-    </div>`).join('');
+  document.getElementById('smpPanelTestCnt').textContent=items.length;
+  if(items.length){
+    document.getElementById('smpPanelTests').innerHTML=items.map(t=>`
+      <div class="adm-test-row">
+        <span class="adm-test-name">${t.name||t.n||'—'}${t.qty>1?' × '+t.qty:''}</span>
+        <span class="adm-pill ${_admSC[testSt]}">${_admSL[testSt]}</span>
+      </div>`).join('');
+  } else {
+    document.getElementById('smpPanelTests').innerHTML=`<div style="color:var(--text-soft);font-size:12px;padding:8px 0">Дані відсутні</div>`;
+  }
   document.getElementById('smpPanelActivity').innerHTML=`
     <div class="adm-act-item"><div class="adm-act-dot"></div><div><div class="adm-act-text">Зразок додано до замовлення</div><div class="adm-act-date">${s.date} 10:00</div></div></div>
     <div class="adm-act-item"><div class="adm-act-dot"></div><div><div class="adm-act-text">Зразок створено</div><div class="adm-act-date">${s.date} 09:30</div></div></div>`;
@@ -1632,7 +1626,7 @@ function _buildClients() {
   _admClients=Object.values(map).map(c=>({...c,orderCount:c.orders.length,lastDate:c.orders[0]?.date||'—',totalFmt:c.total.toLocaleString('uk-UA')+' ₴'}));
 }
 
-let _cliSelId=null, _cliSortF='name', _cliSortA=true, _cliPage=1;
+let _cliSelId=null, _cliSortF='lastOrder', _cliSortA=false, _cliPage=1;
 const _CLI_PER=10;
 
 function cliInit(){_cliSelId=null;_cliPage=1;const si=document.getElementById('cliSearch');if(si)si.value='';cliRender();}
@@ -1652,14 +1646,11 @@ function _cliFiltered(){
 
 function cliRender(){
   const list=_cliFiltered(),total=list.length;
-  const pc=Math.max(1,Math.ceil(total/_CLI_PER));
-  if(_cliPage>pc)_cliPage=pc;
-  const slice=list.slice((_cliPage-1)*_CLI_PER,_cliPage*_CLI_PER);
   const body=document.getElementById('cliBody');if(!body)return;
-  if(!slice.length){
+  if(!list.length){
     body.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:36px;color:var(--text-soft);font-size:13px">Клієнтів не знайдено</td></tr>`;
   } else {
-    body.innerHTML=slice.map(c=>`
+    body.innerHTML=list.map(c=>`
       <tr onclick="cliSelect('${c.name.replace(/'/g,"\\'")}')">
         <td><input type="checkbox" onclick="event.stopPropagation()"></td>
         <td>
@@ -1678,14 +1669,9 @@ function cliRender(){
       </tr>`).join('');
   }
   const pi=document.getElementById('cliPagInfo');
-  if(pi)pi.textContent=`Показано ${total?(_cliPage-1)*_CLI_PER+1:0}–${Math.min(_cliPage*_CLI_PER,total)} з ${total} клієнтів`;
+  if(pi)pi.textContent=`${total} клієнтів`;
   const pag=document.getElementById('cliPagination');
-  if(pag){
-    let h=`<button class="adm-pag-btn" onclick="cliGoP(${_cliPage-1})" ${_cliPage<=1?'disabled':''}>‹</button>`;
-    for(let p=1;p<=pc;p++)h+=`<button class="adm-pag-btn ${p===_cliPage?'cur':''}" onclick="cliGoP(${p})">${p}</button>`;
-    h+=`<button class="adm-pag-btn" onclick="cliGoP(${_cliPage+1})" ${_cliPage>=pc?'disabled':''}>›</button>`;
-    pag.innerHTML=h;
-  }
+  if(pag)pag.innerHTML='';
 }
 
 function cliGoP(p){const pc=Math.max(1,Math.ceil(_cliFiltered().length/_CLI_PER));_cliPage=Math.max(1,Math.min(p,pc));cliRender();}
