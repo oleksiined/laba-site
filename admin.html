@@ -1098,21 +1098,24 @@ function _mapOrder(o) {
   if (o.delivery?.address) delivery += ', ' + o.delivery.address;
   if (o.delivery?.city)    delivery += ', ' + o.delivery.city;
 
-  const payMap  = { invoice:'unpaid', cash:'pending' };
+  const payMap  = { invoice:'unpaid', online:'pending', cod:'pending', cash:'pending' };
   const payment = payMap[o.payment] || 'unpaid';
 
-  const samplesArr  = Array.isArray(o.samples) ? o.samples : [];
-  // packageId → display key mapping
+  const samplesArr = Array.isArray(o.samples) ? o.samples : [];
   const pkgMap = { basic:'basic', standard:'standard', extended:'extended', 'Базовий':'basic', 'Стандартний':'standard', 'Розширений':'extended' };
   const samplesList = samplesArr.map((s,i) => ({
     id:   s.label || `S${pad(i+1)}`,
-    name: [s.label, s.crop, s.field].filter(Boolean).join(', ') || `Зразок ${i+1}`,
+    name: s.name || s.label || `Зразок ${i+1}`,
     st:   'new',
     pkg:  pkgMap[s.packageId] || pkgMap[s.pkg] || 'basic',
   }));
 
   const studies = (Array.isArray(o.items) ? o.items : [])
     .reduce((sum,it) => sum + (Number(it.qty)||1), 0) || samplesArr.length;
+
+  // payer type
+  const pt = o.payer_type || (o.company ? 'legal' : 'private');
+  const companyTypeLabel = pt === 'legal' ? 'Юридична особа' : pt === 'fop' ? 'ФОП' : 'Фізична особа';
 
   return {
     id:          o.order_num || o.id,
@@ -1121,10 +1124,13 @@ function _mapOrder(o) {
     contact:     o.name || '—',
     phone:       o.phone || '—',
     email:       o.email || '—',
-    companyType: o.company ? 'Юридична особа' : 'Фізична особа',
+    companyType: companyTypeLabel,
     pdv:         false,
-    edrpou:      '—',
+    edrpou:      o.edrpou || o.rnokpp || '—',
     companyFull: o.company || o.name || '—',
+    legalAddress:    o.legal_address || '—',
+    accountingEmail: o.accounting_email || '',
+    sendDocs:        o.send_docs ?? null,
     delivery,
     samples:     samplesArr.length,
     studies,
@@ -1326,8 +1332,21 @@ function admSelect(id) {
   setH('admOIPayerType', o.companyType + (o.pdv ? ' <span class="adm-pdv-badge">ПДВ</span>' : ''));
   // Contact
   setH('admOIContact', `<a href="tel:${o.phone}" style="color:var(--navy);text-decoration:none">${o.phone}</a><br><a href="mailto:${o.email}" style="color:var(--navy);text-decoration:none;font-size:11.5px">${o.email}</a>`);
-  // ЄДРПОУ + company full name
-  setH('admOIReqs', `ЄДРПОУ: <b>${o.edrpou}</b> &nbsp;·&nbsp; ${o.companyFull}`);
+  // Реквізити (тільки для юр. особи / ФОП)
+  if (o.companyType === 'Фізична особа') {
+    setH('admOIReqs', '—');
+  } else if (o.companyType === 'ФОП') {
+    const reqParts = [];
+    if (o.edrpou && o.edrpou !== '—') reqParts.push(`РНОКПП: <b>${o.edrpou}</b>`);
+    if (o.legalAddress && o.legalAddress !== '—') reqParts.push(o.legalAddress);
+    setH('admOIReqs', reqParts.join(' &nbsp;·&nbsp; ') || '—');
+  } else {
+    const reqParts = [];
+    if (o.edrpou && o.edrpou !== '—') reqParts.push(`ЄДРПОУ: <b>${o.edrpou}</b>`);
+    if (o.companyFull && o.companyFull !== '—') reqParts.push(o.companyFull);
+    if (o.legalAddress && o.legalAddress !== '—') reqParts.push(o.legalAddress);
+    setH('admOIReqs', reqParts.join(' &nbsp;·&nbsp; ') || '—');
+  }
   // Delivery
   setT('admOIDelivery', o.delivery || '—');
 
