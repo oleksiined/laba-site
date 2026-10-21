@@ -1479,13 +1479,18 @@ function _buildSamples() {
   _admSamples = [];
   _admOrders.forEach(o => {
     (o.samplesList || []).forEach(s => {
+      const smpNum = idx++;
+      const smpLabel = `Зразок ${smpNum}`;
+      const smpName  = s.name && s.name !== smpLabel ? s.name : '';
       _admSamples.push({
-        id:      `SMP-${o.date ? o.date.split('.').reverse().join('-').slice(0,4) : '2026'}-${String(idx++).padStart(4,'0')}`,
+        id:      `SMP-${o.date ? o.date.split('.').reverse().join('-').slice(0,4) : '2026'}-${String(smpNum).padStart(4,'0')}`,
         orderId: o.id,
         client:  o.client,
         short:   o.short,
-        name:    s.name,
-        mat:     _inferMat(s.name),
+        label:   smpLabel,
+        name:    smpName,
+        displayName: smpName ? `${smpLabel} · ${smpName}` : smpLabel,
+        mat:     _inferMat(smpName || s.id || ''),
         pkg:     s.pkg || 'basic',
         status:  s.st || 'new',
         date:    o.date,
@@ -1555,7 +1560,7 @@ function smpRender() {
         <td><div class="adm-order-num">${s.id}</div></td>
         <td style="color:var(--text-soft);font-size:11.5px">${s.orderId}</td>
         <td><div class="adm-client-nm">${s.client}</div></td>
-        <td style="font-size:12.5px;color:var(--text-mid)">${s.name}</td>
+        <td style="font-size:12.5px;color:var(--text-mid)">${s.displayName||s.label||s.id}</td>
         <td><span class="adm-mat ${_MAT_CLASS[s.mat]}">${_MAT_LABEL[s.mat]}</span></td>
         <td style="font-size:12px;color:var(--text-soft)">${_PKG_LABEL[s.pkg]}</td>
         <td><span class="adm-pill ${_SST_CLASS[s.status]}">${_SST_LABEL[s.status]}</span></td>
@@ -1590,7 +1595,7 @@ function smpSelect(id) {
   const ps=document.getElementById('admPanelStat');
   if(ps){ps.className='adm-pill '+_SST_CLASS[s.status];ps.textContent=_SST_LABEL[s.status];}
   _admShowPanel('Sample');
-  document.getElementById('smpPanelName').textContent=s.name;
+  document.getElementById('smpPanelName').textContent=s.displayName||s.label||s.id;
   document.getElementById('smpPanelOrderId').textContent=s.orderId;
   document.getElementById('smpPanelClient').textContent=s.client;
   document.getElementById('smpPanelMat').innerHTML=`<span class="adm-mat ${_MAT_CLASS[s.mat]}">${_MAT_LABEL[s.mat]}</span>`;
@@ -1598,10 +1603,13 @@ function smpSelect(id) {
   document.getElementById('smpPanelDate').textContent=s.date;
   const tests=_TESTS[s.mat]||_TESTS.soil;
   document.getElementById('smpPanelTestCnt').textContent=tests.length;
-  document.getElementById('smpPanelTests').innerHTML=tests.map((t,i)=>`
+  // Статус досліджень залежить від статусу зразку:
+  // new/waiting → всі "Очікує зразки", work → всі "У роботі", done → всі "Готово"
+  const testSt = s.status==='done' ? 'done' : s.status==='work' ? 'work' : 'waiting';
+  document.getElementById('smpPanelTests').innerHTML=tests.map(t=>`
     <div class="adm-test-row">
       <span class="adm-test-name">${t.n}</span>
-      <span class="adm-pill ${_admSC[['work','done','done','waiting','waiting','waiting'][i%6]||'waiting']}">${_admSL[['work','done','done','waiting','waiting','waiting'][i%6]||'waiting']}</span>
+      <span class="adm-pill ${_admSC[testSt]}">${_admSL[testSt]}</span>
     </div>`).join('');
   document.getElementById('smpPanelActivity').innerHTML=`
     <div class="adm-act-item"><div class="adm-act-dot"></div><div><div class="adm-act-text">Зразок додано до замовлення</div><div class="adm-act-date">${s.date} 10:00</div></div></div>
