@@ -451,6 +451,60 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
 .adm-login-input:focus{border-color:#111}
 .adm-login-btn{padding:14px;background:#CCFF00;border:none;border-radius:10px;font-size:15px;font-weight:700;color:#111;cursor:pointer;font-family:inherit;transition:background .15s}
 .adm-login-btn:hover{background:#b8e600}
+
+/* ── SAMPLES REDESIGN ── */
+.adm-smp-kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:0;padding:0 20px 16px;flex-shrink:0}
+.adm-smp-kpi{background:var(--white);border:1px solid var(--border);padding:13px 15px;cursor:pointer;transition:border-color .12s,background .12s;position:relative;user-select:none}
+.adm-smp-kpi:first-child{border-radius:9px 0 0 9px}
+.adm-smp-kpi:last-child{border-radius:0 9px 9px 0}
+.adm-smp-kpi:not(:last-child){border-right:none}
+.adm-smp-kpi:hover{z-index:1;border-color:var(--navy)!important}
+.adm-smp-kpi.active{z-index:1;border-color:var(--neon-dark)!important;background:#f4ffd8}
+.adm-smp-kpi-lbl{font-size:10px;color:var(--text-soft);font-weight:600;letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px}
+.adm-smp-kpi-val{font-size:22px;font-weight:800;color:var(--navy);line-height:1}
+.adm-smp-kpi-trend{font-size:10.5px;margin-top:4px;color:var(--text-soft)}
+.adm-smp-kpi-trend.up{color:#10B981}
+.adm-smp-kpi-trend.dn{color:#EF4444}
+.adm-smp-toolbar{display:flex;align-items:center;gap:8px;padding:0 20px 10px;flex-wrap:wrap}
+/* Sample right panel */
+.smp-info-sec{padding:12px 18px;border-bottom:1px solid var(--border)}
+.smp-info-hd{font-size:10px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.smp-info-row{display:flex;align-items:baseline;padding:3px 0;font-size:12px;gap:0}
+.smp-info-lbl{width:128px;flex-shrink:0;color:var(--text-soft);font-size:11.5px}
+.smp-info-val{color:var(--navy);font-weight:500;flex:1;word-break:break-word}
+.smp-studies-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.smp-studies-title{font-size:12px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px}
+.smp-studies-badge{background:var(--navy);color:#fff;border-radius:8px;font-size:10px;font-weight:700;padding:1px 6px;min-width:16px;text-align:center}
+.smp-pkg-row{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--bg);border-radius:7px;margin-bottom:6px}
+.smp-pkg-name{font-size:12px;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:6px}
+.smp-pkg-ico{width:20px;height:20px;background:var(--neon);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.smp-pkg-cnt{font-size:11px;color:var(--text-soft);background:var(--white);border:1px solid var(--border);border-radius:5px;padding:0 6px}
+.smp-extra-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.smp-extra-chip{padding:2px 9px;border-radius:12px;background:#EFF6FF;color:#2563EB;font-size:11px;font-weight:600}
+.smp-study-tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.smp-study-tbl th{font-size:9px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;padding:4px 6px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+.smp-study-tbl td{padding:5px 6px;border-bottom:1px solid #f0f2f4;color:var(--text-mid);vertical-align:middle}
+.smp-study-tbl tbody tr:last-child td{border-bottom:none}
+.smp-lab-row{display:flex;gap:8px;padding:4px 0}
+.smp-lab-sel{flex:1;border:1.5px solid var(--border);border-radius:7px;padding:6px 8px;font-size:12px;font-family:inherit;color:var(--navy);outline:none;cursor:pointer;background:var(--white)}
+.smp-lab-sel:focus{border-color:var(--neon-dark)}
+.smp-notes-inp{width:100%;box-sizing:border-box;border:1.5px solid var(--border);border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;color:var(--navy);resize:none;outline:none;min-height:60px;transition:border-color .12s}
+.smp-notes-inp:focus{border-color:var(--neon-dark)}
+.smp-actions-new{padding:12px 18px;display:flex;flex-direction:column;gap:7px;flex-shrink:0;border-top:1px solid var(--border)}
+.smp-act-row{display:flex;gap:7px}
+.smp-act-form-btn{flex:0 0 auto;padding:9px 14px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:opacity .15s}
+.smp-act-form-btn:hover{opacity:.85}
+.smp-status-wrap{position:relative;flex:1}
+.smp-status-btn{width:100%;padding:9px 10px;background:var(--white);color:var(--navy);border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px;transition:border-color .15s}
+.smp-status-btn:hover{border-color:var(--navy)}
+.smp-order-btn{flex:0 0 auto;padding:9px 10px;background:var(--white);color:var(--navy);border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:border-color .15s}
+.smp-order-btn:hover{border-color:var(--navy)}
+.smp-status-dd{position:fixed;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.13);z-index:9999;min-width:180px;padding:5px 0;display:none}
+.smp-status-dd.open{display:block}
+.smp-status-dd-item{padding:8px 14px;font-size:13px;cursor:pointer;color:var(--navy)}
+.smp-status-dd-item:hover{background:var(--bg)}
+.adm-add-study-btn{padding:4px 10px;border:1.5px solid var(--neon-dark);border-radius:6px;background:transparent;color:#7a9e00;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+.adm-add-study-btn:hover{background:#f4ffd8}
 </style>
 </head>
 <body>
@@ -695,31 +749,76 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
       <!-- ── SAMPLES TAB ── -->
       <div class="adm-subtab" id="admtab-samples">
         <div class="adm-topbar">
-          <div><div class="adm-page-title">Зразки</div><div class="adm-page-sub">Реєстр зразків — очікувані, отримані та готові</div></div>
-          <button class="adm-btn-primary" onclick="alert('Функція у розробці')">+ Новий зразок</button>
+          <div>
+            <div class="adm-page-title">Зразки</div>
+            <div class="adm-page-sub">Реєстр зразків — очікувані, отримані та готові</div>
+          </div>
+          <div class="adm-topbar-actions">
+            <button class="adm-btn adm-btn-ghost" onclick="smpExport()">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="15" height="15"><path d="M10 13V4M6 9l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16h12" stroke-linecap="round"/></svg>
+              Експорт
+            </button>
+            <button class="adm-btn adm-btn-ghost" onclick="alert('Функція у розробці')">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="15" height="15"><path d="M4 5h12M4 10h8" stroke-linecap="round"/><circle cx="15" cy="14" r="3"/><path d="M15 13v2M14 14h2" stroke-linecap="round"/></svg>
+              Створити завдання
+            </button>
+            <button class="adm-btn adm-btn-primary" onclick="alert('Функція у розробці')">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>
+              Новий зразок
+            </button>
+          </div>
         </div>
-        <div class="adm-qchips" id="smpQChips">
-          <button class="adm-qchip active" onclick="smpQF('',this)">Всі зразки <span class="adm-qchip-cnt" id="smpCntAll">0</span></button>
-          <button class="adm-qchip" onclick="smpQF('waiting',this)">Очікується <span class="adm-qchip-cnt" id="smpCntWait">0</span></button>
-          <button class="adm-qchip" onclick="smpQF('work',this)">У роботі <span class="adm-qchip-cnt" id="smpCntWork">0</span></button>
-          <button class="adm-qchip" onclick="smpQF('done',this)">Готові <span class="adm-qchip-cnt" id="smpCntDone">0</span></button>
-          <button class="adm-qchip" onclick="smpQF('new',this)">Не отримано <span class="adm-qchip-cnt" id="smpCntNew">0</span></button>
+
+        <!-- 6 KPI stats -->
+        <div class="adm-smp-kpi-row">
+          <div class="adm-smp-kpi active" onclick="smpKpiF('',this)" id="smpKpiAll">
+            <div class="adm-smp-kpi-lbl">Всього</div>
+            <div class="adm-smp-kpi-val" id="smpCntAll">0</div>
+            <div class="adm-smp-kpi-trend">зразків</div>
+          </div>
+          <div class="adm-smp-kpi" onclick="smpKpiF('new',this)" id="smpKpiNew">
+            <div class="adm-smp-kpi-lbl">Очікується</div>
+            <div class="adm-smp-kpi-val" id="smpCntNew">0</div>
+            <div class="adm-smp-kpi-trend up">не отримано</div>
+          </div>
+          <div class="adm-smp-kpi" onclick="smpKpiF('received',this)" id="smpKpiRcv">
+            <div class="adm-smp-kpi-lbl">Отримано</div>
+            <div class="adm-smp-kpi-val" id="smpCntRcv">0</div>
+            <div class="adm-smp-kpi-trend">у лабораторії</div>
+          </div>
+          <div class="adm-smp-kpi" onclick="smpKpiF('accepted',this)" id="smpKpiAcc">
+            <div class="adm-smp-kpi-lbl">Прийнято</div>
+            <div class="adm-smp-kpi-val" id="smpCntAcc">0</div>
+            <div class="adm-smp-kpi-trend">підтверджено</div>
+          </div>
+          <div class="adm-smp-kpi" onclick="smpKpiF('work',this)" id="smpKpiWork">
+            <div class="adm-smp-kpi-lbl">У роботі</div>
+            <div class="adm-smp-kpi-val" id="smpCntWork">0</div>
+            <div class="adm-smp-kpi-trend">дослідження</div>
+          </div>
+          <div class="adm-smp-kpi" onclick="smpKpiF('done',this)" id="smpKpiDone">
+            <div class="adm-smp-kpi-lbl">Готові</div>
+            <div class="adm-smp-kpi-val" id="smpCntDone">0</div>
+            <div class="adm-smp-kpi-trend up">завершено</div>
+          </div>
         </div>
-        <div class="adm-toolbar" style="padding:0 20px 10px">
-          <div class="adm-search-wrap">
+
+        <!-- Filter bar -->
+        <div class="adm-smp-toolbar">
+          <div class="adm-search-wrap" style="flex:1;max-width:280px">
             <svg class="adm-search-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="14" height="14"><circle cx="8.5" cy="8.5" r="5"/><path d="M15 15l-3.5-3.5" stroke-linecap="round"/></svg>
             <input id="smpSearch" class="adm-search" placeholder="Пошук зразків..." oninput="smpRender()">
           </div>
-          <select id="smpFStatus" class="adm-select" onchange="smpRender()">
-            <option value="">Статус: Всі</option>
+          <select id="smpFStatus" class="adm-filter-sel" onchange="smpRender()">
+            <option value="">Статус</option>
+            <option value="new">Не отримано</option>
             <option value="received">Отримано</option>
-            <option value="waiting">Очікується</option>
+            <option value="accepted">Прийнято</option>
             <option value="work">У роботі</option>
             <option value="done">Готово</option>
-            <option value="new">Не отримано</option>
           </select>
-          <select id="smpFMat" class="adm-select" onchange="smpRender()">
-            <option value="">Матеріал: Всі</option>
+          <select id="smpFMat" class="adm-filter-sel" onchange="smpRender()">
+            <option value="">Матеріал</option>
             <option value="soil">Ґрунт</option>
             <option value="plant">Рослина</option>
             <option value="water">Вода</option>
@@ -727,21 +826,34 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
             <option value="fert">Добриво</option>
             <option value="oil">Масло</option>
           </select>
+          <select id="smpFLab" class="adm-filter-sel" onchange="smpRender()">
+            <option value="">Лабораторія</option>
+            <option value="dnipro">Дніпро</option>
+            <option value="kyiv">Київ</option>
+          </select>
+          <button class="adm-filter-date">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><rect x="3" y="4" width="14" height="13" rx="2"/><path d="M7 2v4M13 2v4M3 9h14" stroke-linecap="round"/></svg>
+            Дата
+          </button>
         </div>
+
+        <!-- Table -->
         <div style="padding:0 20px">
           <div class="adm-table-wrap">
             <table class="adm-table">
               <thead><tr>
                 <th style="width:32px"><input type="checkbox" onchange="smpToggleAll(this)"></th>
-                <th onclick="smpSort('id')" style="cursor:pointer">№ зразка ↕</th>
-                <th onclick="smpSort('orderId')" style="cursor:pointer">Замовлення ↕</th>
-                <th>Клієнт</th>
-                <th>Назва зразка</th>
-                <th>Матеріал</th>
-                <th>Пакет</th>
-                <th onclick="smpSort('status')" style="cursor:pointer">Статус ↕</th>
-                <th onclick="smpSort('date')" style="cursor:pointer">Дата ↕</th>
-                <th></th>
+                <th onclick="smpSort('id')" style="cursor:pointer;white-space:nowrap">№ ЗРАЗКА ↕</th>
+                <th onclick="smpSort('orderId')" style="cursor:pointer;white-space:nowrap">ЗАМОВЛЕННЯ ↕</th>
+                <th>КЛІЄНТ</th>
+                <th>НАЗВА ЗРАЗКА</th>
+                <th>МАТЕРІАЛ</th>
+                <th style="text-align:center;white-space:nowrap">ДОСЛІДЖЕНЬ</th>
+                <th onclick="smpSort('status')" style="cursor:pointer">СТАТУС ↕</th>
+                <th>ОПЛАТА</th>
+                <th>ЛАБОРАТОРІЯ</th>
+                <th>ЗАВДАННЯ</th>
+                <th style="width:20px"></th>
               </tr></thead>
               <tbody id="smpBody"></tbody>
             </table>
@@ -1185,53 +1297,115 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
 
       <!-- SAMPLE panel body -->
       <div class="adm-panel-body" id="admPanelSample">
-        <div class="adm-panel-sec">
-          <div class="adm-panel-sec-title">Зразок</div>
-          <div class="adm-panel-cl-row" style="font-size:12.5px">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 2v5l-4 8h12l-4-8V2"/><path d="M7 2h6" stroke-linecap="round"/></svg>
-            <span id="smpPanelName">—</span>
+
+        <!-- Основна інформація -->
+        <div class="smp-info-sec">
+          <div class="smp-info-hd">Основна інформація</div>
+          <div class="smp-info-row">
+            <span class="smp-info-lbl">Назва зразка</span>
+            <span class="smp-info-val" id="smpPanelName">—</span>
           </div>
-          <div class="adm-panel-cl-row" style="font-size:12.5px">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M3 8h14M8 3v14" stroke-linecap="round"/></svg>
-            <span id="smpPanelOrderId" style="color:var(--text-soft)">—</span>
+          <div class="smp-info-row">
+            <span class="smp-info-lbl">Матеріал</span>
+            <span class="smp-info-val" id="smpPanelMat">—</span>
+          </div>
+          <div class="smp-info-row">
+            <span class="smp-info-lbl">Клієнт</span>
+            <span class="smp-info-val" id="smpPanelClient">—</span>
+          </div>
+          <div class="smp-info-row">
+            <span class="smp-info-lbl">Замовлення</span>
+            <span class="smp-info-val" id="smpPanelOrderId" style="color:var(--text-soft);text-decoration:underline;cursor:pointer" onclick="smpOpenOrder()">—</span>
+          </div>
+          <div class="smp-info-row">
+            <span class="smp-info-lbl">Дата відбору</span>
+            <span class="smp-info-val" id="smpPanelDate">—</span>
+          </div>
+          <div class="smp-info-row">
+            <span class="smp-info-lbl">Дата отримання</span>
+            <span class="smp-info-val" id="smpPanelDateRcv">—</span>
+          </div>
+          <div class="smp-info-row">
+            <span class="smp-info-lbl">Дата прийняття</span>
+            <span class="smp-info-val" id="smpPanelDateAcc">—</span>
+          </div>
+          <div class="smp-info-row">
+            <span class="smp-info-lbl">Пакет</span>
+            <span class="smp-info-val" id="smpPanelPkg">—</span>
           </div>
         </div>
-        <div class="adm-panel-sec">
-          <div class="adm-meta-row">
-            <div class="adm-meta-item"><div class="adm-meta-label">Матеріал</div><div class="adm-meta-val" id="smpPanelMat">—</div></div>
-            <div class="adm-meta-item"><div class="adm-meta-label">Пакет</div><div class="adm-meta-val" id="smpPanelPkg">—</div></div>
-            <div class="adm-meta-item"><div class="adm-meta-label">Дата</div><div class="adm-meta-val" id="smpPanelDate">—</div></div>
+
+        <!-- Призначені дослідження -->
+        <div class="smp-info-sec">
+          <div class="smp-studies-hd">
+            <div class="smp-studies-title">
+              Призначені дослідження
+              <span class="smp-studies-badge" id="smpPanelTestCnt">0</span>
+            </div>
+            <button class="adm-add-study-btn" onclick="alert('Функція у розробці')">+ Додати</button>
+          </div>
+          <div class="smp-pkg-row">
+            <div class="smp-pkg-name">
+              <div class="smp-pkg-ico">
+                <svg viewBox="0 0 16 16" fill="none" stroke="#111" stroke-width="1.5" width="10" height="10"><path d="M2 5l6-3 6 3v6l-6 3-6-3z" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 2v12M2 5l6 3 6-3" stroke-linecap="round"/></svg>
+              </div>
+              <span id="smpPanelPkgName">Базовий</span>
+            </div>
+            <span class="smp-pkg-cnt" id="smpPanelPkgCnt">0</span>
+          </div>
+          <div class="smp-extra-chips" id="smpPanelExtras"></div>
+          <table class="smp-study-tbl">
+            <thead><tr>
+              <th>№</th><th>ID послуги</th><th>Назва дослідження</th><th>Тип</th>
+            </tr></thead>
+            <tbody id="smpPanelTests"></tbody>
+          </table>
+        </div>
+
+        <!-- Лабораторія та завдання -->
+        <div class="smp-info-sec">
+          <div class="smp-info-hd">Лабораторія та завдання</div>
+          <div class="smp-lab-row">
+            <select class="smp-lab-sel" id="smpPanelLab">
+              <option value="">Лабораторія</option>
+              <option value="dnipro">Дніпро</option>
+              <option value="kyiv">Київ</option>
+            </select>
+            <select class="smp-lab-sel" id="smpPanelTask">
+              <option value="">Завдання</option>
+            </select>
           </div>
         </div>
-        <div class="adm-panel-sec">
-          <div class="adm-panel-sec-title">Клієнт</div>
-          <div class="adm-panel-cl-row" style="font-size:12.5px">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 17c0-3.3 2.7-6 6-6h4c3.3 0 6 2.7 6 6"/><circle cx="10" cy="7" r="3"/></svg>
-            <span id="smpPanelClient">—</span>
+
+        <!-- Примітки -->
+        <div class="smp-info-sec">
+          <div class="smp-info-hd">Примітки</div>
+          <textarea class="smp-notes-inp" id="smpPanelNotes" placeholder="Додати примітку..."></textarea>
+        </div>
+
+        <!-- Actions -->
+        <div class="smp-actions-new">
+          <div class="smp-act-row">
+            <button class="smp-act-form-btn" onclick="smpFormTask()">Сформувати завдання</button>
+            <div class="smp-status-wrap">
+              <button class="smp-status-btn" onclick="smpChangeStatus(event)">
+                Змінити статус
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M4 6l4 4 4-4" stroke-linecap="round"/></svg>
+              </button>
+              <div class="smp-status-dd" id="smpStatusDd">
+                <div class="smp-status-dd-item" onclick="smpApplyStatus('new')">Не отримано</div>
+                <div class="smp-status-dd-item" onclick="smpApplyStatus('received')">Отримано</div>
+                <div class="smp-status-dd-item" onclick="smpApplyStatus('accepted')">Прийнято</div>
+                <div class="smp-status-dd-item" onclick="smpApplyStatus('work')">У роботі</div>
+                <div class="smp-status-dd-item" onclick="smpApplyStatus('done')">Готово</div>
+                <div class="smp-status-dd-item" onclick="smpApplyStatus('rejected')">Відхилено</div>
+                <div class="smp-status-dd-item" onclick="smpApplyStatus('cancelled')">Скасовано</div>
+              </div>
+            </div>
+            <button class="smp-order-btn" onclick="smpOpenOrder()">Відкрити замовлення</button>
           </div>
         </div>
-        <div class="adm-panel-sec">
-          <div class="adm-panel-sec-title">Призначені дослідження (<span id="smpPanelTestCnt">0</span>)</div>
-          <div id="smpPanelTests"></div>
-        </div>
-        <div class="adm-panel-actions">
-          <button class="adm-pbtn adm-pbtn-green" onclick="admActionReceive()">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Позначити отримано
-          </button>
-          <button class="adm-pbtn adm-pbtn-sec" onclick="admActionStatus()">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M4 6h12M4 10h12M4 14h12" stroke-linecap="round"/></svg>
-            Змінити статус
-          </button>
-          <button class="adm-pbtn adm-pbtn-out" onclick="admActionStatus()">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M11 3h6v6M17 3l-8 8M9 5H5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Відкрити замовлення
-          </button>
-        </div>
-        <div class="adm-activity">
-          <div class="adm-act-hd"><div class="adm-panel-sec-title" style="margin-bottom:0">Остання активність</div></div>
-          <div id="smpPanelActivity"></div>
-        </div>
+
       </div><!-- /admPanelSample -->
 
       <!-- CLIENT panel body -->
@@ -2129,6 +2303,8 @@ function _buildSamples() {
         status:  s.st || 'new',
         date:    o.date,
         items:   o.items || [],
+        payment: o.payment || 'unpaid',
+        studiesCount: (o.items||[]).length,
       });
     });
   });
@@ -2142,26 +2318,74 @@ function smpInit() {
   const si=document.getElementById('smpSearch'); if(si)si.value='';
   const fs=document.getElementById('smpFStatus'); if(fs)fs.value='';
   const fm=document.getElementById('smpFMat'); if(fm)fm.value='';
-  document.querySelectorAll('#smpQChips .adm-qchip').forEach((b,i)=>b.classList.toggle('active',i===0));
+  const fl=document.getElementById('smpFLab'); if(fl)fl.value='';
+  // reset KPI cards
+  document.querySelectorAll('.adm-smp-kpi').forEach((k,i)=>k.classList.toggle('active',i===0));
   smpUpdateCounts();
+  _smpUpdateSidebar();
   smpRender();
 }
 
 function smpUpdateCounts() {
   const st = s => _admSamples.filter(x=>x.status===s).length;
-  document.getElementById('smpCntAll').textContent  = _admSamples.length;
-  document.getElementById('smpCntWait').textContent = st('waiting');
-  document.getElementById('smpCntWork').textContent = st('work');
-  document.getElementById('smpCntDone').textContent = st('done');
-  document.getElementById('smpCntNew').textContent  = _admSamples.filter(x=>x.status==='new'||x.status==='received').length;
+  const set = (id,v) => { const e=document.getElementById(id); if(e)e.textContent=v; };
+  const total = _admSamples.length;
+  const nw  = st('new');
+  const rcv = st('received');
+  const acc = st('accepted');
+  const wrk = st('work');
+  const dn  = st('done');
+  set('smpCntAll',  total);
+  set('smpCntNew',  nw);
+  set('smpCntRcv',  rcv);
+  set('smpCntAcc',  acc);
+  set('smpCntWork', wrk);
+  set('smpCntDone', dn);
 }
 
-function smpQF(status, el) {
-  _smpFilter=status;
-  document.querySelectorAll('#smpQChips .adm-qchip').forEach(b=>b.classList.remove('active'));
+function smpKpiF(status, el) {
+  _smpFilter = status;
+  document.querySelectorAll('.adm-smp-kpi').forEach(k=>k.classList.remove('active'));
   if(el) el.classList.add('active');
   const fs=document.getElementById('smpFStatus'); if(fs)fs.value='';
   _smpPage=1; smpRender();
+  // sync sidebar active state
+  const qfMap={'':'admQfAll','new':'admQfNew','work':'admQfWork','done':'admQfDone'};
+  document.querySelectorAll('.adm-qf-item').forEach(b=>b.classList.remove('active'));
+  const sid=qfMap[status]||'admQfAll';
+  const se=document.getElementById(sid); if(se)se.classList.add('active');
+}
+
+function smpQF(status, el) {
+  smpKpiF(status, document.getElementById({'':`smpKpiAll`,'new':'smpKpiNew','received':'smpKpiRcv','accepted':'smpKpiAcc','work':'smpKpiWork','done':'smpKpiDone'}[status]||'smpKpiAll'));
+}
+
+function _smpUpdateSidebar() {
+  const set = (id, label, cnt, fn) => {
+    const e=document.getElementById(id); if(!e)return;
+    e.innerHTML=`${label} <span class="adm-qf-count">${cnt}</span>`;
+    e.onclick = fn;
+  };
+  const st = s => _admSamples.filter(x=>x.status===s).length;
+  set('admQfAll',  'Всі',      _admSamples.length, function(){ smpKpiF('',this.id==='admQfAll'?document.getElementById('smpKpiAll'):null); document.querySelectorAll('.adm-qf-item').forEach(b=>b.classList.remove('active')); this.classList.add('active'); _smpFilter=''; _smpPage=1; smpRender(); });
+  set('admQfNew',  'Нові',     st('new'),  function(){ document.querySelectorAll('.adm-qf-item').forEach(b=>b.classList.remove('active')); this.classList.add('active'); _smpFilter='new';  _smpPage=1; smpRender(); });
+  set('admQfWork', 'У роботі', st('work'), function(){ document.querySelectorAll('.adm-qf-item').forEach(b=>b.classList.remove('active')); this.classList.add('active'); _smpFilter='work'; _smpPage=1; smpRender(); });
+  set('admQfDone', 'Готові',   st('done'), function(){ document.querySelectorAll('.adm-qf-item').forEach(b=>b.classList.remove('active')); this.classList.add('active'); _smpFilter='done'; _smpPage=1; smpRender(); });
+  document.querySelectorAll('.adm-qf-item').forEach(b=>b.classList.remove('active'));
+  const ae=document.getElementById('admQfAll'); if(ae)ae.classList.add('active');
+}
+
+function _ordUpdateSidebar() {
+  const set = (id, label, cnt, fn) => {
+    const e=document.getElementById(id); if(!e)return;
+    e.innerHTML=`${label} <span class="adm-qf-count">${cnt}</span>`;
+    e.onclick = fn;
+  };
+  const st = s => _admOrders.filter(o=>o.status===s).length;
+  set('admQfAll',  'Всі',      _admOrders.length, function(){ admQFilter('',this); });
+  set('admQfNew',  'Нові',     st('new'),          function(){ admQFilter('new',this); });
+  set('admQfWork', 'У роботі', st('work'),         function(){ admQFilter('work',this); });
+  set('admQfDone', 'Готові',   st('done'),         function(){ admQFilter('done',this); });
 }
 
 function _smpFiltered() {
@@ -2180,25 +2404,33 @@ function _smpFiltered() {
   return list;
 }
 
+const _PAY_LABEL = {paid:'Оплачено',pending:'Очікується',unpaid:'Не оплачено',partial:'Частково'};
+const _PAY_CLASS = {paid:'adm-p-paid',pending:'adm-p-pend',unpaid:'adm-p-unpa',partial:'adm-p-part'};
+
 function smpRender() {
   const list=_smpFiltered(), total=list.length;
   const body=document.getElementById('smpBody'); if(!body)return;
   if(!list.length){
-    body.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:36px;color:var(--text-soft);font-size:13px">Зразків не знайдено</td></tr>`;
+    body.innerHTML=`<tr><td colspan="12" style="text-align:center;padding:36px;color:var(--text-soft);font-size:13px">Зразків не знайдено</td></tr>`;
   } else {
-    body.innerHTML=list.map(s=>`
+    body.innerHTML=list.map(s=>{
+      const pay = s.payment||'unpaid';
+      return `
       <tr onclick="smpSelect('${s.id}')" class="${_smpSelId===s.id?'adm-row-sel':''}">
         <td><input type="checkbox" onclick="event.stopPropagation()"></td>
-        <td><div class="adm-order-num">${s.id}</div></td>
-        <td style="color:var(--text-soft);font-size:11.5px">${s.orderId}</td>
+        <td><div class="adm-order-num" style="font-size:11px">${s.id}</div></td>
+        <td style="color:var(--text-soft);font-size:11px;white-space:nowrap">${s.orderId}</td>
         <td><div class="adm-client-nm">${s.client}</div></td>
-        <td style="font-size:12.5px;color:var(--text-mid)">${s.displayName||s.label||s.id}</td>
-        <td><span class="adm-mat ${_MAT_CLASS[s.mat]}">${_MAT_LABEL[s.mat]}</span></td>
-        <td style="font-size:12px;color:var(--text-soft)">${_PKG_LABEL[s.pkg]}</td>
-        <td><span class="adm-pill ${_SST_CLASS[s.status]}">${_SST_LABEL[s.status]}</span></td>
-        <td style="font-size:11.5px;color:var(--text-soft)">${s.date}</td>
+        <td style="font-size:12px;color:var(--text-mid);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.displayName||s.label||s.id}</td>
+        <td><span class="adm-mat ${_MAT_CLASS[s.mat]||''}">${_MAT_LABEL[s.mat]||s.mat}</span></td>
+        <td style="text-align:center;font-size:12px;font-weight:600;color:var(--navy)">${s.studiesCount||0}</td>
+        <td><span class="adm-pill ${_SST_CLASS[s.status]||''}">${_SST_LABEL[s.status]||s.status}</span></td>
+        <td><span class="adm-pill ${_PAY_CLASS[pay]||''}">${_PAY_LABEL[pay]||'—'}</span></td>
+        <td style="font-size:11px;color:var(--text-soft)">—</td>
+        <td style="font-size:11px;color:var(--text-soft)">—</td>
         <td style="color:var(--text-soft)">›</td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
   }
   const pi=document.getElementById('smpPagInfo');
   if(pi)pi.textContent=`${total} зразків`;
@@ -2214,33 +2446,119 @@ function smpSelect(id) {
   _smpSelId=id; smpRender();
   const s=_admSamples.find(x=>x.id===id); if(!s)return;
   const panel=document.getElementById('admPanel'); if(panel)panel.classList.add('open');
+  // Shared panel header
   document.getElementById('admPanelNum').textContent=s.id;
   const ps=document.getElementById('admPanelStat');
-  if(ps){ps.className='adm-pill '+_SST_CLASS[s.status];ps.textContent=_SST_LABEL[s.status];}
+  if(ps){ps.className='adm-pill '+(_SST_CLASS[s.status]||'');ps.textContent=_SST_LABEL[s.status]||s.status;}
+  const pd=document.getElementById('admPanelDate2'); if(pd)pd.textContent=s.date;
+  const pc=document.getElementById('admPanelCName2'); if(pc)pc.textContent=s.client;
   _admShowPanel('Sample');
-  document.getElementById('smpPanelName').textContent=s.displayName||s.label||s.id;
-  document.getElementById('smpPanelOrderId').textContent=s.orderId;
-  document.getElementById('smpPanelClient').textContent=s.client;
-  document.getElementById('smpPanelMat').innerHTML=`<span class="adm-mat ${_MAT_CLASS[s.mat]}">${_MAT_LABEL[s.mat]}</span>`;
-  document.getElementById('smpPanelPkg').textContent=_PKG_LABEL[s.pkg];
-  document.getElementById('smpPanelDate').textContent=s.date;
-  // Дослідження — беремо з реальних items замовлення
+  // Основна інформація
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v||'—';};
+  const setH=(id,v)=>{const e=document.getElementById(id);if(e)e.innerHTML=v||'—';};
+  set('smpPanelName', s.displayName||s.label||s.id);
+  setH('smpPanelMat', `<span class="adm-mat ${_MAT_CLASS[s.mat]||''}">${_MAT_LABEL[s.mat]||s.mat}</span>`);
+  set('smpPanelClient', s.client);
+  set('smpPanelOrderId', s.orderId);
+  set('smpPanelDate', s.date);
+  set('smpPanelDateRcv', s.receivedDate||'—');
+  set('smpPanelDateAcc', s.acceptedDate||'—');
+  set('smpPanelPkg', _PKG_LABEL[s.pkg]||s.pkg);
+  // Призначені дослідження
   const order = _admOrders.find(o=>o.id===s.orderId);
   const items = (order && order.items) ? order.items : s.items || [];
-  const testSt = s.status==='done' ? 'done' : s.status==='work' ? 'work' : 'waiting';
-  document.getElementById('smpPanelTestCnt').textContent=items.length;
-  if(items.length){
-    document.getElementById('smpPanelTests').innerHTML=items.map(t=>`
-      <div class="adm-test-row">
-        <span class="adm-test-name">${t.name||t.n||'—'}${t.qty>1?' × '+t.qty:''}</span>
-        <span class="adm-pill ${_admSC[testSt]}">${_admSL[testSt]}</span>
-      </div>`).join('');
-  } else {
-    document.getElementById('smpPanelTests').innerHTML=`<div style="color:var(--text-soft);font-size:12px;padding:8px 0">Дані відсутні</div>`;
+  set('smpPanelTestCnt', items.length);
+  // Package name + count
+  const pkgLabel = _PKG_LABEL[s.pkg]||s.pkg||'Базовий';
+  set('smpPanelPkgName', pkgLabel);
+  document.getElementById('smpPanelPkgCnt').textContent = items.length;
+  // Extra chips (all unique categories/types from items, if any)
+  const extras = [];
+  items.forEach(t=>{ if(t.category && !extras.includes(t.category)) extras.push(t.category); });
+  const extEl = document.getElementById('smpPanelExtras');
+  if(extEl) extEl.innerHTML = extras.length ? extras.map(e=>`<span class="smp-extra-chip">${e}</span>`).join('') : '';
+  // Studies table
+  const tbody = document.getElementById('smpPanelTests');
+  if(tbody){
+    if(items.length){
+      tbody.innerHTML=items.map((t,i)=>`
+        <tr>
+          <td style="color:var(--text-soft)">${i+1}</td>
+          <td style="font-size:10.5px;color:var(--text-soft);font-family:monospace">${t.id||'—'}</td>
+          <td>${t.name||t.n||'—'}${t.qty>1?' × '+t.qty:''}</td>
+          <td style="color:var(--text-soft);font-size:11px">${t.type||t.category||'—'}</td>
+        </tr>`).join('');
+    } else {
+      tbody.innerHTML=`<tr><td colspan="4" style="color:var(--text-soft);font-size:12px;padding:10px 6px">Дослідження не вказані</td></tr>`;
+    }
   }
-  document.getElementById('smpPanelActivity').innerHTML=`
-    <div class="adm-act-item"><div class="adm-act-dot"></div><div><div class="adm-act-text">Зразок додано до замовлення</div><div class="adm-act-date">${s.date} 10:00</div></div></div>
-    <div class="adm-act-item"><div class="adm-act-dot"></div><div><div class="adm-act-text">Зразок створено</div><div class="adm-act-date">${s.date} 09:30</div></div></div>`;
+  // Clear notes
+  const notes=document.getElementById('smpPanelNotes'); if(notes)notes.value='';
+}
+
+// Samples action buttons
+function smpFormTask() {
+  if(!_smpSelId){ alert('Оберіть зразок'); return; }
+  alert('Завдання сформовано для зразка ' + _smpSelId);
+}
+
+function smpChangeStatus(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('smpStatusDd'); if(!dd)return;
+  const btn = e.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  dd.style.left = rect.left + 'px';
+  dd.style.top  = (rect.bottom + 4) + 'px';
+  dd.style.width = rect.width + 'px';
+  const isOpen = dd.classList.contains('open');
+  document.querySelectorAll('.smp-status-dd.open').forEach(d=>d.classList.remove('open'));
+  if(!isOpen) dd.classList.add('open');
+  if(!isOpen) {
+    setTimeout(()=>{ document.addEventListener('click', ()=>dd.classList.remove('open'), {once:true}); }, 0);
+  }
+}
+
+async function smpApplyStatus(newSt) {
+  document.getElementById('smpStatusDd')?.classList.remove('open');
+  if(!_smpSelId) return;
+  const s = _admSamples.find(x=>x.id===_smpSelId); if(!s) return;
+  const order = _admOrders.find(o=>o.id===s.orderId); if(!order) return;
+  // Find sample index in order
+  const rawSamples = Array.isArray(order._rawSamples) ? order._rawSamples : (Array.isArray(order.samplesList) ? order.samplesList.map(sl=>({...sl})) : []);
+  const smpIdx = order.samplesList ? order.samplesList.indexOf(order.samplesList.find(sl=>sl.idx===s._idx)) : -1;
+  // Update via admActionSampleStatus logic
+  try {
+    const rawSamplesData = _admOrders.find(o=>o.id===s.orderId)?._rawData?.samples || [];
+    // Simple approach: update local state immediately
+    s.status = newSt;
+    const ps=document.getElementById('admPanelStat');
+    if(ps){ps.className='adm-pill '+(_SST_CLASS[newSt]||'');ps.textContent=_SST_LABEL[newSt]||newSt;}
+    const statRow=document.getElementById('smpPanelStatRow');
+    if(statRow) statRow.innerHTML=`<span class="adm-pill ${_SST_CLASS[newSt]||''}">${_SST_LABEL[newSt]||newSt}</span>`;
+    smpUpdateCounts();
+    smpRender();
+    // Try to persist if we can find the sample in the order
+    admActionSampleStatus(null, _smpSelId, newSt);
+  } catch(err){ console.error('smpApplyStatus', err); }
+}
+
+function smpOpenOrder() {
+  if(!_smpSelId) return;
+  const s = _admSamples.find(x=>x.id===_smpSelId); if(!s) return;
+  admSwitch('orders', document.getElementById('adm-navbtn-orders'));
+  setTimeout(()=>admSelect(s.orderId), 100);
+}
+
+function smpExport() {
+  if(!_admSamples.length){ alert('Немає зразків для експорту'); return; }
+  const rows = [['ID зразка','Замовлення','Клієнт','Назва','Матеріал','Статус','Оплата','Дата']];
+  _admSamples.forEach(s=>{
+    rows.push([s.id, s.orderId, s.client, s.displayName||s.label, _MAT_LABEL[s.mat]||s.mat, _SST_LABEL[s.status]||s.status, _PAY_LABEL[s.payment]||s.payment, s.date]);
+  });
+  const csv = rows.map(r=>r.map(c=>`"${(c||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='samples-export.csv'; a.click();
 }
 
 // ─── CLIENTS DATA + FUNCTIONS ─────────────────
@@ -2464,6 +2782,7 @@ admSwitch = function(tab, btn) {
   admClosePanel();
   if (tab==='dashboard') dashInit();
   if (tab==='samples')   { smpInit(); }
+  else                   { if(typeof _ordUpdateSidebar==='function') _ordUpdateSidebar(); }
   if (tab==='clients')   { cliInit(); }
   if (tab==='docs')      { docInit(); }
 };
