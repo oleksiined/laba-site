@@ -1145,6 +1145,7 @@ function _mapOrder(o) {
 
   return {
     id:          o.order_num || o.id,
+    dbId:        o.id,
     client:      clientName,
     short,
     contact:     o.name || '—',
@@ -1546,10 +1547,10 @@ async function admActionReceive() {
     // Determine if all samples received → advance status from waiting→work
     const newStatus = o.status === 'waiting' ? 'work' : o.status;
 
-    const updatePayload = { id: o.id, samples: rawSamples };
+    const updatePayload = { id: o.dbId, samples: rawSamples };
     if (newStatus !== o.status) updatePayload.status = newStatus;
 
-    await _admUpdate(o.id, updatePayload);
+    await _admUpdate(o.dbId, updatePayload);
     await _admReload(o.id);
   } catch (err) {
     alert('Помилка: ' + err.message);
@@ -1571,7 +1572,7 @@ async function admActionConfirm() {
   if (lbl) lbl.textContent = 'Зберігаємо…';
 
   try {
-    await _admUpdate(o.id, { status: next[o.status] });
+    await _admUpdate(o.dbId, { status: next[o.status] });
     await _admReload(o.id);
   } catch (err) {
     alert('Помилка: ' + err.message);
@@ -1591,7 +1592,7 @@ async function admActionCancel() {
   if (btn) { btn.disabled = true; btn.textContent = 'Скасовуємо…'; }
 
   try {
-    await _admUpdate(o.id, { status: 'cancelled' });
+    await _admUpdate(o.dbId, { status: 'cancelled' });
     await _admReload(null);
     document.getElementById('admOrderPanel').style.display = 'none';
   } catch (err) {
