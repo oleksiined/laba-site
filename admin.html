@@ -1174,6 +1174,18 @@ function admInit() {
   const done = _admOrders.filter(o=>o.status==='done').length;
   const setT = (id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   setT('admStatAll',all); setT('admStatWait',wait); setT('admStatWork',work); setT('admStatDone',done);
+  // Update sidebar badges
+  setT('admBadgeOrders', all);
+  const totalSamples = _admOrders.reduce((s,o)=>s+(o.samples||0), 0);
+  setT('admBadgeSamples', totalSamples);
+  // Update quick-filter counts
+  const qNew  = _admOrders.filter(o=>o.status==='new').length;
+  const qWork = _admOrders.filter(o=>o.status==='work').length;
+  const qDone = _admOrders.filter(o=>o.status==='done').length;
+  setT('admQfCountAll',  all);
+  setT('admQfCountNew',  qNew);
+  setT('admQfCountWork', qWork);
+  setT('admQfCountDone', qDone);
   admRender();
 }
 
