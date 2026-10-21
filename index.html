@@ -3694,7 +3694,7 @@ const TASKS_BY_MAT = {
     if (pkgs.length) {
       html += `<div class="hsb-drop-group">Пакети досліджень</div>`;
       pkgs.forEach((item, i) => {
-        html += `<div class="hsb-drop-item" data-idx="${i}" onclick="hsbGoItem('${item.matCode}','${item.id}',${item.isPackage})">
+        html += `<div class="hsb-drop-item" data-idx="${i}" onclick="hsbGoItemByIdx(${i})">
           <div class="hsb-drop-icon">${ICON_PACKAGE}</div>
           <div><div class="hsb-drop-name">${item.name}</div><div class="hsb-drop-sub">${item.mat} · Пакет досліджень</div></div>
           <div class="hsb-drop-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
@@ -3705,7 +3705,7 @@ const TASKS_BY_MAT = {
       html += `<div class="hsb-drop-group">Окремі показники</div>`;
       inds.forEach((item, i) => {
         const idx = pkgs.length + i;
-        html += `<div class="hsb-drop-item" data-idx="${idx}" onclick="hsbGoItem('${item.matCode}','${item.id}',${item.isPackage})">
+        html += `<div class="hsb-drop-item" data-idx="${idx}" onclick="hsbGoItemByIdx(${idx})">
           <div class="hsb-drop-icon">${ICON_INDIVIDUAL}</div>
           <div><div class="hsb-drop-name">${item.name}</div><div class="hsb-drop-sub">${item.mat} · Окреме дослідження</div></div>
           <div class="hsb-drop-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
@@ -3769,6 +3769,11 @@ const TASKS_BY_MAT = {
     hsbCloseDropdown();
     const cl = document.getElementById('hsbClear');
     if (cl) cl.classList.remove('show');
+  };
+
+  window.hsbGoItemByIdx = function(i) {
+    const r = _results[i];
+    if(r) hsbGoItem(r.matCode, r.id, r.isPackage);
   };
 
   window.hsbGoItem = function(matCode, id, isPackage) {
