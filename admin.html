@@ -294,6 +294,48 @@ html{scroll-behavior:smooth}
 .adm-ptab-body.active{display:block}
 #admOTab-samples{padding:0}
 #admOTab-samples.active{display:flex;flex-direction:column;overflow:hidden}
+#admOTab-docs{padding:0}
+#admOTab-docs.active{display:flex;flex-direction:column;overflow:hidden}
+/* ── Docs tab ── */
+.adm-doc-stats{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.adm-doc-stat{flex:1;padding:9px 10px;display:flex;flex-direction:column;gap:1px;border-right:1px solid var(--border);align-items:center;text-align:center}
+.adm-doc-stat:last-child{border-right:none}
+.adm-doc-stat-val{font-size:22px;font-weight:700;color:var(--navy)}
+.adm-doc-stat-lbl{font-size:9px;font-weight:600;color:var(--text-soft);text-transform:uppercase;letter-spacing:.4px;line-height:1.2}
+.adm-doc-list{flex:1;overflow-y:auto}
+.adm-doc-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #f0f2f4}
+.adm-doc-row:last-child{border-bottom:none}
+.adm-doc-icon{width:32px;height:32px;border-radius:7px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-soft)}
+.adm-doc-icon.inv{background:#EFF6FF;color:#3B82F6}
+.adm-doc-icon.act{background:#F0FDF4;color:#16a34a}
+.adm-doc-icon.con{background:#FEF9C3;color:#ca8a04}
+.adm-doc-icon.pro{background:#F5F3FF;color:#7c3aed}
+.adm-doc-nm{font-size:12px;font-weight:600;color:var(--navy);line-height:1.2}
+.adm-doc-type{font-size:10.5px;color:var(--text-soft);margin-top:1px}
+.adm-doc-body{flex:1;min-width:0}
+.adm-doc-vis{font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;white-space:nowrap}
+.adm-doc-vis-pub{background:#ECFDF5;color:#10B981}
+.adm-doc-vis-prv{background:#F3F4F6;color:#6B7280}
+.adm-doc-st{font-size:10.5px;color:var(--text-soft);display:flex;align-items:center;gap:4px}
+.adm-doc-st-ok{font-size:10.5px;font-weight:600;color:#059669}
+.adm-doc-st-no{font-size:10.5px;color:#9ca3af}
+.adm-doc-st-note{font-size:10px;color:#9ca3af;font-style:italic}
+.adm-doc-menu-btn{background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:15px;padding:2px 6px;border-radius:4px;line-height:1;letter-spacing:1px;flex-shrink:0}
+.adm-doc-menu-btn:hover{background:var(--bg);color:var(--navy)}
+.adm-edo-block{margin:10px 14px;border:1.5px solid #E0E7FF;border-radius:10px;background:#F5F8FF;overflow:hidden;flex-shrink:0}
+.adm-edo-hd{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer}
+.adm-edo-hd-ico{width:28px;height:28px;border-radius:6px;background:#3B82F6;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.adm-edo-hd-title{font-size:12.5px;font-weight:700;color:var(--navy);flex:1}
+.adm-edo-meta{font-size:10.5px;color:var(--text-soft);padding:0 12px 8px;display:flex;flex-direction:column;gap:3px}
+.adm-edo-stat-pill{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:99px}
+.adm-edo-no{background:#FEF2F2;color:#EF4444}
+.adm-edo-yes{background:#ECFDF5;color:#10B981}
+.adm-doc-info{margin:8px 14px;border:1px solid var(--border);border-radius:8px;padding:9px 12px;background:var(--bg);display:flex;gap:8px;align-items:flex-start;flex-shrink:0}
+.adm-doc-info-txt{font-size:10.5px;color:var(--text-soft);line-height:1.5}
+.adm-doc-actions{border-top:1px solid var(--border);padding:10px 14px;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.adm-doc-act-row{display:flex;gap:6px}
+.adm-pbtn-dark{background:var(--navy);color:#fff}
+.adm-pbtn-dark:hover{background:#1e3a5f}
 /* Order info section */
 .adm-oi-section{margin-bottom:14px}
 .adm-oi-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-soft);margin-bottom:8px}
@@ -1043,8 +1085,68 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
 
         <!-- TAB: Документи -->
         <div class="adm-ptab-body" id="admOTab-docs">
-          <div style="color:var(--text-soft);font-size:13px;padding:20px 0;text-align:center">
-            Документи формуватимуться після завершення аналізу
+          <!-- Stats row -->
+          <div class="adm-doc-stats">
+            <div class="adm-doc-stat">
+              <div class="adm-doc-stat-val" id="admDSInv">0</div>
+              <div class="adm-doc-stat-lbl">Рахунок</div>
+            </div>
+            <div class="adm-doc-stat">
+              <div class="adm-doc-stat-val" id="admDSAct">0</div>
+              <div class="adm-doc-stat-lbl">Акти</div>
+            </div>
+            <div class="adm-doc-stat">
+              <div class="adm-doc-stat-val" id="admDSCon">0</div>
+              <div class="adm-doc-stat-lbl">Договори у замовленні</div>
+            </div>
+            <div class="adm-doc-stat">
+              <div class="adm-doc-stat-val" id="admDSPro">0</div>
+              <div class="adm-doc-stat-lbl">Протоколи</div>
+            </div>
+          </div>
+          <!-- Document list -->
+          <div class="adm-doc-list" id="admDocList">
+            <!-- rendered by JS -->
+          </div>
+          <!-- EDO block -->
+          <div class="adm-edo-block" id="admEdoBlock">
+            <div class="adm-edo-hd" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">
+              <div class="adm-edo-hd-ico">
+                <svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="1.7" width="16" height="16"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 7h6M7 10h6M7 13h3" stroke-linecap="round"/></svg>
+              </div>
+              <div>
+                <div class="adm-edo-hd-title">Електронний документообіг (ЕДО)</div>
+                <div style="font-size:10.5px;color:var(--text-soft)">Підписання: Вчасно / M.E.Doc</div>
+              </div>
+              <span id="admEdoStatPill" class="adm-edo-stat-pill adm-edo-no" style="margin-left:auto;font-size:10px">● Не відправлено</span>
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="color:var(--text-soft)"><path d="M7 8l3 3 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="adm-edo-meta" style="display:none">
+              <div>Статус ЕДО: <span id="admEdoStatus">Не відправлено</span></div>
+              <div style="font-size:10px;color:#9ca3af">Відправте рахунок через ЕДО після формування</div>
+            </div>
+          </div>
+          <!-- Info note -->
+          <div class="adm-doc-info">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="15" height="15" style="color:var(--text-soft);flex-shrink:0;margin-top:1px"><circle cx="10" cy="10" r="7"/><path d="M10 9v5M10 7v.5" stroke-linecap="round"/></svg>
+            <div class="adm-doc-info-txt">Підписані оригінали та всі статуси документів зберігатимуться в цьому розділі. Ви зможете відстежувати історію змін та завантажувати актуальні версії.</div>
+          </div>
+          <!-- Actions -->
+          <div class="adm-doc-actions">
+            <button class="adm-pbtn adm-pbtn-dark" onclick="admDocDownload()" style="width:100%;font-size:12.5px;padding:10px">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M10 3v10M6 9l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16h12" stroke-linecap="round"/></svg>
+              Завантажити документ
+            </button>
+            <div class="adm-doc-act-row">
+              <button class="adm-pbtn adm-pbtn-sec" onclick="admDocCreateInvoice()" style="flex:1;font-size:12px;padding:8px 10px">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 8h6M7 11h4" stroke-linecap="round"/></svg>
+                Створити рахунок
+              </button>
+              <button class="adm-pbtn adm-pbtn-sec" onclick="admDocOpenAll()" style="flex:1;font-size:12px;padding:8px 10px">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M7 13L14 6M14 6H9M14 6v5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Відкрити всі документи
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1515,6 +1617,9 @@ function admSelect(id) {
   // ── Зразки tab ──
   _admRenderSamplesTab(o);
 
+  // ── Документи tab ──
+  _admRenderDocsTab(o);
+
   // ── Оплата tab ──
   const payStatMap = {paid:'Оплачено',pending:'Очікує оплати',partial:'Частково',unpaid:'Не оплачено'};
   setH('admPayStatFull', `<span class="adm-pill ${_admPC[o.payment]}">${_admPL[o.payment]}</span>`);
@@ -1630,6 +1735,101 @@ function admSampMenu(idx, e) {
   // Placeholder context menu
   alert('Меню зразка #'+(idx+1)+' — у розробці');
 }
+
+// ─── Documents tab rendering ─────────────────────────────────────────────────
+function _admRenderDocsTab(o) {
+  // Determine which docs exist
+  const hasInvoice = !!o.id; // always show invoice row (may be "not created" state)
+  const isDone     = o.status === 'done' || o.status === 'closed';
+  const invoiceNum = 'INV-' + (o.id || '').replace(/LAB-/,'');
+
+  // Stats
+  const setT = (id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+  setT('admDSInv', hasInvoice ? 1 : 0);
+  setT('admDSAct', 0);
+  setT('admDSCon', 0);
+  setT('admDSPro', 0);
+
+  // Document rows definition
+  const docs = [
+    {
+      key: 'invoice',
+      iconCls: 'inv',
+      iconSvg: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 8h6M7 11h6M7 14h3" stroke-linecap="round"/></svg>',
+      name: 'Рахунок ' + invoiceNum,
+      type: 'Рахунок',
+      vis: 'pub',
+      visLbl: 'Доступно клієнту',
+      status: 'ok',
+      statusLbl: 'Готовий',
+    },
+    {
+      key: 'act',
+      iconCls: 'act',
+      iconSvg: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 8h6M7 11h4" stroke-linecap="round"/><path d="M7 14l1.5 1.5L12 12" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+      name: 'Акт',
+      type: 'Акт виконаних робіт',
+      vis: null,
+      visLbl: null,
+      status: 'none',
+      statusLbl: 'Не створено',
+    },
+    {
+      key: 'contract',
+      iconCls: 'con',
+      iconSvg: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 7h6M7 10h6M7 13h3" stroke-linecap="round"/></svg>',
+      name: 'Договір',
+      type: 'Договір',
+      vis: null,
+      visLbl: null,
+      status: 'note',
+      statusLbl: 'Використовується договір клієнта',
+    },
+    {
+      key: 'protocol',
+      iconCls: 'pro',
+      iconSvg: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><path d="M5 3h10a1 1 0 011 1v3l-3 3v6a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M16 7H5" stroke-linecap="round"/></svg>',
+      name: 'Протоколи досліджень',
+      type: 'Протокол',
+      vis: null,
+      visLbl: null,
+      status: isDone ? 'ok' : 'note',
+      statusLbl: isDone ? 'Готово' : 'З\'являється після завершення досліджень',
+    },
+  ];
+
+  const el = document.getElementById('admDocList');
+  if (!el) return;
+  el.innerHTML = docs.map(d => {
+    const visBadge = d.vis === 'pub'
+      ? `<span class="adm-doc-vis adm-doc-vis-pub">${d.visLbl}</span>`
+      : `<span style="font-size:10.5px;color:#9ca3af">—</span>`;
+    let stHtml = '';
+    if (d.status === 'ok')   stHtml = `<span class="adm-doc-st-ok">● ${d.statusLbl}</span>`;
+    if (d.status === 'none') stHtml = `<span class="adm-doc-st-no">${d.statusLbl}</span>`;
+    if (d.status === 'note') stHtml = `<span class="adm-doc-st-note">${d.statusLbl} <svg style="vertical-align:middle" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="11" height="11"><circle cx="10" cy="10" r="7"/><path d="M10 9v5M10 7v.5" stroke-linecap="round"/></svg></span>`;
+    return `<div class="adm-doc-row">
+      <div class="adm-doc-icon ${d.iconCls}">${d.iconSvg}</div>
+      <div class="adm-doc-body">
+        <div class="adm-doc-nm">${d.name}</div>
+        <div class="adm-doc-type">${d.type}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:0">
+        ${visBadge}
+        ${stHtml}
+      </div>
+      <button class="adm-doc-menu-btn" title="Дії" onclick="admDocMenu('${d.key}',event)">···</button>
+    </div>`;
+  }).join('');
+}
+
+function admDocMenu(key, e) {
+  e.stopPropagation();
+  alert('Меню документа ' + key + ' — у розробці');
+}
+function admDocDownload()     { alert('Завантаження документа — у розробці'); }
+function admDocCreateInvoice(){ alert('Створення рахунку — у розробці'); }
+function admDocOpenAll()      { alert('Відкрити всі документи — у розробці'); }
 
 // ─── Supabase order update helper ────────────────────────────────────────────
 async function _admUpdate(id, fields) {
