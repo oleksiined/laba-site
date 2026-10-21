@@ -8019,6 +8019,13 @@ function submitOrder() {
       company: NCO.payerType === 'legal' ? NCO.legal.company
               : NCO.payerType === 'fop'  ? NCO.fop.name
               : '',
+      payerType:      NCO.payerType || 'private',
+      edrpou:         NCO.payerType === 'legal' ? (NCO.legal.edrpou || '') : '',
+      ipn:            NCO.payerType === 'legal' ? (NCO.legal.ipn || '') : '',
+      legalAddress:   NCO.payerType === 'legal' ? (NCO.legal.address || '') : '',
+      rnokpp:         NCO.payerType === 'fop'   ? (NCO.fop.rnokpp || '') : '',
+      sendDocs:       NCO.sendDocs ?? true,
+      accountingEmail: NCO.accountingEmail || '',
     },
     delivery: {
       type: NCO.delivery === 'np' ? 'nova_poshta' : NCO.delivery,
@@ -8033,7 +8040,7 @@ function submitOrder() {
     total:    grand,
     samples:  (_snapSamples || []).map((s, i) => ({
       index: i + 1,
-      label: s.label || `Зразок ${i+1}`,
+      label: s.name || s.label || `Зразок ${i+1}`,
       crop:  s.crop || '',
       field: s.field || s.fieldName || '',
       depth: s.depth || s.horizon || '',
