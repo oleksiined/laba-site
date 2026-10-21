@@ -6774,22 +6774,111 @@ function closeQuickOrder() {
   document.getElementById('quick-order-modal').classList.add('hidden');
 }
 
-function submitQuickOrder() {
-  const name = document.getElementById('qo-name').value.trim();
+async function submitQuickOrder() {
+  const name  = document.getElementById('qo-name').value.trim();
   const phone = document.getElementById('qo-phone').value.trim();
-  if (!name) { document.getElementById('qo-name').focus(); toast('Введіть ім\'я'); return; }
-  if (!phone) { document.getElementById('qo-phone').focus(); toast('Введіть телефон'); return; }
   const email = document.getElementById('qo-email').value.trim();
-  if (!email) { document.getElementById('qo-email').focus(); toast('Введіть email'); return; }
-  closeQuickOrder();
-  // generate order number
-  const orderNum = 'LABA-' + (Math.floor(Math.random() * 9000) + 1000);
-  const numEl = document.getElementById('order-success-num');
-  if (numEl) numEl.textContent = orderNum;
-  const sm = document.getElementById('order-success-modal');
-  if (sm) sm.classList.remove('hidden');
-  // clear cart
-  nc_clearCart && nc_clearCart();
+  if (!name)  { document.getElementById('qo-name').focus();  toast('Введіть ім\'я');   return; }
+  if (!phone) { document.getElementById('qo-phone').focus(); toast('Введіть телефон'); return; }
+  if (!email) { document.getElementById('qo-email').focus(); toast('Введіть email');   return; }
+
+  // disable button while saving
+  const btn = document.querySelector('.qo-submit-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Зберігаємо...'; }
+
+  try {
+    const gs  = nc_groups();
+    const tt  = nc_totals(gs);
+    const now = new Date();
+    const yy  = String(now.getFullYear()).slice(-2);
+    const mm  = String(now.getMonth() + 1).padStart(2, '0');
+    const dd  = String(now.getDate()).padStart(2, '0');
+    const rnd = String(Math.floor(Math.random() * 9000) + 1000);
+    const orderNum = `LAB-${yy}${mm}${dd}-${rnd}`;
+
+    const orderPayload = {
+      order_number:   orderNum,
+      status:         'new',
+      payer_type:     'private',
+      client_name:    name,
+      client_phone:   phone,
+      client_email:   email,
+      client_farm:    null,
+      company_name:   null,
+      edrpou:         null,
+      delivery_type:  'nova_poshta',
+      delivery_ttn:   null,
+      comment:        null,
+      total_amount:   tt.grand,
+      payment_status: 'unpaid',
+      samples_count:  NC_S.samples.length,
+      created_at:     now.toISOString(),
+    };
+
+    // Insert order
+    const orderRes = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+      method:  'POST',
+      headers: {
+        'apikey':        SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type':  'application/json',
+        'Prefer':        'return=representation',
+      },
+      body: JSON.stringify(orderPayload),
+    });
+    if (!orderRes.ok) throw new Error(await orderRes.text());
+    const [order] = await orderRes.json();
+
+    // Build samples rows
+    const sampRows = NC_S.samples.map((s, i) => {
+      const pkg    = NC_CATALOG.packages[s.packageId] || NS_CAT?.packages?.[s.packageId] || {};
+      const mat    = NC_CATALOG.materials[s.materialId] || NS_CAT?.materials?.[s.materialId] || {};
+      const extras = (s.additionalIndicatorIds || []).map(id => {
+        const ind = nc_findInd(id) || (typeof ns_findInd === 'function' && ns_findInd(id));
+        return ind ? { id, name: ind.name, price: ind.price } : { id };
+      });
+      const extraPrice = extras.reduce((sum, e) => sum + (e.price || 0), 0);
+      return {
+        order_id:          order.id,
+        sample_number:     `${orderNum}-${String(i + 1).padStart(2, '0')}`,
+        name:              s.name || `Зразок ${i + 1}`,
+        material:          mat.name || s.materialId || '',
+        base_package_code: s.packageId || '',
+        base_package_name: pkg.name || s.packageId || '',
+        base_price:        pkg.price || 0,
+        extras:            extras,
+        total_price:       (pkg.price || 0) + extraPrice,
+        status:            'awaiting',
+      };
+    });
+
+    if (sampRows.length) {
+      const sampRes = await fetch(`${SUPABASE_URL}/rest/v1/samples`, {
+        method:  'POST',
+        headers: {
+          'apikey':        SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type':  'application/json',
+          'Prefer':        'return=minimal',
+        },
+        body: JSON.stringify(sampRows),
+      });
+      if (!sampRes.ok) throw new Error(await sampRes.text());
+    }
+
+    // Success
+    closeQuickOrder();
+    const numEl = document.getElementById('order-success-num');
+    if (numEl) numEl.textContent = orderNum;
+    const sm = document.getElementById('order-success-modal');
+    if (sm) sm.classList.remove('hidden');
+    nc_clearCart && nc_clearCart();
+
+  } catch (err) {
+    console.error('Quick order error:', err);
+    toast('Помилка при збереженні. Спробуйте ще раз.');
+    if (btn) { btn.disabled = false; btn.textContent = 'Підтвердити замовлення →'; }
+  }
 }
 function closeOrderSuccess() {
   const sm = document.getElementById('order-success-modal');
