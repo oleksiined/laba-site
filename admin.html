@@ -539,6 +539,8 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
                 <option value="waiting">Очікує зразки</option>
                 <option value="work">У роботі</option>
                 <option value="done">Готово</option>
+                <option value="closed">Закрито</option>
+                <option value="cancelled">Скасовано</option>
               </select>
               <select class="adm-filter-sel" id="admFPay" onchange="admRender()">
                 <option value="">Оплата: Всі</option>
@@ -1219,6 +1221,10 @@ function admInit() {
   const si = document.getElementById('admSearchIn'); if(si) si.value='';
   const fs = document.getElementById('admFStatus'); if(fs) fs.value='';
   const fp = document.getElementById('admFPay'); if(fp) fp.value='';
+  // Keep quick-filter visual state in sync with _admFilter = ''
+  document.querySelectorAll('.adm-qf-item').forEach(i => i.classList.remove('active'));
+  const qfAll = document.getElementById('admQfAll');
+  if (qfAll) qfAll.classList.add('active');
   // Update KPI counters
   const all  = _admOrders.length;
   const wait = _admOrders.filter(o=>o.status==='waiting'||o.status==='new').length;
