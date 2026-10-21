@@ -2801,6 +2801,8 @@ let _admClients = [];
 const _CLI_TYPES = ['legal','legal','fop','phys','fop','legal','legal','fop','phys','legal'];
 const _CLI_TYPE_LABELS = {legal:'Юридична особа',fop:'ФОП',phys:'Фізична особа'};
 const _CLI_EDRPOU = ['41234567','39876543','—','3124509876','40111223','36789012','2987654321','42345678','38555111','37771234'];
+const _CLI_ACC_NAMES = ['Олена Коваленко','Андрій Петренко','Марина Савченко','Василь Бондар','Тетяна Мороз','Ірина Шевченко','Олег Кравченко','Наталія Лисенко','Дмитро Поліщук','Людмила Гончар'];
+const _CLI_ACC_PHONES = ['+38067 234 56 78','+38050 345 67 89','+38063 456 78 90','+38097 567 89 01','+38066 678 90 12','+38050 789 01 23','+38067 890 12 34','+38063 901 23 45','+38097 012 34 56','+38066 123 45 67'];
 
 function _buildClients() {
   const map={};
@@ -2822,7 +2824,13 @@ function _buildClients() {
         portalEmail:hasPortal?o.email:'—',
         portalStatus:hasPortal?'Підтверджено':'—',
         contacts:[
-          {name:o.contact,phone:o.phone,email:o.email,role:'main',hasPortal:hasPortal}
+          {name:o.contact,phone:o.phone,email:o.email,role:'main',hasPortal:hasPortal},
+          ...(typeKey!=='phys'?[{
+            name:_CLI_ACC_NAMES[idx%_CLI_ACC_NAMES.length],
+            phone:_CLI_ACC_PHONES[idx%_CLI_ACC_PHONES.length],
+            email:'accounting@'+o.email.split('@')[1],
+            role:'acc',hasPortal:false
+          }]:[])
         ]
       };
     }
