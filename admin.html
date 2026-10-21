@@ -1102,10 +1102,13 @@ function _mapOrder(o) {
   const payment = payMap[o.payment] || 'unpaid';
 
   const samplesArr  = Array.isArray(o.samples) ? o.samples : [];
+  // packageId → display key mapping
+  const pkgMap = { basic:'basic', standard:'standard', extended:'extended', 'Базовий':'basic', 'Стандартний':'standard', 'Розширений':'extended' };
   const samplesList = samplesArr.map((s,i) => ({
     id:   s.label || `S${pad(i+1)}`,
     name: [s.label, s.crop, s.field].filter(Boolean).join(', ') || `Зразок ${i+1}`,
     st:   'new',
+    pkg:  pkgMap[s.packageId] || pkgMap[s.pkg] || 'basic',
   }));
 
   const studies = (Array.isArray(o.items) ? o.items : [])
@@ -1146,6 +1149,7 @@ async function admLoad() {
     console.warn('admLoad error:', err.message);
     _admOrders = [];
   }
+  _buildSamples();
   admInit();
 }
 
@@ -1436,93 +1440,40 @@ const _TESTS = {
 };
 const _TEST_STATUSES = ['done','done','work','waiting','waiting','waiting'];
 
-const _admSamples = (()=>{
-  const raw = [
-    {orderId:'LAB-2026-00482',client:'ФГ «Вікторія»',short:'ФВ', items:[
-      {n:'Поле 1 (Кукурудза)',mat:'soil',pkg:'standard',st:'received',d:'19.10.2026'},
-      {n:'Поле 2 (Пшениця)',mat:'soil',pkg:'standard',st:'waiting',d:'19.10.2026'},
-      {n:'Поле 3 (Соняшник)',mat:'soil',pkg:'basic',st:'waiting',d:'19.10.2026'},
-      {n:'Поле 4 (Ріпак)',mat:'soil',pkg:'basic',st:'new',d:'19.10.2026'},
-      {n:'Рослина пшениця',mat:'plant',pkg:'basic',st:'new',d:'19.10.2026'},
-      {n:'Рослина кукурудза',mat:'plant',pkg:'basic',st:'new',d:'19.10.2026'},
-    ]},
-    {orderId:'LAB-2026-00481',client:'ТОВ «Агро Плюс»',short:'АП', items:[
-      {n:'Поле А (Ріпак)',mat:'soil',pkg:'extended',st:'received',d:'19.10.2026'},
-      {n:'Поле Б (Кукурудза)',mat:'soil',pkg:'extended',st:'received',d:'19.10.2026'},
-      {n:'Поле В (Пшениця)',mat:'soil',pkg:'standard',st:'work',d:'19.10.2026'},
-      {n:'Поле Г (Соя)',mat:'soil',pkg:'standard',st:'work',d:'19.10.2026'},
-      {n:'Рослина соя',mat:'plant',pkg:'basic',st:'work',d:'19.10.2026'},
-      {n:'Зерно ріпак',mat:'grain',pkg:'basic',st:'done',d:'18.10.2026'},
-    ]},
-    {orderId:'LAB-2026-00480',client:'ПП «Лан Агро»',short:'ЛА', items:[
-      {n:'Поле 1 (Ячмінь)',mat:'soil',pkg:'basic',st:'new',d:'18.10.2026'},
-      {n:'Поле 2 (Просо)',mat:'soil',pkg:'basic',st:'new',d:'18.10.2026'},
-      {n:'Зерно ячмінь',mat:'grain',pkg:'standard',st:'new',d:'18.10.2026'},
-    ]},
-    {orderId:'LAB-2026-00479',client:'ТОВ «Зелений Гай»',short:'ЗГ', items:[
-      {n:'Ставок №1 (вода)',mat:'water',pkg:'standard',st:'received',d:'17.10.2026'},
-      {n:'Ставок №2 (вода)',mat:'water',pkg:'standard',st:'work',d:'17.10.2026'},
-      {n:'Озеро (вода)',mat:'water',pkg:'extended',st:'work',d:'17.10.2026'},
-      {n:'Криниця №1',mat:'water',pkg:'basic',st:'received',d:'17.10.2026'},
-      {n:'Річка (зразок)',mat:'water',pkg:'basic',st:'work',d:'17.10.2026'},
-      {n:'Поле А (полив)',mat:'water',pkg:'basic',st:'waiting',d:'17.10.2026'},
-      {n:'Поле Б (грунт)',mat:'soil',pkg:'basic',st:'received',d:'17.10.2026'},
-      {n:'Поле В (грунт)',mat:'soil',pkg:'basic',st:'work',d:'17.10.2026'},
-    ]},
-    {orderId:'LAB-2026-00478',client:'ФГ «Дніпро»',short:'ФД', items:[
-      {n:'Грунт поле 1',mat:'soil',pkg:'standard',st:'waiting',d:'16.10.2026'},
-      {n:'Грунт поле 2',mat:'soil',pkg:'standard',st:'waiting',d:'16.10.2026'},
-      {n:'Грунт поле 3',mat:'soil',pkg:'basic',st:'new',d:'16.10.2026'},
-      {n:'Добриво КАС-32',mat:'fert',pkg:'basic',st:'waiting',d:'16.10.2026'},
-      {n:'Добриво Аміачна',mat:'fert',pkg:'basic',st:'new',d:'16.10.2026'},
-    ]},
-    {orderId:'LAB-2026-00477',client:'ТОВ «Колос»',short:'КС', items:[
-      {n:'Зерно пшениця',mat:'grain',pkg:'extended',st:'done',d:'15.10.2026'},
-      {n:'Зерно ячмінь',mat:'grain',pkg:'extended',st:'done',d:'15.10.2026'},
-      {n:'Зерно кукурудза',mat:'grain',pkg:'standard',st:'done',d:'15.10.2026'},
-      {n:'Зерно соя',mat:'grain',pkg:'standard',st:'done',d:'15.10.2026'},
-    ]},
-    {orderId:'LAB-2026-00476',client:'ФГ «Соняшник»',short:'СЕ', items:[
-      {n:'Поле 1 (Соняшник)',mat:'soil',pkg:'basic',st:'new',d:'14.10.2026'},
-      {n:'Поле 2 (Ріпак)',mat:'soil',pkg:'basic',st:'new',d:'14.10.2026'},
-      {n:'Поле 3 (Кукурудза)',mat:'soil',pkg:'basic',st:'new',d:'14.10.2026'},
-      {n:'Рослина соняшник',mat:'plant',pkg:'basic',st:'new',d:'14.10.2026'},
-      {n:'Насіння ріпак',mat:'grain',pkg:'basic',st:'new',d:'14.10.2026'},
-      {n:'Рослина ріпак',mat:'plant',pkg:'basic',st:'new',d:'14.10.2026'},
-      {n:'Масло соняшникове',mat:'oil',pkg:'standard',st:'new',d:'14.10.2026'},
-    ]},
-    {orderId:'LAB-2026-00475',client:'ТОВ «Агролідер»',short:'АЛ', items:[
-      {n:'Добриво (зразок 1)',mat:'fert',pkg:'standard',st:'done',d:'13.10.2026'},
-      {n:'Добриво (зразок 2)',mat:'fert',pkg:'standard',st:'done',d:'13.10.2026'},
-    ]},
-    {orderId:'LAB-2026-00474',client:'ФГ «Урожай»',short:'УЖ', items:[
-      {n:'Ґрунт ділянка А',mat:'soil',pkg:'standard',st:'received',d:'12.10.2026'},
-      {n:'Ґрунт ділянка Б',mat:'soil',pkg:'standard',st:'work',d:'12.10.2026'},
-      {n:'Ґрунт ділянка В',mat:'soil',pkg:'standard',st:'work',d:'12.10.2026'},
-      {n:'Ґрунт ділянка Г',mat:'soil',pkg:'basic',st:'work',d:'12.10.2026'},
-      {n:'Ґрунт ділянка Д',mat:'soil',pkg:'basic',st:'received',d:'12.10.2026'},
-      {n:'Рослина (озима)',mat:'plant',pkg:'basic',st:'work',d:'12.10.2026'},
-      {n:'Рослина (ярова)',mat:'plant',pkg:'basic',st:'work',d:'12.10.2026'},
-      {n:'Насіння пшениця',mat:'grain',pkg:'basic',st:'received',d:'12.10.2026'},
-      {n:'Насіння ячмінь',mat:'grain',pkg:'basic',st:'work',d:'12.10.2026'},
-    ]},
-    {orderId:'LAB-2026-00473',client:'ПАТ «Зернотрейд»',short:'ЗТ', items:[
-      {n:'Пшениця партія №1',mat:'grain',pkg:'extended',st:'done',d:'11.10.2026'},
-      {n:'Пшениця партія №2',mat:'grain',pkg:'extended',st:'done',d:'11.10.2026'},
-      {n:'Ячмінь партія №1',mat:'grain',pkg:'extended',st:'done',d:'11.10.2026'},
-    ]},
-  ];
+// Samples derived from real orders (populated by _buildSamples after admLoad)
+let _admSamples = [];
+
+// Infer material type from crop/label text
+function _inferMat(text) {
+  const t = (text||'').toLowerCase();
+  if (/вод[аи]|ставок|річк|кринц|озер/.test(t)) return 'water';
+  if (/рослин|листк/.test(t))                    return 'plant';
+  if (/зерн[оа]|насін|партія|ячмін|пшениц|кукурудз|ріпак|соняшник|соя/.test(t)) return 'grain';
+  if (/добрив|КАС|аміач|сечовин|суперфосф/.test(t)) return 'fert';
+  if (/масл[оа]|олі/.test(t))                    return 'oil';
+  return 'soil'; // default
+}
+
+// Build flat samples list from loaded orders
+function _buildSamples() {
   let idx = 1;
-  const result = [];
-  raw.forEach(o => o.items.forEach(s => {
-    result.push({
-      id: `SMP-2026-${String(idx++).padStart(4,'0')}`,
-      orderId: o.orderId, client: o.client, short: o.short,
-      name: s.n, mat: s.mat, pkg: s.pkg, status: s.st, date: s.d
+  _admSamples = [];
+  _admOrders.forEach(o => {
+    (o.samplesList || []).forEach(s => {
+      _admSamples.push({
+        id:      `SMP-${o.date ? o.date.split('.').reverse().join('-').slice(0,4) : '2026'}-${String(idx++).padStart(4,'0')}`,
+        orderId: o.id,
+        client:  o.client,
+        short:   o.short,
+        name:    s.name,
+        mat:     _inferMat(s.name),
+        pkg:     s.pkg || 'basic',
+        status:  s.st || 'new',
+        date:    o.date,
+      });
     });
-  }));
-  return result;
-})();
+  });
+}
 
 let _smpFilter='', _smpSelId=null, _smpSortF='id', _smpSortA=false, _smpPage=1;
 const _SMP_PER=10;
