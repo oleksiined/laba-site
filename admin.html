@@ -171,6 +171,32 @@ html{scroll-behavior:smooth}
 .adm-sp-ok{background:#ECFDF5;color:#10B981}
 .adm-sp-wait{background:#FEF9C3;color:#CA8A04}
 .adm-sp-new{background:#F3F4F6;color:#6B7280}
+/* ── Samples tab full table ── */
+.adm-samp-stats{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.adm-samp-stat{flex:1;padding:10px 12px;display:flex;flex-direction:column;gap:2px;border-right:1px solid var(--border)}
+.adm-samp-stat:last-child{border-right:none}
+.adm-samp-stat-lbl{font-size:9px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px}
+.adm-samp-stat-val{font-size:20px;font-weight:700;color:var(--navy)}
+.adm-samp-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.adm-samp-tbl th{font-size:9px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;padding:7px 6px;text-align:left;border-bottom:1px solid var(--border);background:var(--bg);white-space:nowrap;position:sticky;top:0}
+.adm-samp-tbl td{padding:7px 6px;border-bottom:1px solid #f0f2f4;vertical-align:middle}
+.adm-samp-tbl tbody tr:last-child td{border-bottom:none}
+.adm-samp-tbl tbody tr:hover td{background:#f8fbf8}
+.adm-samp-num{font-size:10.5px;font-weight:700;color:var(--text-soft);font-family:monospace}
+.adm-samp-nm{font-size:12px;font-weight:500;color:var(--navy)}
+.adm-samp-mat{font-size:11px;color:var(--text-mid)}
+.adm-samp-dt{font-size:10.5px;color:var(--text-soft);white-space:nowrap}
+.adm-ss-pill{font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;white-space:nowrap;display:inline-block}
+.adm-ss-new{background:#FEF9C3;color:#CA8A04}
+.adm-ss-rcv{background:#ECFDF5;color:#10B981}
+.adm-ss-acc{background:#EFF6FF;color:#3B82F6}
+.adm-ss-wrk{background:#DBEAFE;color:#2563EB}
+.adm-ss-done{background:#D1FAE5;color:#059669}
+.adm-ss-rej{background:#FEF2F2;color:#EF4444}
+.adm-ss-cnc{background:#F3F4F6;color:#6B7280}
+.adm-samp-menu-btn{background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:15px;padding:1px 6px;border-radius:4px;line-height:1;letter-spacing:1px}
+.adm-samp-menu-btn:hover{background:var(--bg);color:var(--navy)}
+.adm-samp-actions{border-top:1px solid var(--border);padding:10px 14px;display:flex;gap:6px;flex-shrink:0}
 .adm-panel-actions{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:7px}
 .adm-pbtn{display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 14px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .1s}
 .adm-pbtn-green{background:#10B981;color:#fff}
@@ -266,6 +292,8 @@ html{scroll-behavior:smooth}
 .adm-ptab-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--navy);color:#fff;font-size:9.5px;font-weight:700;margin-left:4px}
 .adm-ptab-body{display:none;padding:14px 16px 16px;overflow-y:auto;flex:1}
 .adm-ptab-body.active{display:block}
+#admOTab-samples{padding:0}
+#admOTab-samples.active{display:flex;flex-direction:column;overflow:hidden}
 /* Order info section */
 .adm-oi-section{margin-bottom:14px}
 .adm-oi-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-soft);margin-bottom:8px}
@@ -959,11 +987,42 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
 
         <!-- TAB: Зразки -->
         <div class="adm-ptab-body" id="admOTab-samples">
-          <div id="admPanelSamples" style="display:flex;flex-direction:column;gap:0"></div>
-          <div style="margin-top:10px">
-            <button class="adm-pbtn adm-pbtn-green" onclick="admActionReceive()">
+          <!-- Stats row -->
+          <div class="adm-samp-stats">
+            <div class="adm-samp-stat">
+              <div class="adm-samp-stat-lbl">Всього зразків</div>
+              <div class="adm-samp-stat-val" id="admSSTotal">0</div>
+            </div>
+            <div class="adm-samp-stat">
+              <div class="adm-samp-stat-lbl">Отримано</div>
+              <div class="adm-samp-stat-val" style="color:#10B981" id="admSSReceived">0</div>
+            </div>
+            <div class="adm-samp-stat">
+              <div class="adm-samp-stat-lbl">У роботі</div>
+              <div class="adm-samp-stat-val" style="color:#3B82F6" id="admSSWork">0</div>
+            </div>
+            <div class="adm-samp-stat">
+              <div class="adm-samp-stat-lbl">Готові</div>
+              <div class="adm-samp-stat-val" style="color:#059669" id="admSSDone">0</div>
+            </div>
+          </div>
+          <!-- Sample table -->
+          <div style="flex:1;overflow-y:auto">
+            <div id="admPanelSamples"></div>
+          </div>
+          <!-- Actions -->
+          <div class="adm-samp-actions">
+            <button class="adm-pbtn adm-pbtn-green" onclick="admActionReceive()" style="flex:1;font-size:12px;padding:8px 10px">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Позначити отримано
+              Позначити отримання
+            </button>
+            <button class="adm-pbtn adm-pbtn-sec" onclick="admActionSampleStatus(event)" style="font-size:12px;padding:8px 10px">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2 2" stroke-linecap="round"/></svg>
+              Змінити статус
+            </button>
+            <button class="adm-pbtn adm-pbtn-sec" onclick="admActionOpenSample()" style="font-size:12px;padding:8px 10px">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M7 13L14 6M14 6H9M14 6v5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Відкрити зразок
             </button>
           </div>
         </div>
@@ -1132,10 +1191,13 @@ function _mapOrder(o) {
   const samplesArr = Array.isArray(o.samples) ? o.samples : [];
   const pkgMap = { basic:'basic', standard:'standard', extended:'extended', 'Базовий':'basic', 'Стандартний':'standard', 'Розширений':'extended' };
   const samplesList = samplesArr.map((s,i) => ({
-    id:   `Зразок ${i+1}`,
-    name: (s.label || s.name || '').replace(`Зразок ${i+1}`, '').trim(),
-    st:   s.st || 'new',
-    pkg:  pkgMap[s.packageId] || pkgMap[s.pkg] || 'basic',
+    idx:      i,
+    num:      'S' + String(i+1).padStart(2,'0'),
+    name:     ((s.label || s.name || '').replace(`Зразок ${i+1}`, '').trim()) || `Зразок ${i+1}`,
+    st:       s.st || 'new',
+    material: s.material || s.crop || '',
+    pkg:      pkgMap[s.packageId] || pkgMap[s.pkg] || 'basic',
+    updatedAt: s.updated_at || null,
   }));
 
   const studies = (Array.isArray(o.items) ? o.items : [])
@@ -1451,14 +1513,7 @@ function admSelect(id) {
   }
 
   // ── Зразки tab ──
-  const sampEl = document.getElementById('admPanelSamples');
-  if (sampEl) {
-    sampEl.innerHTML = o.samplesList.map(s=>`
-      <div class="adm-sample-row">
-        <span class="adm-sample-id">${s.id}${s.name ? ' · ' + s.name : ''}</span>
-        <span class="adm-sample-pill ${s.st==='received'?'adm-sp-ok':s.st==='pending'?'adm-sp-wait':'adm-sp-new'}">${s.st==='received'?'Отримано':s.st==='pending'?'Очікується':'Нове'}</span>
-      </div>`).join('');
-  }
+  _admRenderSamplesTab(o);
 
   // ── Оплата tab ──
   const payStatMap = {paid:'Оплачено',pending:'Очікує оплати',partial:'Частково',unpaid:'Не оплачено'};
@@ -1502,6 +1557,78 @@ function admClosePanel() {
 
 function admToggleAll(cb) {
   document.querySelectorAll('#admOrdersBody input[type=checkbox]').forEach(c=>c.checked=cb.checked);
+}
+
+// ─── Samples tab rendering ────────────────────────────────────────────────────
+const _admSSL = { new:'Очікується', received:'Отримано', accepted:'Прийнято', work:'У роботі', done:'Готовий', rejected:'Відхилено', cancelled:'Скасовано' };
+const _admSSC = { new:'adm-ss-new', received:'adm-ss-rcv', accepted:'adm-ss-acc', work:'adm-ss-wrk', done:'adm-ss-done', rejected:'adm-ss-rej', cancelled:'adm-ss-cnc' };
+
+function _admRenderSamplesTab(o) {
+  const sl = o.samplesList || [];
+  const total    = sl.length;
+  const received = sl.filter(s=>['received','accepted','work','done'].includes(s.st)).length;
+  const work     = sl.filter(s=>['accepted','work'].includes(s.st)).length;
+  const done     = sl.filter(s=>s.st==='done').length;
+  const setT = (id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+  setT('admSSTotal',    total);
+  setT('admSSReceived', received);
+  setT('admSSWork',     work);
+  setT('admSSDone',     done);
+
+  const el = document.getElementById('admPanelSamples');
+  if (!el) return;
+  if (!sl.length) {
+    el.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--text-soft);font-size:13px">Зразки не додано</div>';
+    return;
+  }
+  el.innerHTML = `<table class="adm-samp-tbl">
+    <thead><tr>
+      <th style="width:28px"><input type="checkbox" id="admSampCbAll" onchange="admSampToggleAll(this)" style="width:13px;height:13px;cursor:pointer"></th>
+      <th>№</th>
+      <th>НАЗВА ЗРАЗКА</th>
+      <th>МАТЕРІАЛ</th>
+      <th>СТАТУС</th>
+      <th>ОНОВЛЕНО</th>
+      <th style="width:30px"></th>
+    </tr></thead>
+    <tbody>${sl.map((s,i)=>{
+      const stCls = _admSSC[s.st]||'adm-ss-new';
+      const stLbl = _admSSL[s.st]||s.st||'Очікується';
+      const mat   = s.material || '—';
+      const dt    = s.updatedAt ? s.updatedAt.slice(0,10).split('-').reverse().join('.') : o.date;
+      return `<tr>
+        <td><input type="checkbox" class="adm-samp-cb" data-idx="${i}" style="width:13px;height:13px;cursor:pointer"></td>
+        <td><span class="adm-samp-num">${s.num}</span></td>
+        <td><span class="adm-samp-nm">${s.name||'—'}</span></td>
+        <td><span class="adm-samp-mat">${mat}</span></td>
+        <td><span class="adm-ss-pill ${stCls}">${stLbl}</span></td>
+        <td><span class="adm-samp-dt">${dt}</span></td>
+        <td><button class="adm-samp-menu-btn" title="Дії" onclick="admSampMenu(${i},event)">···</button></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
+
+function admSampToggleAll(cb) {
+  document.querySelectorAll('.adm-samp-cb').forEach(c=>{ c.checked = cb.checked; });
+}
+
+function admActionSampleStatus(e) {
+  // Placeholder — will implement status change dropdown
+  alert('Зміна статусу зразків — у розробці');
+}
+
+function admActionOpenSample() {
+  // Placeholder — will open selected sample detail
+  const checked = [...document.querySelectorAll('.adm-samp-cb:checked')];
+  if (!checked.length) { alert('Оберіть зразок'); return; }
+  alert('Відкрити зразок — у розробці');
+}
+
+function admSampMenu(idx, e) {
+  e.stopPropagation();
+  // Placeholder context menu
+  alert('Меню зразка #'+(idx+1)+' — у розробці');
 }
 
 // ─── Supabase order update helper ────────────────────────────────────────────
