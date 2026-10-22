@@ -6810,7 +6810,8 @@ async function submitQuickOrder() {
       });
       const extraPrice = extras.reduce((sum, e) => sum + (e.price || 0), 0);
       return {
-        num:          i + 1,
+        num:          '',   // S26XXXXX — буде заповнено нижче
+        index:        i + 1,
         name:         s.name || `Зразок ${i + 1}`,
         material:     mat.name || s.materialId || '',
         packageCode:  s.packageId || '',
@@ -6820,6 +6821,18 @@ async function submitQuickOrder() {
         totalPrice:   (pkg.price || 0) + extraPrice,
       };
     });
+
+    // ── Отримуємо наступний номер зразків і призначаємо S26XXXXX ──
+    try {
+      const snRes = await fetch('https://laba.zemlerob.com.ua/api/next-sample-num').then(r => r.json());
+      if (snRes.ok) {
+        samplesPayload.forEach((s, i) => {
+          s.num = `S${snRes.year}${String(snRes.nextNum + i).padStart(5, '0')}`;
+        });
+      }
+    } catch(e) {
+      console.warn('Could not get sample num:', e.message);
+    }
 
     // /api/order expects the same format as the full checkout
     const payload = {
@@ -8287,6 +8300,7 @@ function submitOrder() {
       const matObj = (NC_CATALOG.materials[s.materialId] || NS_CAT?.materials?.[s.materialId] || {});
       return {
         index:      i + 1,
+        num:        s._sampleNum || '',   // S26XXXXX — буде заповнено нижче
         label:      s.name || s.label || `Зразок ${i+1}`,
         material:   matObj.name || s.material || s.materialId || '',
         material_id: s.materialId || '',
@@ -8298,6 +8312,20 @@ function submitOrder() {
     }),
     notes: (document.getElementById('f-notes') || {}).value || '',
   };
+
+  // ── Отримуємо наступний номер зразків і призначаємо S26XXXXX ──
+  try {
+    const snRes = await fetch('https://laba.zemlerob.com.ua/api/next-sample-num').then(r => r.json());
+    if (snRes.ok) {
+      const startNum = snRes.nextNum;
+      const sYear = snRes.year;
+      orderPayload.samples.forEach((s, i) => {
+        s.num = `S${sYear}${String(startNum + i).padStart(5, '0')}`;
+      });
+    }
+  } catch(e) {
+    console.warn('Could not get sample num:', e.message);
+  }
 
   // ── Send to backend (fire-and-forget; show confirm regardless) ──
   const BACKEND_URL = '/api/order';

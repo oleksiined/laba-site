@@ -2763,7 +2763,10 @@ function _buildSamples() {
   _admOrders.forEach(o => {
     (o.samplesList || []).forEach((s, i) => {
       const smpNum = idx++;
-      const smpLabel = s.num || `S${String(i+1).padStart(2,'0')}`;
+      // Унікальний номер зразка: S26XXXXX з Supabase, або fallback S{YY}XXXXX на основі індексу
+      const smpLabel = s.num && /^S\d{7,}$/.test(s.num)
+        ? s.num
+        : `S${new Date().getFullYear().toString().slice(-2)}${String(smpNum).padStart(5,'0')}`;
       const smpDisplayLabel = `Зразок ${i+1}`;
       const smpName  = (s.label || s.name || '').replace(smpDisplayLabel, '').trim();
       // Use real material from Supabase (s.material = catalog name like "Ґрунт", or materialId like "soil"/"MAT-01")
@@ -2773,8 +2776,8 @@ function _buildSamples() {
         ? (_MAT_BY_NAME[matRaw] || ((_MAT_LABEL[matRaw] !== undefined) ? matRaw : null) || _inferMat(matRaw))
         : _inferMat(smpName || '');
       _admSamples.push({
-        id:         `SMP-${o.date ? o.date.split('.').reverse().join('-').slice(0,4) : '2026'}-${String(smpNum).padStart(4,'0')}`,
-        sampleNum:  smpLabel,       // S01, S02 — real sample number
+        id:         smpLabel,       // S26XXXXX — унікальний ID зразка
+        sampleNum:  smpLabel,       // S26XXXXX — відображається в таблиці та панелі
         orderId:    o.id,           // LAB-XXXXXX-XXXX — order display number
         client:     o.client,
         short:      o.short,
