@@ -6803,12 +6803,16 @@ async function submitQuickOrder() {
     const yy  = String(now.getFullYear()).slice(-2);
     const mm  = String(now.getMonth() + 1).padStart(2, '0');
     const dd  = String(now.getDate()).padStart(2, '0');
-    let orderNum;
-    try {
-      const onRes = await fetch('https://laba.zemlerob.com.ua/api/next-order-num').then(r => r.json());
-      if (onRes.ok) orderNum = `L${onRes.year}${String(onRes.nextNum).padStart(4, '0')}`;
-    } catch(e) { /* fallback below */ }
-    if (!orderNum) orderNum = `L${yy}${String(Math.floor(Math.random()*900000)+100000)}`;
+
+    // ── Отримуємо номери замовлення і зразків паралельно ──
+    const [onRes, snRes] = await Promise.allSettled([
+      fetch('https://laba.zemlerob.com.ua/api/next-order-num').then(r => r.json()),
+      fetch('https://laba.zemlerob.com.ua/api/next-sample-num').then(r => r.json()),
+    ]);
+    const onData = onRes.status === 'fulfilled' && onRes.value?.ok ? onRes.value : null;
+    const snData = snRes.status === 'fulfilled' && snRes.value?.ok ? snRes.value : null;
+
+    let orderNum = onData ? `L${onData.year}${String(onData.nextNum).padStart(4, '0')}` : `L${yy}${String(Math.floor(Math.random()*9000)+1000)}`;
 
     // Build samples list for /api/order payload
     const samplesPayload = NC_S.samples.map((s, i) => {
@@ -6820,7 +6824,7 @@ async function submitQuickOrder() {
       });
       const extraPrice = extras.reduce((sum, e) => sum + (e.price || 0), 0);
       return {
-        num:          '',   // S26XXXXX — буде заповнено нижче
+        num:          snData ? `S${snData.year}${String(snData.nextNum + i).padStart(7, '0')}` : '',
         index:        i + 1,
         name:         s.name || `Зразок ${i + 1}`,
         material:     mat.name || s.materialId || '',
@@ -6831,18 +6835,6 @@ async function submitQuickOrder() {
         totalPrice:   (pkg.price || 0) + extraPrice,
       };
     });
-
-    // ── Отримуємо наступний номер зразків і призначаємо S26XXXXX ──
-    try {
-      const snRes = await fetch('https://laba.zemlerob.com.ua/api/next-sample-num').then(r => r.json());
-      if (snRes.ok) {
-        samplesPayload.forEach((s, i) => {
-          s.num = `S${snRes.year}${String(snRes.nextNum + i).padStart(7, '0')}`;
-        });
-      }
-    } catch(e) {
-      console.warn('Could not get sample num:', e.message);
-    }
 
     // /api/order expects the same format as the full checkout
     const payload = {
@@ -8245,19 +8237,18 @@ async function submitOrder() {
   if (phone && !validatePhone(phone)) valid = false;
   if (email && !validateEmail(email)) valid = false;
   if (!valid) { toast('Заповніть обов\'язкові поля'); return; }
-  // Generate order number L26XXXXXX
+  // Generate order number L26XXXX and sample numbers — fetch in parallel
   const now = new Date();
   const dd = String(now.getDate()).padStart(2,'0');
   const mm = String(now.getMonth()+1).padStart(2,'0');
   const yy = String(now.getFullYear()).slice(2);
-  let orderNum;
-  try {
-    const onRes = await fetch('https://laba.zemlerob.com.ua/api/next-order-num').then(r => r.json());
-    if (onRes.ok) {
-      orderNum = `L${onRes.year}${String(onRes.nextNum).padStart(4, '0')}`;
-    }
-  } catch(e) { /* fallback below */ }
-  if (!orderNum) orderNum = `L${yy}${String(Math.floor(Math.random()*900000)+100000)}`;
+  const [_onRes, _snRes] = await Promise.allSettled([
+    fetch('https://laba.zemlerob.com.ua/api/next-order-num').then(r => r.json()),
+    fetch('https://laba.zemlerob.com.ua/api/next-sample-num').then(r => r.json()),
+  ]);
+  const _onData = _onRes.status === 'fulfilled' && _onRes.value?.ok ? _onRes.value : null;
+  const _snData = _snRes.status === 'fulfilled' && _snRes.value?.ok ? _snRes.value : null;
+  const orderNum = _onData ? `L${_onData.year}${String(_onData.nextNum).padStart(4, '0')}` : `L${yy}${String(Math.floor(Math.random()*9000)+1000)}`;
   const clientEmail = email ? email.value.trim() : '';
   const grand = NCO.pkgSum + NCO.addSum - NCO.promoDiscount;
   // Store for confirm page
@@ -8329,22 +8320,15 @@ async function submitOrder() {
     notes: (document.getElementById('f-notes') || {}).value || '',
   };
 
-  // ── Отримуємо наступний номер зразків і призначаємо S26XXXXX ──
-  try {
-    const snRes = await fetch('https://laba.zemlerob.com.ua/api/next-sample-num').then(r => r.json());
-    if (snRes.ok) {
-      const startNum = snRes.nextNum;
-      const sYear = snRes.year;
-      orderPayload.samples.forEach((s, i) => {
-        s.num = `S${sYear}${String(startNum + i).padStart(7, '0')}`;
-        // Also update _ncfOrder snapshot so labels print correctly
-        if (window._ncfOrder && window._ncfOrder.samples && window._ncfOrder.samples[i]) {
-          window._ncfOrder.samples[i].num = s.num;
-        }
-      });
-    }
-  } catch(e) {
-    console.warn('Could not get sample num:', e.message);
+  // ── Призначаємо S26XXXXXXX (дані вже отримані паралельно вище) ──
+  if (_snData) {
+    orderPayload.samples.forEach((s, i) => {
+      s.num = `S${_snData.year}${String(_snData.nextNum + i).padStart(7, '0')}`;
+      // Also update _ncfOrder snapshot so labels print correctly
+      if (window._ncfOrder && window._ncfOrder.samples && window._ncfOrder.samples[i]) {
+        window._ncfOrder.samples[i].num = s.num;
+      }
+    });
   }
 
   // ── Send to backend (fire-and-forget; show confirm regardless) ──
