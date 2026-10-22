@@ -5731,7 +5731,7 @@ async function submitOrder(){
   let orderNum;
   try {
     const onRes = await fetch('https://laba.zemlerob.com.ua/api/next-order-num').then(r => r.json());
-    if (onRes.ok) orderNum = `L${onRes.year}${String(onRes.nextNum).padStart(6, '0')}`;
+    if (onRes.ok) orderNum = `L${onRes.year}${String(onRes.nextNum).padStart(4, '0')}`;
   } catch(e) { /* fallback below */ }
   if (!orderNum) orderNum = `L${_yy}${String(Math.floor(Math.random()*900000)+100000)}`;
   currentOrder={
@@ -6806,7 +6806,7 @@ async function submitQuickOrder() {
     let orderNum;
     try {
       const onRes = await fetch('https://laba.zemlerob.com.ua/api/next-order-num').then(r => r.json());
-      if (onRes.ok) orderNum = `L${onRes.year}${String(onRes.nextNum).padStart(6, '0')}`;
+      if (onRes.ok) orderNum = `L${onRes.year}${String(onRes.nextNum).padStart(4, '0')}`;
     } catch(e) { /* fallback below */ }
     if (!orderNum) orderNum = `L${yy}${String(Math.floor(Math.random()*900000)+100000)}`;
 
@@ -8254,7 +8254,7 @@ async function submitOrder() {
   try {
     const onRes = await fetch('https://laba.zemlerob.com.ua/api/next-order-num').then(r => r.json());
     if (onRes.ok) {
-      orderNum = `L${onRes.year}${String(onRes.nextNum).padStart(6, '0')}`;
+      orderNum = `L${onRes.year}${String(onRes.nextNum).padStart(4, '0')}`;
     }
   } catch(e) { /* fallback below */ }
   if (!orderNum) orderNum = `L${yy}${String(Math.floor(Math.random()*900000)+100000)}`;
