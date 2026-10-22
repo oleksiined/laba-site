@@ -2785,7 +2785,7 @@ function _buildSamples() {
         name:       smpName,
         displayName: smpName ? `${smpDisplayLabel} · ${smpName}` : smpDisplayLabel,
         mat:        matKey,
-        matLabel:   matRaw || _MAT_LABEL[matKey] || matKey,
+        matLabel:   _MAT_LABEL[matKey] || matRaw || matKey,
         pkg:        s.pkg || 'basic',
         status:     s.st || 'new',
         date:       o.date,
