@@ -44,8 +44,8 @@ module.exports = async function handler(req, res) {
   }
 
   const pdfBuffer    = Buffer.from(pdfBase64, 'base64');
-  const bucket       = 'invoices';
-  const storagePath  = `${orderNum}.pdf`;
+  const bucket       = 'laba-documents';
+  const storagePath  = `invoices/${orderNum}.pdf`;
   const fileName     = `Рахунок_${orderNum}${invoiceDate ? '_' + invoiceDate.replace(/\./g, '-') : ''}.pdf`;
   const host         = new URL(supaUrl).hostname;
 
