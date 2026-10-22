@@ -1777,6 +1777,7 @@ function _mapOrder(o) {
     date,
     amount:      Number(o.total||0).toLocaleString('uk-UA') + ' ₴',
     amountRaw:   Number(o.total||0),
+    createdAt:   o.created_at || '',
     samplesList,
     items:       Array.isArray(o.items) ? o.items : [],
     activity:    [{ t:'Замовлення створено', d:`${date} ${time}` }],
@@ -1835,7 +1836,7 @@ const _admPC = { paid:'adm-p-paid', pending:'adm-p-pend', unpaid:'adm-p-unpa', p
 
 let _admFilter   = '';
 let _admSelId    = null;
-let _admSortF    = 'id';
+let _admSortF    = 'createdAt';
 let _admSortA    = false;
 let _admPage     = 1;
 let _admDateFrom = '';
@@ -1992,8 +1993,8 @@ function _admFiltered() {
     });
   }
   list.sort((a,b)=>{
-    let va = _admSortF==='client'?a.client : _admSortF==='status'?a.status : _admSortF==='payment'?a.payment : _admSortF==='amountRaw'?a.amountRaw : _admSortF==='date'?a.date : a.id;
-    let vb = _admSortF==='client'?b.client : _admSortF==='status'?b.status : _admSortF==='payment'?b.payment : _admSortF==='amountRaw'?b.amountRaw : _admSortF==='date'?b.date : b.id;
+    let va = _admSortF==='client'?a.client : _admSortF==='status'?a.status : _admSortF==='payment'?a.payment : _admSortF==='amountRaw'?a.amountRaw : _admSortF==='date'?a.date : _admSortF==='createdAt'?a.createdAt : a.id;
+    let vb = _admSortF==='client'?b.client : _admSortF==='status'?b.status : _admSortF==='payment'?b.payment : _admSortF==='amountRaw'?b.amountRaw : _admSortF==='date'?b.date : _admSortF==='createdAt'?b.createdAt : b.id;
     const c = va<vb?-1:va>vb?1:0;
     return _admSortA ? c : -c;
   });
