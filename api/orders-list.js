@@ -86,9 +86,18 @@ module.exports = async function handler(req, res) {
             if (signRes.status < 300) {
               const parsed = JSON.parse(signRes.body);
               const signedURL = parsed.signedURL || parsed.signedUrl || parsed.signed_url || '';
+              console.log(`[orders-list] sign OK for ${d.storage_path}: ${signedURL.substring(0, 80)}`);
               if (signedURL) {
                 const base = url.replace(/\/$/, '');
-                invoiceMap[d.order_id] = signedURL.startsWith('http') ? signedURL : `${base}${signedURL}`;
+                if (signedURL.startsWith('http')) {
+                  invoiceMap[d.order_id] = signedURL;
+                } else if (signedURL.startsWith('/storage/v1')) {
+                  invoiceMap[d.order_id] = `${base}${signedURL}`;
+                } else {
+                  // Supabase returns /object/sign/... without /storage/v1 prefix
+                  const rel = signedURL.startsWith('/') ? signedURL : `/${signedURL}`;
+                  invoiceMap[d.order_id] = `${base}/storage/v1${rel}`;
+                }
               }
             } else {
               console.warn(`sign URL failed for ${d.storage_path}: ${signRes.status} ${signRes.body}`);
