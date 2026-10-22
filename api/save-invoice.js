@@ -75,7 +75,7 @@ module.exports = async function handler(req, res) {
     storage_bucket:    bucket,
     storage_path:      storagePath,
     version:           1,
-    status:            'ready',
+    status:            'published',
     visible_to_client: true,
   });
 

@@ -53,7 +53,7 @@ module.exports = async function handler(req, res) {
     // Fetch orders and invoice documents in parallel
     const [ordersResult, docsResult] = await Promise.allSettled([
       httpsReq(host, '/rest/v1/orders?order=created_at.desc&limit=200', key),
-      httpsReq(host, '/rest/v1/documents?document_type=eq.invoice&status=eq.ready&select=order_id,storage_bucket,storage_path', key),
+      httpsReq(host, '/rest/v1/documents?document_type=eq.invoice&status=eq.published&select=order_id,storage_bucket,storage_path', key),
     ]);
 
     if (ordersResult.status !== 'fulfilled' || ordersResult.value.status >= 300) {
