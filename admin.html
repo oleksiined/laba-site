@@ -252,6 +252,7 @@ html{scroll-behavior:smooth}
 .adm-mat-water{background:#DBEAFE;color:#1D4ED8}
 .adm-mat-grain{background:#FDE68A;color:#78350F}
 .adm-mat-fert{background:#EDE9FE;color:#5B21B6}
+.adm-mat-other{background:#F3F4F6;color:#374151}
 .adm-mat-oil{background:#FCE7F3;color:#9D174D}
 /* ── SAMPLE STATUS ── */
 .adm-sst-received{background:#ECFDF5;color:#10B981}
@@ -1784,10 +1785,20 @@ function _mapOrder(o) {
 
 // Fetch orders from backend and re-init
 async function admLoad() {
+  // Завантажуємо матеріали і замовлення паралельно
+  const [ordersResult, materialsResult] = await Promise.allSettled([
+    fetch('/api/orders-list').then(r => r.json()),
+    fetch('/api/materials').then(r => r.json()),
+  ]);
+
+  // Матеріали з Supabase → будуємо динамічну карту
+  if (materialsResult.status === 'fulfilled' && materialsResult.value.ok) {
+    admBuildMatMap(materialsResult.value.materials || []);
+  }
+
   try {
-    const res  = await fetch('https://laba.zemlerob.com.ua/api/orders-list');
-    const data = await res.json();
-    if (!data.ok) throw new Error(data.error);
+    const data = ordersResult.status === 'fulfilled' ? ordersResult.value : null;
+    if (!data || !data.ok) throw new Error(data?.error || 'fetch failed');
     _admOrders = (data.orders || []).map(_mapOrder);
   } catch (err) {
     console.warn('admLoad error:', err.message);
@@ -1796,6 +1807,25 @@ async function admLoad() {
   _buildSamples();
   _buildClients();
   admInit();
+}
+
+// Будуємо карту з catalog_materials: name → key та materialId → key
+// Також додаємо нові матеріали з Supabase в _MAT_LABEL / _MAT_CLASS динамічно
+function admBuildMatMap(materials) {
+  materials.forEach(m => {
+    if (!m.name) return;
+    const key = m.material_id || m.name; // використовуємо material_id як ключ
+    if (!_MAT_LABEL[key]) {
+      _MAT_LABEL[key] = m.name;
+      _MAT_CLASS[key] = 'adm-mat-other';
+    }
+    // Додаємо зворотний lookup: назва → key
+    _MAT_BY_NAME[m.name] = key;
+    // Також маппимо internal keys (soil, grain...) через назву
+    Object.keys(_MAT_LABEL).forEach(k => {
+      if (_MAT_LABEL[k] === m.name) _MAT_BY_NAME[m.name] = k;
+    });
+  });
 }
 
 const _admSL = { new:'Нове', waiting:'Очікує зразки', work:'У роботі', done:'Готово', closed:'Закрито', cancelled:'Скасовано' };
@@ -2680,8 +2710,24 @@ function _admShowPanel(type) {
 }
 
 // ─── SAMPLES DATA + FUNCTIONS ─────────────────
-const _MAT_LABEL = {soil:'Ґрунт',plant:'Рослина',water:'Вода',grain:'Зерно',fert:'Добриво',oil:'Масло'};
-const _MAT_CLASS = {soil:'adm-mat-soil',plant:'adm-mat-plant',water:'adm-mat-water',grain:'adm-mat-grain',fert:'adm-mat-fert',oil:'adm-mat-oil'};
+// Початковий набір — розширюється динамічно з catalog_materials при admLoad()
+const _MAT_LABEL = {
+  soil:'Ґрунт', plant:'Рослина', water:'Вода',
+  grain:'Зерно', fert:'Добриво', fertilizer:'Добрива',
+  seeds:'Насіння', oil:'Масло',
+  // MAT-xx ключі з Supabase додаються динамічно через admBuildMatMap()
+};
+const _MAT_CLASS = {
+  soil:'adm-mat-soil', plant:'adm-mat-plant', water:'adm-mat-water',
+  grain:'adm-mat-grain', fert:'adm-mat-fert', fertilizer:'adm-mat-fert',
+  seeds:'adm-mat-grain', oil:'adm-mat-fert',
+};
+// Зворотній lookup: "Ґрунт" → 'soil', "Добрива" → 'fertilizer', тощо
+const _MAT_BY_NAME = {
+  'Ґрунт':'soil','Рослина':'plant','Вода':'water',
+  'Зерно':'grain','Добриво':'fert','Добрива':'fertilizer',
+  'Насіння':'seeds','Масло':'oil',
+};
 const _PKG_LABEL = {basic:'Базовий',standard:'Стандартний',extended:'Розширений'};
 const _SST_LABEL = {received:'Отримано',waiting:'Очікується',work:'У роботі',done:'Готово',new:'Не отримано'};
 const _SST_CLASS = {received:'adm-sst-received',waiting:'adm-sst-waiting',work:'adm-sst-work',done:'adm-sst-done',new:'adm-sst-new'};
@@ -2720,9 +2766,12 @@ function _buildSamples() {
       const smpLabel = s.num || `S${String(i+1).padStart(2,'0')}`;
       const smpDisplayLabel = `Зразок ${i+1}`;
       const smpName  = (s.label || s.name || '').replace(smpDisplayLabel, '').trim();
-      // Use real material from Supabase (s.material = s.material || s.crop from _mapOrder)
+      // Use real material from Supabase (s.material = catalog name like "Ґрунт", or materialId like "soil"/"MAT-01")
       const matRaw = s.material || '';
-      const matKey = matRaw ? (Object.keys(_MAT_LABEL).find(k => _MAT_LABEL[k] === matRaw) || _inferMat(matRaw)) : _inferMat(smpName || '');
+      // matKey: шукаємо через _MAT_BY_NAME (назва→key) або напряму в _MAT_LABEL (id→label)
+      const matKey = matRaw
+        ? (_MAT_BY_NAME[matRaw] || ((_MAT_LABEL[matRaw] !== undefined) ? matRaw : null) || _inferMat(matRaw))
+        : _inferMat(smpName || '');
       _admSamples.push({
         id:         `SMP-${o.date ? o.date.split('.').reverse().join('-').slice(0,4) : '2026'}-${String(smpNum).padStart(4,'0')}`,
         sampleNum:  smpLabel,       // S01, S02 — real sample number

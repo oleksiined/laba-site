@@ -8282,15 +8282,20 @@ function submitOrder() {
     discount: NCO.promoDiscount || 0,
     subtotal: NCO.pkgSum + NCO.addSum,
     total:    grand,
-    samples:  (_snapSamples || []).map((s, i) => ({
-      index:    i + 1,
-      label:    s.name || s.label || `Зразок ${i+1}`,
-      material: s.material || s.materialId || '',
-      crop:     s.crop || '',
-      field:    s.field || s.fieldName || '',
-      depth:    s.depth || s.horizon || '',
-      packageId: s.packageId || '',
-    })),
+    samples:  (_snapSamples || []).map((s, i) => {
+      // Беремо назву матеріалу з каталогу (catalog_materials.name)
+      const matObj = (NC_CATALOG.materials[s.materialId] || NS_CAT?.materials?.[s.materialId] || {});
+      return {
+        index:      i + 1,
+        label:      s.name || s.label || `Зразок ${i+1}`,
+        material:   matObj.name || s.material || s.materialId || '',
+        material_id: s.materialId || '',
+        crop:       s.crop || '',
+        field:      s.field || s.fieldName || '',
+        depth:      s.depth || s.horizon || '',
+        packageId:  s.packageId || '',
+      };
+    }),
     notes: (document.getElementById('f-notes') || {}).value || '',
   };
 
