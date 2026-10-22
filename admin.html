@@ -1223,7 +1223,6 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           <span class="adm-panel-hd2-num" id="admPanelNum">—</span>
           <div style="display:flex;align-items:center;gap:6px">
             <span class="adm-pill" id="admPanelStat"></span>
-            <button class="adm-panel-menu-btn" title="Меню">⋯</button>
             <button class="adm-panel-x" onclick="admClosePanel()">✕</button>
           </div>
         </div>
@@ -1489,16 +1488,10 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="14" height="14"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <span id="admBtnConfirmLabel">Підтвердити замовлення</span>
           </button>
-          <div style="display:flex;gap:7px">
-            <button class="adm-pbtn adm-pbtn-sec" onclick="admActionEdit()" style="flex:1;justify-content:center">
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M14.5 3.5l2 2-10 10-3 1 1-3 10-10z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Редагувати
-            </button>
-            <button id="admBtnCancel" class="adm-pbtn adm-pbtn-red" onclick="admActionCancel()" style="flex:1;justify-content:center">
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M6 6l8 8M14 6l-8 8" stroke-linecap="round"/></svg>
-              Скасувати
-            </button>
-          </div>
+          <button id="admBtnCancel" class="adm-pbtn adm-pbtn-red" onclick="admActionCancel()" style="width:100%;justify-content:center">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M6 6l8 8M14 6l-8 8" stroke-linecap="round"/></svg>
+            Скасувати замовлення
+          </button>
         </div>
       </div><!-- /admPanelOrder -->
 
@@ -2065,19 +2058,21 @@ async function admOISave() {
     email:       g('admEIEmail'),
     companyType: g('admEIPayerType'),
   };
-  // Update Supabase
+  // Update Supabase — use dbId (UUID) as primary key; column names match orders table
   try {
     const sb = window._sb || window.supabase;
-    if (sb) {
+    if (sb && o.dbId) {
       const { error } = await sb.from('orders').update({
-        client_name:  updates.client,
-        contact_name: updates.contact,
-        edrpou:       updates.edrpou,
-        phone:        updates.phone,
-        email:        updates.email,
-        company_type: updates.companyType,
-      }).eq('order_id', o.id);
+        company:    updates.client,
+        name:       updates.contact,
+        edrpou:     updates.edrpou,
+        phone:      updates.phone,
+        email:      updates.email,
+        payer_type: updates.companyType === 'Юридична особа' ? 'legal' : updates.companyType === 'ФОП' ? 'fop' : 'private',
+      }).eq('id', o.dbId);
       if (error) { alert('Помилка збереження: ' + error.message); return; }
+    } else if (!o.dbId) {
+      console.warn('admOISave: no dbId on order, cannot save to Supabase');
     }
   } catch(e) { console.warn('Supabase save error', e); }
   // Update local object
