@@ -730,11 +730,28 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
                 <option value="unpaid">Не оплачено</option>
                 <option value="partial">Частково</option>
               </select>
-              <button class="adm-filter-date">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="14" height="13" rx="2"/><path d="M7 2v4M13 2v4M3 9h14" stroke-linecap="round"/></svg>
-                Дата
-              </button>
-              <button class="adm-filter-icon-btn">
+              <div style="position:relative;display:inline-block">
+                <button class="adm-filter-date" id="admDateBtn" onclick="admToggleDatePicker()">
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="14" height="13" rx="2"/><path d="M7 2v4M13 2v4M3 9h14" stroke-linecap="round"/></svg>
+                  <span id="admDateBtnLabel">Дата</span>
+                </button>
+                <div id="admDatePicker" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:9999;background:var(--bg-card,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px;padding:14px 16px;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:240px">
+                  <div style="font-size:11px;font-weight:600;color:var(--text-soft);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Фільтр за датою</div>
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <label style="font-size:12px;color:var(--text-mid)">Від
+                      <input type="date" id="admDateFrom" style="display:block;margin-top:3px;width:100%;padding:5px 8px;border:1px solid var(--border,#e2e8f0);border-radius:6px;font-size:13px;background:var(--bg,#f8fafc)" onchange="admApplyDate()">
+                    </label>
+                    <label style="font-size:12px;color:var(--text-mid)">До
+                      <input type="date" id="admDateTo" style="display:block;margin-top:3px;width:100%;padding:5px 8px;border:1px solid var(--border,#e2e8f0);border-radius:6px;font-size:13px;background:var(--bg,#f8fafc)" onchange="admApplyDate()">
+                    </label>
+                  </div>
+                  <div style="display:flex;gap:6px;margin-top:12px">
+                    <button onclick="admClearDate()" style="flex:1;padding:5px 0;font-size:12px;border:1px solid var(--border,#e2e8f0);border-radius:6px;background:transparent;cursor:pointer;color:var(--text-mid)">Скинути</button>
+                    <button onclick="admToggleDatePicker()" style="flex:1;padding:5px 0;font-size:12px;border:none;border-radius:6px;background:var(--neon,#22c55e);color:#fff;cursor:pointer;font-weight:600">Закрити</button>
+                  </div>
+                </div>
+              </div>
+              <button class="adm-filter-icon-btn" id="admColFilterBtn" onclick="admToggleColFilter()" title="Додаткові фільтри">
                 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h12M6 10h8M8 15h4" stroke-linecap="round"/></svg>
               </button>
             </div>
@@ -1775,12 +1792,81 @@ const _admSC = { new:'adm-p-new', waiting:'adm-p-wait', work:'adm-p-work', done:
 const _admPL = { paid:'Оплачено', pending:'Очікується', unpaid:'Не оплачено', partial:'Частково' };
 const _admPC = { paid:'adm-p-paid', pending:'adm-p-pend', unpaid:'adm-p-unpa', partial:'adm-p-part' };
 
-let _admFilter = '';
-let _admSelId  = null;
-let _admSortF  = 'id';
-let _admSortA  = false;
-let _admPage   = 1;
+let _admFilter   = '';
+let _admSelId    = null;
+let _admSortF    = 'id';
+let _admSortA    = false;
+let _admPage     = 1;
+let _admDateFrom = '';
+let _admDateTo   = '';
 const _ADM_PER = 8;
+
+function admToggleDatePicker() {
+  const dp = document.getElementById('admDatePicker');
+  if (!dp) return;
+  const isOpen = dp.style.display !== 'none';
+  dp.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    // close on outside click
+    setTimeout(() => {
+      document.addEventListener('click', function _close(e) {
+        if (!dp.contains(e.target) && !document.getElementById('admDateBtn').contains(e.target)) {
+          dp.style.display = 'none';
+          document.removeEventListener('click', _close);
+        }
+      });
+    }, 0);
+  }
+}
+
+function admApplyDate() {
+  _admDateFrom = document.getElementById('admDateFrom')?.value || '';
+  _admDateTo   = document.getElementById('admDateTo')?.value   || '';
+  _admPage = 1;
+  // Update button label
+  const lbl = document.getElementById('admDateBtnLabel');
+  if (lbl) {
+    if (_admDateFrom && _admDateTo) lbl.textContent = _admDateFrom.slice(5) + ' – ' + _admDateTo.slice(5);
+    else if (_admDateFrom) lbl.textContent = 'від ' + _admDateFrom.slice(5);
+    else if (_admDateTo)   lbl.textContent = 'до ' + _admDateTo.slice(5);
+    else lbl.textContent = 'Дата';
+  }
+  const btn = document.getElementById('admDateBtn');
+  if (btn) btn.style.fontWeight = (_admDateFrom || _admDateTo) ? '700' : '';
+  admRender();
+}
+
+function admClearDate() {
+  _admDateFrom = ''; _admDateTo = '';
+  const f = document.getElementById('admDateFrom'); if (f) f.value = '';
+  const t = document.getElementById('admDateTo');   if (t) t.value = '';
+  admApplyDate();
+}
+
+function admToggleColFilter() {
+  // Toggle active state on filter icon button
+  const btn = document.getElementById('admColFilterBtn');
+  if (!btn) return;
+  const active = btn.classList.toggle('active');
+  // Show/hide extra filter row with column search inputs
+  let row = document.getElementById('admColFilterRow');
+  if (!row) {
+    // create it dynamically
+    const tableWrap = btn.closest('.adm-subtab')?.querySelector('div[style*="overflow-x"]');
+    if (!tableWrap) return;
+    row = document.createElement('div');
+    row.id = 'admColFilterRow';
+    row.style.cssText = 'display:flex;gap:8px;padding:8px 0 4px;flex-wrap:wrap;align-items:center';
+    row.innerHTML = `
+      <span style="font-size:11px;color:var(--text-soft);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Сортування:</span>
+      ${[['id','№'],['client','Клієнт'],['date','Дата'],['status','Статус'],['payment','Оплата'],['amountRaw','Сума']].map(([f,l])=>
+        `<button class="adm-sort-chip" data-f="${f}" onclick="admSort('${f}')" style="padding:3px 10px;border-radius:20px;border:1px solid var(--border,#e2e8f0);background:transparent;font-size:12px;cursor:pointer;color:var(--text-mid)">${l}</button>`
+      ).join('')}
+    `;
+    tableWrap.parentNode.insertBefore(row, tableWrap);
+  }
+  row.style.display = active ? 'flex' : 'none';
+}
 
 function admUpdateKpi() {
   const all = _admOrders.length;
@@ -1797,7 +1883,7 @@ function admUpdateKpi() {
 function admInit() {
   admUpdateKpi();
   admSwitch('orders', document.getElementById('adm-navbtn-orders'));
-  _admFilter = ''; _admSelId = null; _admPage = 1;
+  _admFilter = ''; _admSelId = null; _admPage = 1; _admDateFrom = ''; _admDateTo = '';
   const si = document.getElementById('admSearchIn'); if(si) si.value='';
   const fs = document.getElementById('admFStatus'); if(fs) fs.value='';
   const fp = document.getElementById('admFPay'); if(fp) fp.value='';
@@ -1849,9 +1935,24 @@ function _admFiltered() {
   if (fs) list = list.filter(o => o.status === fs);
   if (fp) list = list.filter(o => o.payment === fp);
   if (_admFilter) list = list.filter(o => o.status === _admFilter);
+  // Date range filter — o.date is expected as "DD.MM.YYYY" or ISO "YYYY-MM-DD"
+  if (_admDateFrom || _admDateTo) {
+    list = list.filter(o => {
+      // parse order date to comparable string YYYY-MM-DD
+      let ds = o.date || '';
+      if (/^\d{2}\.\d{2}\.\d{4}$/.test(ds)) {
+        const p = ds.split('.'); ds = p[2]+'-'+p[1]+'-'+p[0];
+      } else if (/^\d{4}-\d{2}-\d{2}/.test(ds)) {
+        ds = ds.slice(0, 10);
+      }
+      if (_admDateFrom && ds < _admDateFrom) return false;
+      if (_admDateTo   && ds > _admDateTo)   return false;
+      return true;
+    });
+  }
   list.sort((a,b)=>{
-    let va = _admSortF==='client'?a.client : _admSortF==='status'?a.status : _admSortF==='payment'?a.payment : _admSortF==='amountRaw'?a.amountRaw : a.id;
-    let vb = _admSortF==='client'?b.client : _admSortF==='status'?b.status : _admSortF==='payment'?b.payment : _admSortF==='amountRaw'?b.amountRaw : b.id;
+    let va = _admSortF==='client'?a.client : _admSortF==='status'?a.status : _admSortF==='payment'?a.payment : _admSortF==='amountRaw'?a.amountRaw : _admSortF==='date'?a.date : a.id;
+    let vb = _admSortF==='client'?b.client : _admSortF==='status'?b.status : _admSortF==='payment'?b.payment : _admSortF==='amountRaw'?b.amountRaw : _admSortF==='date'?b.date : b.id;
     const c = va<vb?-1:va>vb?1:0;
     return _admSortA ? c : -c;
   });
