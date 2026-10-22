@@ -7693,12 +7693,17 @@ function renderAddPanel(sid) {
   const curSearch = (NS.search[sid] || '').toLowerCase().trim();
 
   // available = not included in package AND not already added AND matches material
+  // Пробопідготовка вже входить у вартість пакету — не показуємо її для додавання
   const allCats = NS_CAT.categories.filter(c => c.id !== 'all');
+  const prepCat = allCats.find(c => c.name === 'Пробопідготовка' || c.id === 'Пробопідготовка');
+  const prepIds = new Set((prepCat ? prepCat.items : []).map(i => i.id));
+
   const srcItems = curFilter === 'all'
-    ? allCats.flatMap(c => c.items)
+    ? allCats.filter(c => c.name !== 'Пробопідготовка' && c.id !== 'Пробопідготовка').flatMap(c => c.items)
     : (NS_CAT.categories.find(c => c.id === curFilter) || {items:[]}).items;
 
   const avail = srcItems.filter(i =>
+    !prepIds.has(i.id) &&
     !incl.has(i.id) &&
     (!i.mat || i.mat.includes(s.materialId)) &&
     (!curSearch || i.name.toLowerCase().includes(curSearch))
@@ -7706,7 +7711,7 @@ function renderAddPanel(sid) {
 
   const catOpts = [
     {id:'all', name:'Всі категорії'},
-    ...allCats,
+    ...allCats.filter(c => c.name !== 'Пробопідготовка' && c.id !== 'Пробопідготовка'),
   ].map(c => `<option value="${c.id}" ${c.id === curFilter ? 'selected' : ''}>${c.name}</option>`).join('');
 
   el.innerHTML = `
