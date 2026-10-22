@@ -8766,7 +8766,21 @@ function ncf_downloadInvoice() {
   };
 
   const safeDate = invoiceDate.replace(/\./g, '-');
-  pdfMake.createPdf(docDef).download(`Рахунок_LABA_${safeDate}.pdf`);
+  const _pdfDoc  = pdfMake.createPdf(docDef);
+  _pdfDoc.download(`Рахунок_LABA_${safeDate}.pdf`);
+
+  // ── Save PDF to Supabase Storage in background (silent) ──────────────────
+  const _invOrderNum = orderNum;
+  _pdfDoc.getBase64(function(_b64) {
+    fetch('https://laba.zemlerob.com.ua/api/save-invoice', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderNum: _invOrderNum, pdfBase64: _b64 }),
+    }).then(r => r.json()).then(d => {
+      if (d.ok) console.log('[LABA] Invoice saved:', d.url);
+      else      console.warn('[LABA] Invoice save failed:', d.error);
+    }).catch(e => console.warn('[LABA] Invoice save error:', e.message));
+  });
 }
 
 // ══════════════════════════════════════════

@@ -1783,6 +1783,7 @@ function _mapOrder(o) {
     samplesList,
     items:       Array.isArray(o.items) ? o.items : [],
     activity:    [{ t:'Замовлення створено', d:`${date} ${time}` }],
+    invoiceUrl:  o.invoice_url || '',
   };
 }
 
@@ -2464,9 +2465,9 @@ function admSampMenu(idx, e) {
 // ─── Documents tab rendering ─────────────────────────────────────────────────
 function _admRenderDocsTab(o) {
   // Determine which docs exist
-  const hasInvoice = !!o.id; // always show invoice row (may be "not created" state)
+  const hasInvoice = !!o.invoiceUrl; // true only if PDF was saved to storage
   const isDone     = o.status === 'done' || o.status === 'closed';
-  const invoiceNum = 'INV-' + (o.id || '').replace(/^L?AB?-?/,'');
+  const invoiceNum = o.id || '—';
 
   // Stats
   const setT = (id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
@@ -2483,10 +2484,11 @@ function _admRenderDocsTab(o) {
       iconSvg: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 8h6M7 11h6M7 14h3" stroke-linecap="round"/></svg>',
       name: 'Рахунок ' + invoiceNum,
       type: 'Рахунок',
-      vis: 'pub',
-      visLbl: 'Доступно клієнту',
-      status: 'ok',
-      statusLbl: 'Готовий',
+      vis: hasInvoice ? 'pub' : null,
+      visLbl: hasInvoice ? 'Доступно клієнту' : null,
+      status: hasInvoice ? 'ok' : 'none',
+      statusLbl: hasInvoice ? 'Готовий' : 'Ще не завантажено',
+      url: o.invoiceUrl || '',
     },
     {
       key: 'act',
@@ -2533,6 +2535,9 @@ function _admRenderDocsTab(o) {
     if (d.status === 'ok')   stHtml = `<span class="adm-doc-st-ok">● ${d.statusLbl}</span>`;
     if (d.status === 'none') stHtml = `<span class="adm-doc-st-no">${d.statusLbl}</span>`;
     if (d.status === 'note') stHtml = `<span class="adm-doc-st-note">${d.statusLbl} <svg style="vertical-align:middle" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="11" height="11"><circle cx="10" cy="10" r="7"/><path d="M10 9v5M10 7v.5" stroke-linecap="round"/></svg></span>`;
+    const dlBtn = d.url
+      ? `<a href="${d.url}" target="_blank" rel="noopener" title="Завантажити PDF" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;background:#f0f4ff;border:1px solid #c7d4f5;color:#3b5bdb;text-decoration:none;flex-shrink:0" onmouseover="this.style.background='#dbe4ff'" onmouseout="this.style.background='#f0f4ff'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" width="14" height="14"><path d="M8 2v8M5 7.5l3 3 3-3M2 13h12" stroke-linecap="round" stroke-linejoin="round"/></svg></a>`
+      : '';
     return `<div class="adm-doc-row">
       <div class="adm-doc-icon ${d.iconCls}">${d.iconSvg}</div>
       <div class="adm-doc-body">
@@ -2543,6 +2548,7 @@ function _admRenderDocsTab(o) {
         ${visBadge}
         ${stHtml}
       </div>
+      ${dlBtn}
       <button class="adm-doc-menu-btn" title="Дії" onclick="admDocMenu('${d.key}',event)">···</button>
     </div>`;
   }).join('');
