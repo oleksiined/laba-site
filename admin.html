@@ -2003,15 +2003,12 @@ function _admFiltered() {
 function admRender() {
   const list = _admFiltered();
   const total = list.length;
-  const pc = Math.max(1, Math.ceil(total/_ADM_PER));
-  if (_admPage > pc) _admPage = pc;
-  const slice = list.slice((_admPage-1)*_ADM_PER, _admPage*_ADM_PER);
   const body = document.getElementById('admOrdersBody');
   if (!body) return;
-  if (!slice.length) {
+  if (!list.length) {
     body.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:36px 16px;color:var(--text-soft);font-size:13px">Замовлень не знайдено</td></tr>`;
   } else {
-    body.innerHTML = slice.map(o=>`
+    body.innerHTML = list.map(o=>`
       <tr onclick="admSelect('${o.id}')" class="${_admSelId===o.id?'adm-row-sel':''}">
         <td><input type="checkbox" onclick="event.stopPropagation()"></td>
         <td><div class="adm-order-num">${o.id}</div><div class="adm-order-date-sm">${o.date}</div></td>
@@ -2025,25 +2022,9 @@ function admRender() {
       </tr>`).join('');
   }
   const pi = document.getElementById('admPagInfo');
-  if (pi) pi.textContent = `Показано ${total?(_admPage-1)*_ADM_PER+1:0}–${Math.min(_admPage*_ADM_PER,total)} з ${total} замовлень`;
+  if (pi) pi.textContent = total ? `Всього замовлень: ${total}` : '';
   const pag = document.getElementById('admPagination');
-  if (pag) {
-    let h = `<button class="adm-pag-btn" onclick="admGoP(${_admPage-1})" ${_admPage<=1?'disabled':''}>‹</button>`;
-    for (let p=1;p<=pc;p++) {
-      if (pc<=6 || Math.abs(p-_admPage)<=1 || p===1 || p===pc)
-        h += `<button class="adm-pag-btn ${p===_admPage?'cur':''}" onclick="admGoP(${p})">${p}</button>`;
-      else if (Math.abs(p-_admPage)===2)
-        h += `<span style="padding:0 3px;color:var(--text-soft)">…</span>`;
-    }
-    h += `<button class="adm-pag-btn" onclick="admGoP(${_admPage+1})" ${_admPage>=pc?'disabled':''}>›</button>`;
-    pag.innerHTML = h;
-  }
-}
-
-function admGoP(p) {
-  const pc = Math.max(1, Math.ceil(_admFiltered().length/_ADM_PER));
-  _admPage = Math.max(1, Math.min(p,pc));
-  admRender();
+  if (pag) pag.innerHTML = '';
 }
 
 function admSort(f) {
