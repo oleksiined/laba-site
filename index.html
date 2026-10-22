@@ -8812,7 +8812,7 @@ function ncf_printLabels() {
   }
   const sampleData = samples.map((s, i) => {
     const idx = i + 1;
-    const sampleCode = s.code || `LAB-S-${orderNum.replace('LAB-','')}-${String(idx).padStart(3,'0')}`;
+    const sampleCode = s.num || s.code || `S${new Date().getFullYear().toString().slice(-2)}${String(idx).padStart(7,'0')}`;
     const sampleLabel = s.name || s.label || `Зразок ${idx}`;
     const mat = getMat(s.materialId);
     const pkg = getPkgName(s.packageId);
