@@ -5727,7 +5727,13 @@ async function submitOrder(){
   const btn=document.getElementById('btnConfirm');
   btn.disabled=true; btn.textContent='Зберігаємо...';
   const total=samples.reduce((s,samp)=>s+calcSampleTotal(samp),0);
-  const orderNum=`LABA-${new Date().getFullYear()}-${String(Math.floor(Math.random()*9000)+1000)}`;
+  const _yy = String(new Date().getFullYear()).slice(-2);
+  let orderNum;
+  try {
+    const onRes = await fetch('https://laba.zemlerob.com.ua/api/next-order-num').then(r => r.json());
+    if (onRes.ok) orderNum = `L${onRes.year}${String(onRes.nextNum).padStart(6, '0')}`;
+  } catch(e) { /* fallback below */ }
+  if (!orderNum) orderNum = `L${_yy}${String(Math.floor(Math.random()*900000)+100000)}`;
   currentOrder={
     order_number:orderNum,
     status:'new',
@@ -6797,8 +6803,12 @@ async function submitQuickOrder() {
     const yy  = String(now.getFullYear()).slice(-2);
     const mm  = String(now.getMonth() + 1).padStart(2, '0');
     const dd  = String(now.getDate()).padStart(2, '0');
-    const rnd = String(Math.floor(Math.random() * 9000) + 1000);
-    const orderNum = `LAB-${yy}${mm}${dd}-${rnd}`;
+    let orderNum;
+    try {
+      const onRes = await fetch('https://laba.zemlerob.com.ua/api/next-order-num').then(r => r.json());
+      if (onRes.ok) orderNum = `L${onRes.year}${String(onRes.nextNum).padStart(6, '0')}`;
+    } catch(e) { /* fallback below */ }
+    if (!orderNum) orderNum = `L${yy}${String(Math.floor(Math.random()*900000)+100000)}`;
 
     // Build samples list for /api/order payload
     const samplesPayload = NC_S.samples.map((s, i) => {
@@ -8235,13 +8245,19 @@ async function submitOrder() {
   if (phone && !validatePhone(phone)) valid = false;
   if (email && !validateEmail(email)) valid = false;
   if (!valid) { toast('Заповніть обов\'язкові поля'); return; }
-  // Generate order number
+  // Generate order number L26XXXXXX
   const now = new Date();
   const dd = String(now.getDate()).padStart(2,'0');
   const mm = String(now.getMonth()+1).padStart(2,'0');
   const yy = String(now.getFullYear()).slice(2);
-  const seq = String(Math.floor(Math.random()*9000)+1000);
-  const orderNum = `LAB-${yy}${mm}${dd}-${seq}`;
+  let orderNum;
+  try {
+    const onRes = await fetch('https://laba.zemlerob.com.ua/api/next-order-num').then(r => r.json());
+    if (onRes.ok) {
+      orderNum = `L${onRes.year}${String(onRes.nextNum).padStart(6, '0')}`;
+    }
+  } catch(e) { /* fallback below */ }
+  if (!orderNum) orderNum = `L${yy}${String(Math.floor(Math.random()*900000)+100000)}`;
   const clientEmail = email ? email.value.trim() : '';
   const grand = NCO.pkgSum + NCO.addSum - NCO.promoDiscount;
   // Store for confirm page
@@ -8459,7 +8475,7 @@ function ncf_downloadInvoice() {
   }
 
   const o = window._ncfOrder || {};
-  const orderNum  = o.num  || 'LABA-0000';
+  const orderNum  = o.num  || 'L26000000';
   const invoiceId = 'LABA-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random()*9000)+1000);
   const invoiceDate = o.date || new Date().toLocaleDateString('uk-UA');
   // Дійсний до: +7 днів
@@ -8767,7 +8783,7 @@ function ncf_downloadInvoice() {
 // ══════════════════════════════════════════
 function ncf_printLabels() {
   const o = window._ncfOrder || {};
-  const orderNum = o.num || 'LAB-000000-0000';
+  const orderNum = o.num || 'L26000000';
   const clientName = (() => {
     if (NCO) {
       if (NCO.payerType === 'legal' && NCO.legal && NCO.legal.company) return NCO.legal.company;

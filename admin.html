@@ -2464,7 +2464,7 @@ function _admRenderDocsTab(o) {
   // Determine which docs exist
   const hasInvoice = !!o.id; // always show invoice row (may be "not created" state)
   const isDone     = o.status === 'done' || o.status === 'closed';
-  const invoiceNum = 'INV-' + (o.id || '').replace(/LAB-/,'');
+  const invoiceNum = 'INV-' + (o.id || '').replace(/^L?AB?-?/,'');
 
   // Stats
   const setT = (id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
@@ -2760,7 +2760,7 @@ function _buildSamples() {
       _admSamples.push({
         id:         smpLabel,       // S26XXXXX — унікальний ID зразка
         sampleNum:  smpLabel,       // S26XXXXX — відображається в таблиці та панелі
-        orderId:    o.id,           // LAB-XXXXXX-XXXX — order display number
+        orderId:    o.id,           // L26XXXXXX — order display number
         client:     o.client,
         short:      o.short,
         label:      smpDisplayLabel,
