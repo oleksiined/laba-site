@@ -1867,7 +1867,7 @@ main{flex:1}
 .search-row{display:flex;gap:8px;margin-bottom:12px}
 .search-inp{flex:1;padding:7px 10px 7px 32px;border:1.5px solid var(--bd);border-radius:var(--r-sm);font-size:13.5px;color:var(--t1);outline:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 10px center;transition:border-color .15s}
 .search-inp:focus{border-color:var(--neon-dark)}
-.cat-sel{padding:7px 10px;border:1.5px solid var(--bd);border-radius:var(--r-sm);font-size:13.5px;color:var(--t2);outline:none;background:#fff;cursor:pointer;transition:border-color .15s;appearance:auto;flex-shrink:0}
+.cat-sel{padding:7px 10px;border:1.5px solid var(--bd);border-radius:var(--r-sm);font-size:13.5px;color:var(--t2);outline:none;background:#fff;cursor:pointer;transition:border-color .15s;appearance:auto;flex-shrink:0;max-width:160px;min-width:0}
 .cat-sel:focus{border-color:var(--neon-dark)}
 .ind-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;min-width:0}
 .add-ind-btn{display:flex;align-items:center;gap:7px;padding:8px 10px;border:1.5px solid var(--bd);border-radius:var(--r-sm);background:#fff;font-size:13px;color:var(--t2);transition:all .15s;text-align:left;width:100%}
@@ -7284,10 +7284,16 @@ async function loadCatalogFromSupabase() {
     }
 
     // ── Перебудовуємо категорії з services ──
+    // Перевірка на зламані символи (◆ = U+25C6 або U+FFFD — заміна від поламаного UTF-8)
+    function _isCleanText(str) {
+      return str && !/[�◆■●￾]/.test(str);
+    }
     const catMap = new Map();
     for (const svc of services) {
       const group = svc.group_name;
       if (!group || svc.orderable_standalone === false) continue;
+      // Пропускаємо категорії з покаліченими символами
+      if (!_isCleanText(group)) { console.warn('[catalog] broken group_name skipped:', group); continue; }
       if (!catMap.has(group)) {
         catMap.set(group, {
           id:    group,
@@ -7296,9 +7302,10 @@ async function loadCatalogFromSupabase() {
         });
       }
       const matKey = _matIdToKey[svc.material_id];
+      const svcName = _isCleanText(svc.name) ? svc.name : svc.name.replace(/[�◆■●￾]/g, '?');
       catMap.get(group).items.push({
         id:    svc.service_id,
-        name:  svc.name,
+        name:  svcName,
         price: svc.price,
         mat:   matKey ? [matKey] : [],
       });
