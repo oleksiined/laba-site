@@ -2698,25 +2698,32 @@ function _buildSamples() {
   let idx = 1;
   _admSamples = [];
   _admOrders.forEach(o => {
-    (o.samplesList || []).forEach(s => {
+    (o.samplesList || []).forEach((s, i) => {
       const smpNum = idx++;
-      const smpLabel = `Зразок ${smpNum}`;
-      const smpName  = (s.label || s.name || '').replace(smpLabel, '').trim();
+      const smpLabel = s.num || `S${String(i+1).padStart(2,'0')}`;
+      const smpDisplayLabel = `Зразок ${i+1}`;
+      const smpName  = (s.label || s.name || '').replace(smpDisplayLabel, '').trim();
+      // Use real material from Supabase (s.material = s.material || s.crop from _mapOrder)
+      const matRaw = s.material || '';
+      const matKey = matRaw ? (Object.keys(_MAT_LABEL).find(k => _MAT_LABEL[k] === matRaw) || _inferMat(matRaw)) : _inferMat(smpName || '');
       _admSamples.push({
-        id:      `SMP-${o.date ? o.date.split('.').reverse().join('-').slice(0,4) : '2026'}-${String(smpNum).padStart(4,'0')}`,
-        orderId: o.id,
-        client:  o.client,
-        short:   o.short,
-        label:   smpLabel,
-        name:    smpName,
-        displayName: smpName ? `${smpLabel} · ${smpName}` : smpLabel,
-        mat:     _inferMat(smpName || s.id || ''),
-        pkg:     s.pkg || 'basic',
-        status:  s.st || 'new',
-        date:    o.date,
-        items:   o.items || [],
-        payment: o.payment || 'unpaid',
+        id:         `SMP-${o.date ? o.date.split('.').reverse().join('-').slice(0,4) : '2026'}-${String(smpNum).padStart(4,'0')}`,
+        sampleNum:  smpLabel,       // S01, S02 — real sample number
+        orderId:    o.id,           // LAB-XXXXXX-XXXX — order display number
+        client:     o.client,
+        short:      o.short,
+        label:      smpDisplayLabel,
+        name:       smpName,
+        displayName: smpName ? `${smpDisplayLabel} · ${smpName}` : smpDisplayLabel,
+        mat:        matKey,
+        matLabel:   matRaw || _MAT_LABEL[matKey] || matKey,
+        pkg:        s.pkg || 'basic',
+        status:     s.st || 'new',
+        date:       o.date,
+        items:      o.items || [],
+        payment:    o.payment || 'unpaid',
         studiesCount: (o.items||[]).length,
+        updatedAt:  s.updatedAt || null,
       });
     });
   });
@@ -2824,11 +2831,11 @@ function smpRender() {
       return `
       <tr onclick="smpSelect('${s.id}')" class="${_smpSelId===s.id?'adm-row-sel':''}">
         <td><input type="checkbox" onclick="event.stopPropagation()"></td>
-        <td><div class="adm-order-num" style="font-size:11px">${s.id}</div></td>
+        <td><div class="adm-order-num" style="font-size:11.5px">${s.sampleNum||s.id}</div></td>
         <td style="color:var(--text-soft);font-size:11px;white-space:nowrap">${s.orderId}</td>
         <td><div class="adm-client-nm">${s.client}</div></td>
         <td style="font-size:12px;color:var(--text-mid);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.displayName||s.label||s.id}</td>
-        <td><span class="adm-mat ${_MAT_CLASS[s.mat]||''}">${_MAT_LABEL[s.mat]||s.mat}</span></td>
+        <td><span class="adm-mat ${_MAT_CLASS[s.mat]||''}">${_MAT_LABEL[s.mat]||s.matLabel||s.mat||'—'}</span></td>
         <td style="text-align:center;font-size:12px;font-weight:600;color:var(--navy)">${s.studiesCount||0}</td>
         <td><span class="adm-pill ${_SST_CLASS[s.status]||''}">${_SST_LABEL[s.status]||s.status}</span></td>
         <td><span class="adm-pill ${_PAY_CLASS[pay]||''}">${_PAY_LABEL[pay]||'—'}</span></td>
@@ -2852,18 +2859,18 @@ function smpSelect(id) {
   _smpSelId=id; smpRender();
   const s=_admSamples.find(x=>x.id===id); if(!s)return;
   const panel=document.getElementById('admPanel'); if(panel)panel.classList.add('open');
-  // Shared panel header
-  document.getElementById('admPanelNum').textContent=s.id;
+  // Shared panel header — show order number + sample number
+  document.getElementById('admPanelNum').textContent = s.orderId + (s.sampleNum ? ' · ' + s.sampleNum : '');
   const ps=document.getElementById('admPanelStat');
   if(ps){ps.className='adm-pill '+(_SST_CLASS[s.status]||'');ps.textContent=_SST_LABEL[s.status]||s.status;}
   const pd=document.getElementById('admPanelDate2'); if(pd)pd.textContent=s.date;
-  const pc=document.getElementById('admPanelCName2'); if(pc)pc.textContent=s.orderId;
+  const pc=document.getElementById('admPanelCName2'); if(pc)pc.textContent=s.client;
   _admShowPanel('Sample');
   const set=(eid,v)=>{const e=document.getElementById(eid);if(e)e.textContent=v||'—';};
   const setH=(eid,v)=>{const e=document.getElementById(eid);if(e)e.innerHTML=v;};
   // Основна інформація
   set('smpPanelName', s.displayName||s.label||s.id);
-  setH('smpPanelMat', `<span class="adm-mat ${_MAT_CLASS[s.mat]||''}">${_MAT_LABEL[s.mat]||s.mat||'—'}</span>`);
+  setH('smpPanelMat', `<span class="adm-mat ${_MAT_CLASS[s.mat]||''}">${_MAT_LABEL[s.mat]||s.matLabel||s.mat||'—'}</span>`);
   set('smpPanelClient', s.client);
   set('smpPanelDate', s.date||'—');
   set('smpPanelDateRcv', s.receivedDate||'—');
