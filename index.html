@@ -8303,18 +8303,25 @@ async function submitOrder() {
     subtotal: NCO.pkgSum + NCO.addSum,
     total:    grand,
     samples:  (_snapSamples || []).map((s, i) => {
-      // Беремо назву матеріалу з каталогу (catalog_materials.name)
+      // Беремо назву матеріалу і пакету з каталогу
       const matObj = (NC_CATALOG.materials[s.materialId] || NS_CAT?.materials?.[s.materialId] || {});
+      const pkgObj = (NC_CATALOG.packages[s.packageId] || NS_CAT?.packages?.[s.packageId] || {});
+      const addNames = (s.additionalIndicatorIds || []).map(id => {
+        const ind = nc_findInd ? nc_findInd(id) : null;
+        return ind ? ind.name : id;
+      });
       return {
-        index:      i + 1,
-        num:        s._sampleNum || '',   // S26XXXXX — буде заповнено нижче
-        label:      s.name || s.label || `Зразок ${i+1}`,
-        material:   matObj.name || s.material || s.materialId || '',
-        material_id: s.materialId || '',
-        crop:       s.crop || '',
-        field:      s.field || s.fieldName || '',
-        depth:      s.depth || s.horizon || '',
-        packageId:  s.packageId || '',
+        index:        i + 1,
+        num:          s._sampleNum || '',   // S26XXXXXXX — буде заповнено нижче
+        label:        s.name || s.label || `Зразок ${i+1}`,
+        material:     matObj.name || s.material || s.materialId || '',
+        material_id:  s.materialId || '',
+        crop:         s.crop || '',
+        field:        s.field || s.fieldName || '',
+        depth:        s.depth || s.horizon || '',
+        packageId:    s.packageId || '',
+        packageName:  pkgObj.name || s.packageId || '',
+        additionals:  addNames,
       };
     }),
     notes: (document.getElementById('f-notes') || {}).value || '',

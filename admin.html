@@ -1738,13 +1738,15 @@ function _mapOrder(o) {
   const samplesArr = Array.isArray(o.samples) ? o.samples : [];
   const pkgMap = { basic:'basic', standard:'standard', extended:'extended', 'Базовий':'basic', 'Стандартний':'standard', 'Розширений':'extended' };
   const samplesList = samplesArr.map((s,i) => ({
-    idx:      i,
-    num:      (s.num && /^S\d{7,}$/.test(s.num)) ? s.num : 'S' + String(i+1).padStart(2,'0'),
-    name:     ((s.label || s.name || '').replace(`Зразок ${i+1}`, '').trim()) || `Зразок ${i+1}`,
-    st:       s.st || 'new',
-    material: s.material || s.crop || '',
-    pkg:      pkgMap[s.packageId] || pkgMap[s.pkg] || 'basic',
-    updatedAt: s.updated_at || null,
+    idx:         i,
+    num:         (s.num && /^S\d{7,}$/.test(s.num)) ? s.num : 'S' + String(i+1).padStart(2,'0'),
+    name:        ((s.label || s.name || '').replace(`Зразок ${i+1}`, '').trim()) || `Зразок ${i+1}`,
+    st:          s.st || 'new',
+    material:    s.material || s.crop || '',
+    pkg:         pkgMap[s.packageId] || pkgMap[s.pkg] || 'basic',
+    packageName: s.packageName || s.packageCode || '',
+    additionals: Array.isArray(s.additionals) ? s.additionals : [],
+    updatedAt:   s.updated_at || null,
   }));
 
   const studies = (Array.isArray(o.items) ? o.items : [])
@@ -2933,7 +2935,7 @@ function smpSelect(id) {
   // Призначені дослідження
   const order = _admOrders.find(o=>o.id===s.orderId);
   const items = (order && order.items) ? order.items : s.items || [];
-  const pkgLabel = _PKG_LABEL[s.pkg]||s.pkg||'—';
+  const pkgLabel = s.packageName || _PKG_LABEL[s.pkg] || s.pkg || '—';
   // Пакет секція
   const pkgRow = document.getElementById('smpPanelPkgRow');
   if(pkgRow){
@@ -2942,7 +2944,9 @@ function smpSelect(id) {
     items.forEach(t=>{ if((t.type==='extra'||t.type==='окреме'||t.extra) && t.name && !extras.includes(t.name)) extras.push(t.name); });
     document.getElementById('smpPanelPkgName').textContent = 'Пакет: ' + pkgLabel;
     const extEl = document.getElementById('smpPanelExtras');
-    if(extEl) extEl.innerHTML = extras.map(e=>`<span class="sp-extra-chip">${e}</span>`).join('');
+    // Use stored additionals array if available, fall back to items extras
+    const displayExtras = (s.additionals && s.additionals.length) ? s.additionals : extras;
+    if(extEl) extEl.innerHTML = displayExtras.map(e=>`<span class="sp-extra-chip">${e}</span>`).join('');
     set('smpPanelPkgCnt', items.length||'');
   }
   set('smpPanelTestCnt', items.length);
