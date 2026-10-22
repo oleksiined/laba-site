@@ -349,6 +349,8 @@ html{scroll-behavior:smooth}
 .adm-oi-section{margin-bottom:14px}
 .adm-oi-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-soft);margin-bottom:8px}
 .adm-oi-row{display:grid;grid-template-columns:120px 1fr;margin-bottom:7px;gap:8px;font-size:12.5px;align-items:baseline}
+.adm-ei-inp{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12.5px;background:var(--bg,#f8fafc);color:var(--text-dark);box-sizing:border-box;font-family:inherit}
+.adm-ei-inp:focus{outline:none;border-color:var(--neon,#22c55e);box-shadow:0 0 0 2px rgba(34,197,94,.15)}
 .adm-oi-lbl{color:var(--text-soft);font-weight:400}
 .adm-oi-val{color:var(--text-dark);font-weight:500;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
 .adm-pdv-badge{padding:1px 5px;background:#DBEAFE;color:#1D4ED8;border-radius:4px;font-size:10px;font-weight:700}
@@ -1248,30 +1250,53 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
         <div class="adm-ptab-body active" id="admOTab-general">
           <!-- Інформація про замовлення -->
           <div class="adm-oi-section">
-            <div class="adm-oi-section-title">Інформація про замовлення</div>
-            <div class="adm-oi-row">
-              <span class="adm-oi-lbl">Клієнт</span>
-              <span class="adm-oi-val"><span class="adm-oi-link" id="admOIClient">—</span></span>
+            <div class="adm-oi-section-title" style="display:flex;align-items:center;justify-content:space-between">
+              Інформація про замовлення
+              <button id="admOIEditBtn" onclick="admOIToggleEdit()" style="font-size:11px;padding:2px 8px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text-mid);cursor:pointer">✏ Редагувати</button>
             </div>
-            <div class="adm-oi-row">
-              <span class="adm-oi-lbl">Контактна особа</span>
-              <span class="adm-oi-val" id="admOIContact">—</span>
+            <!-- View mode -->
+            <div id="admOIView">
+              <div class="adm-oi-row"><span class="adm-oi-lbl">Клієнт</span><span class="adm-oi-val"><span class="adm-oi-link" id="admOIClient">—</span></span></div>
+              <div class="adm-oi-row"><span class="adm-oi-lbl">Контактна особа</span><span class="adm-oi-val" id="admOIContact">—</span></div>
+              <div class="adm-oi-row"><span class="adm-oi-lbl">ЄДРПОУ / ІПН</span><span class="adm-oi-val" id="admOIReqs">—</span></div>
+              <div class="adm-oi-row"><span class="adm-oi-lbl">Телефон</span><span class="adm-oi-val" id="admOIPhone">—</span></div>
+              <div class="adm-oi-row"><span class="adm-oi-lbl">Email</span><span class="adm-oi-val" id="admOIEmail">—</span></div>
+              <div class="adm-oi-row"><span class="adm-oi-lbl">Тип платника</span><span class="adm-oi-val" id="admOIPayerType">—</span></div>
             </div>
-            <div class="adm-oi-row">
-              <span class="adm-oi-lbl">ЄДРПОУ / ІПН</span>
-              <span class="adm-oi-val" id="admOIReqs">—</span>
-            </div>
-            <div class="adm-oi-row">
-              <span class="adm-oi-lbl">Телефон</span>
-              <span class="adm-oi-val" id="admOIPhone">—</span>
-            </div>
-            <div class="adm-oi-row">
-              <span class="adm-oi-lbl">Email</span>
-              <span class="adm-oi-val" id="admOIEmail">—</span>
-            </div>
-            <div class="adm-oi-row">
-              <span class="adm-oi-lbl">Тип платника</span>
-              <span class="adm-oi-val" id="admOIPayerType">—</span>
+            <!-- Edit mode -->
+            <div id="admOIEdit" style="display:none">
+              <div class="adm-oi-row" style="flex-direction:column;align-items:flex-start;gap:3px">
+                <span class="adm-oi-lbl">Клієнт</span>
+                <input id="admEIClient" class="adm-ei-inp" placeholder="Назва компанії або ПІБ">
+              </div>
+              <div class="adm-oi-row" style="flex-direction:column;align-items:flex-start;gap:3px">
+                <span class="adm-oi-lbl">Контактна особа</span>
+                <input id="admEIContact" class="adm-ei-inp" placeholder="ПІБ">
+              </div>
+              <div class="adm-oi-row" style="flex-direction:column;align-items:flex-start;gap:3px">
+                <span class="adm-oi-lbl">ЄДРПОУ / ІПН</span>
+                <input id="admEIReqs" class="adm-ei-inp" placeholder="Код ЄДРПОУ або ІПН">
+              </div>
+              <div class="adm-oi-row" style="flex-direction:column;align-items:flex-start;gap:3px">
+                <span class="adm-oi-lbl">Телефон</span>
+                <input id="admEIPhone" class="adm-ei-inp" type="tel" placeholder="+380...">
+              </div>
+              <div class="adm-oi-row" style="flex-direction:column;align-items:flex-start;gap:3px">
+                <span class="adm-oi-lbl">Email</span>
+                <input id="admEIEmail" class="adm-ei-inp" type="email" placeholder="email@example.com">
+              </div>
+              <div class="adm-oi-row" style="flex-direction:column;align-items:flex-start;gap:3px">
+                <span class="adm-oi-lbl">Тип платника</span>
+                <select id="admEIPayerType" class="adm-ei-inp">
+                  <option value="Фізична особа">Фізична особа</option>
+                  <option value="ФОП">ФОП</option>
+                  <option value="Юридична особа">Юридична особа</option>
+                </select>
+              </div>
+              <div style="display:flex;gap:6px;margin-top:8px">
+                <button onclick="admOISave()" style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:6px;background:var(--neon,#22c55e);color:#fff;cursor:pointer">Зберегти</button>
+                <button onclick="admOICancelEdit()" style="flex:1;padding:6px 0;font-size:12px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text-mid);cursor:pointer">Скасувати</button>
+              </div>
             </div>
           </div>
           <!-- Mini stats -->
@@ -1281,13 +1306,6 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
               <div class="adm-mini-stat-lbl">
                 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 3v8l-2 4h8l-2-4V3"/><path d="M7 3h6" stroke-linecap="round"/></svg>
                 Зразків
-              </div>
-            </div>
-            <div class="adm-mini-stat">
-              <div class="adm-mini-stat-val" id="admMStudies">0</div>
-              <div class="adm-mini-stat-lbl">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h12M4 10h12M4 14h6" stroke-linecap="round"/></svg>
-                Досліджень
               </div>
             </div>
             <div class="adm-mini-stat">
@@ -2012,6 +2030,62 @@ function admSort(f) {
   admRender();
 }
 
+// ── Order Info Edit ──
+function admOIToggleEdit() {
+  const o = _admOrders.find(x => x.id === _admSelId);
+  if (!o) return;
+  // Populate edit fields
+  const g = (id, v) => { const e = document.getElementById(id); if (e) e.value = v || ''; };
+  g('admEIClient',    o.client    || '');
+  g('admEIContact',  o.contact   || '');
+  g('admEIReqs',     o.edrpou    || '');
+  g('admEIPhone',    o.phone     || '');
+  g('admEIEmail',    o.email     || '');
+  g('admEIPayerType', o.companyType || 'Фізична особа');
+  document.getElementById('admOIView').style.display = 'none';
+  document.getElementById('admOIEdit').style.display = '';
+  document.getElementById('admOIEditBtn').style.display = 'none';
+}
+
+function admOICancelEdit() {
+  document.getElementById('admOIView').style.display = '';
+  document.getElementById('admOIEdit').style.display = 'none';
+  document.getElementById('admOIEditBtn').style.display = '';
+}
+
+async function admOISave() {
+  const o = _admOrders.find(x => x.id === _admSelId);
+  if (!o) return;
+  const g = id => (document.getElementById(id)?.value || '').trim();
+  const updates = {
+    client:      g('admEIClient'),
+    contact:     g('admEIContact'),
+    edrpou:      g('admEIReqs'),
+    phone:       g('admEIPhone'),
+    email:       g('admEIEmail'),
+    companyType: g('admEIPayerType'),
+  };
+  // Update Supabase
+  try {
+    const sb = window._sb || window.supabase;
+    if (sb) {
+      const { error } = await sb.from('orders').update({
+        client_name:  updates.client,
+        contact_name: updates.contact,
+        edrpou:       updates.edrpou,
+        phone:        updates.phone,
+        email:        updates.email,
+        company_type: updates.companyType,
+      }).eq('order_id', o.id);
+      if (error) { alert('Помилка збереження: ' + error.message); return; }
+    }
+  } catch(e) { console.warn('Supabase save error', e); }
+  // Update local object
+  Object.assign(o, updates);
+  admOICancelEdit();
+  admSelect(o.id); // re-render panel
+}
+
 function admStatFilter(status, el) {
   if (_admFilter===status) {
     _admFilter='';
@@ -2041,6 +2115,9 @@ function admSelect(id) {
   const panel = document.getElementById('admPanel');
   if (panel) panel.classList.add('open');
   _admShowPanel('Order');
+
+  // Reset edit mode if open
+  admOICancelEdit();
 
   // Header
   const setT=(i,v)=>{const e=document.getElementById(i);if(e)e.textContent=v;};
