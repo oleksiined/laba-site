@@ -1,7 +1,30 @@
 // Vercel Serverless Function — GET /api/orders-list
-// Returns orders from Supabase for the admin panel
+// Returns orders from Supabase for the admin panel.
+// Also fetches invoice documents and merges invoice_url into each order.
 
 const https = require('https');
+
+function httpsGet(hostname, path, key) {
+  return new Promise((resolve, reject) => {
+    const opts = {
+      hostname,
+      path,
+      method: 'GET',
+      headers: {
+        'apikey':        key,
+        'Authorization': `Bearer ${key}`,
+        'Accept':        'application/json',
+      },
+    };
+    const req = https.request(opts, r => {
+      let raw = '';
+      r.on('data', c => raw += c);
+      r.on('end', () => resolve({ status: r.statusCode, body: raw }));
+    });
+    req.on('error', reject);
+    req.end();
+  });
+}
 
 module.exports = async function handler(req, res) {
   const allowedOrigins = [
@@ -24,34 +47,44 @@ module.exports = async function handler(req, res) {
   const key = process.env.SUPABASE_SERVICE_KEY;
   if (!url || !key) return res.status(500).json({ ok: false, error: 'Supabase not configured' });
 
-  try {
-    const result = await new Promise((resolve, reject) => {
-      const u = new URL(`${url}/rest/v1/orders?order=created_at.desc&limit=200`);
-      const opts = {
-        hostname: u.hostname,
-        path:     u.pathname + u.search,
-        method:   'GET',
-        headers: {
-          'apikey':        key,
-          'Authorization': `Bearer ${key}`,
-          'Accept':        'application/json',
-        },
-      };
-      const req = https.request(opts, r => {
-        let raw = '';
-        r.on('data', c => raw += c);
-        r.on('end', () => resolve({ status: r.statusCode, body: raw }));
-      });
-      req.on('error', reject);
-      req.end();
-    });
+  const host = new URL(url).hostname;
 
-    if (result.status >= 300) {
-      return res.status(500).json({ ok: false, error: `Supabase ${result.status}: ${result.body}` });
+  try {
+    // Fetch orders and invoice documents in parallel
+    const [ordersResult, docsResult] = await Promise.allSettled([
+      httpsGet(host, '/rest/v1/orders?order=created_at.desc&limit=200', key),
+      httpsGet(host, '/rest/v1/documents?document_type=eq.invoice&status=eq.ready&select=order_id,storage_bucket,storage_path', key),
+    ]);
+
+    if (ordersResult.status !== 'fulfilled' || ordersResult.value.status >= 300) {
+      const err = ordersResult.status === 'rejected'
+        ? ordersResult.reason.message
+        : `Supabase ${ordersResult.value.status}: ${ordersResult.value.body}`;
+      return res.status(500).json({ ok: false, error: err });
     }
 
-    const orders = JSON.parse(result.body);
-    return res.status(200).json({ ok: true, orders });
+    const orders = JSON.parse(ordersResult.value.body);
+
+    // Build a map: order_id → public URL
+    const invoiceMap = {};
+    if (docsResult.status === 'fulfilled' && docsResult.value.status < 300) {
+      try {
+        const docs = JSON.parse(docsResult.value.body);
+        docs.forEach(d => {
+          if (d.order_id && d.storage_bucket && d.storage_path) {
+            invoiceMap[d.order_id] = `${url}/storage/v1/object/public/${d.storage_bucket}/${d.storage_path}`;
+          }
+        });
+      } catch (_) { /* non-fatal */ }
+    }
+
+    // Merge invoice_url into each order
+    const enriched = orders.map(o => {
+      const num = o.order_num || o.id;
+      return { ...o, invoice_url: invoiceMap[num] || o.invoice_url || null };
+    });
+
+    return res.status(200).json({ ok: true, orders: enriched });
   } catch (err) {
     return res.status(500).json({ ok: false, error: err.message });
   }

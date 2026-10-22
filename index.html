@@ -8771,11 +8771,12 @@ function ncf_downloadInvoice() {
 
   // ── Save PDF to Supabase Storage in background (silent) ──────────────────
   const _invOrderNum = orderNum;
+  const _invDate = invoiceDate;
   _pdfDoc.getBase64(function(_b64) {
     fetch('https://laba.zemlerob.com.ua/api/save-invoice', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderNum: _invOrderNum, pdfBase64: _b64 }),
+      body: JSON.stringify({ orderNum: _invOrderNum, pdfBase64: _b64, invoiceDate: _invDate }),
     }).then(r => r.json()).then(d => {
       if (d.ok) console.log('[LABA] Invoice saved:', d.url);
       else      console.warn('[LABA] Invoice save failed:', d.error);

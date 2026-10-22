@@ -1,8 +1,23 @@
 // Vercel Serverless Function — POST /api/save-invoice
-// Accepts { orderNum, pdfBase64 } → uploads PDF to Supabase Storage → saves URL in orders table
-// Bucket "invoices" must exist in Supabase Storage (public or with signed URLs)
+// 1. Uploads PDF to Supabase Storage (bucket "invoices")
+// 2. Inserts record in `documents` table
+// 3. Inserts record in `document_orders` table (link doc ↔ order)
 
 const https = require('https');
+
+// Helper: make an HTTPS request, returns { status, headers, body }
+function httpsReq(opts, body) {
+  return new Promise((resolve, reject) => {
+    const r = https.request(opts, res => {
+      let raw = '';
+      res.on('data', c => raw += c);
+      res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, body: raw }));
+    });
+    r.on('error', reject);
+    if (body) r.write(body);
+    r.end();
+  });
+}
 
 module.exports = async function handler(req, res) {
   const allowedOrigins = [
@@ -12,101 +27,101 @@ module.exports = async function handler(req, res) {
     'http://localhost:5500',
   ];
   const origin = req.headers.origin || '';
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
+  if (allowedOrigins.includes(origin)) res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST')   return res.status(405).json({ error: 'Method not allowed' });
 
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_KEY;
-  if (!url || !key) return res.status(500).json({ ok: false, error: 'Supabase not configured' });
+  const supaUrl = process.env.SUPABASE_URL;
+  const supaKey = process.env.SUPABASE_SERVICE_KEY;
+  if (!supaUrl || !supaKey) return res.status(500).json({ ok: false, error: 'Supabase not configured' });
 
-  const { orderNum, pdfBase64 } = req.body || {};
+  const { orderNum, pdfBase64, invoiceDate } = req.body || {};
   if (!orderNum || !pdfBase64) {
     return res.status(400).json({ ok: false, error: 'Missing orderNum or pdfBase64' });
   }
 
-  const pdfBuffer = Buffer.from(pdfBase64, 'base64');
-  const bucket    = 'invoices';
-  const fileName  = `${orderNum}.pdf`;
+  const pdfBuffer    = Buffer.from(pdfBase64, 'base64');
+  const bucket       = 'invoices';
+  const storagePath  = `${orderNum}.pdf`;
+  const fileName     = `Рахунок_${orderNum}${invoiceDate ? '_' + invoiceDate.replace(/\./g, '-') : ''}.pdf`;
+  const host         = new URL(supaUrl).hostname;
 
   // ── 1. Upload PDF to Supabase Storage ─────────────────────────────────────
-  try {
-    const uploadResult = await new Promise((resolve, reject) => {
-      const u = new URL(`${url}/storage/v1/object/${bucket}/${fileName}`);
-      const opts = {
-        hostname: u.hostname,
-        path:     u.pathname,
-        method:   'POST',
-        headers: {
-          'apikey':          key,
-          'Authorization':   `Bearer ${key}`,
-          'Content-Type':    'application/pdf',
-          'Content-Length':  pdfBuffer.length,
-          'x-upsert':        'true',   // overwrite if file already exists
-        },
-      };
-      const r2 = https.request(opts, r => {
-        let raw = '';
-        r.on('data', c => raw += c);
-        r.on('end', () => resolve({ status: r.statusCode, body: raw }));
-      });
-      r2.on('error', reject);
-      r2.write(pdfBuffer);
-      r2.end();
-    });
+  const uploadRes = await httpsReq({
+    hostname: host,
+    path:     `/storage/v1/object/${bucket}/${storagePath}`,
+    method:   'POST',
+    headers: {
+      'apikey':         supaKey,
+      'Authorization':  `Bearer ${supaKey}`,
+      'Content-Type':   'application/pdf',
+      'Content-Length': pdfBuffer.length,
+      'x-upsert':       'true',
+    },
+  }, pdfBuffer);
 
-    if (uploadResult.status >= 300) {
-      console.error('Storage upload error:', uploadResult.status, uploadResult.body);
-      return res.status(500).json({ ok: false, error: `Storage ${uploadResult.status}: ${uploadResult.body}` });
-    }
-  } catch (err) {
-    return res.status(500).json({ ok: false, error: 'Upload error: ' + err.message });
+  if (uploadRes.status >= 300) {
+    return res.status(500).json({ ok: false, error: `Storage upload ${uploadRes.status}: ${uploadRes.body}` });
   }
 
-  // ── 2. Build public URL ────────────────────────────────────────────────────
-  const invoiceUrl = `${url}/storage/v1/object/public/${bucket}/${fileName}`;
+  // ── 2. Insert into `documents` table ──────────────────────────────────────
+  const docPayload = JSON.stringify({
+    document_type:     'invoice',
+    order_id:          orderNum,
+    file_name:         fileName,
+    storage_bucket:    bucket,
+    storage_path:      storagePath,
+    version:           1,
+    status:            'ready',
+    visible_to_client: true,
+  });
 
-  // ── 3. Save URL to orders table ────────────────────────────────────────────
-  try {
-    const encodedNum = encodeURIComponent(orderNum);
-    const body       = JSON.stringify({ invoice_url: invoiceUrl });
-    const updateResult = await new Promise((resolve, reject) => {
-      const u = new URL(`${url}/rest/v1/orders?order_num=eq.${encodedNum}`);
-      const opts = {
-        hostname: u.hostname,
-        path:     u.pathname + u.search,
-        method:   'PATCH',
-        headers: {
-          'apikey':          key,
-          'Authorization':   `Bearer ${key}`,
-          'Content-Type':    'application/json',
-          'Content-Length':  Buffer.byteLength(body),
-          'Prefer':          'return=minimal',
-        },
-      };
-      const r3 = https.request(opts, r => {
-        let raw = '';
-        r.on('data', c => raw += c);
-        r.on('end', () => resolve({ status: r.statusCode, body: raw }));
-      });
-      r3.on('error', reject);
-      r3.write(body);
-      r3.end();
-    });
+  const docRes = await httpsReq({
+    hostname: host,
+    path:     '/rest/v1/documents',
+    method:   'POST',
+    headers: {
+      'apikey':          supaKey,
+      'Authorization':   `Bearer ${supaKey}`,
+      'Content-Type':    'application/json',
+      'Content-Length':  Buffer.byteLength(docPayload),
+      'Prefer':          'return=representation',
+    },
+  }, docPayload);
 
-    if (updateResult.status >= 300) {
-      // Upload succeeded; log but don't fail the response
-      console.warn('Order update failed:', updateResult.status, updateResult.body);
-    }
-  } catch (err) {
-    // Non-fatal — PDF is already uploaded
-    console.warn('Order update error:', err.message);
+  if (docRes.status >= 300) {
+    // PDF uploaded OK but DB insert failed — still return url
+    console.warn('documents insert failed:', docRes.status, docRes.body);
+    const fallbackUrl = `${supaUrl}/storage/v1/object/public/${bucket}/${storagePath}`;
+    return res.status(200).json({ ok: true, url: fallbackUrl, warn: 'documents insert failed' });
   }
 
-  return res.status(200).json({ ok: true, url: invoiceUrl });
+  let docId = null;
+  try {
+    const parsed = JSON.parse(docRes.body);
+    docId = Array.isArray(parsed) ? parsed[0]?.id : parsed?.id;
+  } catch (_) {}
+
+  // ── 3. Insert into `document_orders` (link) ───────────────────────────────
+  if (docId) {
+    const linkPayload = JSON.stringify({ document_id: docId, order_id: orderNum });
+    await httpsReq({
+      hostname: host,
+      path:     '/rest/v1/document_orders',
+      method:   'POST',
+      headers: {
+        'apikey':          supaKey,
+        'Authorization':   `Bearer ${supaKey}`,
+        'Content-Type':    'application/json',
+        'Content-Length':  Buffer.byteLength(linkPayload),
+        'Prefer':          'return=minimal',
+      },
+    }, linkPayload).catch(e => console.warn('document_orders insert error:', e.message));
+  }
+
+  const publicUrl = `${supaUrl}/storage/v1/object/public/${bucket}/${storagePath}`;
+  return res.status(200).json({ ok: true, url: publicUrl, docId });
 };
