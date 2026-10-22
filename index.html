@@ -6827,7 +6827,7 @@ async function submitQuickOrder() {
       const snRes = await fetch('https://laba.zemlerob.com.ua/api/next-sample-num').then(r => r.json());
       if (snRes.ok) {
         samplesPayload.forEach((s, i) => {
-          s.num = `S${snRes.year}${String(snRes.nextNum + i).padStart(5, '0')}`;
+          s.num = `S${snRes.year}${String(snRes.nextNum + i).padStart(7, '0')}`;
         });
       }
     } catch(e) {
@@ -8320,7 +8320,7 @@ function submitOrder() {
       const startNum = snRes.nextNum;
       const sYear = snRes.year;
       orderPayload.samples.forEach((s, i) => {
-        s.num = `S${sYear}${String(startNum + i).padStart(5, '0')}`;
+        s.num = `S${sYear}${String(startNum + i).padStart(7, '0')}`;
       });
     }
   } catch(e) {
