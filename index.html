@@ -8225,7 +8225,7 @@ function validateEdrpou(inp) {
   return ok;
 }
 
-function submitOrder() {
+async function submitOrder() {
   // basic validation
   const name  = document.getElementById('f-name');
   const phone = document.getElementById('f-phone');
@@ -8321,6 +8321,10 @@ function submitOrder() {
       const sYear = snRes.year;
       orderPayload.samples.forEach((s, i) => {
         s.num = `S${sYear}${String(startNum + i).padStart(7, '0')}`;
+        // Also update _ncfOrder snapshot so labels print correctly
+        if (window._ncfOrder && window._ncfOrder.samples && window._ncfOrder.samples[i]) {
+          window._ncfOrder.samples[i].num = s.num;
+        }
       });
     }
   } catch(e) {

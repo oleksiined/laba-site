@@ -1739,7 +1739,7 @@ function _mapOrder(o) {
   const pkgMap = { basic:'basic', standard:'standard', extended:'extended', 'Базовий':'basic', 'Стандартний':'standard', 'Розширений':'extended' };
   const samplesList = samplesArr.map((s,i) => ({
     idx:      i,
-    num:      'S' + String(i+1).padStart(2,'0'),
+    num:      (s.num && /^S\d{7,}$/.test(s.num)) ? s.num : 'S' + String(i+1).padStart(2,'0'),
     name:     ((s.label || s.name || '').replace(`Зразок ${i+1}`, '').trim()) || `Зразок ${i+1}`,
     st:       s.st || 'new',
     material: s.material || s.crop || '',
