@@ -1,6 +1,6 @@
 // Vercel Serverless Function — GET /api/next-sample-num
 // Returns the next available sample number based on total existing samples in Supabase
-// Format: S{YY}{NNNNN}, e.g. S2600001
+// Format: S{YY}{NNNNNNN}, e.g. S260000001
 
 const https = require('https');
 
