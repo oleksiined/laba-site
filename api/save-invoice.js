@@ -63,6 +63,7 @@ module.exports = async function handler(req, res) {
     },
   }, pdfBuffer);
 
+  console.log(`[save-invoice] upload ${uploadRes.status} → bucket=${bucket} path=${storagePath}`);
   if (uploadRes.status >= 300) {
     return res.status(500).json({ ok: false, error: `Storage upload ${uploadRes.status}: ${uploadRes.body}` });
   }

@@ -70,35 +70,33 @@ module.exports = async function handler(req, res) {
     if (docsResult.status === 'fulfilled' && docsResult.value.status < 300) {
       try {
         const docs = JSON.parse(docsResult.value.body);
-        if (docs.length > 0) {
-          // Group paths by bucket (all invoices are in the same bucket)
-          const bucketGroups = {};
-          docs.forEach(d => {
-            if (d.order_id && d.storage_bucket && d.storage_path) {
-              if (!bucketGroups[d.storage_bucket]) bucketGroups[d.storage_bucket] = [];
-              bucketGroups[d.storage_bucket].push({ order_id: d.order_id, path: d.storage_path });
-            }
-          });
+        const validDocs = docs.filter(d => d.order_id && d.storage_bucket && d.storage_path);
 
-          // Batch-generate signed URLs per bucket
-          for (const [bucket, items] of Object.entries(bucketGroups)) {
-            const signBody = JSON.stringify({
-              expiresIn: 604800,  // 7 days
-              paths: items.map(i => i.path),
-            });
-            const signRes = await httpsReq(host, `/storage/v1/object/sign/${bucket}`, key, 'POST', signBody);
+        // Generate signed URLs individually (more reliable than batch)
+        await Promise.allSettled(validDocs.map(async d => {
+          try {
+            const signBody = JSON.stringify({ expiresIn: 604800 });
+            const signRes = await httpsReq(
+              host,
+              `/storage/v1/object/sign/${d.storage_bucket}/${d.storage_path}`,
+              key,
+              'POST',
+              signBody,
+            );
             if (signRes.status < 300) {
-              const signed = JSON.parse(signRes.body);
-              // Response: array of { path, signedURL, error }
-              signed.forEach((s, idx) => {
-                if (s.signedURL && items[idx]) {
-                  const fullSignedUrl = `${url}${s.signedURL}`;
-                  invoiceMap[items[idx].order_id] = fullSignedUrl;
-                }
-              });
+              const parsed = JSON.parse(signRes.body);
+              const signedURL = parsed.signedURL || parsed.signedUrl || parsed.signed_url || '';
+              if (signedURL) {
+                const base = url.replace(/\/$/, '');
+                invoiceMap[d.order_id] = signedURL.startsWith('http') ? signedURL : `${base}${signedURL}`;
+              }
+            } else {
+              console.warn(`sign URL failed for ${d.storage_path}: ${signRes.status} ${signRes.body}`);
             }
+          } catch (e) {
+            console.warn(`sign URL error for ${d.storage_path}:`, e.message);
           }
-        }
+        }));
       } catch (_) { /* non-fatal — orders still returned */ }
     }
 
