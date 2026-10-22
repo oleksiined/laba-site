@@ -187,6 +187,224 @@ function buildClientEmailHtml(o) {
 </html>`;
 }
 
+// ─── Invoice email ────────────────────────────────────────────────────────────
+
+function buildInvoiceHtml(o) {
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const dateStr = o.date || `${pad(now.getDate())}.${pad(now.getMonth()+1)}.${now.getFullYear()}`;
+
+  // Invoice number: LABA-YYYY-XXXX (derived from orderNum)
+  const invoiceNum = o.orderNum
+    ? 'LABA-' + o.orderNum.replace(/^LAB-/,'')
+    : `LABA-${now.getFullYear()}-0001`;
+
+  // Valid until: +7 days
+  const validDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const validStr = `${pad(validDate.getDate())}.${pad(validDate.getMonth()+1)}.${validDate.getFullYear()}`;
+
+  // Client name
+  const buyerName = o.client?.company || o.client?.name || '—';
+  const buyerEdrpou = o.client?.edrpou ? `Код за ЄДРПОУ: ${o.client.edrpou}<br>` : '';
+  const buyerAddr = o.client?.legalAddress || '';
+
+  // Build services table rows from samples grouped by package
+  const pkgMap = {};
+  (o.samples || []).forEach(s => {
+    const key = s.packageId || s.packageCode || s.packageName || 'Пакет';
+    const name = s.packageName || s.packageCode || key;
+    const mat  = s.material || '';
+    const mapKey = `${name}|${mat}`;
+    if (!pkgMap[mapKey]) pkgMap[mapKey] = { name, mat, qty: 0, price: 0 };
+    pkgMap[mapKey].qty += 1;
+    if (s.totalPrice || s.basePrice) pkgMap[mapKey].price = s.totalPrice || s.basePrice || 0;
+  });
+
+  // Fallback: use items array if samples has no package info
+  const useItems = Object.keys(pkgMap).length === 0 || Object.keys(pkgMap).every(k => k.startsWith('|'));
+  let rowsHtml = '';
+  let rowIdx = 1;
+
+  if (!useItems && Object.keys(pkgMap).length > 0) {
+    rowsHtml = Object.entries(pkgMap).map(([, p]) => {
+      const unitPrice = p.qty > 0 ? (p.price / p.qty) : 0;
+      const total = p.price;
+      return `<tr>
+        <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:13px;color:#111;text-align:center">${rowIdx++}</td>
+        <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:13px;color:#555">01-2-00${rowIdx-1}</td>
+        <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:13px;color:#111">${p.name}</td>
+        <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:13px;color:#555">${p.mat}</td>
+        <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:13px;color:#111;text-align:center">${p.qty}</td>
+        <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:13px;color:#111;text-align:right;white-space:nowrap">${fmtPrice(unitPrice).replace(' грн','')}</td>
+        <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:13px;font-weight:600;color:#111;text-align:right;white-space:nowrap">${fmtPrice(total).replace(' грн','')}</td>
+      </tr>`;
+    }).join('');
+  } else {
+    rowsHtml = (o.items || []).map(item => {
+      const unitP = item.qty > 0 ? (item.subtotal || item.price || 0) / item.qty : (item.price || 0);
+      return `<tr>
+        <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:13px;color:#111;text-align:center">${rowIdx++}</td>
+        <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:13px;color:#555">01-2-00${rowIdx-1}</td>
+        <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:13px;color:#111" colspan="2">${item.name}</td>
+        <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:13px;color:#111;text-align:center">${item.qty || 1}</td>
+        <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:13px;color:#111;text-align:right;white-space:nowrap">${fmtPrice(unitP).replace(' грн','')}</td>
+        <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:13px;font-weight:600;color:#111;text-align:right;white-space:nowrap">${fmtPrice(item.subtotal || item.price || 0).replace(' грн','')}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  const discountRow = (o.discount > 0) ? `
+    <tr>
+      <td colspan="6" style="padding:6px 10px;border:1px solid #e5e7eb;font-size:13px;color:#666;text-align:right">Знижка${o.promo ? ' (' + o.promo + ')' : ''}</td>
+      <td style="padding:6px 10px;border:1px solid #e5e7eb;font-size:13px;color:#c00;text-align:right;white-space:nowrap">−${fmtPrice(o.discount).replace(' грн','')}</td>
+    </tr>` : '';
+
+  const paymentPurpose = `Оплата за лабораторні дослідження за рахунком ${invoiceNum}, замовлення ${o.orderNum}.`;
+
+  return `<!DOCTYPE html>
+<html lang="uk">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f7fa;font-family:Arial,Helvetica,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f7fa;padding:32px 16px">
+<tr><td align="center">
+<table width="680" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;max-width:680px;border:1px solid #e5e7eb">
+
+  <!-- Header -->
+  <tr>
+    <td style="padding:24px 32px;border-bottom:2px solid #CCFF00">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td>
+            <div style="font-size:26px;font-weight:900;color:#111;letter-spacing:-1px">LABA<span style="color:#CCFF00">.</span></div>
+            <div style="font-size:11px;color:#888;margin-top:2px;letter-spacing:.5px">by Zemlerob</div>
+          </td>
+          <td style="text-align:right;vertical-align:top">
+            <div style="font-size:18px;font-weight:700;color:#111">РАХУНОК НА ОПЛАТУ</div>
+            <div style="font-size:13px;color:#555;margin-top:4px">${invoiceNum} · ${dateStr}</div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Meta row -->
+  <tr>
+    <td style="padding:16px 32px;background:#f9fafb;border-bottom:1px solid #e5e7eb">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="font-size:12px;color:#888">ЗАМОВЛЕННЯ</td>
+          <td style="font-size:12px;color:#888">ДАТА</td>
+          <td style="font-size:12px;color:#888">ДІЙСНИЙ ДО</td>
+        </tr>
+        <tr>
+          <td style="font-size:14px;font-weight:600;color:#111;padding-top:4px">${o.orderNum}</td>
+          <td style="font-size:14px;font-weight:600;color:#111;padding-top:4px">${dateStr}</td>
+          <td style="font-size:14px;font-weight:600;color:#111;padding-top:4px">${validStr}</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Parties -->
+  <tr>
+    <td style="padding:20px 32px;border-bottom:1px solid #e5e7eb">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td width="50%" style="vertical-align:top;padding-right:16px">
+            <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:.8px;margin-bottom:8px">ПОСТАЧАЛЬНИК</div>
+            <div style="font-size:13px;font-weight:700;color:#111;line-height:1.5">ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ «ЗЕМЛЕРОБ ХАБ»</div>
+            <div style="font-size:12px;color:#555;line-height:1.7;margin-top:4px">
+              Код за ЄДРПОУ: 45801119<br>
+              п/р UA63 305299 00000 26001031616283<br>
+              у банку ПАТ КБ «ПРИВАТБАНК», МФО 305299<br>
+              вул. Б. Вишневецького, 36/1, м. Черкаси, 18000
+            </div>
+          </td>
+          <td width="50%" style="vertical-align:top;padding-left:16px;border-left:1px solid #e5e7eb">
+            <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:.8px;margin-bottom:8px">ПЛАТНИК</div>
+            <div style="font-size:13px;font-weight:700;color:#111;line-height:1.5">${buyerName}</div>
+            <div style="font-size:12px;color:#555;line-height:1.7;margin-top:4px">
+              ${buyerEdrpou}
+              ${o.client?.phone ? 'Тел: ' + o.client.phone + '<br>' : ''}
+              ${o.client?.email ? 'Email: ' + o.client.email + '<br>' : ''}
+              ${buyerAddr ? buyerAddr + '<br>' : ''}
+            </div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Services table -->
+  <tr>
+    <td style="padding:20px 32px">
+      <div style="font-size:12px;font-weight:700;color:#888;letter-spacing:.8px;margin-bottom:12px">ПОСЛУГИ ЗА ЗАМОВЛЕННЯМ</div>
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
+        <thead>
+          <tr style="background:#f3f4f6">
+            <th style="padding:8px 10px;border:1px solid #e5e7eb;font-size:11px;color:#666;font-weight:600;text-align:center;width:32px">№</th>
+            <th style="padding:8px 10px;border:1px solid #e5e7eb;font-size:11px;color:#666;font-weight:600;text-align:left;width:80px">Код послуги</th>
+            <th style="padding:8px 10px;border:1px solid #e5e7eb;font-size:11px;color:#666;font-weight:600;text-align:left">Пакет / дослідження</th>
+            <th style="padding:8px 10px;border:1px solid #e5e7eb;font-size:11px;color:#666;font-weight:600;text-align:left;width:80px">Матеріал</th>
+            <th style="padding:8px 10px;border:1px solid #e5e7eb;font-size:11px;color:#666;font-weight:600;text-align:center;width:60px">К-сть зразків</th>
+            <th style="padding:8px 10px;border:1px solid #e5e7eb;font-size:11px;color:#666;font-weight:600;text-align:right;width:90px">Ціна, грн</th>
+            <th style="padding:8px 10px;border:1px solid #e5e7eb;font-size:11px;color:#666;font-weight:600;text-align:right;width:90px">Сума, грн</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+          ${discountRow}
+        </tbody>
+        <tfoot>
+          <tr style="background:#f9fafb">
+            <td colspan="6" style="padding:10px 10px;border:1px solid #e5e7eb;font-size:14px;font-weight:700;color:#111;text-align:right">Сума після знижки</td>
+            <td style="padding:10px 10px;border:1px solid #e5e7eb;font-size:14px;font-weight:700;color:#111;text-align:right;white-space:nowrap">${fmtPrice(o.total).replace(' грн','')} грн</td>
+          </tr>
+        </tfoot>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Payment details -->
+  <tr>
+    <td style="padding:0 32px 24px">
+      <div style="background:#f9fafb;border-radius:8px;padding:16px 20px;border:1px solid #e5e7eb">
+        <div style="font-size:12px;font-weight:700;color:#888;letter-spacing:.8px;margin-bottom:8px">ДЕТАЛІ ОПЛАТИ</div>
+        <div style="font-size:13px;color:#555;line-height:1.7">
+          <strong style="color:#111">Призначення платежу:</strong> ${paymentPurpose}<br>
+          <strong style="color:#111">Отримувач:</strong> ТОВ «ЗЕМЛЕРОБ ХАБ»<br>
+          <strong style="color:#111">IBAN:</strong> UA63 305299 00000 26001031616283<br>
+          <strong style="color:#111">Банк:</strong> ПАТ КБ «ПРИВАТБАНК», МФО 305299
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:#999">
+          Примітка. Рахунок дійсний протягом 7 календарних днів з дати виставлення.
+        </div>
+      </div>
+    </td>
+  </tr>
+
+  <!-- Footer -->
+  <tr>
+    <td style="padding:16px 32px;background:#f3f4f6;border-top:1px solid #e5e7eb">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="font-size:12px;color:#888">
+            📞 <a href="tel:+380670000000" style="color:#555">+380 67 000 00 00</a> &nbsp;|&nbsp;
+            🌐 <a href="https://laba.zemlerob.com.ua" style="color:#555">laba.zemlerob.com.ua</a>
+          </td>
+          <td style="text-align:right;font-size:11px;color:#aaa">LABA by Zemlerob · Рахунок сформовано автоматично</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+}
+
 // ─── Supabase helper ─────────────────────────────────────────────────────────
 
 async function saveOrderToSupabase(order) {
@@ -290,29 +508,46 @@ module.exports = async function handler(req, res) {
     errors.push({ channel: 'telegram', message: err.message });
   }
 
-  // 2. Email to client
+  // 2. Email to client (confirmation + invoice)
   const clientEmail = order.client?.email;
   if (clientEmail) {
-    try {
-      const transporter = nodemailer.createTransport({
-        host:   process.env.SMTP_HOST,
-        port:   Number(process.env.SMTP_PORT || 587),
-        secure: process.env.SMTP_SECURE === 'true',
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      });
+    const transporter = nodemailer.createTransport({
+      host:   process.env.SMTP_HOST,
+      port:   Number(process.env.SMTP_PORT || 587),
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
 
+    // 2a. Confirmation email
+    try {
       await transporter.sendMail({
-        from: `"LABA Agro" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
-        to:   clientEmail,
+        from:    `"LABA Agro" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+        to:      clientEmail,
         subject: `Замовлення ${order.orderNum} прийнято — LABA`,
         html:    buildClientEmailHtml(order),
       });
     } catch (err) {
-      console.error('Email error:', err.message);
+      console.error('Confirmation email error:', err.message);
       errors.push({ channel: 'email', message: err.message });
+    }
+
+    // 2b. Invoice email
+    const invoiceNum = order.orderNum
+      ? 'LABA-' + order.orderNum.replace(/^LAB-/, '')
+      : 'LABA-рахунок';
+    try {
+      await transporter.sendMail({
+        from:    `"LABA Agro" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+        to:      clientEmail,
+        subject: `Рахунок ${invoiceNum} — LABA`,
+        html:    buildInvoiceHtml(order),
+      });
+    } catch (err) {
+      console.error('Invoice email error:', err.message);
+      errors.push({ channel: 'invoice_email', message: err.message });
     }
   }
 
