@@ -7692,18 +7692,17 @@ function renderAddPanel(sid) {
   const curFilter = NS.catFilter[sid] || 'all';
   const curSearch = (NS.search[sid] || '').toLowerCase().trim();
 
-  // available = not included in package AND not already added AND matches material
-  // Пробопідготовка вже входить у вартість пакету — не показуємо її для додавання
+  // available = not included in package AND matches material
+  // Пробопідготовка відображається, але заблокована для додавання до пакетного дослідження
   const allCats = NS_CAT.categories.filter(c => c.id !== 'all');
   const prepCat = allCats.find(c => c.name === 'Пробопідготовка' || c.id === 'Пробопідготовка');
   const prepIds = new Set((prepCat ? prepCat.items : []).map(i => i.id));
 
   const srcItems = curFilter === 'all'
-    ? allCats.filter(c => c.name !== 'Пробопідготовка' && c.id !== 'Пробопідготовка').flatMap(c => c.items)
+    ? allCats.flatMap(c => c.items)
     : (NS_CAT.categories.find(c => c.id === curFilter) || {items:[]}).items;
 
   const avail = srcItems.filter(i =>
-    !prepIds.has(i.id) &&
     !incl.has(i.id) &&
     (!i.mat || i.mat.includes(s.materialId)) &&
     (!curSearch || i.name.toLowerCase().includes(curSearch))
@@ -7711,7 +7710,7 @@ function renderAddPanel(sid) {
 
   const catOpts = [
     {id:'all', name:'Всі категорії'},
-    ...allCats.filter(c => c.name !== 'Пробопідготовка' && c.id !== 'Пробопідготовка'),
+    ...allCats,
   ].map(c => `<option value="${c.id}" ${c.id === curFilter ? 'selected' : ''}>${c.name}</option>`).join('');
 
   el.innerHTML = `
@@ -7728,6 +7727,16 @@ function renderAddPanel(sid) {
 <div class="ind-grid">
   ${avail.length ? avail.map(i => {
     const isAdded = added.has(i.id);
+    const isPrep = prepIds.has(i.id);
+    if (isPrep) {
+      return `<button class="add-ind-btn add-ind-btn--prep-locked" disabled title="Входить у вартість пакету" style="opacity:.5;cursor:not-allowed">
+      <div class="plus-ic" style="border-style:dashed">—</div>
+      <div class="ind-info">
+        <span class="add-ind-nm">${i.name}</span>
+        <span class="add-ind-price" style="font-style:italic;font-size:11px">входить у пакет</span>
+      </div>
+    </button>`;
+    }
     return `<button class="add-ind-btn${isAdded ? ' is-added' : ''}" ${isAdded ? '' : `onclick="addIndicator('${sid}','${i.id}')"`}>
     <div class="plus-ic">${isAdded ? '✓' : '+'}</div>
     <div class="ind-info">
