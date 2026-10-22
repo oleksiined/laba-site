@@ -95,8 +95,7 @@ module.exports = async function handler(req, res) {
   if (docRes.status >= 300) {
     // PDF uploaded OK but DB insert failed — still return url
     console.warn('documents insert failed:', docRes.status, docRes.body);
-    const fallbackUrl = `${supaUrl}/storage/v1/object/public/${bucket}/${storagePath}`;
-    return res.status(200).json({ ok: true, url: fallbackUrl, warn: 'documents insert failed' });
+    return res.status(200).json({ ok: true, warn: 'documents insert failed', bucket, path: storagePath });
   }
 
   let docId = null;
@@ -122,6 +121,5 @@ module.exports = async function handler(req, res) {
     }, linkPayload).catch(e => console.warn('document_orders insert error:', e.message));
   }
 
-  const publicUrl = `${supaUrl}/storage/v1/object/public/${bucket}/${storagePath}`;
-  return res.status(200).json({ ok: true, url: publicUrl, docId });
+  return res.status(200).json({ ok: true, docId, bucket, path: storagePath });
 };

@@ -4,24 +4,24 @@
 
 const https = require('https');
 
-function httpsGet(hostname, path, key) {
+function httpsReq(hostname, path, key, method = 'GET', body = null) {
   return new Promise((resolve, reject) => {
-    const opts = {
-      hostname,
-      path,
-      method: 'GET',
-      headers: {
-        'apikey':        key,
-        'Authorization': `Bearer ${key}`,
-        'Accept':        'application/json',
-      },
+    const headers = {
+      'apikey':        key,
+      'Authorization': `Bearer ${key}`,
+      'Accept':        'application/json',
     };
-    const req = https.request(opts, r => {
+    if (body) {
+      headers['Content-Type']   = 'application/json';
+      headers['Content-Length'] = Buffer.byteLength(body);
+    }
+    const req = https.request({ hostname, path, method, headers }, r => {
       let raw = '';
       r.on('data', c => raw += c);
       r.on('end', () => resolve({ status: r.statusCode, body: raw }));
     });
     req.on('error', reject);
+    if (body) req.write(body);
     req.end();
   });
 }
@@ -52,8 +52,8 @@ module.exports = async function handler(req, res) {
   try {
     // Fetch orders and invoice documents in parallel
     const [ordersResult, docsResult] = await Promise.allSettled([
-      httpsGet(host, '/rest/v1/orders?order=created_at.desc&limit=200', key),
-      httpsGet(host, '/rest/v1/documents?document_type=eq.invoice&status=eq.ready&select=order_id,storage_bucket,storage_path', key),
+      httpsReq(host, '/rest/v1/orders?order=created_at.desc&limit=200', key),
+      httpsReq(host, '/rest/v1/documents?document_type=eq.invoice&status=eq.ready&select=order_id,storage_bucket,storage_path', key),
     ]);
 
     if (ordersResult.status !== 'fulfilled' || ordersResult.value.status >= 300) {
@@ -65,23 +65,47 @@ module.exports = async function handler(req, res) {
 
     const orders = JSON.parse(ordersResult.value.body);
 
-    // Build a map: order_id → public URL
+    // Build signed URLs for invoices (private buckets)
     const invoiceMap = {};
     if (docsResult.status === 'fulfilled' && docsResult.value.status < 300) {
       try {
         const docs = JSON.parse(docsResult.value.body);
-        docs.forEach(d => {
-          if (d.order_id && d.storage_bucket && d.storage_path) {
-            invoiceMap[d.order_id] = `${url}/storage/v1/object/public/${d.storage_bucket}/${d.storage_path}`;
+        if (docs.length > 0) {
+          // Group paths by bucket (all invoices are in the same bucket)
+          const bucketGroups = {};
+          docs.forEach(d => {
+            if (d.order_id && d.storage_bucket && d.storage_path) {
+              if (!bucketGroups[d.storage_bucket]) bucketGroups[d.storage_bucket] = [];
+              bucketGroups[d.storage_bucket].push({ order_id: d.order_id, path: d.storage_path });
+            }
+          });
+
+          // Batch-generate signed URLs per bucket
+          for (const [bucket, items] of Object.entries(bucketGroups)) {
+            const signBody = JSON.stringify({
+              expiresIn: 604800,  // 7 days
+              paths: items.map(i => i.path),
+            });
+            const signRes = await httpsReq(host, `/storage/v1/object/sign/${bucket}`, key, 'POST', signBody);
+            if (signRes.status < 300) {
+              const signed = JSON.parse(signRes.body);
+              // Response: array of { path, signedURL, error }
+              signed.forEach((s, idx) => {
+                if (s.signedURL && items[idx]) {
+                  const fullSignedUrl = `${url}${s.signedURL}`;
+                  invoiceMap[items[idx].order_id] = fullSignedUrl;
+                }
+              });
+            }
           }
-        });
-      } catch (_) { /* non-fatal */ }
+        }
+      } catch (_) { /* non-fatal — orders still returned */ }
     }
 
     // Merge invoice_url into each order
     const enriched = orders.map(o => {
       const num = o.order_num || o.id;
-      return { ...o, invoice_url: invoiceMap[num] || o.invoice_url || null };
+      return { ...o, invoice_url: invoiceMap[num] || null };
     });
 
     return res.status(200).json({ ok: true, orders: enriched });
