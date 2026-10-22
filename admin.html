@@ -2306,7 +2306,6 @@ function _admRenderSamplesTab(o) {
     <thead><tr>
       <th style="width:28px"><input type="checkbox" id="admSampCbAll" onchange="admSampToggleAll(this)" style="width:13px;height:13px;cursor:pointer"></th>
       <th>№</th>
-      <th>НАЗВА ЗРАЗКА</th>
       <th>МАТЕРІАЛ</th>
       <th>СТАТУС</th>
       <th>ОНОВЛЕНО</th>
@@ -2320,7 +2319,6 @@ function _admRenderSamplesTab(o) {
       return `<tr>
         <td><input type="checkbox" class="adm-samp-cb" data-idx="${i}" onchange="admSampCbChange()" style="width:13px;height:13px;cursor:pointer"></td>
         <td><span class="adm-samp-num">${s.num}</span></td>
-        <td><span class="adm-samp-nm">${s.name||'—'}</span></td>
         <td><span class="adm-samp-mat">${mat}</span></td>
         <td><span class="adm-ss-pill ${stCls}">${stLbl}</span></td>
         <td><span class="adm-samp-dt">${dt}</span></td>
