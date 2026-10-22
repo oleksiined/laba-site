@@ -1787,8 +1787,8 @@ function _mapOrder(o) {
 async function admLoad() {
   // Завантажуємо матеріали і замовлення паралельно
   const [ordersResult, materialsResult] = await Promise.allSettled([
-    fetch('/api/orders-list').then(r => r.json()),
-    fetch('/api/materials').then(r => r.json()),
+    fetch('https://laba.zemlerob.com.ua/api/orders-list').then(r => r.json()),
+    fetch('https://laba.zemlerob.com.ua/api/materials').then(r => r.json()),
   ]);
 
   // Матеріали з Supabase → будуємо динамічну карту
@@ -2104,7 +2104,7 @@ async function admOISave() {
   };
 
   try {
-    const r = await fetch('/api/order-update', {
+    const r = await fetch('https://laba.zemlerob.com.ua/api/order-update', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
