@@ -3841,8 +3841,10 @@ function navigate(page) {
   if (page === 'checkout') {
     const _ck = JSON.stringify((cart||[]).map(c=>c.code+':'+(c.qty||getCartQty(c)))) +
                 '|' + JSON.stringify((typeof samples!=='undefined'&&samples||[]).map(s=>(s.id||'')+'='+(s.extras||[]).map(e=>e.id).join(',')));
-    if (_ck !== NC_S._lastCartKey) { buildNCFromCart(); NC_S._lastCartKey = _ck; nc_maxStep = 1; }
-    nc_render(); nc_setMaxStep(1); try { history.pushState({page},'','#checkout'); } catch(e){} window.scrollTo(0,0); return;
+    if (typeof NC_S !== 'undefined' && _ck !== NC_S._lastCartKey) { buildNCFromCart(); NC_S._lastCartKey = _ck; nc_maxStep = 1; }
+    if (typeof nc_render === 'function') nc_render();
+    if (typeof nc_setMaxStep === 'function') nc_setMaxStep(1);
+    try { history.pushState({page},'','#checkout'); } catch(e){} window.scrollTo(0,0); return;
   }
   try { history.pushState({page}, '', '#' + page); } catch(e){}
   window.scrollTo(0,0);

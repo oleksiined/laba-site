@@ -490,37 +490,42 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Missing orderNum' });
   }
 
-  const errors = [];
+  const notifErrors = [];
+  let supabaseOk = false;
 
-  // 1. Telegram
+  // 1. Save to Supabase — CRITICAL: must succeed for the order to exist
+  try {
+    await saveOrderToSupabase(order);
+    supabaseOk = true;
+  } catch (err) {
+    console.error('Supabase error:', err.message);
+    return res.status(500).json({ ok: false, orderNum: order.orderNum, error: 'Supabase: ' + err.message });
+  }
+
+  // 2. Notifications — non-critical; failures are logged but don't affect HTTP status
+
+  // 2a. Telegram
   try {
     const chatId = process.env.TELEGRAM_CHAT_ID;
     if (!chatId) throw new Error('TELEGRAM_CHAT_ID not set');
     const text = buildTelegramText(order);
-    await tgRequest('sendMessage', {
-      chat_id: chatId,
-      text,
-      parse_mode: 'Markdown',
-    });
+    await tgRequest('sendMessage', { chat_id: chatId, text, parse_mode: 'Markdown' });
   } catch (err) {
-    console.error('Telegram error:', err.message);
-    errors.push({ channel: 'telegram', message: err.message });
+    console.warn('Telegram error (non-fatal):', err.message);
+    notifErrors.push({ channel: 'telegram', message: err.message });
   }
 
-  // 2. Email to client (confirmation + invoice)
+  // 2b. Email to client
   const clientEmail = order.client?.email;
-  if (clientEmail) {
+  if (clientEmail && process.env.SMTP_HOST) {
     const transporter = nodemailer.createTransport({
       host:   process.env.SMTP_HOST,
       port:   Number(process.env.SMTP_PORT || 587),
       secure: process.env.SMTP_SECURE === 'true',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
     });
 
-    // 2a. Confirmation email
+    // Confirmation email
     try {
       await transporter.sendMail({
         from:    `"LABA Agro" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
@@ -529,11 +534,11 @@ module.exports = async function handler(req, res) {
         html:    buildClientEmailHtml(order),
       });
     } catch (err) {
-      console.error('Confirmation email error:', err.message);
-      errors.push({ channel: 'email', message: err.message });
+      console.warn('Confirmation email error (non-fatal):', err.message);
+      notifErrors.push({ channel: 'email', message: err.message });
     }
 
-    // 2b. Invoice email
+    // Invoice email
     const invoiceNum = order.orderNum
       ? 'LABA-' + order.orderNum.replace(/^LAB-/, '')
       : 'LABA-рахунок';
@@ -545,25 +550,21 @@ module.exports = async function handler(req, res) {
         html:    buildInvoiceHtml(order),
       });
     } catch (err) {
-      console.error('Invoice email error:', err.message);
-      errors.push({ channel: 'invoice_email', message: err.message });
+      console.warn('Invoice email error (non-fatal):', err.message);
+      notifErrors.push({ channel: 'invoice_email', message: err.message });
     }
   }
 
-  // 3. Optional: email to LABA team
+  // 2c. Team email
   const teamEmail = process.env.TEAM_EMAIL;
-  if (teamEmail) {
+  if (teamEmail && process.env.SMTP_HOST) {
     try {
       const transporter = nodemailer.createTransport({
         host:   process.env.SMTP_HOST,
         port:   Number(process.env.SMTP_PORT || 587),
         secure: process.env.SMTP_SECURE === 'true',
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
+        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
       });
-
       const textBody = buildTelegramText(order).replace(/[*_`]/g, '');
       await transporter.sendMail({
         from:    `"LABA Site" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
@@ -572,27 +573,15 @@ module.exports = async function handler(req, res) {
         text:    textBody,
       });
     } catch (err) {
-      console.error('Team email error:', err.message);
-      errors.push({ channel: 'team_email', message: err.message });
+      console.warn('Team email error (non-fatal):', err.message);
+      notifErrors.push({ channel: 'team_email', message: err.message });
     }
   }
 
-  // 4. Save to Supabase
-  try {
-    await saveOrderToSupabase(order);
-  } catch (err) {
-    console.error('Supabase error:', err.message);
-    errors.push({ channel: 'supabase', message: err.message });
-  }
-
-  // Return result
-  if (errors.length === 0) {
-    return res.status(200).json({ ok: true, orderNum: order.orderNum });
-  }
-
-  // Partial success is still OK from the client's perspective
-  // (order is logged server-side; channels that failed are noted)
-  const allFailed = errors.length >= 2 || (errors.length === 1 && !clientEmail && !teamEmail);
-  const status = allFailed ? 500 : 200;
-  return res.status(status).json({ ok: !allFailed, orderNum: order.orderNum, errors });
+  // Order saved — always 200; notification failures are informational only
+  return res.status(200).json({
+    ok: true,
+    orderNum: order.orderNum,
+    ...(notifErrors.length ? { partialErrors: notifErrors } : {}),
+  });
 };
