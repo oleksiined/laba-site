@@ -2058,25 +2058,47 @@ async function admOISave() {
     email:       g('admEIEmail'),
     companyType: g('admEIPayerType'),
   };
-  // Update Supabase — use dbId (UUID) as primary key; column names match orders table
+  // Показуємо індикатор збереження
+  const saveBtn = document.querySelector('#admOIEdit button[onclick="admOISave()"]');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Збереження…'; }
+
+  const payerMap = { 'Юридична особа': 'legal', 'ФОП': 'fop', 'Фізична особа': 'private' };
+  const payload = {
+    id:         o.dbId,
+    company:    updates.client,
+    name:       updates.contact,
+    edrpou:     updates.edrpou,
+    phone:      updates.phone,
+    email:      updates.email,
+    payer_type: payerMap[updates.companyType] || 'private',
+  };
+
   try {
-    const sb = window._sb || window.supabase;
-    if (sb && o.dbId) {
-      const { error } = await sb.from('orders').update({
-        company:    updates.client,
-        name:       updates.contact,
-        edrpou:     updates.edrpou,
-        phone:      updates.phone,
-        email:      updates.email,
-        payer_type: updates.companyType === 'Юридична особа' ? 'legal' : updates.companyType === 'ФОП' ? 'fop' : 'private',
-      }).eq('id', o.dbId);
-      if (error) { alert('Помилка збереження: ' + error.message); return; }
-    } else if (!o.dbId) {
-      console.warn('admOISave: no dbId on order, cannot save to Supabase');
+    const r = await fetch('/api/order-update', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await r.json();
+    if (!data.ok) {
+      alert('Помилка збереження: ' + (data.error || r.status));
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Зберегти'; }
+      return;
     }
-  } catch(e) { console.warn('Supabase save error', e); }
-  // Update local object
-  Object.assign(o, updates);
+  } catch(e) {
+    alert('Помилка мережі: ' + e.message);
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Зберегти'; }
+    return;
+  }
+
+  // Update local object so UI reflects saved data immediately
+  o.client      = updates.client;
+  o.contact     = updates.contact;
+  o.edrpou      = updates.edrpou;
+  o.phone       = updates.phone;
+  o.email       = updates.email;
+  o.companyType = updates.companyType;
+
   admOICancelEdit();
   admSelect(o.id); // re-render panel
 }
