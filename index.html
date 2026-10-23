@@ -8657,14 +8657,14 @@ function ncf_downloadInvoice() {
           { stack: [{ text: 'ДАТА',       fontSize: 7.5, color: '#888', bold: true }, { text: invoiceDate, fontSize: 10, bold: true, color: '#000', margin: [0,2,0,0] }] },
           { stack: [{ text: 'ДІЙСНИЙ ДО', fontSize: 7.5, color: '#888', bold: true }, { text: dueDate,     fontSize: 10, bold: true, color: '#000', margin: [0,2,0,0] }], alignment: 'right' },
         ],
-        margin: [0, 0, 0, 6],
+        margin: [0, 0, 0, 4],
       },
 
       // ── Рахунок № … від … ────────────────────────────────
-      { text: `Рахунок № ${invoiceId} від ${invoiceDate}`, fontSize: 9, color: '#555', alignment: 'center', margin: [0, 0, 0, 10] },
+      { text: `Рахунок № ${invoiceId} від ${invoiceDate}`, fontSize: 9, color: '#555', alignment: 'center', margin: [0, 0, 0, 4] },
 
       // ── Лінія-роздільник ─────────────────────────────────────
-      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 10] },
+      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 8] },
 
       // ── Постачальник / Платник ────────────────────────────────
       {
@@ -8689,14 +8689,14 @@ function ncf_downloadInvoice() {
             ]
           }
         ],
-        margin: [0, 0, 0, 10],
+        margin: [0, 0, 0, 8],
       },
 
       // ── Лінія ────────────────────────────────────────────────
-      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 8] },
+      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 6] },
 
       // ── Заголовок таблиці ─────────────────────────────────────
-      { text: 'ПОСЛУГИ ЗА ЗАМОВЛЕННЯМ', fontSize: 9, bold: true, color: '#000', margin: [0, 0, 0, 5] },
+      { text: 'ПОСЛУГИ ЗА ЗАМОВЛЕННЯМ', fontSize: 9, bold: true, color: '#000', margin: [0, 0, 0, 4] },
 
       // ── Таблиця послуг ────────────────────────────────────────
       {
@@ -8712,10 +8712,10 @@ function ncf_downloadInvoice() {
           vLineColor: () => '#d8dce8',
           paddingLeft:  () => 5,
           paddingRight: () => 5,
-          paddingTop:   () => 4,
-          paddingBottom:() => 4,
+          paddingTop:   () => 3,
+          paddingBottom:() => 3,
         },
-        margin: [0, 0, 0, 12],
+        margin: [0, 0, 0, 8],
       },
 
       // ── Деталі оплати + підсумки ──────────────────────────────
@@ -8748,12 +8748,12 @@ function ncf_downloadInvoice() {
             margin: [0, 6, 0, 0],
           }
         ],
-        margin: [0, 0, 0, 12],
+        margin: [0, 0, 0, 8],
       },
 
       // ── Примітка ──────────────────────────────────────────────
-      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 6] },
-      { text: 'Примітка. Рахунок дійсний протягом 7 календарних днів з дати виставлення. Послуга надається тільки після надходження 50% коштів на розрахунковий рахунок.', fontSize: 8, italics: true, color: '#555', margin: [0, 0, 0, 14] },
+      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 5] },
+      { text: 'Примітка. Рахунок дійсний протягом 7 календарних днів з дати виставлення. Послуга надається тільки після надходження 50% коштів на розрахунковий рахунок.', fontSize: 8, italics: true, color: '#555', margin: [0, 0, 0, 10] },
 
       // ── Контакти ──────────────────────────────────────────────
       {
@@ -8785,17 +8785,26 @@ function ncf_downloadInvoice() {
   };
 
   const safeDate = invoiceDate.replace(/\./g, '-');
-  const _pdfDoc  = pdfMake.createPdf(docDef);
-  _pdfDoc.download(`Рахунок_LABA_${safeDate}.pdf`);
+  const _invFileName = `Рахунок_LABA_${safeDate}.pdf`;
 
-  // ── Save PDF to Supabase Storage in background (silent) ──────────────────
-  const _invOrderNum = orderNum;
-  const _invDate = invoiceDate;
-  _pdfDoc.getBase64(function(_b64) {
+  // ── Generate PDF once → same blob used for download AND Supabase save ────
+  pdfMake.createPdf(docDef).getBase64(function(_b64) {
+
+    // ① Download to user (identical to what gets saved)
+    try {
+      const _link = document.createElement('a');
+      _link.href = 'data:application/pdf;base64,' + _b64;
+      _link.download = _invFileName;
+      document.body.appendChild(_link);
+      _link.click();
+      document.body.removeChild(_link);
+    } catch(e) { console.warn('[LABA] Invoice download error:', e.message); }
+
+    // ② Save the same PDF to Supabase Storage (background, silent)
     fetch('https://laba.zemlerob.com.ua/api/save-invoice', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderNum: _invOrderNum, pdfBase64: _b64, invoiceDate: _invDate }),
+      body: JSON.stringify({ orderNum, pdfBase64: _b64, invoiceDate }),
     }).then(r => r.json()).then(d => {
       if (d.ok) console.log('[LABA] Invoice saved:', d.docId || d.path, d.warn || '');
       else      console.warn('[LABA] Invoice save failed:', d.error);
