@@ -2984,12 +2984,16 @@ function smpSelect(id) {
       const pkgLabel = s.packageName || _PKG_LABEL[s.pkg] || s.packageId || '—';
       const pkgCode  = s.packageId || '—';
       const uid = 'pkg_' + (s.id||'').replace(/\W/g,'');
-      html += `<tr class="smp-pkg-row" onclick="smpTogglePkg('${uid}')" style="cursor:pointer;background:var(--bg-soft,#f8f9fa)">
-        <td style="width:20px;color:var(--text-soft);font-size:12px">📦</td>
-        <td style="font-family:monospace;font-size:11px;color:var(--navy);white-space:nowrap">${pkgCode}</td>
-        <td style="font-size:12px;font-weight:500">${pkgLabel}</td>
-        <td style="font-size:11px;color:var(--text-soft);white-space:nowrap;text-align:right">
-          <span id="${uid}_arrow" style="display:inline-block;transition:transform .2s">▶</span>&nbsp;(${pkgItems.length})
+      html += `<tr class="smp-pkg-row" onclick="smpTogglePkg('${uid}')" style="cursor:pointer;background:#eef2ff">
+        <td colspan="4" style="padding:8px 12px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:13px">📦</span>
+            <span style="font-family:monospace;font-size:11px;color:var(--navy)">${pkgCode}</span>
+            <span style="font-size:12px;font-weight:600;color:var(--navy);flex:1">${pkgLabel}</span>
+            <span style="font-size:11px;color:var(--text-soft);white-space:nowrap">
+              ${pkgItems.length} показн.&nbsp;<span id="${uid}_arrow" style="display:inline-block;transition:transform .2s;font-size:10px">▶</span>
+            </span>
+          </div>
         </td>
       </tr>`;
       pkgItems.forEach((pi,i)=>{
