@@ -8521,13 +8521,29 @@ function ncf_downloadInvoice() {
     const pkg = (NS_CAT && NS_CAT.packages && NS_CAT.packages[s.packageId])
              || (NC_CATALOG && NC_CATALOG.packages && NC_CATALOG.packages[s.packageId]);
     const key = (s.packageId||'') + '|' + (s.materialId||'');
-    if (!pkgMap[key]) pkgMap[key] = {
-      code: s.packageId || '—',
-      name: pkg ? pkg.name : (s.packageId || '—'),
-      material: getMat(s.materialId),
-      price: pkg ? (pkg.price || 0) : 0,
-      qty: 0
-    };
+    if (!pkgMap[key]) {
+      // Якщо пакет є "virtual" (має baseName = реальна послуга, напр. 'Пробопідготовка'),
+      // шукаємо фактичний показник у каталозі, щоб отримати правильний код і назву
+      let displayCode = s.packageId || '—';
+      let displayName = pkg ? (pkg.baseName || pkg.name) : (s.packageId || '—');
+      if (pkg && pkg.baseName) {
+        const cats = [
+          ...((NC_CATALOG && NC_CATALOG.categories) || []),
+          ...((NS_CAT && NS_CAT.categories) || []),
+        ];
+        for (const cat of cats) {
+          const found = (cat.items || []).find(i => i.name === pkg.baseName);
+          if (found) { displayCode = found.id || displayCode; break; }
+        }
+      }
+      pkgMap[key] = {
+        code: displayCode,
+        name: displayName,
+        material: getMat(s.materialId),
+        price: pkg ? (pkg.price || 0) : 0,
+        qty: 0
+      };
+    }
     pkgMap[key].qty++;
   });
 
@@ -8645,7 +8661,7 @@ function ncf_downloadInvoice() {
       },
 
       // ── Рахунок № … від … ────────────────────────────────
-      { text: `Рахунок № ${invoiceId} від ${invoiceDate}`, fontSize: 9, color: '#555', margin: [0, 0, 0, 10] },
+      { text: `Рахунок № ${invoiceId} від ${invoiceDate}`, fontSize: 9, color: '#555', alignment: 'center', margin: [0, 0, 0, 10] },
 
       // ── Лінія-роздільник ─────────────────────────────────────
       { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 10] },
@@ -8737,7 +8753,7 @@ function ncf_downloadInvoice() {
 
       // ── Примітка ──────────────────────────────────────────────
       { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 6] },
-      { text: 'Примітка. Рахунок дійсний протягом 7 календарних днів з дати виставлення. Послуга надається тільки після надходження коштів на розрахунковий рахунок.', fontSize: 8, italics: true, color: '#555', margin: [0, 0, 0, 14] },
+      { text: 'Примітка. Рахунок дійсний протягом 7 календарних днів з дати виставлення. Послуга надається тільки після надходження 50% коштів на розрахунковий рахунок.', fontSize: 8, italics: true, color: '#555', margin: [0, 0, 0, 14] },
 
       // ── Контакти ──────────────────────────────────────────────
       {
