@@ -49,6 +49,7 @@ module.exports = async function handler(req, res) {
     });
 
     if (result.status >= 300) {
+      console.error('[next-sample-num] Supabase error:', result.status, result.body);
       return res.status(500).json({ ok: false, error: `Supabase ${result.status}: ${result.body}` });
     }
 
@@ -67,6 +68,7 @@ module.exports = async function handler(req, res) {
 
     return res.status(200).json({ ok: true, nextNum, year });
   } catch (err) {
+    console.error('[next-sample-num] exception:', err.message);
     return res.status(500).json({ ok: false, error: err.message });
   }
 };
