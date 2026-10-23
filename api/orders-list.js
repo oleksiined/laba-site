@@ -130,9 +130,20 @@ module.exports = async function handler(req, res) {
       } catch (_) { /* non-fatal — orders still returned */ }
     }
 
-    // Merge invoice_url into each order + enrich samples with packageName from catalog
+    // Merge invoice_url into each order + enrich items/samples with names from catalog
     const enriched = orders.map(o => {
       const num = o.order_num || o.id;
+
+      // Enrich items: add serviceName from catalog map
+      let items = o.items;
+      if (Array.isArray(items)) {
+        items = items.map(it => ({
+          ...it,
+          serviceName: (it.name && catalogMap[it.name]) || it.serviceName || null,
+        }));
+      }
+
+      // Enrich samples: add packageName from catalog map if missing
       let samples = o.samples;
       if (Array.isArray(samples)) {
         samples = samples.map(s => {
@@ -142,7 +153,8 @@ module.exports = async function handler(req, res) {
           return s;
         });
       }
-      return { ...o, samples, invoice_url: invoiceMap[num] || null };
+
+      return { ...o, items, samples, invoice_url: invoiceMap[num] || null };
     });
 
     return res.status(200).json({ ok: true, orders: enriched });

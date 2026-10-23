@@ -2958,17 +2958,26 @@ function smpSelect(id) {
   }
   set('smpPanelTestCnt', items.length);
   set('smpPanelTestCnt2', items.length);
-  // Таблиця досліджень — будуємо з даних зразка, не з order.items
+  // Таблиця досліджень — order.items + додаткові показники зразка
   const tbody = document.getElementById('smpPanelTests');
   if(tbody){
     const srvRows = [];
-    // 1) Пакет
-    const _pkgName = s.packageName || _PKG_LABEL[s.pkg] || s.pkg || '';
-    const _pkgCode = s.packageId || s.pkg || '';
-    if(_pkgName || _pkgCode){
-      srvRows.push({ code: _pkgCode||'—', name: _pkgName||_pkgCode, type:'Пакет' });
+    // 1) Послуги з order.items (вже збагачені serviceName на бекенді)
+    if(items && items.length){
+      items.forEach(it=>{
+        const code = it.name || '—';
+        const name = it.serviceName || it.displayName || code;
+        srvRows.push({ code, name, type: 'Послуга' });
+      });
+    } else {
+      // Fallback: показуємо пакет якщо items порожні
+      const _pkgName = s.packageName || _PKG_LABEL[s.pkg] || s.pkg || '';
+      const _pkgCode = s.packageId || (s.pkg !== 'basic' ? s.pkg : '') || '';
+      if(_pkgName || _pkgCode){
+        srvRows.push({ code: _pkgCode||'—', name: _pkgName||_pkgCode, type:'Пакет' });
+      }
     }
-    // 2) Додаткові показники
+    // 2) Додаткові показники зразка
     (s.additionals||[]).forEach(name=>{
       srvRows.push({ code:'—', name, type:'Окремий показник' });
     });
