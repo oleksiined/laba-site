@@ -8535,8 +8535,10 @@ function ncf_downloadInvoice() {
   const addMap = {};
   samples.forEach(s => {
     (s.additionalIndicatorIds || []).forEach(id => {
-      const cat = NS_CAT || NC_CATALOG;
-      const ind = cat && cat.indicators && cat.indicators[id];
+      // NC_CATALOG і NS_CAT зберігають показники у categories[].items[], а не у .indicators{}
+      // Використовуємо nc_findInd / ns_findInd для правильного пошуку
+      const ind = (typeof nc_findInd === 'function' && nc_findInd(id))
+               || (typeof ns_findInd === 'function' && ns_findInd(id));
       if (ind) {
         if (!addMap[id]) addMap[id] = { code: id, name: ind.name, material: '—', price: ind.price || 0, qty: 0 };
         addMap[id].qty++;
@@ -8732,7 +8734,7 @@ function ncf_downloadInvoice() {
 
       // ── Примітка ──────────────────────────────────────────────
       { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 6] },
-      { text: 'Примітка. Рахунок дійсний протягом 7 календарних днів з дати виставлення.', fontSize: 8, italics: true, color: '#555', margin: [0, 0, 0, 14] },
+      { text: 'Примітка. Рахунок дійсний протягом 7 календарних днів з дати виставлення. Послуга надається тільки після надходження коштів на розрахунковий рахунок.', fontSize: 8, italics: true, color: '#555', margin: [0, 0, 0, 14] },
 
       // ── Контакти ──────────────────────────────────────────────
       {
