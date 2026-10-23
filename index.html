@@ -8601,7 +8601,7 @@ function ncf_downloadInvoice() {
     ]);
   }
   sumRows.push([
-    { text: 'Сума після знижки', fontSize: 11, bold: true, border: [false,false,false,false] },
+    { text: discount > 0 ? 'Сума після знижки' : 'Сума', fontSize: 11, bold: true, border: [false,false,false,false] },
     { text: fmtUAH(total) + '\nгрн', fontSize: 11, bold: true, alignment: 'right', border: [false,false,false,false] },
   ]);
 
@@ -8641,8 +8641,11 @@ function ncf_downloadInvoice() {
           { stack: [{ text: 'ДАТА',       fontSize: 7.5, color: '#888', bold: true }, { text: invoiceDate, fontSize: 10, bold: true, color: '#000', margin: [0,2,0,0] }] },
           { stack: [{ text: 'ДІЙСНИЙ ДО', fontSize: 7.5, color: '#888', bold: true }, { text: dueDate,     fontSize: 10, bold: true, color: '#000', margin: [0,2,0,0] }], alignment: 'right' },
         ],
-        margin: [0, 0, 0, 10],
+        margin: [0, 0, 0, 6],
       },
+
+      // ── Рахунок № … від … ────────────────────────────────
+      { text: `Рахунок № ${invoiceId} від ${invoiceDate}`, fontSize: 9, color: '#555', margin: [0, 0, 0, 10] },
 
       // ── Лінія-роздільник ─────────────────────────────────────
       { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 10] },
