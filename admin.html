@@ -2778,6 +2778,9 @@ function _buildSamples() {
         mat:        matKey,
         matLabel:   _MAT_LABEL[matKey] || matRaw || matKey,
         pkg:        s.pkg || 'basic',
+        packageId:  s.packageId || '',
+        packageName: s.packageName || '',
+        _idx:       i,
         status:     s.st || 'new',
         date:       o.date,
         items:      o.items || [],
@@ -2962,14 +2965,18 @@ function smpSelect(id) {
   const tbody = document.getElementById('smpPanelTests');
   if(tbody){
     const srvRows = [];
-    // 1) Основна послуга цього зразка: шукаємо в items по packageId, або беремо з sample напряму
+    // 1) Основна послуга цього зразка: шукаємо в items по packageId
     const myCode = s.packageId || '';
-    // Знаходимо відповідний item по коду
-    const myItem = myCode && items ? items.find(it => it.name === myCode) : null;
+    // Шукаємо item по коду послуги
+    let myItem = myCode && items ? items.find(it => it.name === myCode) : null;
+    // Fallback по індексу зразка в замовленні (для старих записів де packageId = 'basic'/'standard'/'extended')
+    if(!myItem && typeof s._idx === 'number' && Array.isArray(items) && items[s._idx]) {
+      myItem = items[s._idx];
+    }
     if(myItem){
       srvRows.push({ code: myItem.name||'—', name: myItem.serviceName||myItem.displayName||myItem.name, type:'Послуга' });
     } else {
-      // Fallback: назва пакету зі зразка або з каталогу
+      // Останній fallback: назва пакету зі зразка або з каталогу
       const _pkgName = s.packageName || _PKG_LABEL[s.pkg] || '';
       const _pkgCode = myCode || '';
       if(_pkgName || _pkgCode){
