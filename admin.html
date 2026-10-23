@@ -146,7 +146,7 @@ html{scroll-behavior:smooth}
 .adm-pag-btn[disabled]{opacity:.35;cursor:default}
 
 /* Right detail panel */
-.adm-panel{width:420px;flex-shrink:0;background:var(--white);border-left:1px solid var(--border);overflow-y:hidden;display:none;flex-direction:column;height:100%}
+.adm-panel{width:520px;flex-shrink:0;background:var(--white);border-left:1px solid var(--border);overflow-y:hidden;display:none;flex-direction:column;height:100%}
 .adm-panel.open{display:flex}
 .adm-panel-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .adm-panel-num{font-size:13.5px;font-weight:700;color:var(--navy)}
@@ -2923,12 +2923,12 @@ function smpGoP(p){const pc=Math.max(1,Math.ceil(_smpFiltered().length/_SMP_PER)
 function smpSort(f){if(_smpSortF===f)_smpSortA=!_smpSortA;else{_smpSortF=f;_smpSortA=true;}_smpPage=1;smpRender();}
 function smpToggleAll(cb){document.querySelectorAll('#smpBody input[type=checkbox]').forEach(c=>c.checked=cb.checked);}
 function smpTogglePkg(uid){
-  const body=document.getElementById(uid+'_body');
+  const rows=document.querySelectorAll(`tr[data-pkg="${uid}"]`);
   const arrow=document.getElementById(uid+'_arrow');
-  if(!body)return;
-  const open=body.style.display==='none'||body.style.display==='';
-  body.style.display=open?'':'none';
-  if(arrow)arrow.style.transform=open?'rotate(90deg)':'';
+  if(!rows.length)return;
+  const open=rows[0].style.display==='none'||rows[0].style.display==='';
+  rows.forEach(r=>r.style.display=open?'':'none');
+  if(arrow)arrow.style.transform=open?'rotate(90deg)':'rotate(0deg)';
 }
 
 function smpSelect(id) {
@@ -2985,25 +2985,23 @@ function smpSelect(id) {
       const pkgCode  = s.packageId || '—';
       const uid = 'pkg_' + (s.id||'').replace(/\W/g,'');
       html += `<tr class="smp-pkg-row" onclick="smpTogglePkg('${uid}')" style="cursor:pointer;background:var(--bg-soft,#f8f9fa)">
-        <td style="color:var(--text-soft);width:24px">📦</td>
+        <td style="color:var(--text-soft);width:20px">📦</td>
         <td style="font-family:monospace;font-size:11px;color:var(--navy)">${pkgCode}</td>
         <td style="font-size:12px;font-weight:500">${pkgLabel}
-          <span style="font-size:10px;color:var(--text-soft);margin-left:4px">(${pkgItems.length} показн.)</span>
+          <span style="font-size:10px;color:var(--text-soft);margin-left:4px">(${pkgItems.length})</span>
         </td>
         <td style="font-size:11px;color:var(--text-soft);white-space:nowrap">
-          Пакет <span id="${uid}_arrow" style="display:inline-block;transition:transform .2s">▶</span>
+          Пакет&nbsp;<span id="${uid}_arrow" style="display:inline-block;transition:transform .2s;font-size:9px">▶</span>
         </td>
       </tr>`;
-      html += `<tbody id="${uid}_body" style="display:none">`;
       pkgItems.forEach((pi,i)=>{
-        html += `<tr style="background:var(--bg-soft,#f8f9fa)">
-          <td style="color:var(--text-soft);padding-left:20px;font-size:11px">${i+1}</td>
+        html += `<tr data-pkg="${uid}" style="display:none;background:var(--bg-soft,#f8f9fa)">
+          <td style="color:var(--text-soft);padding-left:16px;font-size:11px">${i+1}</td>
           <td style="font-family:monospace;font-size:10px;color:var(--text-soft)">${pi.service_id||pi.service_code||'—'}</td>
-          <td style="font-size:11px;color:var(--text-primary,#222);padding-left:8px">${pi.name||'—'}</td>
+          <td style="font-size:11px;color:var(--text-primary,#333);padding-left:4px">${pi.name||'—'}</td>
           <td style="font-size:10px;color:var(--text-soft)">Показник</td>
         </tr>`;
       });
-      html += `</tbody>`;
     } else {
       // Fallback: один рядок пакету
       const myCode = s.packageId || '';
