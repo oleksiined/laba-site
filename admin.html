@@ -2963,8 +2963,10 @@ function smpSelect(id) {
   if(tbody){
     const srvRows = [];
     // 1) Пакет
-    if(s.packageName || s.packageId){
-      srvRows.push({ code: s.packageId||'—', name: s.packageName||s.packageId, type:'Пакет' });
+    const _pkgName = s.packageName || _PKG_LABEL[s.pkg] || s.pkg || '';
+    const _pkgCode = s.packageId || s.pkg || '';
+    if(_pkgName || _pkgCode){
+      srvRows.push({ code: _pkgCode||'—', name: _pkgName||_pkgCode, type:'Пакет' });
     }
     // 2) Додаткові показники
     (s.additionals||[]).forEach(name=>{
