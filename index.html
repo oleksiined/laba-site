@@ -8594,7 +8594,7 @@ function ncf_downloadInvoice() {
       { text: rowNum++, ...tdStyle, alignment: 'center' },
       { text: ind.code, ...tdStyle, fontSize: 7.5, color: '#000' },
       { text: ind.name, ...tdStyle },
-      { text: '—',      ...tdStyle },
+      { text: ind.material || 'Ґрунт', ...tdStyle },
       { text: ind.qty,  ...tdStyle, alignment: 'center' },
       { text: fmtUAH(ind.price), ...tdStyle, alignment: 'right' },
       { text: fmtUAH(ind.price * ind.qty), ...tdStyle, alignment: 'right' },
@@ -8643,7 +8643,7 @@ function ncf_downloadInvoice() {
           {
             stack: [
               { text: 'РАХУНОК НА ОПЛАТУ', fontSize: 13, bold: true, alignment: 'right', color: '#000' },
-              { text: `${invoiceId}  ·  ${invoiceDate}`, fontSize: 8.5, color: '#000', alignment: 'right', margin: [0, 3, 0, 0] },
+              { text: invoiceDate, fontSize: 8.5, color: '#000', alignment: 'right', margin: [0, 3, 0, 0] },
             ]
           }
         ],
@@ -8672,7 +8672,7 @@ function ncf_downloadInvoice() {
             width: '50%',
             stack: [
               { text: 'ПОСТАЧАЛЬНИК', fontSize: 7.5, bold: true, color: '#888', margin: [0,0,0,4] },
-              { text: SELLER.name, fontSize: 8.5, bold: false, color: '#000', lineHeight: 1.2 },
+              { text: SELLER.name, fontSize: 8.5, bold: true, color: '#000', lineHeight: 1.2 },
               { text: `Код за ЄДРПОУ: ${SELLER.edrpou}`, fontSize: 8, color: '#333', margin: [0,2,0,0] },
               { text: `п/р ${SELLER.iban}`, fontSize: 8, color: '#333' },
               { text: `у банку ${SELLER.bank}, МФО ${SELLER.mfo}`, fontSize: 8, color: '#333' },
