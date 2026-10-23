@@ -1748,6 +1748,7 @@ function _mapOrder(o) {
     packageName: s.packageName || s.packageCode || '',
     additionals: Array.isArray(s.additionals) ? s.additionals : [],
     additionalsDetails: Array.isArray(s.additionalsDetails) ? s.additionalsDetails : null,
+    packageItems: Array.isArray(s.packageItems) ? s.packageItems : null,
     updatedAt:   s.updated_at || null,
   }));
 
@@ -2783,6 +2784,7 @@ function _buildSamples() {
         packageName: s.packageName || '',
         additionals: s.additionals || [],
         additionalsDetails: s.additionalsDetails || null,
+        packageItems: s.packageItems || null,
         _idx:       i,
         status:     s.st || 'new',
         date:       o.date,
@@ -2968,22 +2970,26 @@ function smpSelect(id) {
   const tbody = document.getElementById('smpPanelTests');
   if(tbody){
     const srvRows = [];
-    // 1) Основна послуга цього зразка: шукаємо в items по packageId
-    const myCode = s.packageId || '';
-    // Шукаємо item по коду послуги
-    let myItem = myCode && items ? items.find(it => it.name === myCode) : null;
-    // Fallback по індексу зразка в замовленні (для старих записів де packageId = 'basic'/'standard'/'extended')
-    if(!myItem && typeof s._idx === 'number' && Array.isArray(items) && items[s._idx]) {
-      myItem = items[s._idx];
-    }
-    if(myItem){
-      srvRows.push({ code: myItem.name||'—', name: myItem.serviceName||myItem.displayName||myItem.name, type:'Послуга' });
+    // 1) Склад пакету: всі дослідження що входять в пакет цього зразка
+    if(s.packageItems && s.packageItems.length){
+      s.packageItems.forEach(pi=>{
+        srvRows.push({ code: pi.service_id||pi.service_code||'—', name: pi.name||'—', type:'Послуга' });
+      });
     } else {
-      // Останній fallback: назва пакету зі зразка або з каталогу
-      const _pkgName = s.packageName || _PKG_LABEL[s.pkg] || '';
-      const _pkgCode = myCode || '';
-      if(_pkgName || _pkgCode){
-        srvRows.push({ code: _pkgCode||'—', name: _pkgName||_pkgCode||'—', type:'Послуга' });
+      // Fallback: один рядок — пакет/послуга цього зразка
+      const myCode = s.packageId || '';
+      let myItem = myCode && items ? items.find(it => it.name === myCode) : null;
+      if(!myItem && typeof s._idx === 'number' && Array.isArray(items) && items[s._idx]) {
+        myItem = items[s._idx];
+      }
+      if(myItem){
+        srvRows.push({ code: myItem.name||'—', name: myItem.serviceName||myItem.displayName||myItem.name, type:'Послуга' });
+      } else {
+        const _pkgName = s.packageName || _PKG_LABEL[s.pkg] || '';
+        const _pkgCode = myCode || '';
+        if(_pkgName || _pkgCode){
+          srvRows.push({ code: _pkgCode||'—', name: _pkgName||_pkgCode||'—', type:'Послуга' });
+        }
       }
     }
     // 2) Додаткові показники цього зразка (з кодами якщо є)

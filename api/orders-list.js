@@ -51,11 +51,12 @@ module.exports = async function handler(req, res) {
 
   try {
     // Fetch orders, invoice documents, and catalog in parallel
-    const [ordersResult, docsResult, svcResult, pkgResult] = await Promise.allSettled([
+    const [ordersResult, docsResult, svcResult, pkgResult, pkgItemsResult] = await Promise.allSettled([
       httpsReq(host, '/rest/v1/orders?order=created_at.desc&limit=200', key),
       httpsReq(host, '/rest/v1/documents?document_type=eq.invoice&status=eq.published&select=order_id,storage_bucket,storage_path', key),
       httpsReq(host, '/rest/v1/catalog_services?select=service_id,service_code,name&status=eq.active', key),
       httpsReq(host, '/rest/v1/catalog_packages?select=package_id,package_code,name&status=eq.active', key),
+      httpsReq(host, '/rest/v1/catalog_package_items?select=*', key),
     ]);
 
     if (ordersResult.status !== 'fulfilled' || ordersResult.value.status >= 300) {
@@ -86,6 +87,26 @@ module.exports = async function handler(req, res) {
           if (p.package_code) catalogMap[p.package_code] = p.name;
           if (p.package_id)   catalogMap[p.package_id]   = p.name;
         });
+      } catch (_) {}
+    }
+
+    // Build package items map: package_id → [{service_id, service_code, name, sort_order}]
+    const pkgItemsMap = {}; // package_id → array of service entries
+    if (pkgItemsResult.status === 'fulfilled' && pkgItemsResult.value.status < 300) {
+      try {
+        JSON.parse(pkgItemsResult.value.body).forEach(row => {
+          const pid = row.package_id;
+          if (!pid) return;
+          if (!pkgItemsMap[pid]) pkgItemsMap[pid] = [];
+          pkgItemsMap[pid].push({
+            service_id:   row.service_id   || null,
+            service_code: row.service_code || null,
+            name:         row.name || (row.service_id && catalogMap[row.service_id]) || (row.service_code && catalogMap[row.service_code]) || null,
+            sort_order:   row.sort_order   || row.order || 0,
+          });
+        });
+        // Sort each package's services by sort_order
+        Object.values(pkgItemsMap).forEach(arr => arr.sort((a,b) => a.sort_order - b.sort_order));
       } catch (_) {}
     }
 
@@ -154,6 +175,11 @@ module.exports = async function handler(req, res) {
           const enriched = { ...s };
           if (!enriched.packageName && enriched.packageId && catalogMap[enriched.packageId]) {
             enriched.packageName = catalogMap[enriched.packageId];
+          }
+          // Add package composition (all services included in this package)
+          const pid = enriched.packageId;
+          if (pid && pkgItemsMap[pid]) {
+            enriched.packageItems = pkgItemsMap[pid];
           }
           // Enrich additionals with codes from catalog
           if (Array.isArray(enriched.additionals)) {
