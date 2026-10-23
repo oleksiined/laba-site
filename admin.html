@@ -1552,7 +1552,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           </div>
           <table class="sp-tbl">
             <thead><tr>
-              <th>№</th><th>ID послуги</th><th>Назва дослідження</th><th>Тип</th>
+              <th>№</th><th>Код послуги</th><th>Назва дослідження</th><th>Тип</th>
             </tr></thead>
             <tbody id="smpPanelTests"></tbody>
           </table>
@@ -1744,6 +1744,7 @@ function _mapOrder(o) {
     st:          s.st || 'new',
     material:    s.material || s.crop || '',
     pkg:         pkgMap[s.packageId] || pkgMap[s.pkg] || 'basic',
+    packageId:   s.packageId || s.packageCode || '',
     packageName: s.packageName || s.packageCode || '',
     additionals: Array.isArray(s.additionals) ? s.additionals : [],
     updatedAt:   s.updated_at || null,
@@ -2957,15 +2958,24 @@ function smpSelect(id) {
   }
   set('smpPanelTestCnt', items.length);
   set('smpPanelTestCnt2', items.length);
-  // Таблиця досліджень
+  // Таблиця досліджень — будуємо з даних зразка, не з order.items
   const tbody = document.getElementById('smpPanelTests');
   if(tbody){
-    if(items.length){
-      tbody.innerHTML=items.map((t,i)=>`<tr>
+    const srvRows = [];
+    // 1) Пакет
+    if(s.packageName || s.packageId){
+      srvRows.push({ code: s.packageId||'—', name: s.packageName||s.packageId, type:'Пакет' });
+    }
+    // 2) Додаткові показники
+    (s.additionals||[]).forEach(name=>{
+      srvRows.push({ code:'—', name, type:'Окремий показник' });
+    });
+    if(srvRows.length){
+      tbody.innerHTML=srvRows.map((r,i)=>`<tr>
         <td style="color:var(--text-soft);width:24px">${i+1}</td>
-        <td>${t.id||'SRV-'+(String(i+1).padStart(3,'0'))}</td>
-        <td>${t.name||t.n||'—'}${t.pkg?' ('+(_PKG_LABEL[t.pkg]||t.pkg)+')':''}</td>
-        <td>${t.type==='extra'||t.extra?'Окреме':'Пакет'}</td>
+        <td style="font-family:monospace;font-size:11px;color:var(--navy)">${r.code}</td>
+        <td style="font-size:12px">${r.name}</td>
+        <td style="font-size:11px;color:var(--text-soft)">${r.type}</td>
       </tr>`).join('');
     } else {
       tbody.innerHTML=`<tr><td colspan="4" style="color:var(--text-soft);font-size:12px;padding:10px 6px;text-align:center">Дослідження не вказані</td></tr>`;
