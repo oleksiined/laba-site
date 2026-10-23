@@ -76,7 +76,7 @@ module.exports = async function handler(req, res) {
         JSON.parse(svcResult.value.body).forEach(s => {
           if (s.service_code) catalogMap[s.service_code] = s.name;
           if (s.service_id)   catalogMap[s.service_id]   = s.name;
-          if (s.name && s.service_code) nameToCode[s.name] = s.service_code;
+          if (s.name && s.service_id) nameToCode[s.name] = s.service_id;
         });
       } catch (_) {}
     }
