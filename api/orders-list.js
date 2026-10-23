@@ -50,10 +50,12 @@ module.exports = async function handler(req, res) {
   const host = new URL(url).hostname;
 
   try {
-    // Fetch orders and invoice documents in parallel
-    const [ordersResult, docsResult] = await Promise.allSettled([
+    // Fetch orders, invoice documents, and catalog in parallel
+    const [ordersResult, docsResult, svcResult, pkgResult] = await Promise.allSettled([
       httpsReq(host, '/rest/v1/orders?order=created_at.desc&limit=200', key),
       httpsReq(host, '/rest/v1/documents?document_type=eq.invoice&status=eq.published&select=order_id,storage_bucket,storage_path', key),
+      httpsReq(host, '/rest/v1/catalog_services?select=service_id,service_code,name&status=eq.active', key),
+      httpsReq(host, '/rest/v1/catalog_packages?select=package_id,package_code,name&status=eq.active', key),
     ]);
 
     if (ordersResult.status !== 'fulfilled' || ordersResult.value.status >= 300) {
@@ -64,6 +66,25 @@ module.exports = async function handler(req, res) {
     }
 
     const orders = JSON.parse(ordersResult.value.body);
+
+    // Build catalog map: service_code / package_code / id → name
+    const catalogMap = {};
+    if (svcResult.status === 'fulfilled' && svcResult.value.status < 300) {
+      try {
+        JSON.parse(svcResult.value.body).forEach(s => {
+          if (s.service_code) catalogMap[s.service_code] = s.name;
+          if (s.service_id)   catalogMap[s.service_id]   = s.name;
+        });
+      } catch (_) {}
+    }
+    if (pkgResult.status === 'fulfilled' && pkgResult.value.status < 300) {
+      try {
+        JSON.parse(pkgResult.value.body).forEach(p => {
+          if (p.package_code) catalogMap[p.package_code] = p.name;
+          if (p.package_id)   catalogMap[p.package_id]   = p.name;
+        });
+      } catch (_) {}
+    }
 
     // Build signed URLs for invoices (private buckets)
     const invoiceMap = {};
@@ -109,10 +130,19 @@ module.exports = async function handler(req, res) {
       } catch (_) { /* non-fatal — orders still returned */ }
     }
 
-    // Merge invoice_url into each order
+    // Merge invoice_url into each order + enrich samples with packageName from catalog
     const enriched = orders.map(o => {
       const num = o.order_num || o.id;
-      return { ...o, invoice_url: invoiceMap[num] || null };
+      let samples = o.samples;
+      if (Array.isArray(samples)) {
+        samples = samples.map(s => {
+          if (!s.packageName && s.packageId && catalogMap[s.packageId]) {
+            return { ...s, packageName: catalogMap[s.packageId] };
+          }
+          return s;
+        });
+      }
+      return { ...o, samples, invoice_url: invoiceMap[num] || null };
     });
 
     return res.status(200).json({ ok: true, orders: enriched });
