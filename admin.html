@@ -2962,22 +2962,21 @@ function smpSelect(id) {
   const tbody = document.getElementById('smpPanelTests');
   if(tbody){
     const srvRows = [];
-    // 1) Послуги з order.items (вже збагачені serviceName на бекенді)
-    if(items && items.length){
-      items.forEach(it=>{
-        const code = it.name || '—';
-        const name = it.serviceName || it.displayName || code;
-        srvRows.push({ code, name, type: 'Послуга' });
-      });
+    // 1) Основна послуга цього зразка: шукаємо в items по packageId, або беремо з sample напряму
+    const myCode = s.packageId || '';
+    // Знаходимо відповідний item по коду
+    const myItem = myCode && items ? items.find(it => it.name === myCode) : null;
+    if(myItem){
+      srvRows.push({ code: myItem.name||'—', name: myItem.serviceName||myItem.displayName||myItem.name, type:'Послуга' });
     } else {
-      // Fallback: показуємо пакет якщо items порожні
-      const _pkgName = s.packageName || _PKG_LABEL[s.pkg] || s.pkg || '';
-      const _pkgCode = s.packageId || (s.pkg !== 'basic' ? s.pkg : '') || '';
+      // Fallback: назва пакету зі зразка або з каталогу
+      const _pkgName = s.packageName || _PKG_LABEL[s.pkg] || '';
+      const _pkgCode = myCode || '';
       if(_pkgName || _pkgCode){
-        srvRows.push({ code: _pkgCode||'—', name: _pkgName||_pkgCode, type:'Пакет' });
+        srvRows.push({ code: _pkgCode||'—', name: _pkgName||_pkgCode||'—', type:'Послуга' });
       }
     }
-    // 2) Додаткові показники зразка
+    // 2) Додаткові показники цього зразка
     (s.additionals||[]).forEach(name=>{
       srvRows.push({ code:'—', name, type:'Окремий показник' });
     });
