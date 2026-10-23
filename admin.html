@@ -2781,6 +2781,7 @@ function _buildSamples() {
         packageId:  s.packageId || '',
         packageName: s.packageName || '',
         additionals: s.additionals || [],
+        additionalsDetails: s.additionalsDetails || null,
         _idx:       i,
         status:     s.st || 'new',
         date:       o.date,
@@ -2984,9 +2985,10 @@ function smpSelect(id) {
         srvRows.push({ code: _pkgCode||'—', name: _pkgName||_pkgCode||'—', type:'Послуга' });
       }
     }
-    // 2) Додаткові показники цього зразка
-    (s.additionals||[]).forEach(name=>{
-      srvRows.push({ code:'—', name, type:'Окремий показник' });
+    // 2) Додаткові показники цього зразка (з кодами якщо є)
+    const addDetails = s.additionalsDetails || (s.additionals||[]).map(n=>({name:n,code:null}));
+    addDetails.forEach(a=>{
+      srvRows.push({ code: a.code||'—', name: a.name||'—', type:'Окремий показник' });
     });
     if(srvRows.length){
       tbody.innerHTML=srvRows.map((r,i)=>`<tr>

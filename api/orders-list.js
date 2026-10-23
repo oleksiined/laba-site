@@ -68,12 +68,15 @@ module.exports = async function handler(req, res) {
     const orders = JSON.parse(ordersResult.value.body);
 
     // Build catalog map: service_code / package_code / id → name
+    // Also build reverse map: name → service_code (for additionals lookup)
     const catalogMap = {};
+    const nameToCode = {}; // name → service_code
     if (svcResult.status === 'fulfilled' && svcResult.value.status < 300) {
       try {
         JSON.parse(svcResult.value.body).forEach(s => {
           if (s.service_code) catalogMap[s.service_code] = s.name;
           if (s.service_id)   catalogMap[s.service_id]   = s.name;
+          if (s.name && s.service_code) nameToCode[s.name] = s.service_code;
         });
       } catch (_) {}
     }
@@ -144,13 +147,22 @@ module.exports = async function handler(req, res) {
       }
 
       // Enrich samples: add packageName from catalog map if missing
+      // Also enrich additionals: convert string names to [{code, name}] objects
       let samples = o.samples;
       if (Array.isArray(samples)) {
         samples = samples.map(s => {
-          if (!s.packageName && s.packageId && catalogMap[s.packageId]) {
-            return { ...s, packageName: catalogMap[s.packageId] };
+          const enriched = { ...s };
+          if (!enriched.packageName && enriched.packageId && catalogMap[enriched.packageId]) {
+            enriched.packageName = catalogMap[enriched.packageId];
           }
-          return s;
+          // Enrich additionals with codes from catalog
+          if (Array.isArray(enriched.additionals)) {
+            enriched.additionalsDetails = enriched.additionals.map(name => ({
+              name,
+              code: nameToCode[name] || null,
+            }));
+          }
+          return enriched;
         });
       }
 
