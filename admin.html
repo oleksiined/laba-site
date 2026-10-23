@@ -1550,7 +1550,13 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
             </span>
             <button class="sp-sec-btn" onclick="alert('Функція у розробці')">+ Додати</button>
           </div>
-          <table class="sp-tbl">
+          <table class="sp-tbl" style="table-layout:fixed">
+            <colgroup>
+              <col style="width:32px">
+              <col style="width:90px">
+              <col>
+              <col style="width:90px">
+            </colgroup>
             <thead><tr>
               <th>№</th><th>Код послуги</th><th>Назва дослідження</th><th>Тип</th>
             </tr></thead>
@@ -2985,11 +2991,11 @@ function smpSelect(id) {
       const pkgCode  = s.packageId || '—';
       const uid = 'pkg_' + (s.id||'').replace(/\W/g,'');
       html += `<tr class="smp-pkg-row" onclick="smpTogglePkg('${uid}')" style="cursor:pointer;background:#eef2ff">
-        <td style="color:var(--text-soft);width:24px;padding:8px 4px 8px 12px">📦</td>
-        <td style="font-family:monospace;font-size:11px;color:var(--navy);padding:8px 6px;white-space:nowrap">${pkgCode}</td>
-        <td style="font-size:12px;font-weight:600;color:var(--navy);padding:8px 6px">
-          ${pkgLabel}
-          <span style="font-size:10px;font-weight:400;color:var(--text-soft);margin-left:6px">${pkgItems.length} показн.&nbsp;<span id="${uid}_arrow" style="display:inline-block;transition:transform .2s">▶</span></span>
+        <td style="padding:8px 4px;text-align:center">📦</td>
+        <td style="font-family:monospace;font-size:11px;color:var(--navy);padding:8px 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${pkgCode}</td>
+        <td style="font-size:12px;font-weight:600;color:var(--navy);padding:8px 6px;overflow:hidden">
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block">${pkgLabel}</span>
+          <span style="font-size:10px;font-weight:400;color:var(--text-soft)">${pkgItems.length} показн.&nbsp;<span id="${uid}_arrow" style="display:inline-block;transition:transform .2s">▶</span></span>
         </td>
         <td style="font-size:11px;color:var(--text-soft);padding:8px 6px">Пакет</td>
       </tr>`;
