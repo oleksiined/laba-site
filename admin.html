@@ -2926,8 +2926,8 @@ function smpTogglePkg(uid){
   const rows=document.querySelectorAll(`tr[data-pkg="${uid}"]`);
   const arrow=document.getElementById(uid+'_arrow');
   if(!rows.length)return;
-  const open=rows[0].style.display==='none'||rows[0].style.display==='';
-  rows.forEach(r=>r.style.display=open?'':'none');
+  const open=rows[0].style.display==='none';
+  rows.forEach(r=>r.style.display=open?'table-row':'none');
   if(arrow)arrow.style.transform=open?'rotate(90deg)':'rotate(0deg)';
 }
 
@@ -2985,20 +2985,18 @@ function smpSelect(id) {
       const pkgCode  = s.packageId || '—';
       const uid = 'pkg_' + (s.id||'').replace(/\W/g,'');
       html += `<tr class="smp-pkg-row" onclick="smpTogglePkg('${uid}')" style="cursor:pointer;background:var(--bg-soft,#f8f9fa)">
-        <td style="color:var(--text-soft);width:20px">📦</td>
-        <td style="font-family:monospace;font-size:11px;color:var(--navy)">${pkgCode}</td>
-        <td style="font-size:12px;font-weight:500">${pkgLabel}
-          <span style="font-size:10px;color:var(--text-soft);margin-left:4px">(${pkgItems.length})</span>
-        </td>
-        <td style="font-size:11px;color:var(--text-soft);white-space:nowrap">
-          Пакет&nbsp;<span id="${uid}_arrow" style="display:inline-block;transition:transform .2s;font-size:9px">▶</span>
+        <td style="width:20px;color:var(--text-soft);font-size:12px">📦</td>
+        <td style="font-family:monospace;font-size:11px;color:var(--navy);white-space:nowrap">${pkgCode}</td>
+        <td style="font-size:12px;font-weight:500">${pkgLabel}</td>
+        <td style="font-size:11px;color:var(--text-soft);white-space:nowrap;text-align:right">
+          <span id="${uid}_arrow" style="display:inline-block;transition:transform .2s">▶</span>&nbsp;(${pkgItems.length})
         </td>
       </tr>`;
       pkgItems.forEach((pi,i)=>{
-        html += `<tr data-pkg="${uid}" style="display:none;background:var(--bg-soft,#f8f9fa)">
-          <td style="color:var(--text-soft);padding-left:16px;font-size:11px">${i+1}</td>
-          <td style="font-family:monospace;font-size:10px;color:var(--text-soft)">${pi.service_id||pi.service_code||'—'}</td>
-          <td style="font-size:11px;color:var(--text-primary,#333);padding-left:4px">${pi.name||'—'}</td>
+        html += `<tr data-pkg="${uid}" style="display:none;background:#f4f6fa">
+          <td style="color:var(--text-soft);padding-left:12px;font-size:11px">${i+1}</td>
+          <td style="font-family:monospace;font-size:10px;color:var(--text-soft);white-space:nowrap">${pi.service_id||pi.service_code||'—'}</td>
+          <td style="font-size:11px;color:var(--text-primary,#333)">${pi.name||'—'}</td>
           <td style="font-size:10px;color:var(--text-soft)">Показник</td>
         </tr>`;
       });
