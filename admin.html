@@ -2922,6 +2922,14 @@ function smpRender() {
 function smpGoP(p){const pc=Math.max(1,Math.ceil(_smpFiltered().length/_SMP_PER));_smpPage=Math.max(1,Math.min(p,pc));smpRender();}
 function smpSort(f){if(_smpSortF===f)_smpSortA=!_smpSortA;else{_smpSortF=f;_smpSortA=true;}_smpPage=1;smpRender();}
 function smpToggleAll(cb){document.querySelectorAll('#smpBody input[type=checkbox]').forEach(c=>c.checked=cb.checked);}
+function smpTogglePkg(uid){
+  const body=document.getElementById(uid+'_body');
+  const arrow=document.getElementById(uid+'_arrow');
+  if(!body)return;
+  const open=body.style.display==='none'||body.style.display==='';
+  body.style.display=open?'':'none';
+  if(arrow)arrow.style.transform=open?'rotate(90deg)':'';
+}
 
 function smpSelect(id) {
   _smpSelId=id; smpRender();
@@ -2966,47 +2974,61 @@ function smpSelect(id) {
   }
   set('smpPanelTestCnt', items.length);
   set('smpPanelTestCnt2', items.length);
-  // Таблиця досліджень — order.items + додаткові показники зразка
+  // Таблиця досліджень — пакет (акордеон) + додаткові показники
   const tbody = document.getElementById('smpPanelTests');
   if(tbody){
-    const srvRows = [];
-    // 1) Склад пакету: всі дослідження що входять в пакет цього зразка
-    if(s.packageItems && s.packageItems.length){
-      s.packageItems.forEach(pi=>{
-        srvRows.push({ code: pi.service_id||pi.service_code||'—', name: pi.name||'—', type:'Послуга' });
+    let html = '';
+    // 1) Пакет зі складом (акордеон)
+    const pkgItems = s.packageItems && s.packageItems.length ? s.packageItems : null;
+    if(pkgItems){
+      const pkgLabel = s.packageName || _PKG_LABEL[s.pkg] || s.packageId || '—';
+      const pkgCode  = s.packageId || '—';
+      const uid = 'pkg_' + (s.id||'').replace(/\W/g,'');
+      html += `<tr class="smp-pkg-row" onclick="smpTogglePkg('${uid}')" style="cursor:pointer;background:var(--bg-soft,#f8f9fa)">
+        <td style="color:var(--text-soft);width:24px">📦</td>
+        <td style="font-family:monospace;font-size:11px;color:var(--navy)">${pkgCode}</td>
+        <td style="font-size:12px;font-weight:500">${pkgLabel}
+          <span style="font-size:10px;color:var(--text-soft);margin-left:4px">(${pkgItems.length} показн.)</span>
+        </td>
+        <td style="font-size:11px;color:var(--text-soft);white-space:nowrap">
+          Пакет <span id="${uid}_arrow" style="display:inline-block;transition:transform .2s">▶</span>
+        </td>
+      </tr>`;
+      html += `<tbody id="${uid}_body" style="display:none">`;
+      pkgItems.forEach((pi,i)=>{
+        html += `<tr style="background:var(--bg-soft,#f8f9fa)">
+          <td style="color:var(--text-soft);padding-left:20px;font-size:11px">${i+1}</td>
+          <td style="font-family:monospace;font-size:10px;color:var(--text-soft)">${pi.service_id||pi.service_code||'—'}</td>
+          <td style="font-size:11px;color:var(--text-primary,#222);padding-left:8px">${pi.name||'—'}</td>
+          <td style="font-size:10px;color:var(--text-soft)">Показник</td>
+        </tr>`;
       });
+      html += `</tbody>`;
     } else {
-      // Fallback: один рядок — пакет/послуга цього зразка
+      // Fallback: один рядок пакету
       const myCode = s.packageId || '';
       let myItem = myCode && items ? items.find(it => it.name === myCode) : null;
-      if(!myItem && typeof s._idx === 'number' && Array.isArray(items) && items[s._idx]) {
-        myItem = items[s._idx];
-      }
-      if(myItem){
-        srvRows.push({ code: myItem.name||'—', name: myItem.serviceName||myItem.displayName||myItem.name, type:'Послуга' });
-      } else {
-        const _pkgName = s.packageName || _PKG_LABEL[s.pkg] || '';
-        const _pkgCode = myCode || '';
-        if(_pkgName || _pkgCode){
-          srvRows.push({ code: _pkgCode||'—', name: _pkgName||_pkgCode||'—', type:'Послуга' });
-        }
-      }
+      if(!myItem && typeof s._idx === 'number' && Array.isArray(items) && items[s._idx]) myItem = items[s._idx];
+      const _name = myItem ? (myItem.serviceName||myItem.displayName||myItem.name) : (s.packageName||_PKG_LABEL[s.pkg]||myCode||'');
+      const _code = myItem ? (myItem.name||'—') : (myCode||'—');
+      if(_name||_code) html += `<tr>
+        <td style="color:var(--text-soft);width:24px">1</td>
+        <td style="font-family:monospace;font-size:11px;color:var(--navy)">${_code}</td>
+        <td style="font-size:12px">${_name||'—'}</td>
+        <td style="font-size:11px;color:var(--text-soft)">Послуга</td>
+      </tr>`;
     }
-    // 2) Додаткові показники цього зразка (з кодами якщо є)
+    // 2) Додаткові окремі показники
     const addDetails = s.additionalsDetails || (s.additionals||[]).map(n=>({name:n,code:null}));
-    addDetails.forEach(a=>{
-      srvRows.push({ code: a.code||'—', name: a.name||'—', type:'Окремий показник' });
-    });
-    if(srvRows.length){
-      tbody.innerHTML=srvRows.map((r,i)=>`<tr>
+    addDetails.forEach((a,i)=>{
+      html += `<tr>
         <td style="color:var(--text-soft);width:24px">${i+1}</td>
-        <td style="font-family:monospace;font-size:11px;color:var(--navy)">${r.code}</td>
-        <td style="font-size:12px">${r.name}</td>
-        <td style="font-size:11px;color:var(--text-soft)">${r.type}</td>
-      </tr>`).join('');
-    } else {
-      tbody.innerHTML=`<tr><td colspan="4" style="color:var(--text-soft);font-size:12px;padding:10px 6px;text-align:center">Дослідження не вказані</td></tr>`;
-    }
+        <td style="font-family:monospace;font-size:11px;color:var(--navy)">${a.code||'—'}</td>
+        <td style="font-size:12px">${a.name||'—'}</td>
+        <td style="font-size:11px;color:var(--text-soft)">Окремий показник</td>
+      </tr>`;
+    });
+    tbody.innerHTML = html || `<tr><td colspan="4" style="color:var(--text-soft);font-size:12px;padding:10px 6px;text-align:center">Дослідження не вказані</td></tr>`;
   }
   // Лабораторія та завдання
   set('smpPanelLab', s.lab||'Лаб. №1');
