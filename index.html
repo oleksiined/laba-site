@@ -8608,7 +8608,7 @@ function ncf_downloadInvoice() {
   const sumRows = [];
   if (discount > 0) {
     sumRows.push([
-      { text: 'Сума до знижки', fontSize: 8.5, color: '#000', border: [false,false,false,false] },
+      { text: 'Сума без знижки', fontSize: 8.5, color: '#000', border: [false,false,false,false] },
       { text: fmtUAH(subtotal) + ' грн', fontSize: 8.5, alignment: 'right', border: [false,false,false,false] },
     ]);
     sumRows.push([
@@ -8622,7 +8622,7 @@ function ncf_downloadInvoice() {
   ]);
 
   // Призначення платежу
-  const purpose = `оплата за лабораторні дослідження за рахунком ${invoiceId}, замовлення ${orderNum}.`;
+  const purpose = `оплата за лабораторні дослідження за рахунком ${orderNum} від ${invoiceDate}`;
 
   const docDef = {
     pageSize: 'A4',
@@ -8654,14 +8654,13 @@ function ncf_downloadInvoice() {
       {
         columns: [
           { stack: [{ text: 'ЗАМОВЛЕННЯ', fontSize: 7.5, color: '#888', bold: true }, { text: orderNum, fontSize: 10, bold: true, color: '#000', margin: [0,2,0,0] }] },
-          { stack: [{ text: 'ДАТА',       fontSize: 7.5, color: '#888', bold: true }, { text: invoiceDate, fontSize: 10, bold: true, color: '#000', margin: [0,2,0,0] }] },
           { stack: [{ text: 'ДІЙСНИЙ ДО', fontSize: 7.5, color: '#888', bold: true }, { text: dueDate,     fontSize: 10, bold: true, color: '#000', margin: [0,2,0,0] }], alignment: 'right' },
         ],
         margin: [0, 0, 0, 4],
       },
 
       // ── Рахунок № … від … ────────────────────────────────
-      { text: `Рахунок № ${invoiceId} від ${invoiceDate}`, fontSize: 9, color: '#555', alignment: 'center', margin: [0, 13, 0, 4] },
+      { text: `Рахунок № ${orderNum} від ${invoiceDate}`, fontSize: 10, bold: true, color: '#000', alignment: 'center', margin: [0, 13, 0, 4] },
 
       // ── Лінія-роздільник ─────────────────────────────────────
       { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 8] },
