@@ -8556,7 +8556,7 @@ function ncf_downloadInvoice() {
       const ind = (typeof nc_findInd === 'function' && nc_findInd(id))
                || (typeof ns_findInd === 'function' && ns_findInd(id));
       if (ind) {
-        if (!addMap[id]) addMap[id] = { code: id, name: ind.name, material: '—', price: ind.price || 0, qty: 0 };
+        if (!addMap[id]) addMap[id] = { code: id, name: ind.name, material: getMat(s.materialId), price: ind.price || 0, qty: 0 };
         addMap[id].qty++;
       }
     });
@@ -8661,7 +8661,7 @@ function ncf_downloadInvoice() {
       },
 
       // ── Рахунок № … від … ────────────────────────────────
-      { text: `Рахунок № ${invoiceId} від ${invoiceDate}`, fontSize: 9, color: '#555', alignment: 'center', margin: [0, 0, 0, 4] },
+      { text: `Рахунок № ${invoiceId} від ${invoiceDate}`, fontSize: 9, color: '#555', alignment: 'center', margin: [0, 13, 0, 4] },
 
       // ── Лінія-роздільник ─────────────────────────────────────
       { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 8] },
