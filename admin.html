@@ -1747,6 +1747,7 @@ function _mapOrder(o) {
     packageId:   s.packageId || s.packageCode || '',
     packageName: s.packageName || s.packageCode || '',
     additionals: Array.isArray(s.additionals) ? s.additionals : [],
+    additionalsDetails: Array.isArray(s.additionalsDetails) ? s.additionalsDetails : null,
     updatedAt:   s.updated_at || null,
   }));
 
