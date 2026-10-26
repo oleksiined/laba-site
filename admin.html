@@ -2872,7 +2872,7 @@ function admGenAkt(o) {
       const qty   = Number(it.qty || it.quantity || it.samples_count || 1);
       // unit_price → price_per_unit → price → total/qty
       const rawPrice = it.unit_price ?? it.price_per_unit ?? it.price ?? null;
-      const rawTotal = it.total ?? it.sum ?? it.amount ?? null;
+      const rawTotal = it.subtotal ?? it.total ?? it.sum ?? it.amount ?? null;
       const price = rawPrice !== null ? Number(rawPrice)
                   : rawTotal !== null ? Number(rawTotal) / qty
                   : 0;
