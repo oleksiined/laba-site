@@ -8154,22 +8154,69 @@ async function submitOrder() {
     });
   }
 
-  // ── Send to backend (fire-and-forget; show confirm regardless) ──
+  // ── Send to backend ──
   const BACKEND_URL = '/api/order';
-  fetch(BACKEND_URL, {
+  const backendPromise = fetch(BACKEND_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(orderPayload),
   }).then(r => r.json()).then(data => {
-    if (!data.ok && data.errors) {
-      console.warn('Backend partial error:', data.errors);
-    }
+    if (!data.ok && data.errors) console.warn('Backend partial error:', data.errors);
   }).catch(err => {
     console.warn('Backend request failed:', err.message);
-    // Order still shown to user — do not block UI on backend failure
   });
 
-  // Show confirmation page immediately (don't wait for backend)
+  // ── Online payment → LiqPay redirect ──
+  if (NCO.payment === 'online') {
+    const btn = document.querySelector('.btn-primary.btn-full[onclick="submitOrder()"]');
+    if (btn) { btn.disabled = true; btn.textContent = 'Переходимо до оплати…'; }
+
+    // Wait for order to be saved before redirecting
+    await backendPromise.catch(() => {});
+
+    try {
+      const lpRes = await fetch('/api/liqpay-create', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderNum:    orderNum,
+          amount:      grand,
+          description: `Лабораторні дослідження, замовлення ${orderNum}`,
+        }),
+      });
+      const lp = await lpRes.json();
+      if (lp.ok && lp.data && lp.signature) {
+        // Auto-submit form to LiqPay checkout (POST redirect)
+        const form = document.createElement('form');
+        form.method  = 'POST';
+        form.action  = 'https://www.liqpay.ua/api/3/checkout';
+        form.target  = '_self';
+        form.style.display = 'none';
+        ['data', 'signature'].forEach(k => {
+          const inp = document.createElement('input');
+          inp.type  = 'hidden';
+          inp.name  = k;
+          inp.value = lp[k];
+          form.appendChild(inp);
+        });
+        document.body.appendChild(form);
+        form.submit();
+        return; // Don't show confirm page — LiqPay handles redirect
+      } else {
+        console.warn('LiqPay create error:', lp);
+        toast('Помилка підключення до платіжної системи. Спробуйте ще раз.');
+        if (btn) { btn.disabled = false; btn.textContent = 'Підтвердити замовлення →'; }
+        return;
+      }
+    } catch (e) {
+      console.warn('LiqPay fetch error:', e);
+      toast('Помилка підключення до платіжної системи. Спробуйте ще раз.');
+      if (btn) { btn.disabled = false; btn.textContent = 'Підтвердити замовлення →'; }
+      return;
+    }
+  }
+
+  // Show confirmation page (invoice / cod payment methods)
   ncf_show();
 }
 
