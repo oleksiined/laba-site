@@ -1835,6 +1835,7 @@ function _mapOrder(o) {
     items:       Array.isArray(o.items) ? o.items : [],
     activity:    [{ t:'Замовлення створено', d:`${date} ${time}` }],
     invoiceUrl:  o.invoice_url || '',
+    actUrl:      o.act_url     || '',
   };
 }
 
@@ -2638,12 +2639,13 @@ function _docToggleCreate(e) {
 
 function _admRenderDocsTab(o) {
   const hasInvoice = !!o.invoiceUrl;
+  const hasAct     = !!o.actUrl;
   const isDone     = o.status === 'done' || o.status === 'closed';
   const invoiceNum = o.id || '—';
 
   const setT = (id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
   setT('admDSInv', hasInvoice ? 1 : 0);
-  setT('admDSAct', 0);
+  setT('admDSAct', hasAct ? 1 : 0);
   setT('admDSCon', 0);
   setT('admDSPro', isDone ? 1 : 0);
 
@@ -2674,10 +2676,12 @@ function _admRenderDocsTab(o) {
   // ── Акт ──
   const actMenu = [
     item('Сформувати',  `admDocAct('act','create')`),
-    item('Завантажити', `admDocAct('act','download')`, true),
-    item('Відправити клієнту', `admDocAct('act','send')`, true),
+    hasAct
+      ? `<a class="adm-doc-dd-item" href="${o.actUrl}" target="_blank" rel="noopener" onclick="_docCloseMenus()">Завантажити</a>`
+      : item('Завантажити', `admDocAct('act','download')`, true),
+    item('Відправити клієнту', `admDocAct('act','send')`, !hasAct),
     sep(),
-    item('Анулювати',   `admDocAct('act','cancel')`, true, true),
+    item('Анулювати',   `admDocAct('act','cancel')`, !hasAct, true),
   ].join('');
 
   // ── Договір ──
@@ -2724,7 +2728,7 @@ function _admRenderDocsTab(o) {
     renderDoc('inv', 'inv', 'Рахунок ' + invoiceNum, 'Рахунок',
       hasInvoice ? _docBadge('Готово','green') : _docBadge('Не створено','yellow'), invMenu) +
     renderDoc('act', 'act', 'Акт виконаних робіт',   'Акт',
-      _docBadge('Не створено','yellow'), actMenu) +
+      hasAct ? _docBadge('Готово','green') : _docBadge('Не створено','yellow'), actMenu) +
     renderDoc('con', 'con', 'Договір',               'Договір',
       _docBadge('Не прикріплено','yellow'), conMenu) +
     renderDoc('pro', 'pro', 'Протоколи досліджень',  'Протокол',
@@ -3069,7 +3073,35 @@ function admGenAkt(o) {
   const safeDate = aktDate.replace(/\./g, '-');
   const fileName = `Акт_LABA_${aktNum}_${safeDate}.pdf`;
 
-  pdfMake.createPdf(docDef).download(fileName);
+  pdfMake.createPdf(docDef).getBuffer(async function(buffer) {
+    // 1. Trigger browser download
+    const blob = new Blob([buffer], { type: 'application/pdf' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = fileName;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+    // 2. Save to Supabase via /api/save-act
+    try {
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+      const resp   = await fetch('/api/save-act', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderNum: o.id, pdfBase64: base64, actDate: aktDate }),
+      });
+      const result = await resp.json();
+      if (result.ok) {
+        // Reload orders list and re-select this order so docs tab shows "Готово"
+        await _admReload(o.id);
+      } else {
+        console.warn('[save-act] server error:', result);
+      }
+    } catch (e) {
+      console.warn('[save-act] fetch error:', e);
+    }
+  });
 }
 
 // ─── Supabase order update helper ────────────────────────────────────────────

@@ -50,15 +50,17 @@ module.exports = async function handler(req, res) {
   const host = new URL(url).hostname;
 
   try {
-    // Fetch orders, invoice documents, and catalog in parallel
-    const [ordersResult, docsResult, svcResult, pkgResult, pkgItemsResult] = await Promise.allSettled([
+    // Fetch orders, invoice documents, act documents, and catalog in parallel
+    const [ordersResult, docsResult, actDocsResult, svcResult, pkgResult, pkgItemsResult] = await Promise.allSettled([
       httpsReq(host, '/rest/v1/orders?order=created_at.desc&limit=200', key),
       httpsReq(host, '/rest/v1/documents?document_type=eq.invoice&status=eq.published&select=order_id,storage_bucket,storage_path', key),
+      httpsReq(host, '/rest/v1/documents?document_type=eq.act&status=eq.published&select=order_id,storage_bucket,storage_path', key),
       httpsReq(host, '/rest/v1/catalog_services?select=service_id,service_code,name,price', key),
       httpsReq(host, '/rest/v1/catalog_packages?select=package_id,package_code,name,price&status=eq.active', key),
       httpsReq(host, '/rest/v1/catalog_package_items?select=*', key),
     ]);
 
+    // actDocsResult uses same signing logic as invoices — build actMap in parallel below
     if (ordersResult.status !== 'fulfilled' || ordersResult.value.status >= 300) {
       const err = ordersResult.status === 'rejected'
         ? ordersResult.reason.message
@@ -165,7 +167,45 @@ module.exports = async function handler(req, res) {
       } catch (_) { /* non-fatal — orders still returned */ }
     }
 
-    // Merge invoice_url into each order + enrich items/samples with names from catalog
+    // Build signed URLs for acts (same logic as invoices)
+    const actMap = {};
+    if (actDocsResult.status === 'fulfilled' && actDocsResult.value.status < 300) {
+      try {
+        const actDocs = JSON.parse(actDocsResult.value.body);
+        const validActs = actDocs.filter(d => d.order_id && d.storage_bucket && d.storage_path);
+        await Promise.allSettled(validActs.map(async d => {
+          try {
+            const signBody = JSON.stringify({ expiresIn: 604800 });
+            const signRes = await httpsReq(
+              host,
+              `/storage/v1/object/sign/${d.storage_bucket}/${d.storage_path}`,
+              key,
+              'POST',
+              signBody,
+            );
+            if (signRes.status < 300) {
+              const parsed = JSON.parse(signRes.body);
+              const signedURL = parsed.signedURL || parsed.signedUrl || parsed.signed_url || '';
+              if (signedURL) {
+                const base = url.replace(/\/$/, '');
+                if (signedURL.startsWith('http')) {
+                  actMap[d.order_id] = signedURL;
+                } else if (signedURL.startsWith('/storage/v1')) {
+                  actMap[d.order_id] = `${base}${signedURL}`;
+                } else {
+                  const rel = signedURL.startsWith('/') ? signedURL : `/${signedURL}`;
+                  actMap[d.order_id] = `${base}/storage/v1${rel}`;
+                }
+              }
+            }
+          } catch (e) {
+            console.warn(`sign URL error for act ${d.storage_path}:`, e.message);
+          }
+        }));
+      } catch (_) {}
+    }
+
+    // Merge invoice_url and act_url into each order + enrich items/samples with names from catalog
     const enriched = orders.map(o => {
       const num = o.order_num || o.id;
 
@@ -211,7 +251,7 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      return { ...o, items, samples, invoice_url: invoiceMap[num] || null };
+      return { ...o, items, samples, invoice_url: invoiceMap[num] || null, act_url: actMap[num] || null };
     });
 
     return res.status(200).json({ ok: true, orders: enriched });
