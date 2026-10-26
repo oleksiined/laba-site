@@ -54,7 +54,7 @@ module.exports = async function handler(req, res) {
     const [ordersResult, docsResult, svcResult, pkgResult, pkgItemsResult] = await Promise.allSettled([
       httpsReq(host, '/rest/v1/orders?order=created_at.desc&limit=200', key),
       httpsReq(host, '/rest/v1/documents?document_type=eq.invoice&status=eq.published&select=order_id,storage_bucket,storage_path', key),
-      httpsReq(host, '/rest/v1/catalog_services?select=service_id,service_code,name&status=eq.active', key),
+      httpsReq(host, '/rest/v1/catalog_services?select=service_id,service_code,name', key),
       httpsReq(host, '/rest/v1/catalog_packages?select=package_id,package_code,name&status=eq.active', key),
       httpsReq(host, '/rest/v1/catalog_package_items?select=*', key),
     ]);
