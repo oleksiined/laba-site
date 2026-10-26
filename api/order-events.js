@@ -36,15 +36,16 @@ module.exports = async function handler(req, res) {
   const key = process.env.SUPABASE_SERVICE_KEY;
   if (!url || !key) return res.status(500).json({ ok: false, error: 'Supabase not configured' });
 
-  const order_id = req.query?.order_id || (req.url && new URL(req.url, 'http://x').searchParams.get('order_id'));
-  if (!order_id) return res.status(400).json({ ok: false, error: 'order_id required' });
+  const params = new URL(req.url || '/', 'http://x').searchParams;
+  const order_num = req.query?.order_num || params.get('order_num');
+  if (!order_num) return res.status(400).json({ ok: false, error: 'order_num required' });
 
   const host = new URL(url).hostname;
 
   try {
     const [eventsRes, typesRes] = await Promise.allSettled([
       httpsReq(host,
-        `/rest/v1/order_events?order_id=eq.${encodeURIComponent(order_id)}&order=created_at.asc&limit=200`,
+        `/rest/v1/order_events?order_num=eq.${encodeURIComponent(order_num)}&order=created_at.asc&limit=200`,
         key),
       httpsReq(host, '/rest/v1/event_types?select=event_type,label,icon,color', key),
     ]);

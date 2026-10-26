@@ -463,14 +463,14 @@ async function saveOrderToSupabase(order) {
   } catch(_) { return null; }
 }
 
-async function logOrderEvent(orderId, eventType, description, newValues) {
+async function logOrderEvent(orderNum, eventType, description, newValues) {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_KEY;
-  if (!url || !key || !orderId) return;
+  if (!url || !key || !orderNum) return;
   const payload = JSON.stringify({
-    order_id:    orderId,
+    order_num:   orderNum,
     entity_type: 'order',
-    entity_id:   orderId,
+    entity_id:   orderNum,
     event_type:  eventType,
     actor_type:  'system',
     description: description || null,
@@ -542,10 +542,10 @@ module.exports = async function handler(req, res) {
 
   // 1a. Log order_created event (non-critical)
   await logOrderEvent(
-    savedOrderId,
+    order.orderNum,
     'order_created',
     `Замовлення ${order.orderNum} створено клієнтом`,
-    { order_num: order.orderNum, total: order.total, client: order.client?.name || null }
+    { total: order.total, client: order.client?.name || null }
   );
 
   // 2. Notifications — non-critical; failures are logged but don't affect HTTP status
