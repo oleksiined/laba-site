@@ -375,6 +375,17 @@ html{scroll-behavior:smooth}
 .adm-doc-dd-item.red:hover{background:#fef2f2}
 .adm-doc-dd-item.disabled{opacity:.4;pointer-events:none}
 .adm-doc-dd-sep{height:1px;background:var(--border);margin:3px 0}
+.adm-doc-con-search{display:flex;align-items:center;gap:6px;padding:6px 14px 10px;border-bottom:1px solid #f0f2f4}
+.adm-doc-con-search input{flex:1;font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:7px;outline:none;color:var(--navy);background:#fafafa}
+.adm-doc-con-search input:focus{border-color:#6b82c8;background:#fff}
+.adm-doc-con-attach{font-size:11.5px;font-weight:600;padding:5px 12px;border-radius:7px;border:none;background:#3B82F6;color:#fff;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.adm-doc-con-attach:hover{background:#2563eb}
+.adm-doc-con-drop{position:absolute;left:14px;right:14px;top:calc(100% - 2px);background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:300;max-height:180px;overflow-y:auto;display:none}
+.adm-doc-con-drop.open{display:block}
+.adm-doc-con-drop-item{padding:8px 12px;cursor:pointer;font-size:12px;color:var(--navy);border-bottom:1px solid #f0f2f4}
+.adm-doc-con-drop-item:last-child{border-bottom:none}
+.adm-doc-con-drop-item:hover{background:#f0f4ff}
+.adm-doc-con-drop-hint{padding:10px 12px;font-size:12px;color:var(--text-soft);text-align:center}
 /* Bottom create bar */
 .adm-doc-bottom{border-top:1px solid var(--border);padding:10px 14px;display:flex;gap:7px;flex-shrink:0}
 .adm-doc-create-wrap{position:relative;flex:1}
@@ -2722,6 +2733,39 @@ function _admRenderDocsTab(o) {
     </div>`;
   }
 
+  function _renderContractRow(order) {
+    const attached = order._contractName || null;
+    if (attached) {
+      const contractMenu = [
+        item('Відкрити',    `admDocAct('contract','open')`),
+        item('Відкріпити',  `admDetachContract('${order.id}')`),
+      ].join('');
+      return renderDoc('con', 'con', attached, 'Договір',
+        _docBadge('Прикріплено','green'), contractMenu);
+    }
+    return `<div class="adm-doc-row" style="flex-wrap:wrap;align-items:flex-start">
+      <div class="adm-doc-icon con">${iconSvgs['con']}</div>
+      <div class="adm-doc-body">
+        <div class="adm-doc-nm">Договір</div>
+        <div class="adm-doc-type">Договір</div>
+      </div>
+      <div style="flex-shrink:0;margin-right:4px">${_docBadge('Не прикріплено','yellow')}</div>
+      <div style="width:100%;position:relative" id="conSearchWrap">
+        <div class="adm-doc-con-search">
+          <input id="conSearchInput" type="text" placeholder="Пошук договору"
+            oninput="_conSearchInput(this.value)"
+            onfocus="_conSearchInput(this.value)"
+            onblur="setTimeout(()=>{const d=document.getElementById('conSearchDrop');if(d)d.classList.remove('open')},200)"
+            autocomplete="off"/>
+          <button class="adm-doc-con-attach" onclick="_conAttachSelected()">Прикріпити</button>
+        </div>
+        <div id="conSearchDrop" class="adm-doc-con-drop">
+          <div class="adm-doc-con-drop-hint">Введіть назву договору</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
   const el = document.getElementById('admDocList');
   if (!el) return;
   el.innerHTML =
@@ -2729,8 +2773,7 @@ function _admRenderDocsTab(o) {
       hasInvoice ? _docBadge('Готово','green') : _docBadge('Не створено','yellow'), invMenu) +
     renderDoc('act', 'act', 'Акт виконаних робіт',   'Акт',
       hasAct ? _docBadge('Готово','green') : _docBadge('Не створено','yellow'), actMenu) +
-    renderDoc('con', 'con', 'Договір',               'Договір',
-      _docBadge('Не прикріплено','yellow'), conMenu) +
+    _renderContractRow(o) +
     renderDoc('pro', 'pro', 'Протоколи досліджень',  'Протокол',
       isDone ? _docBadge('Готово','green') : _docBadge('Не готово','yellow'), proMenu) +
     renderDoc('edo', 'edo', 'Електронний документообіг (ЕДО)', 'Підписання: Вчасно / M.E.Doc',
@@ -4449,61 +4492,65 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ══════════════════════════════════════════════════════════
-// ПОШУК ДОГОВОРУ — модальне вікно
+// ПОШУК ДОГОВОРУ — inline в рядку документів
 // ══════════════════════════════════════════════════════════
-let _contractSearchOrder = null;
+let _conSearchTimer = null;
+let _conSelectedDoc = null;
 
-function admShowContractSearch(o) {
-  _contractSearchOrder = o;
-  const modal = document.getElementById('contractSearchModal');
-  if (!modal) return;
-  document.getElementById('contractSearchInput').value = '';
-  document.getElementById('contractSearchResults').innerHTML = '<div class="csm-hint">Введіть назву договору для пошуку</div>';
-  modal.style.display = 'flex';
-  setTimeout(() => document.getElementById('contractSearchInput').focus(), 100);
-}
-
-function admCloseContractSearch() {
-  const modal = document.getElementById('contractSearchModal');
-  if (modal) modal.style.display = 'none';
-  _contractSearchOrder = null;
-}
-
-let _contractSearchTimer = null;
-function admContractSearchInput(val) {
-  clearTimeout(_contractSearchTimer);
+function _conSearchInput(val) {
+  _conSelectedDoc = null;
+  const drop = document.getElementById('conSearchDrop');
+  if (!drop) return;
   const q = (val || '').trim();
   if (!q) {
-    document.getElementById('contractSearchResults').innerHTML = '<div class="csm-hint">Введіть назву договору для пошуку</div>';
+    drop.innerHTML = '<div class="adm-doc-con-drop-hint">Введіть назву договору</div>';
+    drop.classList.remove('open');
     return;
   }
-  document.getElementById('contractSearchResults').innerHTML = '<div class="csm-hint">Пошук…</div>';
-  _contractSearchTimer = setTimeout(() => admContractSearchFetch(q), 350);
+  drop.innerHTML = '<div class="adm-doc-con-drop-hint">Пошук…</div>';
+  drop.classList.add('open');
+  clearTimeout(_conSearchTimer);
+  _conSearchTimer = setTimeout(() => _conSearchFetch(q), 350);
 }
 
-async function admContractSearchFetch(q) {
+async function _conSearchFetch(q) {
+  const drop = document.getElementById('conSearchDrop');
+  if (!drop) return;
   try {
     const resp = await fetch(`/api/documents-list?type=contract&q=${encodeURIComponent(q)}`);
     const data = await resp.json();
-    const el = document.getElementById('contractSearchResults');
     if (!data.ok || !data.documents || !data.documents.length) {
-      el.innerHTML = '<div class="csm-hint">Документів не знайдено</div>';
+      drop.innerHTML = '<div class="adm-doc-con-drop-hint">Нічого не знайдено</div>';
       return;
     }
-    el.innerHTML = data.documents.map(d => `
-      <div class="csm-item" onclick="admAttachContract(${JSON.stringify(d).replace(/"/g,'&quot;')})">
-        <div class="csm-item-name">${d.file_name || d.document_name || '—'}</div>
-        <div class="csm-item-meta">${d.document_type || 'Договір'} · ${d.created_at ? new Date(d.created_at).toLocaleDateString('uk-UA') : '—'}</div>
+    drop.innerHTML = data.documents.map(d => `
+      <div class="adm-doc-con-drop-item" onmousedown="_conSelectDoc(${JSON.stringify(d).replace(/"/g,'&quot;')})">
+        ${d.file_name || '—'}
+        <span style="font-size:10px;color:var(--text-soft);margin-left:6px">${d.created_at ? new Date(d.created_at).toLocaleDateString('uk-UA') : ''}</span>
       </div>
     `).join('');
   } catch(e) {
-    document.getElementById('contractSearchResults').innerHTML = `<div class="csm-hint" style="color:var(--danger,#d32)">Помилка: ${e.message}</div>`;
+    drop.innerHTML = `<div class="adm-doc-con-drop-hint" style="color:#d32">Помилка: ${e.message}</div>`;
   }
 }
 
-async function admAttachContract(doc) {
-  const o = _contractSearchOrder;
+function _conSelectDoc(doc) {
+  _conSelectedDoc = doc;
+  const inp = document.getElementById('conSearchInput');
+  if (inp) inp.value = doc.file_name || '—';
+  const drop = document.getElementById('conSearchDrop');
+  if (drop) drop.classList.remove('open');
+}
+
+async function _conAttachSelected() {
+  const o = _admOrders.find(x => x.id === _admSelId);
   if (!o) return;
+  const doc = _conSelectedDoc;
+  if (!doc) {
+    const inp = document.getElementById('conSearchInput');
+    if (inp) inp.focus();
+    return;
+  }
   try {
     const resp = await fetch('/api/order-update', {
       method: 'PATCH',
@@ -4512,7 +4559,6 @@ async function admAttachContract(doc) {
     });
     const result = await resp.json();
     if (result.ok) {
-      admCloseContractSearch();
       await _admReload(o.id);
     } else {
       alert('Помилка прикріплення: ' + (result.error || 'невідома'));
@@ -4521,29 +4567,30 @@ async function admAttachContract(doc) {
     alert('Помилка: ' + e.message);
   }
 }
+
+async function admDetachContract(orderId) {
+  if (!confirm('Відкріпити договір?')) return;
+  try {
+    const resp = await fetch('/api/order-update', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: orderId, contract_document_id: null }),
+    });
+    const result = await resp.json();
+    if (result.ok) {
+      await _admReload(orderId);
+    } else {
+      alert('Помилка: ' + (result.error || 'невідома'));
+    }
+  } catch(e) {
+    alert('Помилка: ' + e.message);
+  }
+}
+
+// Залишаємо для сумісності зі старими викликами
+function admShowContractSearch(o) { /* no-op — replaced by inline search */ }
+function admCloseContractSearch() { /* no-op */ }
 </script>
 
-<!-- ═══════════════════════════════ ДОГОВІР — ПОШУК ═══════════════════════════════ -->
-<div id="contractSearchModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);align-items:center;justify-content:center;" onclick="if(event.target===this)admCloseContractSearch()">
-  <div style="background:var(--surface,#fff);border-radius:12px;width:min(520px,92vw);padding:24px;box-shadow:0 8px 32px rgba(0,0,0,.22);display:flex;flex-direction:column;gap:12px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:15px;font-weight:700;color:var(--text,#111)">Прикріпити договір</span>
-      <button onclick="admCloseContractSearch()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-soft,#888);line-height:1;padding:2px 6px;">&times;</button>
-    </div>
-    <input id="contractSearchInput" type="text" placeholder="Пошук за назвою договору…"
-      oninput="admContractSearchInput(this.value)"
-      style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid var(--border,#ddd);border-radius:8px;font-size:14px;color:var(--text,#111);background:var(--input-bg,#f8f8f8);outline:none;">
-    <div id="contractSearchResults" style="max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;">
-      <div class="csm-hint">Введіть назву договору для пошуку</div>
-    </div>
-  </div>
-</div>
-<style>
-.csm-hint{padding:10px 4px;font-size:13px;color:var(--text-soft,#888);text-align:center;}
-.csm-item{padding:10px 12px;border-radius:8px;cursor:pointer;border:1px solid var(--border,#e5e7eb);transition:background .15s;}
-.csm-item:hover{background:var(--hover,#f3f4f6);}
-.csm-item-name{font-size:13.5px;font-weight:600;color:var(--text,#111);}
-.csm-item-meta{font-size:11.5px;color:var(--text-soft,#888);margin-top:2px;}
-</style>
 </body>
 </html>
