@@ -2753,6 +2753,16 @@ function admDocAct(docType, action) {
     admGenAkt(o);
     return;
   }
+  if (docType === 'invoice' && action === 'create') {
+    if (!o) return alert('Відкрийте замовлення перед формуванням рахунку');
+    admGenInvoice(o);
+    return;
+  }
+  if (docType === 'contract' && action === 'attach') {
+    if (!o) return alert('Відкрийте замовлення');
+    admShowContractSearch(o);
+    return;
+  }
   alert(`${docType} → ${action} — у розробці`);
 }
 
@@ -3102,6 +3112,344 @@ function admGenAkt(o) {
       }
     } catch (e) {
       console.warn('[save-act] fetch error:', e);
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// РАХУНОК-ФАКТУРА — генерація PDF (pdfMake)
+// ══════════════════════════════════════════════════════════
+function admGenInvoice(o) {
+  if (typeof pdfMake === 'undefined') {
+    alert('PDF-бібліотека ще завантажується, спробуйте за секунду');
+    return;
+  }
+
+  const orderNum  = o.id || o.order_num || '—';
+  const invDate   = new Date().toLocaleDateString('uk-UA');
+  const invDateFull = (() => {
+    const d = new Date();
+    const months = ['січня','лютого','березня','квітня','травня','червня',
+                    'липня','серпня','вересня','жовтня','листопада','грудня'];
+    return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} р.`;
+  })();
+
+  const invNum = (() => {
+    const m = String(orderNum).match(/\d+$/);
+    if (m) return parseInt(m[0], 10);
+    return Math.floor(Date.now() / 1000) % 100000;
+  })();
+
+  // ── Продавець ─────────────────────────────────────────────
+  const SELLER = {
+    name:    'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ «ЗЕМЛЕРОБ ХАБ»',
+    short:   'ТОВ «ЗЕМЛЕРОБ ХАБ»',
+    edrpou:  '45801119',
+    iban:    'UA63 305299 00000 26001031616283',
+    bank:    'ПАТ КБ «ПРИВАТБАНК»',
+    mfo:     '305299',
+    address: 'вул. Б. Вишневецького, 36/1, м. Черкаси, 18000',
+    site:    'laba.zemlerob.com.ua',
+  };
+
+  // ── Замовник ──────────────────────────────────────────────
+  const pt = o.companyType === 'Юридична особа' ? 'legal'
+           : o.companyType === 'ФОП'            ? 'fop'
+           : 'private';
+  const companyName = (o.companyFull && o.companyFull !== '—') ? o.companyFull : '';
+  const contactName = (o.contact     && o.contact     !== '—') ? o.contact     : '';
+  const edrpouVal   = (o.edrpou      && o.edrpou      !== '—') ? o.edrpou      : '';
+
+  const buyerName = (() => {
+    if (pt === 'legal') return 'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ «' + (companyName || '').toUpperCase() + '»';
+    if (pt === 'fop')   return 'ФІЗИЧНА ОСОБА-ПІДПРИЄМЕЦЬ ' + (companyName || contactName || '').toUpperCase();
+    return (contactName || companyName || 'Фізична особа').toUpperCase();
+  })();
+  const buyerShort = (() => {
+    if (pt === 'legal') return 'ТОВ «' + (companyName || contactName || '') + '»';
+    if (pt === 'fop')   return 'ФОП ' + (companyName || contactName || '');
+    return contactName || companyName || 'Фізична особа';
+  })();
+
+  const buyerStack = [
+    { text: buyerName, fontSize: 9, bold: true, lineHeight: 1.2 },
+  ];
+  if (edrpouVal && pt !== 'private') buyerStack.push({ text: 'Код за ЄДРПОУ: ' + edrpouVal, fontSize: 8, color: '#333', margin: [0,2,0,0] });
+
+  // ── Таблиця послуг ────────────────────────────────────────
+  const fmtUAH = n => Number(n || 0).toLocaleString('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const UAHwords = n => {
+    const units = ['','один','два','три','чотири','п\'ять','шість','сім','вісім','дев\'ять'];
+    const teens = ['десять','одинадцять','дванадцять','тринадцять','чотирнадцять','п\'ятнадцять','шістнадцять','сімнадцять','вісімнадцять','дев\'ятнадцять'];
+    const tens  = ['','','двадцять','тридцять','сорок','п\'ятдесят','шістдесят','сімдесят','вісімдесят','дев\'яносто'];
+    const hunds = ['','сто','двісті','триста','чотириста','п\'ятсот','шістсот','сімсот','вісімсот','дев\'ятсот'];
+    const thous = ['тисяч','тисяча','тисячі','тисячі','тисячі','тисяч','тисяч','тисяч','тисяч','тисяч'];
+    const thou1 = ['','одна','дві'];
+    if (!n || n === 0) return 'нуль гривень';
+    let int = Math.floor(n);
+    const kop = Math.round((n - int) * 100);
+    let words = [];
+    const th = Math.floor(int / 1000);
+    if (th > 0) {
+      const t1 = Math.floor(th / 100), t2 = th % 100, t3 = th % 10;
+      if (t1) words.push(hunds[t1]);
+      if (t2 >= 10 && t2 <= 19) { words.push(teens[t2-10]); }
+      else { if (Math.floor(t2/10)) words.push(tens[Math.floor(t2/10)]); if (t3) words.push(t3<=2?thou1[t3]:units[t3]); }
+      words.push(th>=11&&th<=14?'тисяч':thous[th%10>4||th%10===0?0:th%10]);
+    }
+    int = int % 1000;
+    const h = Math.floor(int/100), rem = int%100, d = Math.floor(rem/10), u = rem%10;
+    if (h) words.push(hunds[h]);
+    if (rem >= 10 && rem <= 19) { words.push(teens[rem-10]); }
+    else { if (d) words.push(tens[d]); if (u) words.push(units[u]); }
+    const hrn = int%100>=11&&int%100<=19 ? 'гривень' : int%10===1 ? 'гривня' : int%10>=2&&int%10<=4 ? 'гривні' : 'гривень';
+    const result = words.join(' ');
+    return (result.charAt(0).toUpperCase() + result.slice(1)) + ' ' + hrn + ' ' + String(kop).padStart(2,'0') + ' копійок.';
+  };
+
+  const items = o.items || [];
+  const thStyle = { fontSize: 8, bold: true, color: '#000', fillColor: '#f0f0f0' };
+  const tdStyle = { fontSize: 8.5, color: '#000' };
+  const tableBody = [[
+    { text: '№',                   ...thStyle, alignment: 'center' },
+    { text: 'Код\nпослуги',        ...thStyle, alignment: 'center' },
+    { text: 'Пакет / дослідження', ...thStyle },
+    { text: 'Матеріал',            ...thStyle },
+    { text: 'К-сть\nзразків',      ...thStyle, alignment: 'center' },
+    { text: 'Ціна, грн',           ...thStyle, alignment: 'right' },
+    { text: 'Сума, грн',           ...thStyle, alignment: 'right' },
+  ]];
+
+  let total = 0;
+  if (items.length > 0) {
+    items.forEach((it, i) => {
+      const qty      = Number(it.qty || it.quantity || it.samples_count || 1);
+      const rawPrice = it.catalog_price != null ? it.catalog_price
+                     : it.unit_price ?? it.price_per_unit ?? it.price ?? null;
+      const rawTotal = it.subtotal ?? it.total ?? it.sum ?? it.amount ?? null;
+      const price    = rawPrice !== null ? Number(rawPrice)
+                     : rawTotal !== null ? Number(rawTotal) / qty : 0;
+      const sum      = it.catalog_price != null ? price * qty
+                     : rawTotal !== null ? Number(rawTotal) : price * qty;
+      total += sum;
+      const code = it.package_id || it.packageId || it.service_code || it.code || it.name || '—';
+      const name = it.serviceName || it.displayName || it.service_name || it.name || '—';
+      const mat  = it.material_name || it.material || 'Ґрунт';
+      tableBody.push([
+        { text: i + 1,        ...tdStyle, alignment: 'center' },
+        { text: code,         ...tdStyle, fontSize: 7.5 },
+        { text: name,         ...tdStyle },
+        { text: mat,          ...tdStyle },
+        { text: qty,          ...tdStyle, alignment: 'center' },
+        { text: fmtUAH(price),...tdStyle, alignment: 'right' },
+        { text: fmtUAH(sum),  ...tdStyle, alignment: 'right' },
+      ]);
+    });
+  } else {
+    total = Number(o.total || o.grand_total || 0);
+    tableBody.push([
+      { text: '1',                        ...tdStyle, alignment: 'center' },
+      { text: '—',                        ...tdStyle, fontSize: 7.5 },
+      { text: 'Лабораторні дослідження',  ...tdStyle },
+      { text: 'Ґрунт',                    ...tdStyle },
+      { text: o.samples_count || 1,       ...tdStyle, alignment: 'center' },
+      { text: fmtUAH(total / (o.samples_count || 1)), ...tdStyle, alignment: 'right' },
+      { text: fmtUAH(total),              ...tdStyle, alignment: 'right' },
+    ]);
+  }
+
+  const docDef = {
+    pageSize: 'A4',
+    pageMargins: [36, 24, 36, 40],
+    defaultStyle: { font: 'Roboto', fontSize: 9, color: '#000' },
+    content: [
+      // ── Шапка ─────────────────────────────────────────────
+      {
+        columns: [
+          {
+            width: 130,
+            stack: [
+              { svg: LABA_LOGO_SVG, width: 110, margin: [0, 0, 0, 0] },
+            ]
+          },
+          {
+            stack: [
+              { text: 'РАХУНОК-ФАКТУРА', fontSize: 13, bold: true, alignment: 'right', color: '#000' },
+              { text: invDate, fontSize: 8.5, color: '#000', alignment: 'right', margin: [0,3,0,0] },
+            ]
+          }
+        ],
+        margin: [0, 0, 0, 10],
+      },
+      // ── Номер рахунку / Замовник ──────────────────────────
+      {
+        columns: [
+          { stack: [{ text: 'НОМЕР РАХУНКУ', fontSize: 7.5, color: '#888', bold: true }, { text: String(invNum), fontSize: 10, bold: true, color: '#000', margin: [0,2,0,0] }] },
+          { stack: [{ text: 'ЗАМОВНИК', fontSize: 7.5, color: '#888', bold: true }, { text: buyerShort, fontSize: 10, bold: true, color: '#000', margin: [0,2,0,0] }], alignment: 'right' },
+        ],
+        margin: [0, 0, 0, 4],
+      },
+      // ── Заголовок ─────────────────────────────────────────
+      { text: `Рахунок-фактура № ${invNum} від ${invDateFull}`, fontSize: 10, bold: true, color: '#000', alignment: 'center', margin: [0, 13, 0, 4] },
+      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 8] },
+      // ── Постачальник / Покупець ───────────────────────────
+      {
+        columns: [
+          {
+            width: '50%',
+            stack: [
+              { text: 'ПОСТАЧАЛЬНИК', fontSize: 7.5, bold: true, color: '#888', margin: [0,0,0,4] },
+              { text: SELLER.name, fontSize: 8.5, bold: true, color: '#000', lineHeight: 1.2 },
+              { text: `Код за ЄДРПОУ: ${SELLER.edrpou}`, fontSize: 8, color: '#333', margin: [0,2,0,0] },
+              { text: `п/р ${SELLER.iban}`, fontSize: 8, color: '#333' },
+              { text: `у банку ${SELLER.bank}, МФО ${SELLER.mfo}`, fontSize: 8, color: '#333' },
+              { text: SELLER.address, fontSize: 8, color: '#333' },
+            ],
+            margin: [0, 0, 16, 0],
+          },
+          {
+            width: '50%',
+            stack: [
+              { text: 'ПОКУПЕЦЬ', fontSize: 7.5, bold: true, color: '#888', margin: [0,0,0,4] },
+              ...buyerStack,
+            ]
+          }
+        ],
+        margin: [0, 0, 0, 8],
+      },
+      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 8] },
+      // ── Заголовок таблиці ─────────────────────────────────
+      { text: 'ПЕРЕЛІК ПОСЛУГ', fontSize: 9, bold: true, color: '#000', margin: [0, 0, 0, 4] },
+      // ── Таблиця ───────────────────────────────────────────
+      {
+        table: {
+          headerRows: 1,
+          widths: [16, 52, '*', 42, 36, 48, 52],
+          body: tableBody,
+        },
+        layout: {
+          hLineWidth: (i, node) => i === 0 || i === 1 || i === node.table.body.length ? 1 : 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#d8dce8',
+          vLineColor: () => '#d8dce8',
+          paddingLeft:   () => 5,
+          paddingRight:  () => 5,
+          paddingTop:    () => 3,
+          paddingBottom: () => 3,
+        },
+        margin: [0, 0, 0, 8],
+      },
+      // ── Підсумок ──────────────────────────────────────────
+      {
+        columns: [
+          {
+            width: '55%',
+            table: { widths: ['*'], body: [[{
+              stack: [
+                { text: 'ЗАГАЛЬНА СУМА ДО ОПЛАТИ', fontSize: 7.5, bold: true, color: '#000', margin: [0,0,0,4] },
+                { text: UAHwords(total), fontSize: 8, color: '#000', lineHeight: 1.3 },
+              ],
+              fillColor: '#f0f0f0', border: [false,false,false,false], margin: [8,8,8,8],
+            }]] },
+            layout: { defaultBorder: false },
+          },
+          { width: '5%', text: '' },
+          {
+            width: '40%',
+            table: { widths: ['*', 'auto'], body: [[
+              { text: 'До оплати', fontSize: 11, bold: true, border: [false,false,false,false] },
+              { text: fmtUAH(total) + '\nгрн', fontSize: 11, bold: true, alignment: 'right', border: [false,false,false,false] },
+            ]] },
+            layout: { defaultBorder: false },
+            margin: [0,6,0,0],
+          },
+        ],
+        margin: [0, 0, 0, 8],
+      },
+      // ── Реквізити для оплати ──────────────────────────────
+      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 6] },
+      {
+        stack: [
+          { text: 'РЕКВІЗИТИ ДЛЯ ОПЛАТИ', fontSize: 7.5, bold: true, color: '#888', margin: [0,0,0,4] },
+          { text: `Отримувач: ${SELLER.name}`, fontSize: 8.5, color: '#000' },
+          { text: `ЄДРПОУ: ${SELLER.edrpou}  |  IBAN: ${SELLER.iban}`, fontSize: 8, color: '#333', margin: [0,2,0,0] },
+          { text: `Банк: ${SELLER.bank}, МФО ${SELLER.mfo}`, fontSize: 8, color: '#333' },
+          { text: `Призначення платежу: Оплата за лабораторні дослідження, рахунок № ${invNum} від ${invDate}`, fontSize: 8, color: '#333', margin: [0,4,0,0], italics: true },
+        ],
+        margin: [0, 0, 0, 16],
+      },
+      // ── Підписи ───────────────────────────────────────────
+      {
+        columns: [
+          {
+            width: '48%',
+            stack: [
+              { text: 'ВИПИСАВ', fontSize: 7.5, bold: true, color: '#888', margin: [0,0,0,3] },
+              { text: SELLER.short, fontSize: 9, bold: true, color: '#000', margin: [0,0,0,18] },
+              { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 230, y2: 0, lineWidth: 0.5, lineColor: '#999' }] },
+              { text: 'Посада, підпис, ПІБ', fontSize: 7.5, color: '#888', margin: [0,2,0,12] },
+              { text: invDate, fontSize: 8.5, color: '#000' },
+            ],
+          },
+          { width: '4%', text: '' },
+          {
+            width: '48%',
+            stack: [
+              { text: 'ОТРИМАВ', fontSize: 7.5, bold: true, color: '#888', margin: [0,0,0,3] },
+              { text: buyerShort, fontSize: 9, bold: true, color: '#000', margin: [0,0,0,18] },
+              { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 230, y2: 0, lineWidth: 0.5, lineColor: '#999' }] },
+              { text: 'Посада, підпис, ПІБ', fontSize: 7.5, color: '#888', margin: [0,2,0,12] },
+              { text: invDate, fontSize: 8.5, color: '#000' },
+            ],
+          },
+        ],
+        margin: [0, 0, 0, 6],
+      },
+      // ── Підвал ────────────────────────────────────────────
+      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 5] },
+      {
+        columns: [
+          { stack: [{ text: 'САЙТ', fontSize: 7.5, bold: true, color: '#888' }, { text: SELLER.site, fontSize: 8.5, color: '#000', margin: [0,2,0,0] }] },
+        ],
+      },
+    ],
+    footer: (currentPage, pageCount) => ({
+      columns: [
+        { text: 'LABA by Zemlerob · Рахунок-фактура', fontSize: 7, color: '#333', margin: [40, 10, 0, 0] },
+        { text: `Сторінка ${currentPage} з ${pageCount}`, fontSize: 7, color: '#333', alignment: 'right', margin: [0, 10, 40, 0] },
+      ]
+    }),
+  };
+
+  const safeDate = invDate.replace(/\./g, '-');
+  const fileName = `Рахунок_LABA_${invNum}_${safeDate}.pdf`;
+
+  pdfMake.createPdf(docDef).getBuffer(async function(buffer) {
+    // 1. Trigger browser download
+    const blob = new Blob([buffer], { type: 'application/pdf' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = fileName;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+    // 2. Save to Supabase via /api/save-invoice
+    try {
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+      const resp   = await fetch('/api/save-invoice', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderNum: o.id, pdfBase64: base64, invDate }),
+      });
+      const result = await resp.json();
+      if (result.ok) {
+        await _admReload(o.id);
+      } else {
+        console.warn('[save-invoice] server error:', result);
+      }
+    } catch (e) {
+      console.warn('[save-invoice] fetch error:', e);
     }
   });
 }
@@ -4074,6 +4422,103 @@ document.addEventListener('DOMContentLoaded', () => {
     admLoad();
   }
 });
+
+// ══════════════════════════════════════════════════════════
+// ПОШУК ДОГОВОРУ — модальне вікно
+// ══════════════════════════════════════════════════════════
+let _contractSearchOrder = null;
+
+function admShowContractSearch(o) {
+  _contractSearchOrder = o;
+  const modal = document.getElementById('contractSearchModal');
+  if (!modal) return;
+  document.getElementById('contractSearchInput').value = '';
+  document.getElementById('contractSearchResults').innerHTML = '<div class="csm-hint">Введіть назву договору для пошуку</div>';
+  modal.style.display = 'flex';
+  setTimeout(() => document.getElementById('contractSearchInput').focus(), 100);
+}
+
+function admCloseContractSearch() {
+  const modal = document.getElementById('contractSearchModal');
+  if (modal) modal.style.display = 'none';
+  _contractSearchOrder = null;
+}
+
+let _contractSearchTimer = null;
+function admContractSearchInput(val) {
+  clearTimeout(_contractSearchTimer);
+  const q = (val || '').trim();
+  if (!q) {
+    document.getElementById('contractSearchResults').innerHTML = '<div class="csm-hint">Введіть назву договору для пошуку</div>';
+    return;
+  }
+  document.getElementById('contractSearchResults').innerHTML = '<div class="csm-hint">Пошук…</div>';
+  _contractSearchTimer = setTimeout(() => admContractSearchFetch(q), 350);
+}
+
+async function admContractSearchFetch(q) {
+  try {
+    const resp = await fetch(`/api/documents-list?type=contract&q=${encodeURIComponent(q)}`);
+    const data = await resp.json();
+    const el = document.getElementById('contractSearchResults');
+    if (!data.ok || !data.documents || !data.documents.length) {
+      el.innerHTML = '<div class="csm-hint">Документів не знайдено</div>';
+      return;
+    }
+    el.innerHTML = data.documents.map(d => `
+      <div class="csm-item" onclick="admAttachContract(${JSON.stringify(d).replace(/"/g,'&quot;')})">
+        <div class="csm-item-name">${d.file_name || d.document_name || '—'}</div>
+        <div class="csm-item-meta">${d.document_type || 'Договір'} · ${d.created_at ? new Date(d.created_at).toLocaleDateString('uk-UA') : '—'}</div>
+      </div>
+    `).join('');
+  } catch(e) {
+    document.getElementById('contractSearchResults').innerHTML = `<div class="csm-hint" style="color:var(--danger,#d32)">Помилка: ${e.message}</div>`;
+  }
+}
+
+async function admAttachContract(doc) {
+  const o = _contractSearchOrder;
+  if (!o) return;
+  try {
+    const resp = await fetch('/api/order-update', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: o.id, contract_document_id: doc.id }),
+    });
+    const result = await resp.json();
+    if (result.ok) {
+      admCloseContractSearch();
+      await _admReload(o.id);
+    } else {
+      alert('Помилка прикріплення: ' + (result.error || 'невідома'));
+    }
+  } catch(e) {
+    alert('Помилка: ' + e.message);
+  }
+}
 </script>
+
+<!-- ═══════════════════════════════ ДОГОВІР — ПОШУК ═══════════════════════════════ -->
+<div id="contractSearchModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);align-items:center;justify-content:center;" onclick="if(event.target===this)admCloseContractSearch()">
+  <div style="background:var(--surface,#fff);border-radius:12px;width:min(520px,92vw);padding:24px;box-shadow:0 8px 32px rgba(0,0,0,.22);display:flex;flex-direction:column;gap:12px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:15px;font-weight:700;color:var(--text,#111)">Прикріпити договір</span>
+      <button onclick="admCloseContractSearch()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-soft,#888);line-height:1;padding:2px 6px;">&times;</button>
+    </div>
+    <input id="contractSearchInput" type="text" placeholder="Пошук за назвою договору…"
+      oninput="admContractSearchInput(this.value)"
+      style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid var(--border,#ddd);border-radius:8px;font-size:14px;color:var(--text,#111);background:var(--input-bg,#f8f8f8);outline:none;">
+    <div id="contractSearchResults" style="max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;">
+      <div class="csm-hint">Введіть назву договору для пошуку</div>
+    </div>
+  </div>
+</div>
+<style>
+.csm-hint{padding:10px 4px;font-size:13px;color:var(--text-soft,#888);text-align:center;}
+.csm-item{padding:10px 12px;border-radius:8px;cursor:pointer;border:1px solid var(--border,#e5e7eb);transition:background .15s;}
+.csm-item:hover{background:var(--hover,#f3f4f6);}
+.csm-item-name{font-size:13.5px;font-weight:600;color:var(--text,#111);}
+.csm-item-meta{font-size:11.5px;color:var(--text-soft,#888);margin-top:2px;}
+</style>
 </body>
 </html>
