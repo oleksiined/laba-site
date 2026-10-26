@@ -205,7 +205,7 @@ html{scroll-behavior:smooth}
 .adm-st-dd-item.active-st{background:#f0fdf4}
 .adm-st-dd-sep{height:1px;background:var(--border);margin:4px 0}
 .adm-pbtn-sec:disabled{opacity:.4;cursor:not-allowed}
-.adm-samp-acc-form{border-top:1px solid var(--border);padding:12px 14px 8px;flex-shrink:0;background:#FAFBFC;display:none}
+.adm-samp-acc-form{border-top:1px solid var(--border);padding:12px 14px 8px;flex-shrink:0;background:#FAFBFC}
 .adm-samp-acc-form.visible{display:block}
 .adm-samp-acc-title{font-size:12px;font-weight:700;color:var(--text-dark);margin-bottom:2px}
 .adm-samp-acc-subtitle{font-size:11px;color:var(--text-soft);margin-bottom:10px}
@@ -2546,7 +2546,7 @@ function _admRenderSamplesTab(o) {
   // Reset to phase 1
   const accForm = document.getElementById('admSampAccForm');
   const actMain = document.getElementById('admSampActionsMain');
-  if (accForm) accForm.classList.remove('visible');
+  if (accForm) { accForm.classList.remove('visible'); accForm.style.display = 'none'; }
   if (actMain) actMain.style.display = '';
   const p1Btn = document.getElementById('admBtnAcceptPhase1');
   const p1Lbl = document.getElementById('admBtnAcceptPhase1Lbl');
@@ -2578,15 +2578,14 @@ function _admRenderSamplesTab(o) {
     <thead><tr>
       <th style="width:28px"><input type="checkbox" id="admSampCbAll" onchange="admSampToggleAll(this)" style="width:13px;height:13px;cursor:pointer"></th>
       <th>№</th>
-      <th>МАТЕРІАЛ</th>
+      <th>НАЗВА ЗРАЗКА</th>
       <th>СТАТУС</th>
       <th>ОНОВЛЕНО</th>
-      <th style="width:30px"></th>
     </tr></thead>
     <tbody>${sl.map((s,i)=>{
       const stCls = _admSSC[s.st]||'adm-ss-new';
       const stLbl = _admSSL[s.st]||s.st||'Очікується';
-      const mat   = s.material || '—';
+      const mat   = s.material || s.name || '—';
       const dt    = s.updatedAt ? s.updatedAt.slice(0,10).split('-').reverse().join('.') : o.date;
       return `<tr>
         <td><input type="checkbox" class="adm-samp-cb" data-idx="${i}" onchange="admSampCbChange()" style="width:13px;height:13px;cursor:pointer"></td>
@@ -2594,7 +2593,6 @@ function _admRenderSamplesTab(o) {
         <td><span class="adm-samp-mat">${mat}</span></td>
         <td><span class="adm-ss-pill ${stCls}">${stLbl}</span></td>
         <td><span class="adm-samp-dt">${dt}</span></td>
-        <td><button class="adm-samp-menu-btn" title="Дії" onclick="admSampMenu(${i},event)">···</button></td>
       </tr>`;
     }).join('')}</tbody>
   </table>`;
@@ -2626,17 +2624,17 @@ function admAccFormOpen() {
   // Update badge
   const badge = document.getElementById('admAccBadge');
   if (badge) badge.textContent = n;
-  // Show form, hide phase1 button
+  // Show form, hide actions
   const form = document.getElementById('admSampAccForm');
   const actions = document.getElementById('admSampActionsMain');
-  if (form) form.classList.add('visible');
+  if (form) { form.style.display = 'block'; form.classList.add('visible'); }
   if (actions) actions.style.display = 'none';
 }
 
 function admAccFormCancel() {
   const form = document.getElementById('admSampAccForm');
   const actions = document.getElementById('admSampActionsMain');
-  if (form) form.classList.remove('visible');
+  if (form) { form.style.display = 'none'; form.classList.remove('visible'); }
   if (actions) actions.style.display = '';
   // Reset checklist
   const n1 = document.getElementById('accChkNaming');
@@ -3767,16 +3765,21 @@ async function admActionAcceptSamples() {
       return s;
     });
 
+    // Якщо всі зразки тепер прийняті/у роботі/готові → переводимо замовлення в «У роботі»
+    const allAccepted = rawSamples.every(s => ['accepted','work','done'].includes(s.st));
+    const newOrderStatus = allAccepted && ['new','waiting'].includes(o.status) ? 'work' : null;
+
     const updatePayload = { samples: rawSamples };
     if (ttn)  updatePayload.ttn = ttn;
     if (lab)  updatePayload.destination_lab = lab;
+    if (newOrderStatus) updatePayload.status = newOrderStatus;
 
     const acceptedNames = checked.map(i => rawOrder.samples[i]?.name || `Зразок ${i+1}`);
     await _admUpdate(o.dbId, updatePayload, {
       event_type:  'sample_accepted',
       entity_type: 'sample',
-      description: `Прийнято зразки: ${acceptedNames.join(', ')}` + (ttn ? ` (ТТН: ${ttn})` : '') + (comment ? `. ${comment}` : ''),
-      new_values:  { accepted: acceptedNames, lab, ttn: ttn || undefined, comment: comment || undefined },
+      description: `Прийнято зразки: ${acceptedNames.join(', ')}` + (ttn ? ` (ТТН: ${ttn})` : '') + (comment ? `. ${comment}` : '') + (newOrderStatus ? ` → статус замовлення: У роботі` : ''),
+      new_values:  { accepted: acceptedNames, lab, ttn: ttn || undefined, comment: comment || undefined, ...(newOrderStatus ? { order_status: newOrderStatus } : {}) },
     });
 
     if (btn) { btn.innerHTML = '✓ Прийнято'; btn.style.background = '#059669'; }
