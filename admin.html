@@ -2564,7 +2564,20 @@ async function admApplySampleStatus(indices, newSt) {
       return s;
     });
 
-    await _admUpdate(o.dbId, { samples: rawSamples });
+    const changedSamples = indices.map(i => ({
+      name: rawOrder.samples[i]?.name || `Зразок ${i+1}`,
+      oldSt: rawOrder.samples[i]?.st || 'new',
+    }));
+    const stLabels = { new:'новий', received:'отримано', accepted:'прийнято', work:'в роботі', done:'виконано', rejected:'відхилено' };
+    const evDescParts = changedSamples.map(s => `${s.name}: ${stLabels[s.oldSt]||s.oldSt} → ${stLabels[newSt]||newSt}`);
+
+    await _admUpdate(o.dbId, { samples: rawSamples }, {
+      event_type:  'sample_status',
+      entity_type: 'sample',
+      description: `Зміна статусу зразків: ${evDescParts.join('; ')}`,
+      old_values:  Object.fromEntries(changedSamples.map(s => [s.name, s.oldSt])),
+      new_values:  Object.fromEntries(changedSamples.map(s => [s.name, newSt])),
+    });
 
     if (stBtn) { stBtn.textContent = '✓ Збережено'; stBtn.style.color = '#059669'; }
     setTimeout(async () => {
@@ -2690,11 +2703,12 @@ function admDocCreateInvoice(){ alert('Створення рахунку — у 
 function admDocOpenAll()      { alert('Відкрити всі документи — у розробці'); }
 
 // ─── Supabase order update helper ────────────────────────────────────────────
-async function _admUpdate(id, fields) {
+// event (optional): { event_type, description, old_values, new_values, entity_type, entity_id, actor_type }
+async function _admUpdate(id, fields, event) {
   const res = await fetch('https://laba.zemlerob.com.ua/api/order-update', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id, ...fields }),
+    body: JSON.stringify({ id, ...fields, ...(event ? { _event: event } : {}) }),
   });
   const data = await res.json();
   if (!data.ok) throw new Error(data.error || 'Update failed');
@@ -2747,7 +2761,13 @@ async function admActionReceive() {
     const updatePayload = { samples: rawSamples };
     if (newStatus !== o.status) updatePayload.status = newStatus;
 
-    await _admUpdate(o.dbId, updatePayload);
+    const receivedNames = checked.map(i => rawOrder.samples[i]?.name || `Зразок ${i+1}`);
+    await _admUpdate(o.dbId, updatePayload, {
+      event_type:  'sample_received',
+      entity_type: 'sample',
+      description: `Отримано зразки: ${receivedNames.join(', ')}`,
+      new_values:  { received: receivedNames, ...(newStatus !== o.status ? { status: newStatus } : {}) },
+    });
 
     // Show success state briefly, then reload
     if (btn) { btn.innerHTML = '✓ Позначено'; btn.style.background = '#059669'; }
@@ -2773,8 +2793,21 @@ async function admActionConfirm() {
   if (btn) btn.disabled = true;
   if (lbl) lbl.textContent = 'Зберігаємо…';
 
+  const newStatus = next[o.status];
+  const statusLabels = { waiting:'очікує зразки', work:'в роботі', done:'виконано', closed:'закрито' };
+  const eventTypeMap = { done:'order_completed', closed:'order_completed' };
+  const evType = eventTypeMap[newStatus] || 'order_confirmed';
+  const evDesc = newStatus === 'done' || newStatus === 'closed'
+    ? `Замовлення ${o.id} завершено`
+    : `Замовлення ${o.id} підтверджено — статус змінено на «${statusLabels[newStatus] || newStatus}»`;
+
   try {
-    await _admUpdate(o.dbId, { status: next[o.status] });
+    await _admUpdate(o.dbId, { status: newStatus }, {
+      event_type:  evType,
+      description: evDesc,
+      old_values:  { status: o.status },
+      new_values:  { status: newStatus },
+    });
     await _admReload(o.id);
   } catch (err) {
     alert('Помилка: ' + err.message);
@@ -2792,7 +2825,12 @@ async function admActionRestore() {
   const btn = document.getElementById('admBtnCancel');
   if (btn) { btn.disabled = true; btn.textContent = 'Відновлення…'; }
   try {
-    await _admUpdate(o.dbId, { status: 'new' });
+    await _admUpdate(o.dbId, { status: 'new' }, {
+      event_type:  'order_updated',
+      description: `Замовлення ${o.id} відновлено зі статусу «скасовано»`,
+      old_values:  { status: 'cancelled' },
+      new_values:  { status: 'new' },
+    });
     await _admReload(_admSelId);
   } catch (err) {
     alert('Помилка: ' + err.message);
@@ -2809,7 +2847,12 @@ async function admActionCancel() {
   if (btn) { btn.disabled = true; btn.textContent = 'Скасовуємо…'; }
 
   try {
-    await _admUpdate(o.dbId, { status: 'cancelled' });
+    await _admUpdate(o.dbId, { status: 'cancelled' }, {
+      event_type:  'order_cancelled',
+      description: `Замовлення ${o.id} скасовано`,
+      old_values:  { status: o.status },
+      new_values:  { status: 'cancelled' },
+    });
     await _admReload(null);
     document.getElementById('admOrderPanel').style.display = 'none';
   } catch (err) {
