@@ -2763,7 +2763,32 @@ function admDocAct(docType, action) {
     admShowContractSearch(o);
     return;
   }
+  if ((docType === 'invoice' || docType === 'act') && action === 'cancel') {
+    if (!o) return alert('Відкрийте замовлення');
+    const typeLabel = docType === 'invoice' ? 'рахунок' : 'акт';
+    if (!confirm(`Анулювати ${typeLabel} для замовлення ${o.id}?`)) return;
+    admCancelDocument(o, docType);
+    return;
+  }
   alert(`${docType} → ${action} — у розробці`);
+}
+
+async function admCancelDocument(o, docType) {
+  try {
+    const res = await fetch('https://laba.zemlerob.com.ua/api/cancel-document', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId: o.id, docType }),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+    const typeLabel = docType === 'invoice' ? 'Рахунок' : 'Акт';
+    alert(`${typeLabel} анульовано`);
+    await _admReload(o.id);
+  } catch (e) {
+    alert('Помилка анулювання: ' + e.message);
+  }
 }
 
 // ── Лого LABA для PDF (SVG → pdfMake) ─────────────────────
