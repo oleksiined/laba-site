@@ -347,6 +347,7 @@ html{scroll-behavior:smooth}
 .adm-doc-icon.act{background:#F0FDF4;color:#16a34a}
 .adm-doc-icon.con{background:#FEF9C3;color:#ca8a04}
 .adm-doc-icon.pro{background:#F5F3FF;color:#7c3aed}
+.adm-doc-icon.edo{background:#EFF6FF;color:#2563EB}
 .adm-doc-nm{font-size:12px;font-weight:600;color:var(--navy);line-height:1.2}
 .adm-doc-type{font-size:10.5px;color:var(--text-soft);margin-top:1px}
 .adm-doc-body{flex:1;min-width:0}
@@ -2649,6 +2650,7 @@ function _admRenderDocsTab(o) {
     act: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 8h6M7 11h4" stroke-linecap="round"/><path d="M7 14l1.5 1.5L12 12" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     con: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 7h6M7 10h6M7 13h3" stroke-linecap="round"/></svg>',
     pro: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><path d="M5 3h10a1 1 0 011 1v3l-3 3v6a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M16 7H5" stroke-linecap="round"/></svg>',
+    edo: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><rect x="3" y="5" width="14" height="10" rx="2"/><path d="M3 8l7 4 7-4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   };
 
   // Dropdown menu item helper
@@ -2690,6 +2692,13 @@ function _admRenderDocsTab(o) {
     item('Надіслати',   `admDocAct('protocol','send')`,     !isDone),
   ].join('');
 
+  // ── ЕДО ──
+  const edoMenu = [
+    item('Відправити у Вчасно',  `admDocAct('edo','send-vchasno')`),
+    item('Відправити у M.E.Doc', `admDocAct('edo','send-medoc')`),
+    item('Перевірити статус',    `admDocAct('edo','status')`),
+  ].join('');
+
   const chevron = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10"><path d="M4 6l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
   function renderDoc(uid, iconCls, name, type, statusHtml, menuItems) {
@@ -2717,7 +2726,9 @@ function _admRenderDocsTab(o) {
     renderDoc('con', 'con', 'Договір',               'Договір',
       _docBadge('Не прикріплено','yellow'), conMenu) +
     renderDoc('pro', 'pro', 'Протоколи досліджень',  'Протокол',
-      isDone ? _docBadge('Готово','green') : _docBadge('Не готово','yellow'), proMenu);
+      isDone ? _docBadge('Готово','green') : _docBadge('Не готово','yellow'), proMenu) +
+    renderDoc('edo', 'edo', 'Електронний документообіг (ЕДО)', 'Підписання: Вчасно / M.E.Doc',
+      _docBadge('Не відправлено','red'), edoMenu);
 }
 
 function _docToggleDD(e, uid) {
