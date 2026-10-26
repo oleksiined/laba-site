@@ -1845,8 +1845,10 @@ function _mapOrder(o) {
     samplesList,
     items:       Array.isArray(o.items) ? o.items : [],
     activity:    [{ t:'Замовлення створено', d:`${date} ${time}` }],
-    invoiceUrl:  o.invoice_url || '',
-    actUrl:      o.act_url     || '',
+    invoiceUrl:  o.invoice_url  || '',
+    invoiceName: o.invoice_name || '',
+    actUrl:      o.act_url      || '',
+    actName:     o.act_name     || '',
   };
 }
 
@@ -2773,9 +2775,13 @@ function _admRenderDocsTab(o) {
   const el = document.getElementById('admDocList');
   if (!el) return;
   el.innerHTML =
-    renderDoc('inv', 'inv', 'Рахунок ' + invoiceNum, 'Рахунок',
+    renderDoc('inv', 'inv',
+      o.invoiceName || ('Рахунок ' + invoiceNum),
+      'Рахунок',
       hasInvoice ? _docBadge('Готово','green') : _docBadge('Не створено','yellow'), invMenu) +
-    renderDoc('act', 'act', 'Акт виконаних робіт',   'Акт',
+    renderDoc('act', 'act',
+      o.actName || 'Акт виконаних робіт',
+      'Акт',
       hasAct ? _docBadge('Готово','green') : _docBadge('Не створено','yellow'), actMenu) +
     _renderContractRow(o) +
     renderDoc('pro', 'pro', 'Протоколи досліджень',  'Протокол',

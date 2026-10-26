@@ -53,8 +53,8 @@ module.exports = async function handler(req, res) {
     // Fetch orders, invoice documents, act documents, and catalog in parallel
     const [ordersResult, docsResult, actDocsResult, svcResult, pkgResult, pkgItemsResult] = await Promise.allSettled([
       httpsReq(host, '/rest/v1/orders?order=created_at.desc&limit=200', key),
-      httpsReq(host, '/rest/v1/documents?document_type=eq.invoice&status=eq.published&select=order_id,storage_bucket,storage_path', key),
-      httpsReq(host, '/rest/v1/documents?document_type=eq.act&status=eq.published&select=order_id,storage_bucket,storage_path', key),
+      httpsReq(host, '/rest/v1/documents?document_type=eq.invoice&status=eq.published&select=order_id,storage_bucket,storage_path,file_name', key),
+      httpsReq(host, '/rest/v1/documents?document_type=eq.act&status=eq.published&select=order_id,storage_bucket,storage_path,file_name', key),
       httpsReq(host, '/rest/v1/catalog_services?select=service_id,service_code,name,price', key),
       httpsReq(host, '/rest/v1/catalog_packages?select=package_id,package_code,name,price&status=eq.active', key),
       httpsReq(host, '/rest/v1/catalog_package_items?select=*', key),
@@ -125,10 +125,12 @@ module.exports = async function handler(req, res) {
 
     // Build signed URLs for invoices (private buckets)
     const invoiceMap = {};
+    const invoiceNameMap = {};
     if (docsResult.status === 'fulfilled' && docsResult.value.status < 300) {
       try {
         const docs = JSON.parse(docsResult.value.body);
         const validDocs = docs.filter(d => d.order_id && d.storage_bucket && d.storage_path);
+        validDocs.forEach(d => { if (d.file_name) invoiceNameMap[d.order_id] = d.file_name; });
 
         // Generate signed URLs individually (more reliable than batch)
         await Promise.allSettled(validDocs.map(async d => {
@@ -169,10 +171,12 @@ module.exports = async function handler(req, res) {
 
     // Build signed URLs for acts (same logic as invoices)
     const actMap = {};
+    const actNameMap = {};
     if (actDocsResult.status === 'fulfilled' && actDocsResult.value.status < 300) {
       try {
         const actDocs = JSON.parse(actDocsResult.value.body);
         const validActs = actDocs.filter(d => d.order_id && d.storage_bucket && d.storage_path);
+        validActs.forEach(d => { if (d.file_name) actNameMap[d.order_id] = d.file_name; });
         await Promise.allSettled(validActs.map(async d => {
           try {
             const signBody = JSON.stringify({ expiresIn: 604800 });
@@ -251,7 +255,12 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      return { ...o, items, samples, invoice_url: invoiceMap[num] || null, act_url: actMap[num] || null };
+      return { ...o, items, samples,
+        invoice_url:  invoiceMap[num]     || null,
+        invoice_name: invoiceNameMap[num] || null,
+        act_url:      actMap[num]         || null,
+        act_name:     actNameMap[num]     || null,
+      };
     });
 
     return res.status(200).json({ ok: true, orders: enriched });
