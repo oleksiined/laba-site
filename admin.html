@@ -2750,6 +2750,10 @@ function _admRenderDocsTab(o) {
         <div class="adm-doc-type">Договір</div>
       </div>
       <div style="flex-shrink:0;margin-right:4px">${_docBadge('Не прикріплено','yellow')}</div>
+      <div class="adm-doc-dd">
+        <button class="adm-doc-dd-btn" onclick="_docToggleDD(event,'con')">Дії ${chevron}</button>
+        <div class="adm-doc-dd-menu" id="docMenu-con">${conMenu}</div>
+      </div>
       <div style="width:100%;position:relative" id="conSearchWrap">
         <div class="adm-doc-con-search">
           <input id="conSearchInput" type="text" placeholder="Пошук договору"
