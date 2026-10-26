@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Як відібрати зразок — LABA Землероб</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1B2B5E;
+    --neon:#C8F135;
+    --border:#E5E7EB;
+    --border-soft:#F0F2F5;
+    --text-mid:#4B5563;
+    --text-soft:#9CA3AF;
+    --white:#fff;
+    --bg:#F9FAFB;
+    --radius-lg:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Manrope',system-ui,sans-serif;background:var(--bg);color:var(--navy);min-height:100vh}
+
+  /* HEADER */
+  .header{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .header-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .header-logo-mark{width:32px;height:32px;background:var(--navy);border-radius:8px;display:flex;align-items:center;justify-content:center}
+  .header-logo-mark span{color:var(--neon);font-weight:800;font-size:14px;letter-spacing:-.5px}
+  .header-logo-text{font-weight:800;font-size:16px;color:var(--navy);letter-spacing:-.3px}
+  .header-cta{background:var(--navy);color:var(--white);border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center}
+  .header-cta:hover{background:#2d3f7a}
+
+  /* HERO */
+  .hero{background:var(--navy);padding:56px 24px;text-align:center}
+  .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(200,241,53,.15);border:1px solid rgba(200,241,53,.3);border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;color:var(--neon);margin-bottom:18px;letter-spacing:.05em;text-transform:uppercase}
+  .hero h1{font-size:clamp(28px,5vw,42px);font-weight:800;color:var(--white);line-height:1.2;margin-bottom:12px}
+  .hero p{font-size:16px;color:rgba(255,255,255,.65);max-width:520px;margin:0 auto 32px;line-height:1.65}
+  .hero-tabs{display:inline-flex;background:rgba(255,255,255,.1);border-radius:12px;padding:4px;gap:4px}
+  .hero-tab{background:none;border:none;border-radius:9px;padding:10px 20px;font-size:13px;font-weight:600;color:rgba(255,255,255,.6);cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:6px}
+  .hero-tab.active{background:var(--white);color:var(--navy)}
+
+  /* LAYOUT */
+  .layout{max-width:900px;margin:0 auto;padding:48px 24px 80px}
+
+  /* STEPS */
+  .steps{display:flex;flex-direction:column;gap:0}
+  .step{display:grid;grid-template-columns:1fr 1fr;gap:40px;padding:40px 0;border-bottom:1px solid var(--border-soft);align-items:center}
+  .step:last-child{border-bottom:none}
+  .step:nth-child(even) .step-text{order:2}
+  .step:nth-child(even) .step-photo{order:1}
+
+  .step-num{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--neon);color:var(--navy);font-size:15px;font-weight:800;margin-bottom:14px;flex-shrink:0}
+  .step-title{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:10px;line-height:1.3}
+  .step-desc{font-size:14px;color:var(--text-mid);line-height:1.8}
+  .step-tip{display:flex;align-items:flex-start;gap:8px;margin-top:16px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:12px 14px;font-size:13px;color:#92400E;line-height:1.6}
+  .step-tip-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+
+  .step-photo{border-radius:var(--radius-lg);overflow:hidden;background:var(--border-soft);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
+  .step-photo-inner{text-align:center;opacity:.4}
+  .step-photo-inner span{display:block;font-size:48px;margin-bottom:8px}
+  .step-photo-label{font-size:12px;font-weight:600;color:var(--text-soft)}
+
+  /* CTA */
+  .cta-block{background:var(--navy);border-radius:var(--radius-lg);padding:36px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:48px}
+  .cta-block h3{font-size:20px;font-weight:700;color:var(--white);margin-bottom:6px}
+  .cta-block p{font-size:14px;color:rgba(255,255,255,.6)}
+  .btn-primary{background:var(--neon);color:var(--navy);border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center}
+  .btn-primary:hover{background:#b8e020}
+
+  /* SECTION TITLE */
+  .section-title{font-size:13px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.07em;margin-bottom:32px}
+
+  @media(max-width:700px){
+    .step{grid-template-columns:1fr}
+    .step:nth-child(even) .step-text{order:1}
+    .step:nth-child(even) .step-photo{order:2}
+    .cta-block{flex-direction:column;align-items:flex-start;padding:24px}
+    .hero-tabs{flex-wrap:wrap;justify-content:center}
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="header-logo" href="https://laba.zemlerob.com.ua">
+    <div class="header-logo-mark"><span>LA</span></div>
+    <span class="header-logo-text">LABA</span>
+  </a>
+  <a class="header-cta" href="https://laba.zemlerob.com.ua">Замовити аналіз →</a>
+</header>
+
+<div class="hero">
+  <div class="hero-badge">📋 Інструкція з відбору</div>
+  <h1>Як відібрати зразок</h1>
+  <p>Правильний відбір — запорука точного результату. Оберіть тип матеріалу та дотримуйтесь кроків.</p>
+  <div class="hero-tabs">
+    <button class="hero-tab active" onclick="show('soil',this)">🌱 Ґрунт</button>
+    <button class="hero-tab" onclick="show('fertilizer',this)">🧪 Добрива</button>
+    <button class="hero-tab" onclick="show('water',this)">💧 Вода</button>
+    <button class="hero-tab" onclick="show('seeds',this)">🌾 Насіння та зерно</button>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="section-title" id="sectionTitle">Відбір зразків ґрунту</div>
+  <div class="steps" id="steps"></div>
+  <div class="cta-block">
+    <div>
+      <h3>Готові відправити зразки?</h3>
+      <p>Оформіть замовлення онлайн — ми надішлемо реквізити для доставки</p>
+    </div>
+    <a class="btn-primary" href="https://laba.zemlerob.com.ua">Замовити аналіз →</a>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  soil: {icon:'🌱', title:'Відбір зразків ґрунту', steps:[
+    {title:'Підготуйте обладнання', desc:'Для відбору знадобляться: ґрунтовий щуп або лопатка, поліетиленовий пакет, маркер для підписання зразка.', tip:'Обладнання має бути чистим, без залишків мастила або добрив.'},
+    {title:'Визначте площу відбору', desc:'Для однорідного поля — одне змішане пробовідбирання на 5–30 га. На неоднорідних полях — окремо для кожної зони.', tip:'Не відбирайте з меж доріжок і місць де худоба відпочивала.'},
+    {title:'Відберіть зразок', desc:'Зробіть 20–25 точкових відборів рівномірно по полю на глибину 0–30 см (або 0–20 см для деяких аналізів). Змішайте.', tip:'Маса змішаного зразка — 1–1.5 кг.'},
+    {title:'Упакуйте та підпишіть', desc:'Висипте зразок у пакет, закрийте і підпишіть: назва поля, дата, глибина, культура. Зразок зберігати в сухому прохолодному місці.', tip:'Не допускайте перегріву та намокання.'},
+  ]},
+  fertilizer: {icon:'🧪', title:'Відбір зразків добрив', steps:[
+    {title:'Відбір твердих добрив', desc:'З кожного мішка або купи відберіть щуп у 3–5 точках. Змішайте, зменшіть до 0.5 кг методом квартування.', tip:'Для кожного виду добрива — окремий контейнер.'},
+    {title:'Відбір рідких добрив', desc:'Перемішайте партію, відберіть з різних рівнів ємності. Обʼєм — 0.5–1 л у чисту ємність.', tip:'Використовуйте хімічностійку тару.'},
+  ]},
+  water: {icon:'💧', title:'Відбір проб води', steps:[
+    {title:'Підготовка тари', desc:'Використовуйте чисту пластикову або скляну тару обʼємом 1–2 л.', tip:'Промийте тару водою, яку будете відбирати.'},
+    {title:'Відбір', desc:'Для криниці — після 5 хвилин роботи насосу. Для водойми — з поверхні без суспензії.', tip:'Заповнюйте тару без повітря, закупорте.'},
+  ]},
+  seeds: {icon:'🌾', title:'Відбір зразків насіння та зерна', steps:[
+    {title:'Точковий відбір', desc:'З різних частин партії відберіть точкові проби щупом.', tip:'Мінімум 5 точок з різних місць.'},
+    {title:'Формування зразка', desc:'Змішайте точкові проби, скоротіть до 0.5–1 кг методом квартування.', tip:'Зберігайте в паперовому або тканинному мішку.'},
+  ]},
+};
+
+function show(type, btn){
+  document.querySelectorAll('.hero-tab').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const d = DATA[type];
+  document.getElementById('sectionTitle').textContent = d.title;
+  document.getElementById('steps').innerHTML = d.steps.map((s,i)=>`
+    <div class="step">
+      <div class="step-text">
+        <div class="step-num">${i+1}</div>
+        <div class="step-title">${s.title}</div>
+        <div class="step-desc">${s.desc}</div>
+        ${s.tip ? `<div class="step-tip"><span class="step-tip-icon">💡</span>${s.tip}</div>` : ''}
+      </div>
+      <div class="step-photo">
+        <div class="step-photo-inner">
+          <span>${d.icon}</span>
+          <div class="step-photo-label">Крок ${i+1}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+show('soil');
+</script>
+</body>
+</html>
