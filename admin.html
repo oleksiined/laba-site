@@ -611,6 +611,8 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
 .adm-add-study-btn{padding:4px 10px;border:1.5px solid var(--neon-dark);border-radius:6px;background:transparent;color:#7a9e00;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
 .adm-add-study-btn:hover{background:#f4ffd8}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 </head>
 <body>
 
@@ -2741,7 +2743,313 @@ function _docToggleDD(e, uid) {
 }
 
 function admDocAct(docType, action) {
+  const o = _admOrders.find(x => x.id === _admSelId);
+  if (docType === 'act' && action === 'create') {
+    if (!o) return alert('Відкрийте замовлення перед формуванням акту');
+    admGenAkt(o);
+    return;
+  }
   alert(`${docType} → ${action} — у розробці`);
+}
+
+// ══════════════════════════════════════════════════════════
+// АКТ НАДАННЯ ПОСЛУГ — генерація PDF (pdfMake)
+// ══════════════════════════════════════════════════════════
+function admGenAkt(o) {
+  if (typeof pdfMake === 'undefined') {
+    alert('PDF-бібліотека ще завантажується, спробуйте за секунду');
+    return;
+  }
+
+  const orderNum  = o.id || o.order_num || '—';
+  const aktDate   = new Date().toLocaleDateString('uk-UA');
+  const aktDateFull = (() => {
+    const d = new Date();
+    const months = ['січня','лютого','березня','квітня','травня','червня',
+                    'липня','серпня','вересня','жовтня','листопада','грудня'];
+    return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} р.`;
+  })();
+
+  // Номер акту — використовуємо числову частину замовлення або дату+час
+  const aktNum = (() => {
+    const m = String(orderNum).match(/\d+$/);
+    if (m) return parseInt(m[0], 10);
+    return Math.floor(Date.now() / 1000) % 100000;
+  })();
+
+  // ── Продавець ─────────────────────────────────────────────
+  const SELLER = {
+    name:    'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ «ЗЕМЛЕРОБ ХАБ»',
+    short:   'ТОВ «ЗЕМЛЕРОБ ХАБ»',
+    edrpou:  '45801119',
+    iban:    'UA63 305299 00000 26001031616283',
+    bank:    'ПАТ КБ «ПРИВАТБАНК»',
+    mfo:     '305299',
+    address: 'вул. Б. Вишневецького, 36/1, м. Черкаси, 18000',
+    site:    'laba.zemlerob.com.ua',
+  };
+
+  // ── Замовник ──────────────────────────────────────────────
+  const pt = o.payer_type || (o.company ? 'legal' : 'private');
+  const buyerName = (() => {
+    if (pt === 'legal') return 'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ «' + (o.company || '').toUpperCase() + '»';
+    if (pt === 'fop')   return 'ФІЗИЧНА ОСОБА-ПІДПРИЄМЕЦЬ ' + (o.company || o.name || '').toUpperCase();
+    return (o.name || o.company || 'Фізична особа').toUpperCase();
+  })();
+  const buyerShort = (() => {
+    if (pt === 'legal') return 'ТОВ «' + (o.company || o.name || '') + '»';
+    if (pt === 'fop')   return 'ФОП ' + (o.company || o.name || '');
+    return o.name || o.company || '—';
+  })();
+
+  const buyerStack = [
+    { text: buyerName, fontSize: 9, bold: true, lineHeight: 1.2 },
+  ];
+  if (o.edrpou) buyerStack.push({ text: 'Код за ЄДРПОУ: ' + o.edrpou, fontSize: 8, color: '#333', margin: [0,2,0,0] });
+  buyerStack.push({
+    text: 'На підставі Публічного договору про надання послуг від 01.12.2025 р., розміщеного на веб-сайті laba.zemlerob.com.ua.',
+    fontSize: 8, color: '#333', margin: [0,3,0,0],
+  });
+
+  // ── Таблиця послуг ────────────────────────────────────────
+  const fmtUAH = n => Number(n || 0).toLocaleString('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const UAHwords = n => {
+    // Проста функція числа прописом (тільки гривні)
+    const units = ['','один','два','три','чотири','п\'ять','шість','сім','вісім','дев\'ять'];
+    const teens = ['десять','одинадцять','дванадцять','тринадцять','чотирнадцять','п\'ятнадцять','шістнадцять','сімнадцять','вісімнадцять','дев\'ятнадцять'];
+    const tens  = ['','','двадцять','тридцять','сорок','п\'ятдесят','шістдесят','сімдесят','вісімдесят','дев\'яносто'];
+    const hunds = ['','сто','двісті','триста','чотириста','п\'ятсот','шістсот','сімсот','вісімсот','дев\'ятсот'];
+    const thous = ['тисяч','тисяча','тисячі','тисячі','тисячі','тисяч','тисяч','тисяч','тисяч','тисяч'];
+    const thou1 = ['','одна','дві'];
+    if (!n || n === 0) return 'нуль гривень';
+    let int = Math.floor(n);
+    const kop = Math.round((n - int) * 100);
+    let words = [];
+    const th = Math.floor(int / 1000);
+    if (th > 0) {
+      const t1 = Math.floor(th / 100), t2 = th % 100, t3 = th % 10;
+      if (t1) words.push(hunds[t1]);
+      if (t2 >= 10 && t2 <= 19) { words.push(teens[t2-10]); }
+      else { if (Math.floor(t2/10)) words.push(tens[Math.floor(t2/10)]); if (t3) words.push(t3<=2?thou1[t3]:units[t3]); }
+      words.push(th>=11&&th<=14?'тисяч':thous[th%10>4||th%10===0?0:th%10]);
+    }
+    int = int % 1000;
+    const h = Math.floor(int/100), rem = int%100, d = Math.floor(rem/10), u = rem%10;
+    if (h) words.push(hunds[h]);
+    if (rem >= 10 && rem <= 19) { words.push(teens[rem-10]); }
+    else { if (d) words.push(tens[d]); if (u) words.push(units[u]); }
+    // Відмінювання гривень
+    const hrn = int%100>=11&&int%100<=19 ? 'гривень' : int%10===1 ? 'гривня' : int%10>=2&&int%10<=4 ? 'гривні' : 'гривень';
+    const result = words.join(' ');
+    return (result.charAt(0).toUpperCase() + result.slice(1)) + ' ' + hrn + ' ' + String(kop).padStart(2,'0') + ' копійок.';
+  };
+
+  const items = o.items || [];
+  const thStyle = { fontSize: 8, bold: true, color: '#000', fillColor: '#f0f0f0' };
+  const tdStyle = { fontSize: 8.5, color: '#000' };
+  const tableBody = [[
+    { text: '№',                   ...thStyle, alignment: 'center' },
+    { text: 'Код\nпослуги',        ...thStyle, alignment: 'center' },
+    { text: 'Пакет / дослідження', ...thStyle },
+    { text: 'Матеріал',            ...thStyle },
+    { text: 'К-сть\nзразків',      ...thStyle, alignment: 'center' },
+    { text: 'Ціна, грн',           ...thStyle, alignment: 'right' },
+    { text: 'Сума, грн',           ...thStyle, alignment: 'right' },
+  ]];
+
+  let total = 0;
+  if (items.length > 0) {
+    items.forEach((it, i) => {
+      const price = Number(it.price || 0);
+      const qty   = Number(it.qty || it.quantity || 1);
+      const sum   = price * qty;
+      total += sum;
+      tableBody.push([
+        { text: i + 1,           ...tdStyle, alignment: 'center' },
+        { text: it.code || '—',  ...tdStyle, fontSize: 7.5 },
+        { text: it.name || '—',  ...tdStyle },
+        { text: it.material || 'Ґрунт', ...tdStyle },
+        { text: qty,             ...tdStyle, alignment: 'center' },
+        { text: fmtUAH(price),   ...tdStyle, alignment: 'right' },
+        { text: fmtUAH(sum),     ...tdStyle, alignment: 'right' },
+      ]);
+    });
+  } else {
+    // Fallback: одна загальна послуга
+    total = Number(o.total || o.grand_total || 0);
+    tableBody.push([
+      { text: '1',                            ...tdStyle, alignment: 'center' },
+      { text: '—',                            ...tdStyle, fontSize: 7.5 },
+      { text: 'Лабораторні дослідження',      ...tdStyle },
+      { text: 'Ґрунт',                        ...tdStyle },
+      { text: o.samples_count || 1,           ...tdStyle, alignment: 'center' },
+      { text: fmtUAH(total / (o.samples_count || 1)), ...tdStyle, alignment: 'right' },
+      { text: fmtUAH(total),                  ...tdStyle, alignment: 'right' },
+    ]);
+  }
+
+  const docDef = {
+    pageSize: 'A4',
+    pageMargins: [36, 24, 36, 40],
+    defaultStyle: { font: 'Roboto', fontSize: 9, color: '#000' },
+    content: [
+      // ── Шапка ─────────────────────────────────────────────
+      {
+        columns: [
+          {
+            width: 120,
+            stack: [
+              { text: 'LABA.', fontSize: 22, bold: true, color: '#000', lineHeight: 1 },
+              { text: 'by Zemlerob', fontSize: 8, color: '#000' },
+            ]
+          },
+          {
+            stack: [
+              { text: 'АКТ НАДАННЯ ПОСЛУГ', fontSize: 13, bold: true, alignment: 'right', color: '#000' },
+              { text: aktDate, fontSize: 8.5, color: '#000', alignment: 'right', margin: [0,3,0,0] },
+            ]
+          }
+        ],
+        margin: [0, 0, 0, 10],
+      },
+      // ── Номер акта / Замовник ─────────────────────────────
+      {
+        columns: [
+          { stack: [{ text: 'НОМЕР АКТА', fontSize: 7.5, color: '#888', bold: true }, { text: String(aktNum), fontSize: 10, bold: true, color: '#000', margin: [0,2,0,0] }] },
+          { stack: [{ text: 'ЗАМОВНИК', fontSize: 7.5, color: '#888', bold: true }, { text: buyerShort, fontSize: 10, bold: true, color: '#000', margin: [0,2,0,0] }], alignment: 'right' },
+        ],
+        margin: [0, 0, 0, 4],
+      },
+      // ── Заголовок ─────────────────────────────────────────
+      { text: `Акт № ${aktNum} від ${aktDateFull}`, fontSize: 10, bold: true, color: '#000', alignment: 'center', margin: [0, 13, 0, 4] },
+      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 8] },
+      // ── Виконавець / Замовник ─────────────────────────────
+      {
+        columns: [
+          {
+            width: '50%',
+            stack: [
+              { text: 'ВИКОНАВЕЦЬ', fontSize: 7.5, bold: true, color: '#888', margin: [0,0,0,4] },
+              { text: SELLER.name, fontSize: 8.5, bold: true, color: '#000', lineHeight: 1.2 },
+              { text: `Код за ЄДРПОУ: ${SELLER.edrpou}`, fontSize: 8, color: '#333', margin: [0,2,0,0] },
+              { text: `п/р ${SELLER.iban}`, fontSize: 8, color: '#333' },
+              { text: `у банку ${SELLER.bank}, МФО ${SELLER.mfo}`, fontSize: 8, color: '#333' },
+              { text: SELLER.address, fontSize: 8, color: '#333' },
+            ],
+            margin: [0, 0, 16, 0],
+          },
+          {
+            width: '50%',
+            stack: [
+              { text: 'ЗАМОВНИК', fontSize: 7.5, bold: true, color: '#888', margin: [0,0,0,4] },
+              ...buyerStack,
+            ]
+          }
+        ],
+        margin: [0, 0, 0, 8],
+      },
+      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 8] },
+      // ── Вступний текст ────────────────────────────────────
+      { text: 'Представники Замовника та Виконавця склали цей акт про те, що Виконавцем надано, а Замовником прийнято такі послуги:', fontSize: 8.5, margin: [0,0,0,8] },
+      // ── Заголовок таблиці ─────────────────────────────────
+      { text: 'НАДАНІ ПОСЛУГИ', fontSize: 9, bold: true, color: '#000', margin: [0, 0, 0, 4] },
+      // ── Таблиця ───────────────────────────────────────────
+      {
+        table: {
+          headerRows: 1,
+          widths: [16, 52, '*', 42, 36, 48, 52],
+          body: tableBody,
+        },
+        layout: {
+          hLineWidth: (i, node) => i === 0 || i === 1 || i === node.table.body.length ? 1 : 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#d8dce8',
+          vLineColor: () => '#d8dce8',
+          paddingLeft:   () => 5,
+          paddingRight:  () => 5,
+          paddingTop:    () => 3,
+          paddingBottom: () => 3,
+        },
+        margin: [0, 0, 0, 8],
+      },
+      // ── Підсумок ──────────────────────────────────────────
+      {
+        columns: [
+          {
+            width: '55%',
+            table: { widths: ['*'], body: [[{
+              stack: [
+                { text: 'ЗАГАЛЬНА ВАРТІСТЬ ПОСЛУГ', fontSize: 7.5, bold: true, color: '#000', margin: [0,0,0,4] },
+                { text: UAHwords(total), fontSize: 8, color: '#000', lineHeight: 1.3 },
+              ],
+              fillColor: '#f0f0f0', border: [false,false,false,false], margin: [8,8,8,8],
+            }]] },
+            layout: { defaultBorder: false },
+          },
+          { width: '5%', text: '' },
+          {
+            width: '40%',
+            table: { widths: ['*', 'auto'], body: [[
+              { text: 'Всього', fontSize: 11, bold: true, border: [false,false,false,false] },
+              { text: fmtUAH(total) + '\nгрн', fontSize: 11, bold: true, alignment: 'right', border: [false,false,false,false] },
+            ]] },
+            layout: { defaultBorder: false },
+            margin: [0,6,0,0],
+          },
+        ],
+        margin: [0, 0, 0, 8],
+      },
+      // ── Клауза про відсутність претензій ─────────────────
+      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 6] },
+      { text: 'Замовник претензій щодо обсягу, якості та строків надання послуг не має.', fontSize: 8.5, margin: [0,0,0,16] },
+      // ── Підписи ───────────────────────────────────────────
+      {
+        columns: [
+          {
+            width: '48%',
+            stack: [
+              { text: 'ВІД ВИКОНАВЦЯ*', fontSize: 7.5, bold: true, color: '#888', margin: [0,0,0,3] },
+              { text: SELLER.short, fontSize: 9, bold: true, color: '#000', margin: [0,0,0,18] },
+              { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 230, y2: 0, lineWidth: 0.5, lineColor: '#999' }] },
+              { text: 'Посада, підпис, ПІБ', fontSize: 7.5, color: '#888', margin: [0,2,0,12] },
+              { text: aktDate, fontSize: 8.5, color: '#000' },
+            ],
+          },
+          { width: '4%', text: '' },
+          {
+            width: '48%',
+            stack: [
+              { text: 'ВІД ЗАМОВНИКА', fontSize: 7.5, bold: true, color: '#888', margin: [0,0,0,3] },
+              { text: buyerShort, fontSize: 9, bold: true, color: '#000', margin: [0,0,0,18] },
+              { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 230, y2: 0, lineWidth: 0.5, lineColor: '#999' }] },
+              { text: 'Посада, підпис, ПІБ', fontSize: 7.5, color: '#888', margin: [0,2,0,12] },
+              { text: aktDate, fontSize: 8.5, color: '#000' },
+            ],
+          },
+        ],
+        margin: [0, 0, 0, 6],
+      },
+      { text: '* Відповідальний за здійснення господарської операції і правильність її оформлення.', fontSize: 7.5, italics: true, color: '#888', margin: [0,0,0,14] },
+      // ── Підвал ────────────────────────────────────────────
+      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 5] },
+      {
+        columns: [
+          { stack: [{ text: 'САЙТ', fontSize: 7.5, bold: true, color: '#888' }, { text: SELLER.site, fontSize: 8.5, color: '#000', margin: [0,2,0,0] }] },
+        ],
+      },
+    ],
+    footer: (currentPage, pageCount) => ({
+      columns: [
+        { text: 'LABA by Zemlerob · Акт надання послуг', fontSize: 7, color: '#333', margin: [40, 10, 0, 0] },
+        { text: `Сторінка ${currentPage} з ${pageCount}`, fontSize: 7, color: '#333', alignment: 'right', margin: [0, 10, 40, 0] },
+      ]
+    }),
+  };
+
+  const safeDate = aktDate.replace(/\./g, '-');
+  const fileName = `Акт_LABA_${aktNum}_${safeDate}.pdf`;
+
+  pdfMake.createPdf(docDef).download(fileName);
 }
 
 // ─── Supabase order update helper ────────────────────────────────────────────
