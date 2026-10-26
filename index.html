@@ -398,59 +398,6 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .param-chip{display:inline;color:var(--t2);font-weight:600;cursor:pointer;border-bottom:1.5px dashed var(--border);padding-bottom:1px;transition:color .12s;white-space:nowrap}
 .param-chip:hover{color:var(--navy)}
 
-/* ══════════════════════════════
-   SAMPLING PAGE — split layout
-══════════════════════════════ */
-.sampling-layout{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 60px)}
-.sampling-sidebar{background:var(--white);border-right:1px solid var(--border);padding:28px 16px;display:flex;flex-direction:column;gap:6px;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
-.sampling-sidebar-title{font-size:11px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.07em;padding:0 8px;margin-bottom:6px}
-.smat-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius-md);border:2px solid transparent;background:none;cursor:pointer;width:100%;text-align:left;transition:border-color .15s,background .15s}
-.smat-item:hover{background:#f5ffe0;border-color:var(--neon-dark)}
-.smat-item.active{background:#f5ffe0;border-color:var(--neon-dark)}
-.smat-icon{font-size:26px;flex-shrink:0;line-height:1}
-.smat-info{flex:1}
-.smat-name{font-size:14px;font-weight:700;color:var(--navy)}
-.smat-item.active .smat-name{color:var(--navy)}
-.smat-sub{font-size:11px;color:var(--text-soft);margin-top:1px}
-.smat-arrow{color:var(--text-soft);flex-shrink:0;transition:color .15s,transform .15s}
-.smat-item.active .smat-arrow,.smat-item:hover .smat-arrow{color:var(--navy);transform:translateX(2px)}
-.smat-cta{margin-top:auto;padding:16px;background:var(--bg);border-radius:var(--radius-md);border:1px solid var(--border)}
-.smat-cta p{font-size:12px;color:var(--text-mid);line-height:1.5}
-.sampling-content{padding:36px 48px 60px;overflow-y:auto;max-width:900px}
-.scon-header{margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--border)}
-.scon-title{font-family:'Manrope',system-ui,sans-serif;font-size:28px;font-weight:700;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:12px}
-.scon-desc{font-size:15px;color:var(--text-soft);line-height:1.65}
-.scon-steps{display:flex;flex-direction:column;gap:0}
-.scon-step{display:grid;grid-template-columns:1fr 1fr;gap:36px;padding:32px 0;border-bottom:1px solid var(--border-soft);align-items:center}
-.scon-step:last-child{border-bottom:none}
-.scon-step:nth-child(even) .scon-step-text{order:2}
-.scon-step:nth-child(even) .scon-step-photo{order:1}
-.scon-step-num{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--neon);color:var(--navy);font-size:14px;font-weight:800;margin-bottom:10px}
-.scon-step-title{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:8px;font-family:'Manrope',system-ui,sans-serif;line-height:1.3}
-.scon-step-desc{font-size:14px;color:var(--text-mid);line-height:1.75}
-.scon-tip{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border-radius:var(--radius-sm);padding:10px 12px;margin-top:12px;font-size:12px;color:var(--t2);font-weight:500;line-height:1.5;border:1px solid var(--border)}
-.scon-tip-icon{flex-shrink:0;font-size:14px}
-.scon-step-photo{border-radius:var(--radius-lg);overflow:hidden;background:var(--border-soft);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
-.scon-photo-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-size:52px;width:100%;height:100%;background:linear-gradient(135deg,var(--bg) 0%,var(--white) 100%)}
-.scon-photo-label{font-size:11px;color:var(--text-soft);font-weight:500}
-.scon-checklist{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-top:32px}
-.scon-checklist-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:14px}
-.scon-check-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-soft);font-size:13px;color:var(--text-mid);line-height:1.5}
-.scon-check-item:last-child{border-bottom:none}
-.scon-check-icon{flex-shrink:0;margin-top:1px}
-.scon-order-block{background:var(--navy);border-radius:var(--radius-lg);padding:24px 28px;margin-top:28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
-.scon-order-block h3{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px}
-.scon-order-block p{font-size:13px;color:rgba(255,255,255,.6)}
-@media(max-width:900px){
-  .sampling-layout{grid-template-columns:1fr}
-  .sampling-sidebar{position:static;height:auto;flex-direction:row;flex-wrap:wrap;border-right:none;border-bottom:1px solid var(--border);padding:12px;gap:8px}
-  .smat-item{width:calc(50% - 4px)}
-  .smat-cta{display:none}
-  .scon-step{grid-template-columns:1fr}
-  .scon-step:nth-child(even) .scon-step-text{order:1}
-  .scon-step:nth-child(even) .scon-step-photo{order:2}
-  .sampling-content{padding:20px 16px 40px}
-}
 
 /* ══════════════════════════════
    CALCULATOR PAGE
@@ -2241,8 +2188,6 @@ main{flex:1}
   .checkout-page{padding:16px 12px 28px}
   .checkout-title{font-size:22px}
 
-  /* Sampling page */
-  .sampling-content{padding:16px 12px 40px}
 
   /* CTA banner image */
   .cta-banner-img{height:auto!important;aspect-ratio:unset!important}
@@ -2392,18 +2337,6 @@ main{flex:1}
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
         </div>
       </div>
-      <div class="home-how-card" onclick="navigate('sampling')">
-        <div class="home-how-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M12 8v8"/></svg>
-        </div>
-        <div>
-          <div class="home-how-title">Відправити зразок</div>
-          <div class="home-how-desc">Дізнайтесь, як правильно підготувати та відправити</div>
-        </div>
-        <div class="home-how-arrow">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
-        </div>
-      </div>
       <div class="home-how-card" onclick="navigate('cabinet')">
         <div class="home-how-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
@@ -2447,7 +2380,6 @@ main{flex:1}
       </div>
       <div class="laba-footer-col">
         <div class="laba-footer-col-title">Клієнтам</div>
-        <a href="#" onclick="navigate('sampling');return false;">Як відправити зразок</a>
         <a href="#">Оплата і доставка</a>
         <a href="#" onclick="navigate('cabinet');return false;">Отримати результати</a>
         <a href="#">Поширені запитання</a>
@@ -2661,62 +2593,6 @@ main{flex:1}
         <div class="empty-icon">🔍</div>
         <p style="color:var(--text-soft);font-size:14px">Нічого не знайдено. Спробуйте змінити фільтри.</p>
       </div>
-    </div>
-  </div>
-</div>
-<!-- ══ SAMPLING ══ -->
-<div class="page" id="page-sampling">
-  <div class="sampling-layout">
-
-    <!-- LEFT: матеріали -->
-    <div class="sampling-sidebar">
-      <div class="sampling-sidebar-title">Матеріал для аналізу</div>
-
-      <button class="smat-item active" data-type="soil" onclick="setSamplingMat('soil',this)">
-        <div class="smat-icon">🌱</div>
-        <div class="smat-info">
-          <div class="smat-name">Ґрунт</div>
-          <div class="smat-sub">Агрохімічний аналіз</div>
-        </div>
-        <svg class="smat-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-
-      <button class="smat-item" data-type="fertilizer" onclick="setSamplingMat('fertilizer',this)">
-        <div class="smat-icon">🧪</div>
-        <div class="smat-info">
-          <div class="smat-name">Добрива</div>
-          <div class="smat-sub">Контроль якості</div>
-        </div>
-        <svg class="smat-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-
-      <button class="smat-item" data-type="water" onclick="setSamplingMat('water',this)">
-        <div class="smat-icon">💧</div>
-        <div class="smat-info">
-          <div class="smat-name">Вода</div>
-          <div class="smat-sub">Фертигація · Зрошення</div>
-        </div>
-        <svg class="smat-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-
-      <button class="smat-item" data-type="seeds" onclick="setSamplingMat('seeds',this)">
-        <div class="smat-icon">🌾</div>
-        <div class="smat-info">
-          <div class="smat-name">Насіння та зерно</div>
-          <div class="smat-sub">Посівний матеріал</div>
-        </div>
-        <svg class="smat-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-
-      <div class="smat-cta">
-        <p>Потрібна допомога з відбором?</p>
-        <button class="btn-primary" style="width:100%;margin-top:10px;font-size:13px" onclick="openCallModal()">Замовити виїзд</button>
-      </div>
-    </div>
-
-    <!-- RIGHT: інструкція -->
-    <div class="sampling-content" id="samplingContent">
-      <!-- filled by JS -->
     </div>
   </div>
 </div>
@@ -3396,10 +3272,6 @@ main{flex:1}
             </a>
 
           </div>
-          <a href="#" onclick="navigate('sampling');return false" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:13px;color:var(--t3);text-decoration:none">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 4l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Переглянути інструкцію з пакування
-          </a>
         </div>
       </div>
 
@@ -3837,7 +3709,6 @@ function navigate(page) {
   if (page === 'calculator') calcInit();
   if (page === 'cabinet') { cabInit(); cabSwitch('orders'); }
   document.querySelector('nav.navbar').style.display = '';
-  if (page === 'sampling') initSampling();
   if (page === 'checkout') {
     const _ck = JSON.stringify((cart||[]).map(c=>c.code+':'+(c.qty||getCartQty(c)))) +
                 '|' + JSON.stringify((typeof samples!=='undefined'&&samples||[]).map(s=>(s.id||'')+'='+(s.extras||[]).map(e=>e.id).join(',')));
@@ -5920,63 +5791,6 @@ function addParamToCard(){
 })();
 
 // ═══════════════════════════════════════════════
-// SAMPLING PAGE (v24 compatible)
-// ═══════════════════════════════════════════════
-const SAMPLING_DATA={
-  soil:{icon:'🌱',title:'Відбір зразків ґрунту',steps:[
-    {title:'Підготуйте обладнання',desc:'Для відбору знадобляться: ґрунтовий щуп або лопатка, поліетиленовий пакет, маркер для підписання зразка.',tip:'Обладнання має бути чистим, без залишків мастила або добрив.'},
-    {title:'Визначте площу відбору',desc:'Для однорідного поля — одне змішане пробовідбирання на 5–30 га. На неоднорідних полях — окремо для кожної зони.',tip:'Не відбирайте з меж доріжок і місць де худоба відпочивала.'},
-    {title:'Відберіть зразок',desc:'Зробіть 20–25 точкових відборів рівномірно по полю на глибину 0–30 см (або 0–20 см для деяких аналізів). Змішайте.',tip:'Маса змішаного зразка — 1–1.5 кг.'},
-    {title:'Упакуйте та підпишіть',desc:'Висипте зразок у пакет, закрийте і підпишіть: назва поля, дата, глибина, культура. Зразок зберігати в сухому прохолодному місці.',tip:'Не допускайте перегріву та намокання.'},
-  ]},
-  fertilizer:{icon:'🧪',title:'Відбір зразків добрив',steps:[
-    {title:'Відбір твердих добрив',desc:'З кожного мішка або купи відберіть щуп у 3–5 точках. Змішайте, зменшіть до 0.5 кг методом квартування.',tip:'Для кожного виду добрива — окремий контейнер.'},
-    {title:'Відбір рідких добрив',desc:'Перемішайте партію, відберіть з різних рівнів ємності. Обʼєм — 0.5–1 л у чисту ємність.',tip:'Використовуйте хімічностійку тару.'},
-  ]},
-  water:{icon:'💧',title:'Відбір проб води',steps:[
-    {title:'Підготовка тари',desc:'Використовуйте чисту пластикову або скляну тару обʼємом 1–2 л.',tip:'Промийте тару водою, яку будете відбирати.'},
-    {title:'Відбір',desc:'Для криниці — після 5 хвилин роботи насосу. Для водойми — з поверхні без суспензії.',tip:'Заповнюйте тару без повітря, закупорте.'},
-  ]},
-  seeds:{icon:'🌾',title:'Відбір зразків насіння та зерна',steps:[
-    {title:'Точковий відбір',desc:'З різних частин партії відберіть точкові проби щупом.',tip:'Мінімум 5 точок з різних місць.'},
-    {title:'Формування зразка',desc:'Змішайте точкові проби, скоротіть до 0.5–1 кг методом квартування.',tip:'Зберігайте в паперовому або тканинному мішку.'},
-  ]},
-};
-
-function setSamplingMat(type,btn){
-  document.querySelectorAll('.smat-item').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-  renderSamplingContent(type);
-}
-
-function renderSamplingContent(type){
-  const data=SAMPLING_DATA[type]||SAMPLING_DATA.soil;
-  const el=document.getElementById('samplingContent');
-  if(!el)return;
-  el.innerHTML=`
-    <div class="scon-header">
-      <div class="scon-title">${data.icon} ${data.title}</div>
-      <div class="scon-desc">Дотримуйтесь інструкцій для отримання достовірного результату</div>
-    </div>
-    <div class="scon-steps">
-      ${data.steps.map((s,i)=>`
-        <div class="scon-step">
-          <div class="scon-step-text">
-            <div class="scon-step-num">${i+1}</div>
-            <div class="scon-step-title">${s.title}</div>
-            <div class="scon-step-desc">${s.desc}</div>
-            ${s.tip?`<div class="scon-tip"><span class="scon-tip-icon">💡</span>${s.tip}</div>`:''}
-          </div>
-          <div class="scon-step-photo"><div class="scon-photo-placeholder"><span>${data.icon}</span><span class="scon-photo-label">Крок ${i+1}</span></div></div>
-        </div>`).join('')}
-    </div>
-    <div class="scon-order-block">
-      <div><h3>Готові відправити зразки?</h3><p>Оформіть замовлення онлайн — ми надішлемо інструкцію</p></div>
-      <button class="btn-primary" onclick="navigate('services')">Замовити аналіз</button>
-    </div>`;
-}
-
-function initSampling(){ renderSamplingContent('soil'); }
 
 // ═══════════════════════════════════════════════
 // CONSTRUCTOR (removed — stubs only)
@@ -6237,7 +6051,7 @@ function showToast(msg,ms=2500){
     navigate('services');
   } else if(_initHash && _initHash !== '#'){
     const _pg = _initHash.slice(1);
-    const _pages=['home','services','about','contacts','checkout','cabinet','calculator','sampling'];
+    const _pages=['home','services','about','contacts','checkout','cabinet','calculator'];
     if(_pages.includes(_pg)) navigate(_pg); else navigate('home');
   } else {
     navigate('home');
