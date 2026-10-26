@@ -103,7 +103,7 @@ module.exports = async function handler(req, res) {
     // Resolve text order_num (e.g. "L260009") for event logging — id may be a UUID
     let orderNum = id;
     try {
-      const numRes = await httpsReq(host, `/rest/v1/orders?id=eq.${encodeURIComponent(id)}&select=order_num`, key);
+      const numRes = await httpsReq(host, `/rest/v1/orders?id=eq.${encodeURIComponent(id)}&select=order_num`, key, 'GET');
       if (numRes.status < 300) {
         const rows = JSON.parse(numRes.body);
         if (rows[0]?.order_num) orderNum = rows[0].order_num;
