@@ -8598,7 +8598,7 @@ function ncf_downloadInvoice() {
   };
 
   const safeDate = invoiceDate.replace(/\./g, '-');
-  const _invFileName = `Рахунок_LABA_${safeDate}.pdf`;
+  const _invFileName = `Рахунок_${orderNum}_${safeDate}.pdf`;
 
   // ── Generate PDF once → same blob used for download AND Supabase save ────
   pdfMake.createPdf(docDef).getBase64(function(_b64) {
