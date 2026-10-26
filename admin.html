@@ -362,13 +362,25 @@ html{scroll-behavior:smooth}
 .adm-doc-badge-yellow{background:#FFFBEB;color:#B45309;border:1px solid #FDE68A}
 .adm-doc-badge-green{background:#ECFDF5;color:#059669;border:1px solid #A7F3D0}
 .adm-doc-badge-red{background:#FEF2F2;color:#DC2626;border:1px solid #FECACA}
-/* Doc action buttons strip */
-.adm-doc-acts{display:flex;gap:5px;flex-wrap:wrap;padding:8px 14px;border-bottom:1px solid #f0f2f4;background:#fafafa}
-.adm-doc-act-btn{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:5px 9px;border-radius:6px;border:1px solid var(--border);background:#fff;color:var(--navy);cursor:pointer;white-space:nowrap}
-.adm-doc-act-btn:hover{background:#f0f4ff;border-color:#c7d4f5;color:#3b5bdb}
-.adm-doc-act-btn-red{border-color:#fecaca;color:#dc2626}
-.adm-doc-act-btn-red:hover{background:#fef2f2;border-color:#fca5a5}
-.adm-doc-act-btn-disabled{opacity:.4;pointer-events:none}
+/* Doc dropdown */
+.adm-doc-dd{position:relative;flex-shrink:0}
+.adm-doc-dd-btn{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:500;padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:#fff;color:var(--navy);cursor:pointer;white-space:nowrap}
+.adm-doc-dd-btn:hover{background:#f0f4ff;border-color:#c7d4f5}
+.adm-doc-dd-menu{display:none;position:absolute;right:0;top:calc(100% + 4px);min-width:190px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.10);z-index:200;padding:4px 0;overflow:hidden}
+.adm-doc-dd-menu.open{display:block}
+.adm-doc-dd-item{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:12px;color:var(--navy);cursor:pointer;white-space:nowrap;background:none;border:none;width:100%;text-align:left;text-decoration:none}
+.adm-doc-dd-item:hover{background:#f5f7fa}
+.adm-doc-dd-item.red{color:#dc2626}
+.adm-doc-dd-item.red:hover{background:#fef2f2}
+.adm-doc-dd-item.disabled{opacity:.4;pointer-events:none}
+.adm-doc-dd-sep{height:1px;background:var(--border);margin:3px 0}
+/* Bottom create bar */
+.adm-doc-bottom{border-top:1px solid var(--border);padding:10px 14px;display:flex;gap:7px;flex-shrink:0}
+.adm-doc-create-wrap{position:relative;flex:1}
+.adm-doc-create-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;font-size:12.5px;font-weight:600;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--navy);cursor:pointer}
+.adm-doc-create-btn:hover{background:#f0f4ff;border-color:#c7d4f5}
+.adm-doc-create-menu{display:none;position:absolute;bottom:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.10);z-index:200;padding:4px 0}
+.adm-doc-create-menu.open{display:block}
 .adm-doc-menu-btn{background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:15px;padding:2px 6px;border-radius:4px;line-height:1;letter-spacing:1px;flex-shrink:0}
 .adm-doc-menu-btn:hover{background:var(--bg);color:var(--navy)}
 .adm-edo-block{margin:10px 14px;border:1.5px solid #E0E7FF;border-radius:10px;background:#F5F8FF;overflow:hidden;flex-shrink:0}
@@ -1472,6 +1484,34 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           <!-- Document list -->
           <div class="adm-doc-list" id="admDocList">
             <!-- rendered by JS -->
+          </div>
+          <!-- Bottom bar -->
+          <div class="adm-doc-bottom">
+            <div class="adm-doc-create-wrap">
+              <button class="adm-doc-create-btn" onclick="_docToggleCreate(event)">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>
+                Створити
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M4 6l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="adm-doc-create-menu" id="admDocCreateMenu">
+                <button class="adm-doc-dd-item" onclick="admDocAct('invoice','create');_docCloseMenus()">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="#3B82F6" stroke-width="1.6" width="14" height="14"><rect x="2" y="1" width="12" height="14" rx="2"/><path d="M5 5h6M5 8h6M5 11h3" stroke-linecap="round"/></svg>
+                  Рахунок
+                </button>
+                <button class="adm-doc-dd-item" onclick="admDocAct('act','create');_docCloseMenus()">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="#16a34a" stroke-width="1.6" width="14" height="14"><rect x="2" y="1" width="12" height="14" rx="2"/><path d="M5 5h6M5 8h4" stroke-linecap="round"/><path d="M5 11l1.5 1.5L10 9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Акт виконаних робіт
+                </button>
+                <button class="adm-doc-dd-item" onclick="admDocAct('contract','create');_docCloseMenus()">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="#ca8a04" stroke-width="1.6" width="14" height="14"><rect x="2" y="1" width="12" height="14" rx="2"/><path d="M5 5h6M5 8h6M5 11h3" stroke-linecap="round"/></svg>
+                  Договір
+                </button>
+              </div>
+            </div>
+            <button class="adm-doc-create-btn" style="flex:1" onclick="admDocAct('all','open')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M7 13L14 6M14 6H9M14 6v5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Відкрити всі документи
+            </button>
           </div>
         </div>
 
@@ -2581,60 +2621,28 @@ function _docBadge(label, color) {
   return `<span class="adm-doc-badge adm-doc-badge-${color}">${label}</span>`;
 }
 
-// SVG icons (inline, small)
-const _docSvg = {
-  create:   '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M8 5v6M5 8h6" stroke-linecap="round"/></svg>',
-  download: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><path d="M8 2v8M5 7.5l3 3 3-3M2 13h12" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  send:     '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><path d="M13 3L7 9M13 3l-4 10-2-4-4-2 10-4z" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  cancel:   '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><path d="M4 4l8 8M12 4l-8 8" stroke-linecap="round"/></svg>',
-  attach:   '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><path d="M13 8.5l-5.5 5.5a3.5 3.5 0 01-5-5l6-6a2 2 0 013 3l-6 6a.5.5 0 01-.7-.7L10 6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-};
+// Close all doc dropdowns
+function _docCloseMenus() {
+  document.querySelectorAll('.adm-doc-dd-menu.open, .adm-doc-create-menu.open').forEach(m=>m.classList.remove('open'));
+}
+document.addEventListener('click', _docCloseMenus);
+
+function _docToggleCreate(e) {
+  e.stopPropagation();
+  _docCloseMenus();
+  document.getElementById('admDocCreateMenu')?.classList.toggle('open');
+}
 
 function _admRenderDocsTab(o) {
   const hasInvoice = !!o.invoiceUrl;
   const isDone     = o.status === 'done' || o.status === 'closed';
   const invoiceNum = o.id || '—';
 
-  // Stats
   const setT = (id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
   setT('admDSInv', hasInvoice ? 1 : 0);
   setT('admDSAct', 0);
   setT('admDSCon', 0);
   setT('admDSPro', isDone ? 1 : 0);
-
-  // ── Рахунок ──
-  const invStatus  = hasInvoice ? _docBadge('Готово','green') : _docBadge('Не створено','yellow');
-  const invActions = [
-    { label:'Сформувати', icon:'create',   fn:`admDocAct('invoice','create')`,   disabled: hasInvoice },
-    { label:'Завантажити',icon:'download', fn:`admDocAct('invoice','download')`, disabled: !hasInvoice, href: o.invoiceUrl },
-    { label:'Відправити', icon:'send',     fn:`admDocAct('invoice','send')`,     disabled: !hasInvoice },
-    { label:'Анулювати',  icon:'cancel',   fn:`admDocAct('invoice','cancel')`,   disabled: !hasInvoice, red:true },
-  ];
-
-  // ── Акт ──
-  const actStatus  = _docBadge('Не створено','yellow');
-  const actActions = [
-    { label:'Сформувати', icon:'create',   fn:`admDocAct('act','create')` },
-    { label:'Завантажити',icon:'download', fn:`admDocAct('act','download')`, disabled:true },
-    { label:'Відправити', icon:'send',     fn:`admDocAct('act','send')`,     disabled:true },
-    { label:'Анулювати',  icon:'cancel',   fn:`admDocAct('act','cancel')`,   disabled:true, red:true },
-  ];
-
-  // ── Договір ──
-  const conStatus  = _docBadge('Не прикріплено','yellow');
-  const conActions = [
-    { label:'Прикріпити', icon:'attach',   fn:`admDocAct('contract','attach')` },
-    { label:'Створити',   icon:'create',   fn:`admDocAct('contract','create')` },
-    { label:'Відправити', icon:'send',     fn:`admDocAct('contract','send')`,     disabled:true },
-    { label:'Завантажити',icon:'download', fn:`admDocAct('contract','download')`, disabled:true },
-  ];
-
-  // ── Протокол ──
-  const proStatus  = isDone ? _docBadge('Готово','green') : _docBadge('Не готово','yellow');
-  const proActions = [
-    { label:'Завантажити',icon:'download', fn:`admDocAct('protocol','download')`, disabled:!isDone },
-    { label:'Надіслати',  icon:'send',     fn:`admDocAct('protocol','send')`,     disabled:!isDone },
-  ];
 
   const iconSvgs = {
     inv: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 8h6M7 11h6M7 14h3" stroke-linecap="round"/></svg>',
@@ -2643,32 +2651,82 @@ function _admRenderDocsTab(o) {
     pro: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><path d="M5 3h10a1 1 0 011 1v3l-3 3v6a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M16 7H5" stroke-linecap="round"/></svg>',
   };
 
-  function renderDoc(iconCls, name, type, statusHtml, actions) {
-    const actHtml = actions.map(a => {
-      const cls = ['adm-doc-act-btn', a.red?'adm-doc-act-btn-red':'', a.disabled?'adm-doc-act-btn-disabled':''].filter(Boolean).join(' ');
-      if (a.href && !a.disabled) {
-        return `<a href="${a.href}" target="_blank" rel="noopener" class="${cls}" style="text-decoration:none">${_docSvg[a.icon]||''} ${a.label}</a>`;
-      }
-      return `<button class="${cls}" onclick="${a.disabled?'':a.fn}">${_docSvg[a.icon]||''} ${a.label}</button>`;
-    }).join('');
-    return `<div class="adm-doc-row" style="flex-wrap:wrap;gap:6px 10px;padding-bottom:6px">
+  // Dropdown menu item helper
+  const item  = (label, fn, disabled, red) =>
+    `<button class="adm-doc-dd-item${red?' red':''}${disabled?' disabled':''}" onclick="${disabled?'':fn+';_docCloseMenus()'}">${label}</button>`;
+  const sep   = () => '<div class="adm-doc-dd-sep"></div>';
+
+  // ── Рахунок ──
+  const invMenu = [
+    item('Сформувати',  `admDocAct('invoice','create')`,   hasInvoice),
+    hasInvoice
+      ? `<a class="adm-doc-dd-item" href="${o.invoiceUrl}" target="_blank" rel="noopener" onclick="_docCloseMenus()">Завантажити</a>`
+      : item('Завантажити', `admDocAct('invoice','download')`, true),
+    item('Відправити клієнту', `admDocAct('invoice','send')`,   !hasInvoice),
+    sep(),
+    item('Анулювати',   `admDocAct('invoice','cancel')`,   !hasInvoice, true),
+  ].join('');
+
+  // ── Акт ──
+  const actMenu = [
+    item('Сформувати',  `admDocAct('act','create')`),
+    item('Завантажити', `admDocAct('act','download')`, true),
+    item('Відправити клієнту', `admDocAct('act','send')`, true),
+    sep(),
+    item('Анулювати',   `admDocAct('act','cancel')`, true, true),
+  ].join('');
+
+  // ── Договір ──
+  const conMenu = [
+    item('Прикріпити',  `admDocAct('contract','attach')`),
+    item('Створити',    `admDocAct('contract','create')`),
+    item('Відправити',  `admDocAct('contract','send')`,     true),
+    item('Завантажити', `admDocAct('contract','download')`, true),
+  ].join('');
+
+  // ── Протокол ──
+  const proMenu = [
+    item('Завантажити', `admDocAct('protocol','download')`, !isDone),
+    item('Надіслати',   `admDocAct('protocol','send')`,     !isDone),
+  ].join('');
+
+  const chevron = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10"><path d="M4 6l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function renderDoc(uid, iconCls, name, type, statusHtml, menuItems) {
+    return `<div class="adm-doc-row">
       <div class="adm-doc-icon ${iconCls}">${iconSvgs[iconCls]}</div>
       <div class="adm-doc-body">
         <div class="adm-doc-nm">${name}</div>
         <div class="adm-doc-type">${type}</div>
       </div>
-      <div style="flex-shrink:0">${statusHtml}</div>
-      <div class="adm-doc-acts" style="width:100%;padding:6px 0 0 42px;border:none;background:none">${actHtml}</div>
+      <div style="flex-shrink:0;margin-right:4px">${statusHtml}</div>
+      <div class="adm-doc-dd">
+        <button class="adm-doc-dd-btn" onclick="_docToggleDD(event,'${uid}')">Дії ${chevron}</button>
+        <div class="adm-doc-dd-menu" id="docMenu-${uid}">${menuItems}</div>
+      </div>
     </div>`;
   }
 
   const el = document.getElementById('admDocList');
   if (!el) return;
   el.innerHTML =
-    renderDoc('inv', 'Рахунок ' + invoiceNum, 'Рахунок',           invStatus, invActions) +
-    renderDoc('act', 'Акт виконаних робіт',   'Акт',               actStatus, actActions) +
-    renderDoc('con', 'Договір',               'Договір',           conStatus, conActions) +
-    renderDoc('pro', 'Протоколи досліджень',  'Протокол',          proStatus, proActions);
+    renderDoc('inv', 'inv', 'Рахунок ' + invoiceNum, 'Рахунок',
+      hasInvoice ? _docBadge('Готово','green') : _docBadge('Не створено','yellow'), invMenu) +
+    renderDoc('act', 'act', 'Акт виконаних робіт',   'Акт',
+      _docBadge('Не створено','yellow'), actMenu) +
+    renderDoc('con', 'con', 'Договір',               'Договір',
+      _docBadge('Не прикріплено','yellow'), conMenu) +
+    renderDoc('pro', 'pro', 'Протоколи досліджень',  'Протокол',
+      isDone ? _docBadge('Готово','green') : _docBadge('Не готово','yellow'), proMenu);
+}
+
+function _docToggleDD(e, uid) {
+  e.stopPropagation();
+  const menu = document.getElementById('docMenu-' + uid);
+  if (!menu) return;
+  const wasOpen = menu.classList.contains('open');
+  _docCloseMenus();
+  if (!wasOpen) menu.classList.add('open');
 }
 
 function admDocAct(docType, action) {
