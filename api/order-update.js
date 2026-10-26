@@ -100,8 +100,18 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ ok: false, error: `Supabase ${result.status}: ${result.body}` });
     }
 
+    // Resolve text order_num (e.g. "L260009") for event logging — id may be a UUID
+    let orderNum = id;
+    try {
+      const numRes = await httpsReq(host, `/rest/v1/orders?id=eq.${encodeURIComponent(id)}&select=order_num`, key);
+      if (numRes.status < 300) {
+        const rows = JSON.parse(numRes.body);
+        if (rows[0]?.order_num) orderNum = rows[0].order_num;
+      }
+    } catch (_) {}
+
     // Log event server-side — non-fatal
-    await logEvent(host, key, id, _event);
+    await logEvent(host, key, orderNum, _event);
 
     return res.status(200).json({ ok: true });
   } catch (err) {
