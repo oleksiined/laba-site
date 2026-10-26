@@ -205,6 +205,16 @@ html{scroll-behavior:smooth}
 .adm-st-dd-item.active-st{background:#f0fdf4}
 .adm-st-dd-sep{height:1px;background:var(--border);margin:4px 0}
 .adm-pbtn-sec:disabled{opacity:.4;cursor:not-allowed}
+.adm-samp-acc-form{border-top:1px solid var(--border);padding:12px 14px 8px;flex-shrink:0;background:#FAFBFC}
+.adm-samp-acc-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:10px}
+.adm-samp-acc-checklist{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.adm-samp-acc-check{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-mid);cursor:pointer}
+.adm-samp-acc-check input[type=checkbox]{width:14px;height:14px;accent-color:var(--navy);cursor:pointer}
+.adm-samp-acc-row{margin-bottom:8px}
+.adm-samp-acc-lbl{display:block;font-size:11px;font-weight:600;color:var(--text-soft);margin-bottom:3px}
+.adm-samp-acc-sel,.adm-samp-acc-inp,.adm-samp-acc-textarea{width:100%;font-size:12px;padding:6px 9px;border:1px solid var(--border);border-radius:7px;background:#fff;color:var(--text-dark);font-family:inherit;box-sizing:border-box}
+.adm-samp-acc-sel:focus,.adm-samp-acc-inp:focus,.adm-samp-acc-textarea:focus{outline:none;border-color:var(--neon-dark);box-shadow:0 0 0 2px rgba(90,188,0,.12)}
+.adm-samp-acc-textarea{resize:none;line-height:1.5}
 .adm-samp-actions{border-top:1px solid var(--border);padding:10px 14px;display:flex;gap:6px;flex-shrink:0}
 .adm-panel-actions{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:7px}
 .adm-pbtn{display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 14px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .1s}
@@ -1443,20 +1453,65 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           <div style="flex:1;overflow-y:auto">
             <div id="admPanelSamples"></div>
           </div>
+          <!-- Acceptance form -->
+          <div class="adm-samp-acc-form" id="admSampAccForm">
+            <div class="adm-samp-acc-title">Прийняття зразків</div>
+            <!-- Checklist -->
+            <div class="adm-samp-acc-checklist" id="admSampAccChecklist">
+              <label class="adm-samp-acc-check">
+                <input type="checkbox" id="accChkSeal"> Цілісність упаковки/пломби
+              </label>
+              <label class="adm-samp-acc-check">
+                <input type="checkbox" id="accChkDoc"> Відповідність документів
+              </label>
+            </div>
+            <!-- Лабораторія призначення -->
+            <div class="adm-samp-acc-row">
+              <label class="adm-samp-acc-lbl">Лабораторія призначення</label>
+              <select class="adm-samp-acc-sel" id="admAccLab">
+                <option value="">— оберіть —</option>
+                <option value="kri">Лабораторія КРІ</option>
+                <option value="dnipro">Лабораторія Дніпро</option>
+                <option value="kyiv">Лабораторія Київ</option>
+              </select>
+            </div>
+            <!-- ТТН -->
+            <div class="adm-samp-acc-row">
+              <label class="adm-samp-acc-lbl">ТТН <span title="Номер товарно-транспортної накладної" style="cursor:help;font-style:normal">ℹ️</span></label>
+              <input type="text" class="adm-samp-acc-inp" id="admAccTtn" placeholder="Введіть номер ТТН" autocomplete="off"/>
+            </div>
+            <!-- Коментар -->
+            <div class="adm-samp-acc-row">
+              <label class="adm-samp-acc-lbl">Коментар (за потреби)</label>
+              <textarea class="adm-samp-acc-textarea" id="admAccComment" rows="2" placeholder="Додайте коментар..."></textarea>
+            </div>
+          </div>
           <!-- Actions -->
-          <div class="adm-samp-actions">
-            <button class="adm-pbtn adm-pbtn-green" onclick="admActionReceive()" style="flex:1;font-size:12px;padding:8px 10px">
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Позначити отримання
-            </button>
-            <button id="admBtnSampStatus" class="adm-pbtn adm-pbtn-sec" onclick="admActionSampleStatus(event)" disabled style="font-size:12px;padding:8px 10px">
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2 2" stroke-linecap="round"/></svg>
-              Змінити статус
-            </button>
-            <button class="adm-pbtn adm-pbtn-sec" onclick="admActionOpenSample()" style="font-size:12px;padding:8px 10px">
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M7 13L14 6M14 6H9M14 6v5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Відкрити зразок
-            </button>
+          <div class="adm-samp-actions" style="flex-direction:column;gap:6px">
+            <div style="display:flex;gap:6px">
+              <button class="adm-pbtn adm-pbtn-green" onclick="admActionAcceptSamples()" style="flex:1;font-size:12px;padding:8px 10px">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Прийняти зразки
+              </button>
+              <button class="adm-pbtn adm-pbtn-sec" onclick="admActionFixNonConformity()" style="flex:1;font-size:12px;padding:8px 10px">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><circle cx="10" cy="10" r="7"/><path d="M10 7v3M10 14v.5" stroke-linecap="round"/></svg>
+                Зафіксувати невідповідність
+              </button>
+            </div>
+            <div style="display:flex;gap:6px">
+              <button class="adm-pbtn adm-pbtn-green" onclick="admActionReceive()" style="flex:1;font-size:12px;padding:8px 10px">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Позначити отримання
+              </button>
+              <button id="admBtnSampStatus" class="adm-pbtn adm-pbtn-sec" onclick="admActionSampleStatus(event)" disabled style="font-size:12px;padding:8px 10px">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2 2" stroke-linecap="round"/></svg>
+                Змінити статус
+              </button>
+              <button class="adm-pbtn adm-pbtn-sec" onclick="admActionOpenSample()" style="font-size:12px;padding:8px 10px">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M7 13L14 6M14 6H9M14 6v5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Відкрити зразок
+              </button>
+            </div>
           </div>
         </div>
 
@@ -3611,6 +3666,61 @@ async function admActionReceive() {
 }
 
 function admActionStatus()  { alert('Функцію «Змінити статус» буде підключено'); }
+
+async function admActionAcceptSamples() {
+  const o = _admOrders.find(x => x.id === _admSelId);
+  if (!o) return;
+
+  const checked = [...document.querySelectorAll('.adm-samp-cb:checked')].map(cb => parseInt(cb.dataset.idx));
+  if (!checked.length) { alert('Виберіть хоча б один зразок'); return; }
+
+  const lab     = document.getElementById('admAccLab')?.value     || '';
+  const ttn     = document.getElementById('admAccTtn')?.value.trim() || '';
+  const comment = document.getElementById('admAccComment')?.value.trim() || '';
+
+  const btn = document.querySelector('#admOTab-samples .adm-pbtn-green');
+  if (btn) { btn.disabled = true; btn.textContent = 'Зберігаємо…'; }
+
+  try {
+    const listRes = await fetch('https://laba.zemlerob.com.ua/api/orders-list');
+    const listData = await listRes.json();
+    const rawOrder = (listData.orders || []).find(x => x.id === o.dbId);
+    if (!rawOrder) throw new Error('Order not found');
+
+    const rawSamples = (rawOrder.samples || []).map((s, i) => {
+      if (checked.includes(i)) return { ...s, st: 'accepted', accepted_at: new Date().toISOString(), lab: lab || s.lab };
+      return s;
+    });
+
+    const updatePayload = { samples: rawSamples };
+    if (ttn)  updatePayload.ttn = ttn;
+    if (lab)  updatePayload.destination_lab = lab;
+
+    const acceptedNames = checked.map(i => rawOrder.samples[i]?.name || `Зразок ${i+1}`);
+    await _admUpdate(o.dbId, updatePayload, {
+      event_type:  'sample_accepted',
+      entity_type: 'sample',
+      description: `Прийнято зразки: ${acceptedNames.join(', ')}` + (ttn ? ` (ТТН: ${ttn})` : '') + (comment ? `. ${comment}` : ''),
+      new_values:  { accepted: acceptedNames, lab, ttn: ttn || undefined, comment: comment || undefined },
+    });
+
+    if (btn) { btn.textContent = '✓ Прийнято'; btn.style.background = '#059669'; }
+    setTimeout(async () => { await _admReload(o.id); }, 800);
+  } catch (err) {
+    alert('Помилка: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'Прийняти зразки'; btn.style.background = ''; }
+  }
+}
+
+function admActionFixNonConformity() {
+  const o = _admOrders.find(x => x.id === _admSelId);
+  if (!o) return;
+  const comment = document.getElementById('admAccComment')?.value.trim() || '';
+  const ttn     = document.getElementById('admAccTtn')?.value.trim() || '';
+  const msg = comment ? `Невідповідність: ${comment}` : 'Зафіксувати невідповідність зразків?';
+  if (!confirm(msg + (ttn ? `\nТТН: ${ttn}` : ''))) return;
+  alert('Невідповідність зафіксована' + (ttn ? ` (ТТН: ${ttn})` : '') + '. Функцію буде підключено до Supabase.');
+}
 
 async function admActionConfirm() {
   const o = _admOrders.find(x => x.id === _admSelId);
