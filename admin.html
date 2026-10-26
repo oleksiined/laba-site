@@ -2795,10 +2795,12 @@ async function admActionConfirm() {
 
   const newStatus = next[o.status];
   const statusLabels = { waiting:'очікує зразки', work:'в роботі', done:'виконано', closed:'закрито' };
-  const eventTypeMap = { done:'order_completed', closed:'order_completed' };
+  const eventTypeMap = { done:'order_completed', closed:'order_closed' };
   const evType = eventTypeMap[newStatus] || 'order_confirmed';
-  const evDesc = newStatus === 'done' || newStatus === 'closed'
+  const evDesc = newStatus === 'done'
     ? `Замовлення ${o.id} завершено`
+    : newStatus === 'closed'
+    ? `Замовлення ${o.id} закрито`
     : `Замовлення ${o.id} підтверджено — статус змінено на «${statusLabels[newStatus] || newStatus}»`;
 
   try {
