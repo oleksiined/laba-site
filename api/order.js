@@ -443,7 +443,7 @@ async function saveOrderToSupabase(order) {
         'Content-Length': Buffer.byteLength(payload),
         'apikey': key,
         'Authorization': `Bearer ${key}`,
-        'Prefer': 'return=minimal',
+        'Prefer': 'return=representation',
       },
     };
     const req = https.request(opts, r => {
@@ -457,7 +457,44 @@ async function saveOrderToSupabase(order) {
   });
 
   if (res.status >= 300) throw new Error(`Supabase ${res.status}: ${res.body}`);
-  return true;
+  try {
+    const rows = JSON.parse(res.body);
+    return Array.isArray(rows) && rows[0] ? rows[0].id : null;
+  } catch(_) { return null; }
+}
+
+async function logOrderEvent(orderId, eventType, description, newValues) {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_KEY;
+  if (!url || !key || !orderId) return;
+  const payload = JSON.stringify({
+    order_id:    orderId,
+    entity_type: 'order',
+    entity_id:   orderId,
+    event_type:  eventType,
+    actor_type:  'system',
+    description: description || null,
+    new_values:  newValues   || null,
+  });
+  try {
+    await new Promise((resolve, reject) => {
+      const u = new URL(`${url}/rest/v1/order_events`);
+      const req = require('https').request({
+        hostname: u.hostname, path: u.pathname, method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payload),
+          'apikey': key, 'Authorization': `Bearer ${key}`,
+          'Prefer': 'return=minimal',
+        },
+      }, r => { r.resume(); r.on('end', resolve); });
+      req.on('error', reject);
+      req.write(payload);
+      req.end();
+    });
+  } catch(e) {
+    console.warn('logOrderEvent error (non-fatal):', e.message);
+  }
 }
 
 // ─── main handler ────────────────────────────────────────────────────────────
@@ -494,13 +531,22 @@ module.exports = async function handler(req, res) {
   let supabaseOk = false;
 
   // 1. Save to Supabase — CRITICAL: must succeed for the order to exist
+  let savedOrderId = null;
   try {
-    await saveOrderToSupabase(order);
+    savedOrderId = await saveOrderToSupabase(order);
     supabaseOk = true;
   } catch (err) {
     console.error('Supabase error:', err.message);
     return res.status(500).json({ ok: false, orderNum: order.orderNum, error: 'Supabase: ' + err.message });
   }
+
+  // 1a. Log order_created event (non-critical)
+  await logOrderEvent(
+    savedOrderId,
+    'order_created',
+    `Замовлення ${order.orderNum} створено клієнтом`,
+    { order_num: order.orderNum, total: order.total, client: order.client?.name || null }
+  );
 
   // 2. Notifications — non-critical; failures are logged but don't affect HTTP status
 
