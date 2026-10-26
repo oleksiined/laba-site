@@ -54,8 +54,8 @@ module.exports = async function handler(req, res) {
     const [ordersResult, docsResult, svcResult, pkgResult, pkgItemsResult] = await Promise.allSettled([
       httpsReq(host, '/rest/v1/orders?order=created_at.desc&limit=200', key),
       httpsReq(host, '/rest/v1/documents?document_type=eq.invoice&status=eq.published&select=order_id,storage_bucket,storage_path', key),
-      httpsReq(host, '/rest/v1/catalog_services?select=service_id,service_code,name', key),
-      httpsReq(host, '/rest/v1/catalog_packages?select=package_id,package_code,name&status=eq.active', key),
+      httpsReq(host, '/rest/v1/catalog_services?select=service_id,service_code,name,price', key),
+      httpsReq(host, '/rest/v1/catalog_packages?select=package_id,package_code,name,price&status=eq.active', key),
       httpsReq(host, '/rest/v1/catalog_package_items?select=*', key),
     ]);
 
@@ -71,6 +71,7 @@ module.exports = async function handler(req, res) {
     // Build catalog map: service_code / package_code / id → name
     // Also build reverse map: name → service_code (for additionals lookup)
     const catalogMap = {};
+    const catalogPriceMap = {}; // id/code → price
     const nameToCode = {}; // name → service_code
     if (svcResult.status === 'fulfilled' && svcResult.value.status < 300) {
       try {
@@ -78,6 +79,11 @@ module.exports = async function handler(req, res) {
           if (s.service_code) catalogMap[s.service_code] = s.name;
           if (s.service_id)   catalogMap[s.service_id]   = s.name;
           if (s.name && s.service_id) nameToCode[s.name] = s.service_id;
+          const price = s.price != null ? Number(s.price) : null;
+          if (price !== null) {
+            if (s.service_code) catalogPriceMap[s.service_code] = price;
+            if (s.service_id)   catalogPriceMap[s.service_id]   = price;
+          }
         });
       } catch (_) {}
     }
@@ -86,6 +92,11 @@ module.exports = async function handler(req, res) {
         JSON.parse(pkgResult.value.body).forEach(p => {
           if (p.package_code) catalogMap[p.package_code] = p.name;
           if (p.package_id)   catalogMap[p.package_id]   = p.name;
+          const price = p.price != null ? Number(p.price) : null;
+          if (price !== null) {
+            if (p.package_code) catalogPriceMap[p.package_code] = price;
+            if (p.package_id)   catalogPriceMap[p.package_id]   = price;
+          }
         });
       } catch (_) {}
     }
@@ -158,13 +169,21 @@ module.exports = async function handler(req, res) {
     const enriched = orders.map(o => {
       const num = o.order_num || o.id;
 
-      // Enrich items: add serviceName from catalog map
+      // Enrich items: add serviceName and catalog price from catalog map
       let items = o.items;
       if (Array.isArray(items)) {
-        items = items.map(it => ({
-          ...it,
-          serviceName: (it.name && catalogMap[it.name]) || it.serviceName || null,
-        }));
+        items = items.map(it => {
+          // Look up catalog price by package_id, then by name (which may be a code)
+          const catalogPrice = (it.package_id   && catalogPriceMap[it.package_id])
+                            || (it.service_id    && catalogPriceMap[it.service_id])
+                            || (it.name          && catalogPriceMap[it.name])
+                            || null;
+          return {
+            ...it,
+            serviceName:  (it.name && catalogMap[it.name]) || it.serviceName || null,
+            catalog_price: catalogPrice,
+          };
+        });
       }
 
       // Enrich samples: add packageName from catalog map if missing

@@ -2870,8 +2870,9 @@ function admGenAkt(o) {
   if (items.length > 0) {
     items.forEach((it, i) => {
       const qty   = Number(it.qty || it.quantity || it.samples_count || 1);
-      // unit_price → price_per_unit → price → total/qty
-      const rawPrice = it.unit_price ?? it.price_per_unit ?? it.price ?? null;
+      // catalog_price (from catalog_packages/catalog_services) takes priority
+      const rawPrice = it.catalog_price != null ? it.catalog_price
+                     : it.unit_price ?? it.price_per_unit ?? it.price ?? null;
       const rawTotal = it.subtotal ?? it.total ?? it.sum ?? it.amount ?? null;
       const price = rawPrice !== null ? Number(rawPrice)
                   : rawTotal !== null ? Number(rawTotal) / qty
