@@ -357,6 +357,18 @@ html{scroll-behavior:smooth}
 .adm-doc-st-ok{font-size:10.5px;font-weight:600;color:#059669}
 .adm-doc-st-no{font-size:10.5px;color:#9ca3af}
 .adm-doc-st-note{font-size:10px;color:#9ca3af;font-style:italic}
+/* Doc status badges */
+.adm-doc-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;white-space:nowrap;display:inline-block}
+.adm-doc-badge-yellow{background:#FFFBEB;color:#B45309;border:1px solid #FDE68A}
+.adm-doc-badge-green{background:#ECFDF5;color:#059669;border:1px solid #A7F3D0}
+.adm-doc-badge-red{background:#FEF2F2;color:#DC2626;border:1px solid #FECACA}
+/* Doc action buttons strip */
+.adm-doc-acts{display:flex;gap:5px;flex-wrap:wrap;padding:8px 14px;border-bottom:1px solid #f0f2f4;background:#fafafa}
+.adm-doc-act-btn{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:5px 9px;border-radius:6px;border:1px solid var(--border);background:#fff;color:var(--navy);cursor:pointer;white-space:nowrap}
+.adm-doc-act-btn:hover{background:#f0f4ff;border-color:#c7d4f5;color:#3b5bdb}
+.adm-doc-act-btn-red{border-color:#fecaca;color:#dc2626}
+.adm-doc-act-btn-red:hover{background:#fef2f2;border-color:#fca5a5}
+.adm-doc-act-btn-disabled{opacity:.4;pointer-events:none}
 .adm-doc-menu-btn{background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:15px;padding:2px 6px;border-radius:4px;line-height:1;letter-spacing:1px;flex-shrink:0}
 .adm-doc-menu-btn:hover{background:var(--bg);color:var(--navy)}
 .adm-edo-block{margin:10px 14px;border:1.5px solid #E0E7FF;border-radius:10px;background:#F5F8FF;overflow:hidden;flex-shrink:0}
@@ -1461,46 +1473,6 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           <div class="adm-doc-list" id="admDocList">
             <!-- rendered by JS -->
           </div>
-          <!-- EDO block -->
-          <div class="adm-edo-block" id="admEdoBlock">
-            <div class="adm-edo-hd" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">
-              <div class="adm-edo-hd-ico">
-                <svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="1.7" width="16" height="16"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 7h6M7 10h6M7 13h3" stroke-linecap="round"/></svg>
-              </div>
-              <div>
-                <div class="adm-edo-hd-title">Електронний документообіг (ЕДО)</div>
-                <div style="font-size:10.5px;color:var(--text-soft)">Підписання: Вчасно / M.E.Doc</div>
-              </div>
-              <span id="admEdoStatPill" class="adm-edo-stat-pill adm-edo-no" style="margin-left:auto;font-size:10px">● Не відправлено</span>
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="color:var(--text-soft)"><path d="M7 8l3 3 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <div class="adm-edo-meta" style="display:none">
-              <div>Статус ЕДО: <span id="admEdoStatus">Не відправлено</span></div>
-              <div style="font-size:10px;color:#9ca3af">Відправте рахунок через ЕДО після формування</div>
-            </div>
-          </div>
-          <!-- Info note -->
-          <div class="adm-doc-info">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="15" height="15" style="color:var(--text-soft);flex-shrink:0;margin-top:1px"><circle cx="10" cy="10" r="7"/><path d="M10 9v5M10 7v.5" stroke-linecap="round"/></svg>
-            <div class="adm-doc-info-txt">Підписані оригінали та всі статуси документів зберігатимуться в цьому розділі. Ви зможете відстежувати історію змін та завантажувати актуальні версії.</div>
-          </div>
-          <!-- Actions -->
-          <div class="adm-doc-actions">
-            <button class="adm-pbtn adm-pbtn-dark" onclick="admDocDownload()" style="width:100%;font-size:12.5px;padding:10px">
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M10 3v10M6 9l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16h12" stroke-linecap="round"/></svg>
-              Завантажити документ
-            </button>
-            <div class="adm-doc-act-row">
-              <button class="adm-pbtn adm-pbtn-sec" onclick="admDocCreateInvoice()" style="flex:1;font-size:12px;padding:8px 10px">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 8h6M7 11h4" stroke-linecap="round"/></svg>
-                Створити рахунок
-              </button>
-              <button class="adm-pbtn adm-pbtn-sec" onclick="admDocOpenAll()" style="flex:1;font-size:12px;padding:8px 10px">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M7 13L14 6M14 6H9M14 6v5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Відкрити всі документи
-              </button>
-            </div>
-          </div>
         </div>
 
         <!-- TAB: Історія -->
@@ -2603,9 +2575,23 @@ function admSampMenu(idx, e) {
 }
 
 // ─── Documents tab rendering ─────────────────────────────────────────────────
+// ─── Document status helpers ──────────────────────────────────────────────────
+// badge: 'yellow' | 'green' | 'red'
+function _docBadge(label, color) {
+  return `<span class="adm-doc-badge adm-doc-badge-${color}">${label}</span>`;
+}
+
+// SVG icons (inline, small)
+const _docSvg = {
+  create:   '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M8 5v6M5 8h6" stroke-linecap="round"/></svg>',
+  download: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><path d="M8 2v8M5 7.5l3 3 3-3M2 13h12" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  send:     '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><path d="M13 3L7 9M13 3l-4 10-2-4-4-2 10-4z" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  cancel:   '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><path d="M4 4l8 8M12 4l-8 8" stroke-linecap="round"/></svg>',
+  attach:   '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><path d="M13 8.5l-5.5 5.5a3.5 3.5 0 01-5-5l6-6a2 2 0 013 3l-6 6a.5.5 0 01-.7-.7L10 6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+};
+
 function _admRenderDocsTab(o) {
-  // Determine which docs exist
-  const hasInvoice = !!o.invoiceUrl; // true only if PDF was saved to storage
+  const hasInvoice = !!o.invoiceUrl;
   const isDone     = o.status === 'done' || o.status === 'closed';
   const invoiceNum = o.id || '—';
 
@@ -2614,93 +2600,80 @@ function _admRenderDocsTab(o) {
   setT('admDSInv', hasInvoice ? 1 : 0);
   setT('admDSAct', 0);
   setT('admDSCon', 0);
-  setT('admDSPro', 0);
+  setT('admDSPro', isDone ? 1 : 0);
 
-  // Document rows definition
-  const docs = [
-    {
-      key: 'invoice',
-      iconCls: 'inv',
-      iconSvg: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 8h6M7 11h6M7 14h3" stroke-linecap="round"/></svg>',
-      name: 'Рахунок ' + invoiceNum,
-      type: 'Рахунок',
-      vis: hasInvoice ? 'pub' : null,
-      visLbl: hasInvoice ? 'Доступно клієнту' : null,
-      status: hasInvoice ? 'ok' : 'none',
-      statusLbl: hasInvoice ? 'Готовий' : 'Ще не завантажено',
-      url: o.invoiceUrl || '',
-    },
-    {
-      key: 'act',
-      iconCls: 'act',
-      iconSvg: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 8h6M7 11h4" stroke-linecap="round"/><path d="M7 14l1.5 1.5L12 12" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-      name: 'Акт',
-      type: 'Акт виконаних робіт',
-      vis: null,
-      visLbl: null,
-      status: 'none',
-      statusLbl: 'Не створено',
-    },
-    {
-      key: 'contract',
-      iconCls: 'con',
-      iconSvg: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 7h6M7 10h6M7 13h3" stroke-linecap="round"/></svg>',
-      name: 'Договір',
-      type: 'Договір',
-      vis: null,
-      visLbl: null,
-      status: 'note',
-      statusLbl: 'Використовується договір клієнта',
-    },
-    {
-      key: 'protocol',
-      iconCls: 'pro',
-      iconSvg: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><path d="M5 3h10a1 1 0 011 1v3l-3 3v6a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M16 7H5" stroke-linecap="round"/></svg>',
-      name: 'Протоколи досліджень',
-      type: 'Протокол',
-      vis: null,
-      visLbl: null,
-      status: isDone ? 'ok' : 'note',
-      statusLbl: isDone ? 'Готово' : 'З\'являється після завершення досліджень',
-    },
+  // ── Рахунок ──
+  const invStatus  = hasInvoice ? _docBadge('Готово','green') : _docBadge('Не створено','yellow');
+  const invActions = [
+    { label:'Сформувати', icon:'create',   fn:`admDocAct('invoice','create')`,   disabled: hasInvoice },
+    { label:'Завантажити',icon:'download', fn:`admDocAct('invoice','download')`, disabled: !hasInvoice, href: o.invoiceUrl },
+    { label:'Відправити', icon:'send',     fn:`admDocAct('invoice','send')`,     disabled: !hasInvoice },
+    { label:'Анулювати',  icon:'cancel',   fn:`admDocAct('invoice','cancel')`,   disabled: !hasInvoice, red:true },
   ];
+
+  // ── Акт ──
+  const actStatus  = _docBadge('Не створено','yellow');
+  const actActions = [
+    { label:'Сформувати', icon:'create',   fn:`admDocAct('act','create')` },
+    { label:'Завантажити',icon:'download', fn:`admDocAct('act','download')`, disabled:true },
+    { label:'Відправити', icon:'send',     fn:`admDocAct('act','send')`,     disabled:true },
+    { label:'Анулювати',  icon:'cancel',   fn:`admDocAct('act','cancel')`,   disabled:true, red:true },
+  ];
+
+  // ── Договір ──
+  const conStatus  = _docBadge('Не прикріплено','yellow');
+  const conActions = [
+    { label:'Прикріпити', icon:'attach',   fn:`admDocAct('contract','attach')` },
+    { label:'Створити',   icon:'create',   fn:`admDocAct('contract','create')` },
+    { label:'Відправити', icon:'send',     fn:`admDocAct('contract','send')`,     disabled:true },
+    { label:'Завантажити',icon:'download', fn:`admDocAct('contract','download')`, disabled:true },
+  ];
+
+  // ── Протокол ──
+  const proStatus  = isDone ? _docBadge('Готово','green') : _docBadge('Не готово','yellow');
+  const proActions = [
+    { label:'Завантажити',icon:'download', fn:`admDocAct('protocol','download')`, disabled:!isDone },
+    { label:'Надіслати',  icon:'send',     fn:`admDocAct('protocol','send')`,     disabled:!isDone },
+  ];
+
+  const iconSvgs = {
+    inv: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 8h6M7 11h6M7 14h3" stroke-linecap="round"/></svg>',
+    act: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 8h6M7 11h4" stroke-linecap="round"/><path d="M7 14l1.5 1.5L12 12" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    con: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 7h6M7 10h6M7 13h3" stroke-linecap="round"/></svg>',
+    pro: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="16" height="16"><path d="M5 3h10a1 1 0 011 1v3l-3 3v6a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M16 7H5" stroke-linecap="round"/></svg>',
+  };
+
+  function renderDoc(iconCls, name, type, statusHtml, actions) {
+    const actHtml = actions.map(a => {
+      const cls = ['adm-doc-act-btn', a.red?'adm-doc-act-btn-red':'', a.disabled?'adm-doc-act-btn-disabled':''].filter(Boolean).join(' ');
+      if (a.href && !a.disabled) {
+        return `<a href="${a.href}" target="_blank" rel="noopener" class="${cls}" style="text-decoration:none">${_docSvg[a.icon]||''} ${a.label}</a>`;
+      }
+      return `<button class="${cls}" onclick="${a.disabled?'':a.fn}">${_docSvg[a.icon]||''} ${a.label}</button>`;
+    }).join('');
+    return `<div class="adm-doc-row" style="flex-wrap:wrap;gap:6px 10px;padding-bottom:6px">
+      <div class="adm-doc-icon ${iconCls}">${iconSvgs[iconCls]}</div>
+      <div class="adm-doc-body">
+        <div class="adm-doc-nm">${name}</div>
+        <div class="adm-doc-type">${type}</div>
+      </div>
+      <div style="flex-shrink:0">${statusHtml}</div>
+      <div class="adm-doc-acts" style="width:100%;padding:6px 0 0 42px;border:none;background:none">${actHtml}</div>
+    </div>`;
+  }
 
   const el = document.getElementById('admDocList');
   if (!el) return;
-  el.innerHTML = docs.map(d => {
-    const visBadge = d.vis === 'pub'
-      ? `<span class="adm-doc-vis adm-doc-vis-pub">${d.visLbl}</span>`
-      : `<span style="font-size:10.5px;color:#9ca3af">—</span>`;
-    let stHtml = '';
-    if (d.status === 'ok')   stHtml = `<span class="adm-doc-st-ok">● ${d.statusLbl}</span>`;
-    if (d.status === 'none') stHtml = `<span class="adm-doc-st-no">${d.statusLbl}</span>`;
-    if (d.status === 'note') stHtml = `<span class="adm-doc-st-note">${d.statusLbl} <svg style="vertical-align:middle" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="11" height="11"><circle cx="10" cy="10" r="7"/><path d="M10 9v5M10 7v.5" stroke-linecap="round"/></svg></span>`;
-    const dlBtn = d.url
-      ? `<a href="${d.url}" target="_blank" rel="noopener" title="Завантажити PDF" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;background:#f0f4ff;border:1px solid #c7d4f5;color:#3b5bdb;text-decoration:none;flex-shrink:0" onmouseover="this.style.background='#dbe4ff'" onmouseout="this.style.background='#f0f4ff'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" width="14" height="14"><path d="M8 2v8M5 7.5l3 3 3-3M2 13h12" stroke-linecap="round" stroke-linejoin="round"/></svg></a>`
-      : '';
-    return `<div class="adm-doc-row">
-      <div class="adm-doc-icon ${d.iconCls}">${d.iconSvg}</div>
-      <div class="adm-doc-body">
-        <div class="adm-doc-nm">${d.name}</div>
-        <div class="adm-doc-type">${d.type}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:0">
-        ${visBadge}
-        ${stHtml}
-      </div>
-      ${dlBtn}
-      <button class="adm-doc-menu-btn" title="Дії" onclick="admDocMenu('${d.key}',event)">···</button>
-    </div>`;
-  }).join('');
+  el.innerHTML =
+    renderDoc('inv', 'Рахунок ' + invoiceNum, 'Рахунок',           invStatus, invActions) +
+    renderDoc('act', 'Акт виконаних робіт',   'Акт',               actStatus, actActions) +
+    renderDoc('con', 'Договір',               'Договір',           conStatus, conActions) +
+    renderDoc('pro', 'Протоколи досліджень',  'Протокол',          proStatus, proActions);
 }
 
-function admDocMenu(key, e) {
-  e.stopPropagation();
-  alert('Меню документа ' + key + ' — у розробці');
+function admDocAct(docType, action) {
+  alert(`${docType} → ${action} — у розробці`);
 }
-function admDocDownload()     { alert('Завантаження документа — у розробці'); }
-function admDocCreateInvoice(){ alert('Створення рахунку — у розробці'); }
-function admDocOpenAll()      { alert('Відкрити всі документи — у розробці'); }
 
 // ─── Supabase order update helper ────────────────────────────────────────────
 // event (optional): { event_type, description, old_values, new_values, entity_type, entity_id, actor_type }
