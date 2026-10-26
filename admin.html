@@ -2790,22 +2790,31 @@ function admGenAkt(o) {
   };
 
   // ── Замовник ──────────────────────────────────────────────
-  const pt = o.payer_type || (o.company ? 'legal' : 'private');
+  // o — mapped order: companyType ('Юридична особа'|'ФОП'|'Фізична особа'),
+  //                   companyFull (company name), contact (person name),
+  //                   edrpou (may be literal '—')
+  const pt = o.companyType === 'Юридична особа' ? 'legal'
+           : o.companyType === 'ФОП'            ? 'fop'
+           : 'private';
+  const companyName = (o.companyFull && o.companyFull !== '—') ? o.companyFull : '';
+  const contactName = (o.contact     && o.contact     !== '—') ? o.contact     : '';
+  const edrpouVal   = (o.edrpou      && o.edrpou      !== '—') ? o.edrpou      : '';
+
   const buyerName = (() => {
-    if (pt === 'legal') return 'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ «' + (o.company || '').toUpperCase() + '»';
-    if (pt === 'fop')   return 'ФІЗИЧНА ОСОБА-ПІДПРИЄМЕЦЬ ' + (o.company || o.name || '').toUpperCase();
-    return (o.name || o.company || 'Фізична особа').toUpperCase();
+    if (pt === 'legal') return 'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ «' + (companyName || '').toUpperCase() + '»';
+    if (pt === 'fop')   return 'ФІЗИЧНА ОСОБА-ПІДПРИЄМЕЦЬ ' + (companyName || contactName || '').toUpperCase();
+    return (contactName || companyName || 'Фізична особа').toUpperCase();
   })();
   const buyerShort = (() => {
-    if (pt === 'legal') return 'ТОВ «' + (o.company || o.name || '') + '»';
-    if (pt === 'fop')   return 'ФОП ' + (o.company || o.name || '');
-    return o.name || o.company || 'Фізична особа';
+    if (pt === 'legal') return 'ТОВ «' + (companyName || contactName || '') + '»';
+    if (pt === 'fop')   return 'ФОП ' + (companyName || contactName || '');
+    return contactName || companyName || 'Фізична особа';
   })();
 
   const buyerStack = [
     { text: buyerName, fontSize: 9, bold: true, lineHeight: 1.2 },
   ];
-  if (o.edrpou && pt !== 'private') buyerStack.push({ text: 'Код за ЄДРПОУ: ' + o.edrpou, fontSize: 8, color: '#333', margin: [0,2,0,0] });
+  if (edrpouVal && pt !== 'private') buyerStack.push({ text: 'Код за ЄДРПОУ: ' + edrpouVal, fontSize: 8, color: '#333', margin: [0,2,0,0] });
   buyerStack.push({
     text: 'На підставі Публічного договору про надання послуг від 01.12.2025 р., розміщеного на веб-сайті laba.zemlerob.com.ua.',
     fontSize: 8, color: '#333', margin: [0,3,0,0],
@@ -2860,18 +2869,26 @@ function admGenAkt(o) {
   let total = 0;
   if (items.length > 0) {
     items.forEach((it, i) => {
-      const price = Number(it.price || 0);
-      const qty   = Number(it.qty || it.quantity || 1);
-      const sum   = price * qty;
+      const qty   = Number(it.qty || it.quantity || it.samples_count || 1);
+      // unit_price → price_per_unit → price → total/qty
+      const rawPrice = it.unit_price ?? it.price_per_unit ?? it.price ?? null;
+      const rawTotal = it.total ?? it.sum ?? it.amount ?? null;
+      const price = rawPrice !== null ? Number(rawPrice)
+                  : rawTotal !== null ? Number(rawTotal) / qty
+                  : 0;
+      const sum   = rawTotal !== null ? Number(rawTotal) : price * qty;
       total += sum;
+      const code = it.package_id || it.packageId || it.service_code || it.code || '—';
+      const name = it.serviceName || it.displayName || it.service_name || it.name || '—';
+      const mat  = it.material_name || it.material || 'Ґрунт';
       tableBody.push([
-        { text: i + 1,           ...tdStyle, alignment: 'center' },
-        { text: it.service_code || it.code || '—',  ...tdStyle, fontSize: 7.5 },
-        { text: it.serviceName || it.displayName || it.service_name || it.name || '—', ...tdStyle },
-        { text: it.material_name || it.material || 'Ґрунт', ...tdStyle },
-        { text: qty,             ...tdStyle, alignment: 'center' },
-        { text: fmtUAH(price),   ...tdStyle, alignment: 'right' },
-        { text: fmtUAH(sum),     ...tdStyle, alignment: 'right' },
+        { text: i + 1,        ...tdStyle, alignment: 'center' },
+        { text: code,         ...tdStyle, fontSize: 7.5 },
+        { text: name,         ...tdStyle },
+        { text: mat,          ...tdStyle },
+        { text: qty,          ...tdStyle, alignment: 'center' },
+        { text: fmtUAH(price),...tdStyle, alignment: 'right' },
+        { text: fmtUAH(sum),  ...tdStyle, alignment: 'right' },
       ]);
     });
   } else {
