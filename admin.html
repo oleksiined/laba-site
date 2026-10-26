@@ -2795,13 +2795,15 @@ async function admActionConfirm() {
 
   const newStatus = next[o.status];
   const statusLabels = { waiting:'очікує зразки', work:'в роботі', done:'виконано', closed:'закрито' };
-  const eventTypeMap = { done:'order_completed', closed:'order_closed' };
+  const eventTypeMap = { waiting:'order_confirmed', work:'order_in_work', done:'order_completed', closed:'order_closed' };
   const evType = eventTypeMap[newStatus] || 'order_confirmed';
-  const evDesc = newStatus === 'done'
-    ? `Замовлення ${o.id} завершено`
-    : newStatus === 'closed'
-    ? `Замовлення ${o.id} закрито`
-    : `Замовлення ${o.id} підтверджено — статус змінено на «${statusLabels[newStatus] || newStatus}»`;
+  const evDescMap = {
+    waiting: `Замовлення ${o.id} підтверджено — статус змінено на «очікує зразки»`,
+    work:    `Замовлення ${o.id} передано в роботу`,
+    done:    `Замовлення ${o.id} виконано`,
+    closed:  `Замовлення ${o.id} закрито`,
+  };
+  const evDesc = evDescMap[newStatus] || `Замовлення ${o.id} оновлено`;
 
   try {
     await _admUpdate(o.dbId, { status: newStatus }, {
