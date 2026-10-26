@@ -63,7 +63,7 @@ module.exports = async function handler(req, res) {
   const docId = docs[0].id;
 
   // ── Patch status ───────────────────────────────────────────────────────────
-  const payload = JSON.stringify({ status: 'cancelled' });
+  const payload = JSON.stringify({ status: 'void' });
   const patchRes = await httpsReq({
     hostname: host,
     path:     `/rest/v1/documents?id=eq.${docId}`,
