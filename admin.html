@@ -340,7 +340,7 @@ html{scroll-behavior:smooth}
 .adm-ptab-body{display:none;padding:14px 16px 16px;overflow-y:auto;flex:1}
 .adm-ptab-body.active{display:block}
 #admOTab-samples{padding:0}
-#admOTab-samples.active{display:flex;flex-direction:column;overflow:hidden}
+#admOTab-samples.active{display:flex;flex-direction:column;overflow-y:auto}
 #admOTab-docs{padding:0}
 #admOTab-docs.active{display:flex;flex-direction:column;overflow:hidden}
 /* ── Docs tab ── */
@@ -1450,7 +1450,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
             </div>
           </div>
           <!-- Sample table -->
-          <div style="flex:1;overflow-y:auto">
+          <div style="overflow-y:auto;max-height:220px;min-height:40px">
             <div id="admPanelSamples"></div>
           </div>
           <!-- Acceptance form -->
