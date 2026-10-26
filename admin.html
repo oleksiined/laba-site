@@ -205,16 +205,27 @@ html{scroll-behavior:smooth}
 .adm-st-dd-item.active-st{background:#f0fdf4}
 .adm-st-dd-sep{height:1px;background:var(--border);margin:4px 0}
 .adm-pbtn-sec:disabled{opacity:.4;cursor:not-allowed}
-.adm-samp-acc-form{border-top:1px solid var(--border);padding:12px 14px 8px;flex-shrink:0;background:#FAFBFC}
-.adm-samp-acc-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:10px}
+.adm-samp-acc-form{border-top:1px solid var(--border);padding:12px 14px 8px;flex-shrink:0;background:#FAFBFC;display:none}
+.adm-samp-acc-form.visible{display:block}
+.adm-samp-acc-title{font-size:12px;font-weight:700;color:var(--text-dark);margin-bottom:2px}
+.adm-samp-acc-subtitle{font-size:11px;color:var(--text-soft);margin-bottom:10px}
+.adm-samp-acc-badge{display:inline-block;background:var(--navy);color:#fff;font-size:10px;font-weight:700;border-radius:20px;padding:1px 8px;margin-left:4px;vertical-align:middle}
 .adm-samp-acc-checklist{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
-.adm-samp-acc-check{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-mid);cursor:pointer}
-.adm-samp-acc-check input[type=checkbox]{width:14px;height:14px;accent-color:var(--navy);cursor:pointer}
+.adm-samp-acc-check{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:var(--text-mid);cursor:pointer;line-height:1.4}
+.adm-samp-acc-check input[type=checkbox]{width:14px;height:14px;accent-color:var(--navy);cursor:pointer;flex-shrink:0;margin-top:1px}
 .adm-samp-acc-row{margin-bottom:8px}
 .adm-samp-acc-lbl{display:block;font-size:11px;font-weight:600;color:var(--text-soft);margin-bottom:3px}
+.adm-samp-acc-inp-wrap{position:relative;display:flex;align-items:center}
+.adm-samp-acc-inp-wrap .adm-samp-acc-inp{padding-right:28px}
+.adm-samp-acc-inp-clear{position:absolute;right:7px;background:none;border:none;cursor:pointer;font-size:14px;color:var(--text-soft);line-height:1;padding:0;display:none}
+.adm-samp-acc-inp-clear.visible{display:block}
 .adm-samp-acc-sel,.adm-samp-acc-inp,.adm-samp-acc-textarea{width:100%;font-size:12px;padding:6px 9px;border:1px solid var(--border);border-radius:7px;background:#fff;color:var(--text-dark);font-family:inherit;box-sizing:border-box}
 .adm-samp-acc-sel:focus,.adm-samp-acc-inp:focus,.adm-samp-acc-textarea:focus{outline:none;border-color:var(--neon-dark);box-shadow:0 0 0 2px rgba(90,188,0,.12)}
 .adm-samp-acc-textarea{resize:none;line-height:1.5}
+.adm-samp-lab-section{border-top:1px solid var(--border);padding:10px 14px 8px;flex-shrink:0;background:#F5F6F8;opacity:.55;pointer-events:none}
+.adm-samp-lab-section.unlocked{opacity:1;pointer-events:auto}
+.adm-samp-lab-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:4px}
+.adm-samp-lab-hint{font-size:11px;color:var(--text-soft);font-style:italic}
 .adm-samp-actions{border-top:1px solid var(--border);padding:10px 14px;display:flex;gap:6px;flex-shrink:0}
 .adm-panel-actions{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:7px}
 .adm-pbtn{display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 14px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .1s}
@@ -1453,51 +1464,70 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           <div style="overflow-y:auto;max-height:220px;min-height:40px">
             <div id="admPanelSamples"></div>
           </div>
-          <!-- Acceptance form -->
+          <!-- Acceptance form (phase 2 — hidden by default) -->
           <div class="adm-samp-acc-form" id="admSampAccForm">
-            <div class="adm-samp-acc-title">Прийняття зразків</div>
-            <!-- Checklist -->
-            <div class="adm-samp-acc-checklist" id="admSampAccChecklist">
-              <label class="adm-samp-acc-check">
-                <input type="checkbox" id="accChkSeal"> Цілісність упаковки/пломби
-              </label>
-              <label class="adm-samp-acc-check">
-                <input type="checkbox" id="accChkDoc"> Відповідність документів
-              </label>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+              <div class="adm-samp-acc-title">Перевірка перед прийманням <span class="adm-samp-acc-badge" id="admAccBadge">0</span></div>
             </div>
-            <!-- Лабораторія призначення -->
-            <div class="adm-samp-acc-row">
-              <label class="adm-samp-acc-lbl">Лабораторія призначення</label>
-              <select class="adm-samp-acc-sel" id="admAccLab">
-                <option value="">— оберіть —</option>
-                <option value="kri">Лабораторія КРІ</option>
-                <option value="dnipro">Лабораторія Дніпро</option>
-                <option value="kyiv">Лабораторія Київ</option>
-              </select>
+            <div class="adm-samp-acc-subtitle">Підтвердьте, що зразки відповідають вимогам.</div>
+            <!-- Checklist -->
+            <div class="adm-samp-acc-checklist">
+              <label class="adm-samp-acc-check">
+                <input type="checkbox" id="accChkNaming"> Належна відповідна внутрішня лабораторна нумерація і назви зразків
+              </label>
+              <label class="adm-samp-acc-check">
+                <input type="checkbox" id="accChkPack"> Пакування вибраних зразків належне та ціле
+              </label>
             </div>
             <!-- ТТН -->
             <div class="adm-samp-acc-row">
-              <label class="adm-samp-acc-lbl">ТТН <span title="Номер товарно-транспортної накладної" style="cursor:help;font-style:normal">ℹ️</span></label>
-              <input type="text" class="adm-samp-acc-inp" id="admAccTtn" placeholder="Введіть номер ТТН" autocomplete="off"/>
+              <label class="adm-samp-acc-lbl">ТТН (необов'язково)</label>
+              <div class="adm-samp-acc-inp-wrap">
+                <input type="text" class="adm-samp-acc-inp" id="admAccTtn" placeholder="Введіть номер ТТН" autocomplete="off" oninput="admAccTtnInput(this)"/>
+                <button class="adm-samp-acc-inp-clear" id="admAccTtnClear" onclick="admAccTtnClear()" title="Очистити">×</button>
+              </div>
             </div>
             <!-- Коментар -->
             <div class="adm-samp-acc-row">
-              <label class="adm-samp-acc-lbl">Коментар (за потреби)</label>
+              <label class="adm-samp-acc-lbl">Коментарі (за потреби)</label>
               <textarea class="adm-samp-acc-textarea" id="admAccComment" rows="2" placeholder="Додайте коментар..."></textarea>
             </div>
-          </div>
-          <!-- Actions -->
-          <div class="adm-samp-actions" style="flex-direction:column;gap:6px">
-            <div style="display:flex;gap:6px">
-              <button class="adm-pbtn adm-pbtn-green" onclick="admActionAcceptSamples()" style="flex:1;font-size:12px;padding:8px 10px">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Прийняти зразки
-              </button>
-              <button class="adm-pbtn adm-pbtn-sec" onclick="admActionFixNonConformity()" style="flex:1;font-size:12px;padding:8px 10px">
+            <!-- Phase 2 buttons -->
+            <div style="display:flex;gap:6px;margin-top:4px">
+              <button class="adm-pbtn adm-pbtn-sec" onclick="admAccFormCancel()" style="font-size:12px;padding:7px 10px">Скасувати</button>
+              <button class="adm-pbtn" onclick="admActionFixNonConformity()" style="flex:1;font-size:12px;padding:7px 10px;background:#FEF3C7;color:#92400E;border:1px solid #FCD34D">
                 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><circle cx="10" cy="10" r="7"/><path d="M10 7v3M10 14v.5" stroke-linecap="round"/></svg>
                 Зафіксувати невідповідність
               </button>
+              <button class="adm-pbtn adm-pbtn-green" id="admBtnConfirmAcc" onclick="admActionAcceptSamples()" style="flex:1;font-size:12px;padding:7px 10px">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Підтвердити приймання
+              </button>
             </div>
+          </div>
+          <!-- Передача лабораторії (locked until accepted) -->
+          <div class="adm-samp-lab-section" id="admSampLabSection">
+            <div class="adm-samp-lab-title">Передача лабораторії</div>
+            <div class="adm-samp-lab-hint" id="admSampLabHint">Стане доступним після прийняття зразків.</div>
+            <div id="admSampLabBody" style="display:none">
+              <div class="adm-samp-acc-row" style="margin-top:6px">
+                <label class="adm-samp-acc-lbl">Лабораторія призначення</label>
+                <select class="adm-samp-acc-sel" id="admAccLab">
+                  <option value="">— оберіть —</option>
+                  <option value="kri">Лабораторія КРІ</option>
+                  <option value="dnipro">Лабораторія Дніпро</option>
+                  <option value="kyiv">Лабораторія Київ</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <!-- Actions (phase 1 + misc) -->
+          <div class="adm-samp-actions" id="admSampActionsMain" style="flex-direction:column;gap:6px">
+            <!-- Phase 1 primary button -->
+            <button class="adm-pbtn adm-pbtn-green" id="admBtnAcceptPhase1" onclick="admAccFormOpen()" disabled style="font-size:13px;padding:9px 12px;font-weight:600;width:100%">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="14" height="14"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span id="admBtnAcceptPhase1Lbl">Прийняти зразки</span>
+            </button>
             <div style="display:flex;gap:6px">
               <button class="adm-pbtn adm-pbtn-green" onclick="admActionReceive()" style="flex:1;font-size:12px;padding:8px 10px">
                 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -2523,9 +2553,18 @@ const _admSSL = { new:'Очікується', received:'Отримано', accep
 const _admSSC = { new:'adm-ss-new', received:'adm-ss-rcv', accepted:'adm-ss-acc', work:'adm-ss-wrk', done:'adm-ss-done', rejected:'adm-ss-rej', cancelled:'adm-ss-cnc' };
 
 function _admRenderSamplesTab(o) {
+  // Reset to phase 1
+  const accForm = document.getElementById('admSampAccForm');
+  const actMain = document.getElementById('admSampActionsMain');
+  if (accForm) accForm.classList.remove('visible');
+  if (actMain) actMain.style.display = '';
+  const p1Btn = document.getElementById('admBtnAcceptPhase1');
+  const p1Lbl = document.getElementById('admBtnAcceptPhase1Lbl');
+  if (p1Btn) p1Btn.disabled = true;
+  if (p1Lbl) p1Lbl.textContent = 'Прийняти зразки';
   // Reset status button state
   const stBtn = document.getElementById('admBtnSampStatus');
-  if (stBtn) { stBtn.disabled = true; stBtn.textContent = ''; stBtn.style.color = '';
+  if (stBtn) { stBtn.disabled = true; stBtn.style.color = '';
     stBtn.innerHTML = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2 2" stroke-linecap="round"/></svg> Змінити статус';
   }
   const sl = o.samplesList || [];
@@ -2577,9 +2616,55 @@ function admSampToggleAll(cb) {
 }
 
 function admSampCbChange() {
-  const anyChecked = document.querySelector('.adm-samp-cb:checked');
+  const checked = document.querySelectorAll('.adm-samp-cb:checked');
+  const n = checked.length;
   const stBtn = document.getElementById('admBtnSampStatus');
-  if (stBtn) stBtn.disabled = !anyChecked;
+  if (stBtn) stBtn.disabled = !n;
+  // Phase 1 button: show count
+  const p1Btn = document.getElementById('admBtnAcceptPhase1');
+  const p1Lbl = document.getElementById('admBtnAcceptPhase1Lbl');
+  if (p1Btn) p1Btn.disabled = !n;
+  if (p1Lbl) p1Lbl.textContent = n ? `Прийняти зразки (${n})` : 'Прийняти зразки';
+  // If form already open, update badge
+  const badge = document.getElementById('admAccBadge');
+  if (badge) badge.textContent = n;
+}
+
+function admAccFormOpen() {
+  const n = document.querySelectorAll('.adm-samp-cb:checked').length;
+  if (!n) return;
+  // Update badge
+  const badge = document.getElementById('admAccBadge');
+  if (badge) badge.textContent = n;
+  // Show form, hide phase1 button
+  const form = document.getElementById('admSampAccForm');
+  const actions = document.getElementById('admSampActionsMain');
+  if (form) form.classList.add('visible');
+  if (actions) actions.style.display = 'none';
+}
+
+function admAccFormCancel() {
+  const form = document.getElementById('admSampAccForm');
+  const actions = document.getElementById('admSampActionsMain');
+  if (form) form.classList.remove('visible');
+  if (actions) actions.style.display = '';
+  // Reset checklist
+  const n1 = document.getElementById('accChkNaming');
+  const n2 = document.getElementById('accChkPack');
+  if (n1) n1.checked = false;
+  if (n2) n2.checked = false;
+}
+
+function admAccTtnInput(el) {
+  const btn = document.getElementById('admAccTtnClear');
+  if (btn) btn.classList.toggle('visible', !!el.value);
+}
+
+function admAccTtnClear() {
+  const inp = document.getElementById('admAccTtn');
+  const btn = document.getElementById('admAccTtnClear');
+  if (inp) inp.value = '';
+  if (btn) btn.classList.remove('visible');
 }
 
 function admActionSampleStatus(e) {
@@ -3678,8 +3763,8 @@ async function admActionAcceptSamples() {
   const ttn     = document.getElementById('admAccTtn')?.value.trim() || '';
   const comment = document.getElementById('admAccComment')?.value.trim() || '';
 
-  const btn = document.querySelector('#admOTab-samples .adm-pbtn-green');
-  if (btn) { btn.disabled = true; btn.textContent = 'Зберігаємо…'; }
+  const btn = document.getElementById('admBtnConfirmAcc');
+  if (btn) { btn.disabled = true; btn.innerHTML = 'Зберігаємо…'; }
 
   try {
     const listRes = await fetch('https://laba.zemlerob.com.ua/api/orders-list');
@@ -3704,11 +3789,15 @@ async function admActionAcceptSamples() {
       new_values:  { accepted: acceptedNames, lab, ttn: ttn || undefined, comment: comment || undefined },
     });
 
-    if (btn) { btn.textContent = '✓ Прийнято'; btn.style.background = '#059669'; }
+    if (btn) { btn.innerHTML = '✓ Прийнято'; btn.style.background = '#059669'; }
     setTimeout(async () => { await _admReload(o.id); }, 800);
   } catch (err) {
     alert('Помилка: ' + err.message);
-    if (btn) { btn.disabled = false; btn.textContent = 'Прийняти зразки'; btn.style.background = ''; }
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg> Підтвердити приймання';
+      btn.style.background = '';
+    }
   }
 }
 
