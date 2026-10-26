@@ -1528,20 +1528,10 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="14" height="14"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
               <span id="admBtnAcceptPhase1Lbl">Прийняти зразки</span>
             </button>
-            <div style="display:flex;gap:6px">
-              <button class="adm-pbtn adm-pbtn-green" onclick="admActionReceive()" style="flex:1;font-size:12px;padding:8px 10px">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Позначити отримання
-              </button>
-              <button id="admBtnSampStatus" class="adm-pbtn adm-pbtn-sec" onclick="admActionSampleStatus(event)" disabled style="font-size:12px;padding:8px 10px">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2 2" stroke-linecap="round"/></svg>
-                Змінити статус
-              </button>
-              <button class="adm-pbtn adm-pbtn-sec" onclick="admActionOpenSample()" style="font-size:12px;padding:8px 10px">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M7 13L14 6M14 6H9M14 6v5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Відкрити зразок
-              </button>
-            </div>
+            <button class="adm-pbtn adm-pbtn-green" onclick="admActionReceive()" style="width:100%;font-size:12px;padding:8px 10px">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Позначити отримання
+            </button>
           </div>
         </div>
 
