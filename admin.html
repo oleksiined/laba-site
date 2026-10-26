@@ -2799,13 +2799,13 @@ function admGenAkt(o) {
   const buyerShort = (() => {
     if (pt === 'legal') return 'ТОВ «' + (o.company || o.name || '') + '»';
     if (pt === 'fop')   return 'ФОП ' + (o.company || o.name || '');
-    return o.name || o.company || '—';
+    return o.name || o.company || 'Фізична особа';
   })();
 
   const buyerStack = [
     { text: buyerName, fontSize: 9, bold: true, lineHeight: 1.2 },
   ];
-  if (o.edrpou) buyerStack.push({ text: 'Код за ЄДРПОУ: ' + o.edrpou, fontSize: 8, color: '#333', margin: [0,2,0,0] });
+  if (o.edrpou && pt !== 'private') buyerStack.push({ text: 'Код за ЄДРПОУ: ' + o.edrpou, fontSize: 8, color: '#333', margin: [0,2,0,0] });
   buyerStack.push({
     text: 'На підставі Публічного договору про надання послуг від 01.12.2025 р., розміщеного на веб-сайті laba.zemlerob.com.ua.',
     fontSize: 8, color: '#333', margin: [0,3,0,0],
@@ -2866,9 +2866,9 @@ function admGenAkt(o) {
       total += sum;
       tableBody.push([
         { text: i + 1,           ...tdStyle, alignment: 'center' },
-        { text: it.code || '—',  ...tdStyle, fontSize: 7.5 },
-        { text: it.name || '—',  ...tdStyle },
-        { text: it.material || 'Ґрунт', ...tdStyle },
+        { text: it.service_code || it.code || '—',  ...tdStyle, fontSize: 7.5 },
+        { text: it.serviceName || it.displayName || it.service_name || it.name || '—', ...tdStyle },
+        { text: it.material_name || it.material || 'Ґрунт', ...tdStyle },
         { text: qty,             ...tdStyle, alignment: 'center' },
         { text: fmtUAH(price),   ...tdStyle, alignment: 'right' },
         { text: fmtUAH(sum),     ...tdStyle, alignment: 'right' },
