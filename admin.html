@@ -2878,7 +2878,7 @@ function admGenAkt(o) {
                   : 0;
       const sum   = rawTotal !== null ? Number(rawTotal) : price * qty;
       total += sum;
-      const code = it.package_id || it.packageId || it.service_code || it.code || '—';
+      const code = it.package_id || it.packageId || it.service_code || it.code || it.name || '—';
       const name = it.serviceName || it.displayName || it.service_name || it.name || '—';
       const mat  = it.material_name || it.material || 'Ґрунт';
       tableBody.push([
