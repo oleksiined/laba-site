@@ -2299,6 +2299,102 @@ main{flex:1}
   .mcat-req-grid{grid-template-columns:1fr}
 }
 
+/* ════════════════════════════════════════
+   СТАТУС ЗАМОВЛЕННЯ PAGE
+════════════════════════════════════════ */
+.ostat-page{min-height:100vh;background:var(--bg);padding-bottom:80px}
+.ostat-hero{background:linear-gradient(135deg,var(--navy) 0%,#0a1a3a 100%);padding:80px 24px 64px;text-align:center;position:relative;overflow:hidden}
+.ostat-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(57,255,20,.07),transparent);pointer-events:none}
+.ostat-hero h1{font-size:clamp(1.9rem,4vw,3rem);font-weight:800;color:#fff;margin:0 0 12px;letter-spacing:-.5px}
+.ostat-hero p{color:rgba(255,255,255,.65);font-size:1.05rem;margin:0 0 40px}
+.ostat-search-wrap{max-width:560px;margin:0 auto;display:flex;gap:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:8px 8px 8px 20px;backdrop-filter:blur(8px)}
+.ostat-search-wrap input{flex:1;background:transparent;border:none;outline:none;color:#fff;font-size:1rem;font-family:inherit;min-width:0}
+.ostat-search-wrap input::placeholder{color:rgba(255,255,255,.4)}
+.ostat-search-btn{background:var(--neon);color:var(--navy);border:none;border-radius:10px;padding:12px 24px;font-size:.95rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .2s,transform .1s;font-family:inherit}
+.ostat-search-btn:hover{opacity:.85}
+.ostat-search-btn:active{transform:scale(.97)}
+.ostat-hint{color:rgba(255,255,255,.4);font-size:.82rem;margin-top:12px;text-align:center}
+
+.ostat-body{max-width:760px;margin:0 auto;padding:0 24px}
+
+/* Result card */
+.ostat-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:28px 32px;margin-top:36px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.ostat-card-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+.ostat-order-num{font-size:1.3rem;font-weight:800;color:var(--navy)}
+.ostat-refresh-btn{background:transparent;border:1.5px solid var(--border);border-radius:9px;padding:8px 16px;font-size:.85rem;font-weight:600;color:var(--text-mid);cursor:pointer;transition:border-color .2s,color .2s;font-family:inherit}
+.ostat-refresh-btn:hover{border-color:var(--neon);color:var(--navy)}
+.ostat-section-label{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-soft);margin-bottom:8px}
+.ostat-status-title{font-size:1.25rem;font-weight:700;color:var(--navy);margin:0}
+.ostat-date{font-size:.85rem;color:var(--text-soft);margin-top:6px;display:flex;align-items:center;gap:6px}
+.ostat-date svg{opacity:.5}
+
+/* Stepper */
+.ostat-stepper{display:flex;align-items:flex-start;gap:0;margin:32px 0 28px;position:relative}
+.ostat-step{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative}
+.ostat-step-line{position:absolute;top:18px;left:50%;right:-50%;height:2px;background:var(--border);z-index:0}
+.ostat-step:last-child .ostat-step-line{display:none}
+.ostat-step-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;position:relative;z-index:1;transition:all .3s}
+.ostat-step.done .ostat-step-icon{background:var(--neon);color:var(--navy)}
+.ostat-step.done .ostat-step-line{background:var(--neon)}
+.ostat-step.active .ostat-step-icon{background:var(--navy);color:#fff;box-shadow:0 0 0 4px rgba(57,255,20,.25)}
+.ostat-step.future .ostat-step-icon{background:#f3f4f6;color:#9ca3af;border:2px solid var(--border)}
+.ostat-step-label{font-size:.75rem;font-weight:600;color:var(--text-soft);margin-top:8px;line-height:1.3;max-width:80px}
+.ostat-step.done .ostat-step-label,.ostat-step.active .ostat-step-label{color:var(--navy)}
+
+/* Cancelled state */
+.ostat-cancelled-badge{display:inline-flex;align-items:center;gap:6px;background:#fff0f0;color:#c0392b;border:1px solid #fcc;border-radius:8px;padding:8px 14px;font-size:.88rem;font-weight:600;margin-bottom:16px}
+
+/* Samples table */
+.ostat-samples-title{font-size:1rem;font-weight:700;color:var(--navy);margin:24px 0 14px}
+.ostat-samples-table{width:100%;border-collapse:collapse}
+.ostat-samples-table th{text-align:left;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-soft);padding:0 12px 10px;border-bottom:1.5px solid var(--border)}
+.ostat-samples-table td{padding:12px 12px;border-bottom:1px solid #f3f4f6;font-size:.9rem;color:var(--text-dark);vertical-align:top}
+.ostat-samples-table tr:last-child td{border-bottom:none}
+.ostat-samp-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600}
+.ostat-samp-new{background:#f3f4f6;color:#6b7280}
+.ostat-samp-received,.ostat-samp-accepted{background:#e0f2fe;color:#0369a1}
+.ostat-samp-work{background:#fef9c3;color:#854d0e}
+.ostat-samp-done{background:#dcfce7;color:#15803d}
+.ostat-samp-rejected,.ostat-samp-cancelled{background:#fee2e2;color:#b91c1c}
+
+/* Not found / contact */
+.ostat-contact-wrap{text-align:center;margin-top:40px;padding:28px 24px;background:#f8faff;border-radius:16px;border:1px dashed var(--border)}
+.ostat-contact-wrap p{color:var(--text-mid);font-size:.95rem;margin:0 0 16px}
+.ostat-contact-wrap a{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;border-radius:10px;padding:12px 22px;font-weight:600;font-size:.9rem;text-decoration:none;transition:opacity .2s}
+.ostat-contact-wrap a:hover{opacity:.85}
+
+/* FAQ accordion */
+.ostat-faq{margin-top:48px}
+.ostat-faq-title{font-size:1.1rem;font-weight:700;color:var(--navy);margin-bottom:16px}
+.ostat-faq-item{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:8px}
+.ostat-faq-q{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;font-weight:600;color:var(--navy);font-size:.93rem;transition:background .2s;user-select:none}
+.ostat-faq-q:hover{background:#f8faff}
+.ostat-faq-q svg{flex-shrink:0;transition:transform .25s;color:var(--text-soft)}
+.ostat-faq-item.open .ostat-faq-q svg{transform:rotate(45deg)}
+.ostat-faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s}
+.ostat-faq-item.open .ostat-faq-a{max-height:200px;padding:0 20px 16px}
+.ostat-faq-a p{margin:0;color:var(--text-mid);font-size:.88rem;line-height:1.7}
+
+/* Bottom link */
+.ostat-bottom-link{text-align:center;margin-top:48px}
+.ostat-bottom-link a{color:var(--navy);font-weight:600;text-decoration:none;font-size:.95rem;display:inline-flex;align-items:center;gap:6px;transition:opacity .2s}
+.ostat-bottom-link a:hover{opacity:.7}
+
+/* Loading / error states */
+.ostat-loading{text-align:center;padding:48px 0;color:var(--text-soft)}
+.ostat-spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--neon);border-radius:50%;animation:ostat-spin .7s linear infinite;margin:0 auto 16px}
+@keyframes ostat-spin{to{transform:rotate(360deg)}}
+.ostat-error-msg{text-align:center;padding:32px;color:#c0392b;background:#fff5f5;border-radius:14px;border:1px solid #fcc;margin-top:24px;font-size:.9rem}
+
+@media(max-width:560px){
+  .ostat-card{padding:20px 18px}
+  .ostat-stepper{gap:0}
+  .ostat-step-label{font-size:.68rem;max-width:64px}
+  .ostat-search-wrap{flex-direction:column;padding:12px}
+  .ostat-search-btn{width:100%;text-align:center}
+  .ostat-samples-table th:nth-child(2),.ostat-samples-table td:nth-child(2){display:none}
+}
+
 </style>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
@@ -2318,6 +2414,7 @@ main{flex:1}
       <button class="nav-link" id="nav-home" onclick="navigate('home')">Головна</button>
       <button class="nav-link" id="nav-services" onclick="goServices()">Дослідження</button>
       <button class="nav-link" id="nav-methods" onclick="navigate('methods')">Каталог методів</button>
+      <button class="nav-link" id="nav-status" onclick="navigate('status')">Статус замовлення</button>
     </div>
     <div class="nav-right">
       <div style="position:relative">
@@ -2345,6 +2442,7 @@ main{flex:1}
     <button class="mobile-menu-link" onclick="closeMobileMenu();navigate('home')">Головна</button>
     <button class="mobile-menu-link" onclick="closeMobileMenu();goServices()">Дослідження</button>
     <button class="mobile-menu-link" onclick="closeMobileMenu();navigate('methods')">Каталог методів</button>
+    <button class="mobile-menu-link" onclick="closeMobileMenu();navigate('status')">Статус замовлення</button>
   </div>
   <div class="mobile-menu-footer">
     <button class="btn-primary" style="flex:1;text-align:center;padding:12px;font-size:14px" onclick="closeMobileMenu();navigate('checkout')">
@@ -3505,6 +3603,85 @@ main{flex:1}
   </div>
 </div>
 
+<!-- ══ СТАТУС ЗАМОВЛЕННЯ PAGE ══ -->
+<div class="page ostat-page" id="page-status">
+  <div class="ostat-hero">
+    <h1>Як там моє замовлення?</h1>
+    <p>Введіть номер замовлення або зразка — ми покажемо актуальний статус</p>
+    <div class="ostat-search-wrap">
+      <input type="text" id="ostat-input" placeholder="Наприклад: L261042 або S0000001" autocomplete="off"
+        onkeydown="if(event.key==='Enter')ostCheck()">
+      <button class="ostat-search-btn" onclick="ostCheck()">Перевірити →</button>
+    </div>
+    <div class="ostat-hint">Номер замовлення вказано у підтвердженні на вашій електронній пошті</div>
+  </div>
+
+  <div class="ostat-body">
+    <!-- Result injected here by JS -->
+    <div id="ostat-result"></div>
+
+    <!-- Contact block (always visible) -->
+    <div class="ostat-contact-wrap" id="ostat-contact">
+      <p>Не знайшли? Зараз розберемось.</p>
+      <a href="mailto:lab@zemlerob.com.ua">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        Зв'язатися з менеджером →
+      </a>
+    </div>
+
+    <!-- FAQ -->
+    <div class="ostat-faq">
+      <div class="ostat-faq-title">Є запитання?</div>
+
+      <div class="ostat-faq-item">
+        <div class="ostat-faq-q" onclick="ostFaqToggle(this)">
+          <span>Де мій номер замовлення?</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </div>
+        <div class="ostat-faq-a">
+          <p>Номер замовлення у форматі <strong>LXXxxxx</strong> надсилається на електронну пошту після підтвердження замовлення. Також він відображається в особистому кабінеті.</p>
+        </div>
+      </div>
+
+      <div class="ostat-faq-item">
+        <div class="ostat-faq-q" onclick="ostFaqToggle(this)">
+          <span>Коли чекати на результати?</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </div>
+        <div class="ostat-faq-a">
+          <p>Стандартний термін виконання — 7–14 робочих днів з моменту отримання зразків лабораторією. Терміновий аналіз (якщо обрано) виконується за 1–3 робочі дні.</p>
+        </div>
+      </div>
+
+      <div class="ostat-faq-item">
+        <div class="ostat-faq-q" onclick="ostFaqToggle(this)">
+          <span>Статус не змінюється. Що робити?</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </div>
+        <div class="ostat-faq-a">
+          <p>Спробуйте оновити сторінку або натиснути кнопку «Оновити» біля номера замовлення. Якщо статус не змінився понад тиждень — зверніться до менеджера через форму нижче.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ostat-bottom-link">
+      <a href="#" onclick="navigate('services');return false;">← До каталогу досліджень</a>
+    </div>
+  </div>
+</div>
+
 <!-- ADD IND MODAL -->
 <div class="add-ind-backdrop" id="addIndBackdrop">
   <div class="add-ind-modal">
@@ -3855,6 +4032,7 @@ function navigate(page) {
   if (page === 'services') { if(!srvMat) { srvMat=''; currentMaterial=''; srvFmtChosen=false; const ctx=document.getElementById('srvTaskContext'); if(ctx) ctx.style.display='none'; } buildTasksFromGroups(); renderTaskFilter(); render(); }
   else { searchQ=''; const si=document.getElementById('searchInput'); if(si) si.value=''; }
   if (page === 'methods') loadMethodsCatalog();
+  if (page === 'status') ostPageInit();
   if (page === 'calculator') calcInit();
   if (page === 'cabinet') { cabInit(); cabSwitch('orders'); }
   document.querySelector('nav.navbar').style.display = '';
@@ -6425,6 +6603,155 @@ function mcatDrawerOrder() {
   } else {
     navigate('services');
   }
+}
+
+/* ════════════════════════════════════════
+   СТАТУС ЗАМОВЛЕННЯ
+════════════════════════════════════════ */
+const _OST_STEPS = [
+  { key: 'new',     icon: '✓',  label: 'Замовлення\nпідтверджено' },
+  { key: 'waiting', icon: '📦', label: 'Зразки\nотримано' },
+  { key: 'work',    icon: '⚗',  label: 'Дослідження\nтривають' },
+  { key: 'done',    icon: '📄', label: 'Результати\nготові' },
+];
+const _OST_STEP_IDX = { new:0, waiting:1, work:2, done:3, closed:3, cancelled:-1 };
+
+function ostPageInit() {
+  // Focus search input on page open
+  const inp = document.getElementById('ostat-input');
+  if (inp) setTimeout(() => inp.focus(), 200);
+  // Check for ?order= query param (e.g. from email link)
+  const params = new URLSearchParams(window.location.search);
+  const preNum = params.get('order') || params.get('num');
+  if (preNum && inp) {
+    inp.value = preNum;
+    ostCheck();
+  }
+}
+
+async function ostCheck() {
+  const inp = document.getElementById('ostat-input');
+  const num = (inp ? inp.value : '').trim();
+  if (!num) { inp && inp.focus(); return; }
+
+  const result = document.getElementById('ostat-result');
+  result.innerHTML = `<div class="ostat-loading"><div class="ostat-spinner"></div>Шукаємо замовлення…</div>`;
+  document.getElementById('ostat-contact').style.display = 'none';
+
+  try {
+    const r = await fetch(`/api/order-status?num=${encodeURIComponent(num)}`);
+    const data = await r.json();
+
+    if (!data.ok) {
+      if (r.status === 404) {
+        result.innerHTML = `<div class="ostat-error-msg">
+          Замовлення або зразок <strong>${escHtml(num)}</strong> не знайдено.<br>
+          Перевірте номер або зверніться до менеджера.
+        </div>`;
+      } else {
+        result.innerHTML = `<div class="ostat-error-msg">Сталася помилка. Спробуйте ще раз.</div>`;
+      }
+      document.getElementById('ostat-contact').style.display = '';
+      return;
+    }
+
+    result.innerHTML = ostBuildCard(data);
+    lucide && lucide.createIcons && lucide.createIcons();
+  } catch (e) {
+    result.innerHTML = `<div class="ostat-error-msg">Не вдалося зв'язатися з сервером. Перевірте з'єднання.</div>`;
+    document.getElementById('ostat-contact').style.display = '';
+  }
+}
+
+function ostRefresh() {
+  const inp = document.getElementById('ostat-input');
+  if (inp && inp.value.trim()) ostCheck();
+}
+
+function ostBuildCard(d) {
+  const stepIdx = _OST_STEP_IDX[d.status] ?? 0;
+  const cancelled = d.status === 'cancelled';
+
+  // Build stepper
+  let stepperHtml = '<div class="ostat-stepper">';
+  _OST_STEPS.forEach((s, i) => {
+    let cls = 'future';
+    if (!cancelled) {
+      if (i < stepIdx) cls = 'done';
+      else if (i === stepIdx) cls = 'active';
+    }
+    const iconContent = cls === 'done' ? '✓' : s.icon;
+    stepperHtml += `
+      <div class="ostat-step ${cls}">
+        <div class="ostat-step-line"></div>
+        <div class="ostat-step-icon">${iconContent}</div>
+        <div class="ostat-step-label">${s.label.replace(/\n/g,'<br>')}</div>
+      </div>`;
+  });
+  stepperHtml += '</div>';
+
+  // Created date
+  let dateHtml = '';
+  if (d.created_at) {
+    const dt = new Date(d.created_at);
+    const dateStr = dt.toLocaleDateString('uk-UA', { day:'2-digit', month:'long', year:'numeric' });
+    dateHtml = `<div class="ostat-date">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+      Замовлення від ${dateStr}
+    </div>`;
+  }
+
+  // Samples list
+  let samplesHtml = '';
+  if (d.samples && d.samples.length > 0) {
+    samplesHtml = `<div class="ostat-samples-title">Зразки (${d.samples.length})</div>
+    <table class="ostat-samples-table">
+      <thead><tr>
+        <th>#</th>
+        <th>Номер зразка</th>
+        <th>Назва</th>
+        <th>Статус</th>
+      </tr></thead>
+      <tbody>`;
+    d.samples.forEach(s => {
+      const badgeCls = 'ostat-samp-' + (s.status || 'new');
+      samplesHtml += `<tr>
+        <td>${s.idx}</td>
+        <td><code style="font-size:.82rem">${escHtml(s.num)}</code></td>
+        <td>${escHtml(s.name)}${s.material ? `<br><span style="font-size:.78rem;color:var(--text-soft)">${escHtml(s.material)}</span>` : ''}</td>
+        <td><span class="ostat-samp-badge ${badgeCls}">${escHtml(s.statusLabel)}</span></td>
+      </tr>`;
+    });
+    samplesHtml += '</tbody></table>';
+  }
+
+  const cancelledBadge = cancelled
+    ? `<div class="ostat-cancelled-badge">⛔ Замовлення скасовано</div>` : '';
+
+  return `<div class="ostat-card">
+    <div class="ostat-card-head">
+      <div class="ostat-order-num">Замовлення ${escHtml(d.order_num)}</div>
+      <button class="ostat-refresh-btn" onclick="ostRefresh()">↻ Оновити</button>
+    </div>
+    ${cancelledBadge}
+    <div class="ostat-section-label">ПОТОЧНИЙ СТАТУС</div>
+    <div class="ostat-status-title">${escHtml(d.statusLabel)}</div>
+    ${dateHtml}
+    ${cancelled ? '' : stepperHtml}
+    ${samplesHtml}
+  </div>`;
+}
+
+function ostFaqToggle(qEl) {
+  const item = qEl.closest('.ostat-faq-item');
+  item.classList.toggle('open');
+}
+
+function escHtml(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 </script>
 
