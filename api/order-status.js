@@ -1,6 +1,6 @@
-// Vercel Serverless Function — GET /api/order-status?num=LB261042
+// Vercel Serverless Function — GET /api/order-status?num=L260025
 // Public endpoint: returns order status without sensitive client data.
-// Accepts order number (e.g. L261042) or sample number.
+// Searches by order_num only (case-insensitive).
 
 const https = require('https');
 
@@ -65,29 +65,19 @@ module.exports = async function handler(req, res) {
   const SELECT = 'order_num,status,created_at,samples,expected_at';
   let orderData = null;
 
-  // 1. Try by order_num
+  // Search by order_num (case-insensitive)
   try {
     const r = await sbGet(supabaseUrl, serviceKey,
-      `/rest/v1/orders?select=${SELECT}&order_num=eq.${encodeURIComponent(num)}&limit=1`
+      `/rest/v1/orders?select=${SELECT}&order_num=ilike.${encodeURIComponent(num)}&limit=1`
     );
     if (r.status === 200) {
       const rows = JSON.parse(r.body);
       if (rows.length > 0) orderData = rows[0];
+    } else {
+      console.error('Supabase error:', r.status, r.body);
     }
-  } catch (e) { /* continue */ }
-
-  // 2. Try by sample num inside JSONB samples array: samples @> '[{"num":"S..."}]'
-  if (!orderData) {
-    try {
-      const containsVal = encodeURIComponent(JSON.stringify([{ num }]));
-      const r = await sbGet(supabaseUrl, serviceKey,
-        `/rest/v1/orders?select=${SELECT}&samples=cs.${containsVal}&limit=1`
-      );
-      if (r.status === 200) {
-        const rows = JSON.parse(r.body);
-        if (rows.length > 0) orderData = rows[0];
-      }
-    } catch (e) { /* not found */ }
+  } catch (e) {
+    console.error('Fetch error:', e.message);
   }
 
   if (!orderData) {
@@ -98,22 +88,22 @@ module.exports = async function handler(req, res) {
 
   // Build public samples list — no sensitive data
   const samplesInfo = samplesArr.map((s, i) => ({
-    idx:      i + 1,
-    num:      s.num || `${orderData.order_num}-${String(i + 1).padStart(2, '0')}`,
-    name:     s.label || s.name || `Зразок ${i + 1}`,
-    material: s.material || s.crop || '',
-    status:   s.st || 'new',
+    idx:         i + 1,
+    num:         s.num || `${orderData.order_num}-${String(i + 1).padStart(2, '0')}`,
+    name:        s.label || s.name || `Зразок ${i + 1}`,
+    material:    s.material || s.crop || '',
+    status:      s.st || 'new',
     statusLabel: SAMPLE_STATUS_LABEL[s.st || 'new'] || (s.st || 'new'),
   }));
 
   return res.status(200).json({
-    ok:           true,
-    order_num:    orderData.order_num,
-    status:       orderData.status || 'new',
-    statusLabel:  STATUS_LABEL[orderData.status] || orderData.status,
-    created_at:   orderData.created_at || null,
-    expected_at:  orderData.expected_at || null,
+    ok:            true,
+    order_num:     orderData.order_num,
+    status:        orderData.status || 'new',
+    statusLabel:   STATUS_LABEL[orderData.status] || orderData.status,
+    created_at:    orderData.created_at || null,
+    expected_at:   orderData.expected_at || null,
     samples_count: samplesArr.length,
-    samples:      samplesInfo,
+    samples:       samplesInfo,
   });
 };

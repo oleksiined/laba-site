@@ -3649,7 +3649,7 @@ main{flex:1}
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
-            <input type="text" id="ostat-input" placeholder="LB261042 або S0000001" autocomplete="off"
+            <input type="text" id="ostat-input" placeholder="Наприклад: L260025" autocomplete="off"
               onkeydown="if(event.key==='Enter')ostCheck()">
           </div>
           <button class="ostat-search-btn" onclick="ostCheck()">Перевірити →</button>
@@ -6700,7 +6700,7 @@ async function ostCheck() {
     if (!data.ok) {
       if (r.status === 404) {
         result.innerHTML = `<div class="ostat-error-msg">
-          Замовлення або зразок <strong>${escHtml(num)}</strong> не знайдено.<br>
+          Замовлення <strong>${escHtml(num)}</strong> не знайдено.<br>
           Перевірте номер або зверніться до менеджера.
         </div>`;
       } else {
