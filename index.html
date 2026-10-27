@@ -37,8 +37,7 @@ html{scroll-behavior:smooth}
 }
 
 *,*::before,*::after{font-family:'Manrope',system-ui,sans-serif!important}
-body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh;font-family:'Manrope',system-ui,sans-serif;overflow-x:hidden;display:flex;flex-direction:column}
-.page.active{flex:1}
+body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;font-family:'Manrope',system-ui,sans-serif;overflow-x:hidden}
 a{text-decoration:none;color:inherit}
 /* Hide native number input spinners sitewide */
 input[type="number"]{-moz-appearance:textfield;appearance:textfield}
@@ -66,7 +65,9 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .btn-primary:hover{background:var(--neon-dark);transform:translateY(-1px)}
 
 /* ── PAGE SHELL ── */
-.page{display:none}
+.page{display:none;flex-direction:column}
+.page.active{display:flex;min-height:calc(100vh - 68px)}
+.page.active>.laba-footer{margin-top:auto}
 .page.active{display:block}
 
 /* ══════════════════════════════
