@@ -2199,6 +2199,106 @@ main{flex:1}
   .home-mat-tiles{grid-template-columns:repeat(2,1fr)!important}
 }
 
+/* ══ METHODS CATALOG PAGE ══ */
+.mcat-page{display:none;flex-direction:column;min-height:calc(100vh - 60px);padding:0 0 60px}
+.mcat-page.active{display:flex}
+.mcat-hero{background:linear-gradient(135deg,var(--navy) 0%,#0a1628 100%);color:#fff;padding:52px 40px 44px;text-align:center}
+.mcat-hero h1{font-size:32px;font-weight:800;margin:0 0 10px;letter-spacing:-0.5px}
+.mcat-hero p{color:rgba(255,255,255,.62);font-size:15px;margin:0}
+
+.mcat-filters{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:60px;z-index:90;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.mcat-filters-inner{max-width:1100px;margin:0 auto;padding:16px 24px}
+.mcat-search{width:100%;box-sizing:border-box;padding:10px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;outline:none;margin-bottom:12px;transition:border-color .2s}
+.mcat-search:focus{border-color:var(--neon)}
+.mcat-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.mcat-pill{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:13px;font-weight:500;color:var(--text-mid);cursor:pointer;transition:all .18s;font-family:inherit}
+.mcat-pill:hover{border-color:var(--neon);color:var(--neon)}
+.mcat-pill.active{background:var(--neon);border-color:var(--neon);color:#fff}
+.mcat-bottom-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mcat-select{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;color:var(--text-dark);background:#fff;outline:none;cursor:pointer;flex:1;min-width:180px}
+.mcat-select:focus{border-color:var(--neon)}
+.mcat-clear-btn{padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;font-size:13px;color:var(--text-soft);cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .18s}
+.mcat-clear-btn:hover{border-color:#e55;color:#e55}
+
+.mcat-body{max-width:1100px;width:100%;margin:0 auto;padding:24px 24px 0;box-sizing:border-box;flex:1}
+.mcat-count{font-size:13px;color:var(--text-soft);margin-bottom:14px}
+.mcat-loading{text-align:center;padding:60px;color:var(--text-soft);font-size:15px}
+.mcat-empty{text-align:center;padding:60px;color:var(--text-soft)}
+.mcat-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:#fff}
+.mcat-table{width:100%;border-collapse:collapse;font-size:14px}
+.mcat-table th{padding:12px 16px;text-align:left;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);border-bottom:1px solid var(--border);white-space:nowrap;background:#fafafa}
+.mcat-table td{padding:13px 16px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text-dark)}
+.mcat-table tr:last-child td{border-bottom:none}
+.mcat-table tr:hover td{background:#f9fafb}
+.mcat-svc-name{font-weight:600;font-size:14px;color:var(--text-dark)}
+.mcat-method-name{font-size:13px;color:var(--text-mid);max-width:260px}
+.mcat-std{font-size:12px;color:var(--text-soft);font-family:monospace}
+.mcat-days{font-size:13px;color:var(--text-dark);white-space:nowrap}
+.mcat-price{font-size:13px;font-weight:600;color:var(--text-dark);white-space:nowrap}
+
+.mcat-mat-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+.mcat-mat-badge.soil{background:#e8f5e9;color:#2e7d32}
+.mcat-mat-badge.fertilizer{background:#fff3e0;color:#e65100}
+.mcat-mat-badge.plant{background:#f3e5f5;color:#6a1b9a}
+.mcat-mat-badge.water{background:#e3f2fd;color:#1565c0}
+.mcat-mat-badge.seed{background:#fce4ec;color:#880e4f}
+.mcat-mat-badge.default{background:#f0f0f0;color:#555}
+
+.mcat-detail-btn{padding:6px 14px;border:1.5px solid var(--neon);border-radius:var(--radius-sm);background:transparent;color:var(--neon);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;white-space:nowrap}
+.mcat-detail-btn:hover{background:var(--neon);color:#fff}
+
+.mcat-pagination{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:20px;padding:0 0 8px}
+.mcat-page-btns{display:flex;gap:4px;flex-wrap:wrap}
+.mcat-page-btn{width:34px;height:34px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;font-size:13px;cursor:pointer;font-family:inherit;transition:all .18s;color:var(--text-dark)}
+.mcat-page-btn:hover{border-color:var(--neon);color:var(--neon)}
+.mcat-page-btn.active{background:var(--neon);border-color:var(--neon);color:#fff;font-weight:700}
+.mcat-page-btn:disabled{opacity:.4;cursor:default}
+.mcat-per-page{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-soft)}
+.mcat-per-page select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;background:#fff;cursor:pointer;color:var(--text-dark)}
+
+.mcat-cta{background:#f5f7fa;border-top:1px solid var(--border);padding:48px 24px;text-align:center}
+.mcat-cta-title{font-size:20px;font-weight:700;color:var(--text-dark);margin-bottom:8px}
+.mcat-cta-sub{font-size:14px;color:var(--text-soft);margin-bottom:20px}
+
+/* drawer */
+.mcat-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400}
+.mcat-overlay.open{display:block}
+.mcat-drawer{position:fixed;top:0;right:-540px;width:100%;max-width:520px;height:100%;background:#fff;box-shadow:-4px 0 32px rgba(0,0,0,.15);z-index:401;display:flex;flex-direction:column;transition:right .3s cubic-bezier(.4,0,.2,1);overflow:hidden}
+.mcat-drawer.open{right:0}
+.mcat-drawer-head{padding:24px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:16px}
+.mcat-drawer-mat{margin-bottom:8px}
+.mcat-drawer-title{font-size:18px;font-weight:800;color:var(--text-dark);line-height:1.3;margin-bottom:4px}
+.mcat-drawer-method{font-size:13px;color:var(--text-soft)}
+.mcat-drawer-close{width:36px;height:36px;border:1px solid var(--border);border-radius:50%;background:#fff;font-size:16px;cursor:pointer;flex-shrink:0;transition:all .18s;color:var(--text-mid)}
+.mcat-drawer-close:hover{background:#fee;border-color:#fcc;color:#e55}
+.mcat-drawer-body{flex:1;overflow-y:auto;padding:24px}
+.mcat-drawer-body h4{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin:20px 0 8px}
+.mcat-drawer-body h4:first-child{margin-top:0}
+.mcat-drawer-body p{font-size:14px;color:var(--text-dark);line-height:1.6;margin:0 0 8px}
+.mcat-drawer-body ul{margin:0 0 8px;padding-left:18px}
+.mcat-drawer-body ul li{font-size:14px;color:var(--text-dark);line-height:1.6;margin-bottom:4px}
+.mcat-req-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:8px 0}
+.mcat-req-card{background:#f5f7fa;border-radius:8px;padding:14px 14px 12px;border:1px solid var(--border)}
+.mcat-req-card-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--text-soft);margin-bottom:6px}
+.mcat-req-card-val{font-size:13px;font-weight:600;color:var(--text-dark)}
+.mcat-drawer-std-row{display:flex;align-items:center;gap:10px;background:#f5f7fa;border-radius:8px;padding:12px 14px;margin-top:8px}
+.mcat-drawer-std-code{font-family:monospace;font-size:13px;font-weight:700;color:var(--navy)}
+.mcat-drawer-std-name{font-size:13px;color:var(--text-mid)}
+.mcat-drawer-footer{padding:16px 24px;border-top:1px solid var(--border);background:#fff}
+
+@media(max-width:700px){
+  .mcat-hero{padding:36px 20px 28px}
+  .mcat-hero h1{font-size:24px}
+  .mcat-filters-inner{padding:14px 16px}
+  .mcat-body{padding:16px 12px 0}
+  .mcat-table th,.mcat-table td{padding:10px 10px}
+  .mcat-drawer{max-width:100%}
+  .mcat-req-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:500px){
+  .mcat-req-grid{grid-template-columns:1fr}
+}
+
 </style>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
@@ -2217,6 +2317,7 @@ main{flex:1}
     <div class="nav-links">
       <button class="nav-link" id="nav-home" onclick="navigate('home')">Головна</button>
       <button class="nav-link" id="nav-services" onclick="goServices()">Дослідження</button>
+      <button class="nav-link" id="nav-methods" onclick="navigate('methods')">Каталог методів</button>
     </div>
     <div class="nav-right">
       <div style="position:relative">
@@ -2243,6 +2344,7 @@ main{flex:1}
   <div class="mobile-menu-links">
     <button class="mobile-menu-link" onclick="closeMobileMenu();navigate('home')">Головна</button>
     <button class="mobile-menu-link" onclick="closeMobileMenu();goServices()">Дослідження</button>
+    <button class="mobile-menu-link" onclick="closeMobileMenu();navigate('methods')">Каталог методів</button>
   </div>
   <div class="mobile-menu-footer">
     <button class="btn-primary" style="flex:1;text-align:center;padding:12px;font-size:14px" onclick="closeMobileMenu();navigate('checkout')">
@@ -3357,6 +3459,52 @@ main{flex:1}
   </div>
 </div>
 
+<!-- ══ PAGE: METHODS CATALOG ══ -->
+<div class="page mcat-page" id="page-methods">
+  <div class="mcat-hero">
+    <h1>Каталог методів</h1>
+    <p>Повний перелік акредитованих методів досліджень лабораторії</p>
+  </div>
+  <div class="mcat-filters" id="mcatFilters">
+    <div class="mcat-filters-inner">
+      <input type="text" id="mcatSearch" class="mcat-search" placeholder="Пошук за назвою дослідження або методу..." oninput="mcatFilterChange()" autocomplete="off">
+      <div class="mcat-pills" id="mcatMatPills">
+        <button class="mcat-pill active" data-mat="" onclick="mcatSetMat(this,'')">Усі</button>
+      </div>
+      <div class="mcat-bottom-row">
+        <select class="mcat-select" id="mcatGroupSel" onchange="mcatFilterChange()">
+          <option value="">Напрям дослідження</option>
+        </select>
+        <button class="mcat-clear-btn" id="mcatClearBtn" onclick="mcatClearFilters()" style="display:none">✕ Очистити фільтри</button>
+      </div>
+    </div>
+  </div>
+  <div class="mcat-body">
+    <div id="mcatContent"><div class="mcat-loading">Завантаження...</div></div>
+  </div>
+  <div class="mcat-cta">
+    <div class="mcat-cta-title">Не знайшли потрібний метод?</div>
+    <div class="mcat-cta-sub">Зверніться до нас — ми підберемо оптимальне рішення для вашого завдання</div>
+    <button class="btn-primary" onclick="navigate('checkout')">Отримати консультацію</button>
+  </div>
+</div>
+<!-- METHODS DRAWER -->
+<div class="mcat-overlay" id="mcatOverlay" onclick="mcatCloseDrawer()"></div>
+<div class="mcat-drawer" id="mcatDrawer">
+  <div class="mcat-drawer-head">
+    <div style="flex:1;min-width:0">
+      <div class="mcat-drawer-mat" id="mdMat"></div>
+      <div class="mcat-drawer-title" id="mdTitle"></div>
+      <div class="mcat-drawer-method" id="mdMethod"></div>
+    </div>
+    <button class="mcat-drawer-close" onclick="mcatCloseDrawer()">✕</button>
+  </div>
+  <div class="mcat-drawer-body" id="mdBody"></div>
+  <div class="mcat-drawer-footer">
+    <button class="btn-primary" style="width:100%" onclick="mcatDrawerOrder()">Переглянути дослідження →</button>
+  </div>
+</div>
+
 <!-- ADD IND MODAL -->
 <div class="add-ind-backdrop" id="addIndBackdrop">
   <div class="add-ind-modal">
@@ -3706,6 +3854,7 @@ function navigate(page) {
   }
   if (page === 'services') { if(!srvMat) { srvMat=''; currentMaterial=''; srvFmtChosen=false; const ctx=document.getElementById('srvTaskContext'); if(ctx) ctx.style.display='none'; } buildTasksFromGroups(); renderTaskFilter(); render(); }
   else { searchQ=''; const si=document.getElementById('searchInput'); if(si) si.value=''; }
+  if (page === 'methods') loadMethodsCatalog();
   if (page === 'calculator') calcInit();
   if (page === 'cabinet') { cabInit(); cabSwitch('orders'); }
   document.querySelector('nav.navbar').style.display = '';
@@ -6062,6 +6211,221 @@ function showToast(msg,ms=2500){
   // Lucide icons
   if (typeof lucide !== 'undefined') lucide.createIcons();
 })();
+
+/* ══ METHODS CATALOG ══ */
+let _mcatLoaded = false;
+let _mcatAllRows = [];
+let _mcatFilteredRows = [];
+let _mcatPage = 1;
+let _mcatPerPage = 10;
+let _mcatMat = '';
+let _mcatGroup = '';
+let _mcatSearch = '';
+let _mcatDrawerItem = null;
+
+const _mcatMatBadgeClass = {
+  'MAT-01':'soil','MAT-02':'fertilizer','MAT-03':'plant','MAT-04':'water','MAT-05':'seed'
+};
+const _mcatMatLabel = {
+  'MAT-01':'Ґрунт','MAT-02':'Добрива','MAT-03':'Рослина','MAT-04':'Вода','MAT-05':'Насіння'
+};
+
+async function loadMethodsCatalog() {
+  if (_mcatLoaded) { mcatApplyFilters(); return; }
+  document.getElementById('mcatContent').innerHTML = '<div class="mcat-loading">Завантаження...</div>';
+  try {
+    const [methods, services, materials] = await Promise.all([
+      _sbFetch('catalog_methods','select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,method_id').catch(()=>[]),
+      _sbFetch('catalog_services','select=service_id,name,material_id,group_name,full_description,short_description,slug&status=in.(active,draft)').catch(()=>[]),
+      _sbFetch('catalog_materials','select=material_id,name,sort_order&order=sort_order.asc.nullslast').catch(()=>[]),
+    ]);
+    const svcMap = {};
+    services.forEach(s=>{ svcMap[s.service_id]=s; });
+    const matMap = {};
+    materials.forEach(m=>{ matMap[m.material_id]=m; });
+
+    // Build material pills
+    const pillsEl = document.getElementById('mcatMatPills');
+    pillsEl.innerHTML = '<button class="mcat-pill active" data-mat="" onclick="mcatSetMat(this,\'\')">Усі</button>';
+    materials.forEach(m=>{
+      const cls = _mcatMatBadgeClass[m.material_id] || 'default';
+      pillsEl.innerHTML += `<button class="mcat-pill" data-mat="${m.material_id}" onclick="mcatSetMat(this,'${m.material_id}')">${m.name}</button>`;
+    });
+
+    // Build group dropdown
+    const groupSel = document.getElementById('mcatGroupSel');
+    const groups = [...new Set(services.map(s=>s.group_name).filter(Boolean))].sort();
+    groupSel.innerHTML = '<option value="">Напрям дослідження</option>';
+    groups.forEach(g=>{ groupSel.innerHTML += `<option value="${g}">${g}</option>`; });
+
+    // Build rows
+    _mcatAllRows = methods.map(m=>{
+      const svc = svcMap[m.service_id] || {};
+      const mat = matMap[svc.material_id] || {};
+      return {
+        id: m.method_id,
+        svcName: svc.name || '',
+        methodName: m.method_name || '',
+        std: m.standard_code || '',
+        tag: m.selection_note || '',
+        days: m.turnaround_value || null,
+        price: m.price != null ? m.price : null,
+        matId: svc.material_id || '',
+        matName: mat.name || '',
+        group: svc.group_name || '',
+        svcDesc: svc.full_description || svc.short_description || '',
+        svcSlug: svc.slug || '',
+        svcId: m.service_id || '',
+      };
+    });
+    _mcatLoaded = true;
+    mcatApplyFilters();
+  } catch(e) {
+    document.getElementById('mcatContent').innerHTML = '<div class="mcat-empty">Помилка завантаження. Спробуйте пізніше.</div>';
+  }
+}
+
+function mcatSetMat(btn, matId) {
+  _mcatMat = matId;
+  _mcatPage = 1;
+  document.querySelectorAll('.mcat-pill').forEach(p=>p.classList.toggle('active', p===btn));
+  mcatApplyFilters();
+}
+
+function mcatFilterChange() {
+  _mcatSearch = (document.getElementById('mcatSearch').value || '').toLowerCase().trim();
+  _mcatGroup = document.getElementById('mcatGroupSel').value || '';
+  _mcatPage = 1;
+  mcatApplyFilters();
+}
+
+function mcatClearFilters() {
+  _mcatMat = ''; _mcatGroup = ''; _mcatSearch = ''; _mcatPage = 1;
+  document.getElementById('mcatSearch').value = '';
+  document.getElementById('mcatGroupSel').value = '';
+  document.querySelectorAll('.mcat-pill').forEach(p=>p.classList.toggle('active', p.dataset.mat===''));
+  mcatApplyFilters();
+}
+
+function mcatApplyFilters() {
+  const q = _mcatSearch;
+  _mcatFilteredRows = _mcatAllRows.filter(r=>{
+    if (_mcatMat && r.matId !== _mcatMat) return false;
+    if (_mcatGroup && r.group !== _mcatGroup) return false;
+    if (q && !r.svcName.toLowerCase().includes(q) && !r.methodName.toLowerCase().includes(q) && !r.std.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  const anyFilter = _mcatMat || _mcatGroup || _mcatSearch;
+  document.getElementById('mcatClearBtn').style.display = anyFilter ? '' : 'none';
+  mcatRender();
+}
+
+function mcatRender() {
+  const total = _mcatFilteredRows.length;
+  const pages = Math.max(1, Math.ceil(total / _mcatPerPage));
+  if (_mcatPage > pages) _mcatPage = pages;
+  const start = (_mcatPage-1)*_mcatPerPage;
+  const rows = _mcatFilteredRows.slice(start, start+_mcatPerPage);
+
+  if (total === 0) {
+    document.getElementById('mcatContent').innerHTML = '<div class="mcat-empty">Нічого не знайдено. Спробуйте змінити фільтри.</div>';
+    return;
+  }
+
+  let html = `<div class="mcat-count">Знайдено: <strong>${total}</strong> методів</div>`;
+  html += '<div class="mcat-table-wrap"><table class="mcat-table"><thead><tr>';
+  html += '<th>Дослідження</th><th>Метод</th><th>Матеріал</th><th>Нормативний документ</th><th>Термін, дн.</th><th></th>';
+  html += '</tr></thead><tbody>';
+  rows.forEach((r,i)=>{
+    const globalIdx = start + i;
+    const cls = _mcatMatBadgeClass[r.matId] || 'default';
+    const daysStr = r.days != null ? r.days : '—';
+    html += `<tr>
+      <td><div class="mcat-svc-name">${r.svcName || '—'}</div></td>
+      <td><div class="mcat-method-name">${r.methodName || '—'}</div></td>
+      <td>${r.matId ? `<span class="mcat-mat-badge ${cls}">${r.matName || r.matId}</span>` : '—'}</td>
+      <td><span class="mcat-std">${r.std || '—'}</span></td>
+      <td class="mcat-days">${daysStr}</td>
+      <td><button class="mcat-detail-btn" onclick="mcatOpenDrawer(${globalIdx})">Детальніше →</button></td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  html += mcatPaginationHtml(total, pages);
+  document.getElementById('mcatContent').innerHTML = html;
+}
+
+function mcatPaginationHtml(total, pages) {
+  if (pages <= 1 && total <= 10) return '';
+  let btns = '';
+  const p = _mcatPage;
+  for (let i=1; i<=pages; i++) {
+    if (i===1||i===pages||Math.abs(i-p)<=1) {
+      btns += `<button class="mcat-page-btn${i===p?' active':''}" onclick="mcatGoPage(${i})">${i}</button>`;
+    } else if (Math.abs(i-p)===2) {
+      btns += `<button class="mcat-page-btn" disabled>…</button>`;
+    }
+  }
+  return `<div class="mcat-pagination">
+    <div class="mcat-per-page">На сторінці:
+      <select onchange="mcatSetPerPage(this.value)">
+        ${[10,25,50].map(v=>`<option value="${v}"${v===_mcatPerPage?' selected':''}>${v}</option>`).join('')}
+      </select>
+    </div>
+    <div class="mcat-page-btns">${btns}</div>
+  </div>`;
+}
+
+function mcatGoPage(p) { _mcatPage=p; mcatRender(); window.scrollTo({top:document.getElementById('mcatContent').getBoundingClientRect().top+window.scrollY-120,behavior:'smooth'}); }
+function mcatSetPerPage(v) { _mcatPerPage=parseInt(v)||10; _mcatPage=1; mcatRender(); }
+
+function mcatOpenDrawer(idx) {
+  const r = _mcatFilteredRows[idx];
+  if (!r) return;
+  _mcatDrawerItem = r;
+  const cls = _mcatMatBadgeClass[r.matId] || 'default';
+  document.getElementById('mdMat').innerHTML = r.matId ? `<span class="mcat-mat-badge ${cls}">${r.matName||r.matId}</span>` : '';
+  document.getElementById('mdTitle').textContent = r.svcName || '—';
+  document.getElementById('mdMethod').textContent = r.methodName ? `Метод: ${r.methodName}` : '';
+
+  let body = '';
+  if (r.svcDesc) {
+    body += `<h4>Про дослідження</h4><p>${r.svcDesc}</p>`;
+  }
+  if (r.std) {
+    body += `<h4>Методика та нормативний документ</h4>
+      <div class="mcat-drawer-std-row">
+        <span class="mcat-drawer-std-code">${r.std}</span>
+        <span class="mcat-drawer-std-name">${r.methodName||''}</span>
+      </div>`;
+  }
+  if (r.days != null) {
+    body += `<h4>Строки виконання</h4><p>Результат готовий протягом <strong>${r.days} робочих днів</strong> з моменту отримання зразка лабораторією.</p>`;
+  }
+  if (r.tag) {
+    body += `<h4>Примітка</h4><p>${r.tag}</p>`;
+  }
+  if (!body) body = '<p style="color:var(--text-soft)">Деталі по цьому методу уточнюйте у менеджера.</p>';
+
+  document.getElementById('mdBody').innerHTML = body;
+  document.getElementById('mcatOverlay').classList.add('open');
+  document.getElementById('mcatDrawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function mcatCloseDrawer() {
+  document.getElementById('mcatOverlay').classList.remove('open');
+  document.getElementById('mcatDrawer').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function mcatDrawerOrder() {
+  mcatCloseDrawer();
+  if (_mcatDrawerItem && _mcatDrawerItem.svcId) {
+    goServices();
+  } else {
+    navigate('services');
+  }
+}
 </script>
 
 
