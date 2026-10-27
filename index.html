@@ -2472,11 +2472,12 @@ main{flex:1}
 .ostat-step.done .ostat-step-icon{color:var(--navy)}
 .ostat-step.active .ostat-step-icon{color:var(--navy)}
 .ostat-step.future .ostat-step-icon{color:#c0cad4}
-.ostat-step-connector{flex:1;height:2.5px;margin:0 4px;position:relative;top:0}
+.ostat-step-connector{flex:1;height:2.5px;margin:0 0 0 4px;position:relative;top:0}
 .ostat-step.done .ostat-step-connector{background:var(--neon)}
 .ostat-step.active .ostat-step-connector{background:#d1d9e0}
 .ostat-step.future .ostat-step-connector{background:#d1d9e0}
-.ostat-step-connector-left{flex:1;height:2.5px;margin:0 4px;background:#d1d9e0}
+.ostat-step:last-child .ostat-step-connector{margin:0 4px 0 0}
+.ostat-step-connector-left{flex:1;height:2.5px;margin:0 4px 0 0;background:#d1d9e0}
 .ostat-step-connector-left.done{background:var(--neon)}
 .ostat-step:not(:first-child):not(:last-child){align-items:center}
 .ostat-step:not(:first-child):not(:last-child) .ostat-step-label{text-align:center}
@@ -2488,7 +2489,6 @@ main{flex:1}
 .ostat-step.done .ostat-step-label{color:var(--text-mid)}
 .ostat-step.active .ostat-step-label{color:var(--navy);font-weight:700}
 .ostat-step.active .ostat-step-icon{position:relative}
-.ostat-step.active .ostat-step-icon::after{content:'';position:absolute;bottom:-6px;left:4px;right:4px;height:2.5px;background:var(--neon);border-radius:2px}
 
 /* Cancelled state */
 .ostat-cancelled-badge{display:inline-flex;align-items:center;gap:6px;background:#fff0f0;color:#c0392b;border:1px solid #fcc;border-radius:8px;padding:8px 14px;font-size:.88rem;font-weight:600;margin-bottom:16px}
