@@ -65,9 +65,8 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .btn-primary:hover{background:var(--neon-dark);transform:translateY(-1px)}
 
 /* ── PAGE SHELL ── */
-.page{display:none;flex-direction:column}
-.page.active{display:flex;flex-direction:column;min-height:calc(100vh - 68px)}
-.page.active>.laba-footer{margin-top:auto}
+.page{display:none}
+.page.active{display:block}
 
 /* ══════════════════════════════
    HOME PAGE
@@ -171,7 +170,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 /* ══════════════════════════════
    SERVICES PAGE — hotline style
 ══════════════════════════════ */
-.services-layout{max-width:1320px;width:100%;margin:0 auto;padding:0 24px 24px;display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start;flex:1}
+.services-layout{max-width:1320px;margin:0 auto;padding:0 24px 24px;display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start}
 .services-header{max-width:1320px;margin:0 auto;padding:24px 24px 0}
 .services-header h1{font-family:'Manrope',system-ui,sans-serif;font-size:28px;font-weight:700;color:var(--navy);margin-bottom:4px}
 .services-header-sub{font-size:14px;color:var(--text-soft);margin-bottom:4px}
