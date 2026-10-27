@@ -6704,7 +6704,7 @@ async function ostCheck() {
           Перевірте номер або зверніться до менеджера.
         </div>`;
       } else {
-        result.innerHTML = `<div class="ostat-error-msg">Сталася помилка. Спробуйте ще раз.</div>`;
+        result.innerHTML = `<div class="ostat-error-msg">Помилка сервера (${r.status}): ${escHtml(data.error || 'невідома помилка')}.</div>`;
       }
       document.getElementById('ostat-contact').style.display = '';
       return;

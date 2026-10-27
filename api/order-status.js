@@ -57,27 +57,29 @@ module.exports = async function handler(req, res) {
   if (!num) return res.status(400).json({ ok: false, error: 'Missing num parameter' });
 
   const supabaseUrl = process.env.SUPABASE_URL;
-  const serviceKey  = process.env.SUPABASE_SERVICE_KEY;
+  const serviceKey  = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
   if (!supabaseUrl || !serviceKey) {
-    return res.status(500).json({ ok: false, error: 'Server not configured' });
+    return res.status(500).json({ ok: false, error: 'Server not configured: missing SUPABASE_URL or SUPABASE_SERVICE_KEY' });
   }
 
   const SELECT = 'order_num,status,created_at,samples,expected_at';
   let orderData = null;
 
   // Search by order_num (case-insensitive)
+  const queryPath = `/rest/v1/orders?select=${SELECT}&order_num=ilike.${encodeURIComponent(num)}&limit=1`;
+  console.log('[order-status] searching:', num, queryPath);
   try {
-    const r = await sbGet(supabaseUrl, serviceKey,
-      `/rest/v1/orders?select=${SELECT}&order_num=ilike.${encodeURIComponent(num)}&limit=1`
-    );
+    const r = await sbGet(supabaseUrl, serviceKey, queryPath);
+    console.log('[order-status] supabase status:', r.status, r.body.slice(0, 200));
     if (r.status === 200) {
       const rows = JSON.parse(r.body);
       if (rows.length > 0) orderData = rows[0];
     } else {
-      console.error('Supabase error:', r.status, r.body);
+      return res.status(502).json({ ok: false, error: `Supabase error ${r.status}: ${r.body.slice(0, 200)}` });
     }
   } catch (e) {
-    console.error('Fetch error:', e.message);
+    console.error('[order-status] fetch error:', e.message);
+    return res.status(500).json({ ok: false, error: `Fetch error: ${e.message}` });
   }
 
   if (!orderData) {
