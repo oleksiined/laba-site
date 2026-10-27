@@ -1449,6 +1449,125 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
   @page{size:A4 portrait;margin:12mm}
 }
 
+/* ══════════════════════════════
+   SAMPLING PAGE — Як відібрати зразок
+══════════════════════════════ */
+.samp-page{background:var(--bg)}
+.samp-wrap{max-width:1280px;margin:0 auto;padding:0 32px 0}
+
+/* Breadcrumb */
+.samp-breadcrumb{padding:20px 0 0;font-size:13px;color:var(--text-soft)}
+.samp-breadcrumb a{color:var(--text-soft);text-decoration:none;transition:color .15s}
+.samp-breadcrumb a:hover{color:var(--navy)}
+.samp-breadcrumb span{margin:0 6px;color:var(--border)}
+
+/* Header */
+.samp-header{padding:8px 0 24px}
+.samp-header h1{font-size:36px;font-weight:800;color:var(--navy);letter-spacing:-.5px;margin-bottom:8px;line-height:1.1}
+.samp-header p{font-size:15px;color:var(--text-soft);margin:0}
+
+/* Material tabs */
+.samp-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px}
+.samp-tab{display:flex;align-items:center;gap:8px;padding:9px 18px;border-radius:var(--radius-pill);border:1.5px solid var(--border);background:var(--white);font-size:14px;font-weight:600;color:var(--text-mid);cursor:pointer;transition:border-color .15s,background .15s,color .15s;white-space:nowrap}
+.samp-tab:hover{border-color:var(--neon-dark);color:var(--navy)}
+.samp-tab.active{background:#edffd1;border-color:#a8e030;color:var(--navy)}
+.samp-tab svg{flex-shrink:0}
+
+/* Content layout */
+.samp-body{display:grid;grid-template-columns:1fr 320px;gap:32px;align-items:start;padding-bottom:40px}
+
+/* Left content */
+.samp-content-wrap{position:relative}
+.samp-content-heading h2{font-size:28px;font-weight:800;color:var(--navy);letter-spacing:-.3px;margin-bottom:6px}
+.samp-content-heading p{font-size:14px;color:var(--text-soft);margin:0 0 28px}
+
+/* Steps */
+.samp-steps-area{display:grid;grid-template-columns:1fr 200px;gap:24px;align-items:start}
+.samp-steps{display:flex;flex-direction:column;gap:0}
+.samp-step{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--border-soft)}
+.samp-step:last-child{border-bottom:none}
+.samp-step-num{flex-shrink:0;width:36px;height:36px;background:#f0f5e8;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#5a7a2a;letter-spacing:.5px}
+.samp-step-body{flex:1;min-width:0}
+.samp-step-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:5px}
+.samp-step-desc{font-size:14px;color:var(--text-mid);line-height:1.55;margin:0}
+.samp-step-addr{display:flex;align-items:center;gap:8px;margin-top:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);font-size:13px;color:var(--text-mid)}
+.samp-step-addr svg{flex-shrink:0;color:var(--text-soft)}
+
+/* Illustration */
+.samp-illustration{display:flex;justify-content:center;align-items:flex-start;padding-top:8px}
+.samp-ill-bag{width:160px;height:200px;position:relative}
+.samp-ill-bag-inner{width:150px;background:#f8f9f5;border:2px solid #d0d6c0;border-radius:8px 8px 12px 12px;padding:16px 14px;position:relative;box-shadow:2px 4px 12px rgba(0,0,0,.08)}
+.samp-ill-bag-top{height:22px;background:#d0d6c0;border-radius:4px 4px 0 0;margin:-16px -14px 12px;display:flex;align-items:center;justify-content:center}
+.samp-ill-bag-clip{width:30px;height:14px;background:#b8bfaa;border-radius:3px}
+.samp-ill-bag-label{font-size:11.5px;font-weight:600;color:#3a4a2a;line-height:1.5;border:1px dashed #c0c8aa;border-radius:4px;padding:8px 10px;background:var(--white)}
+.samp-ill-line{font-size:11px;color:#888;margin-top:8px;border-top:1px solid #e0e4d0;padding-top:6px}
+
+/* Note */
+.samp-note{display:flex;align-items:flex-start;gap:10px;margin-top:20px;padding:12px 16px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-md);font-size:13px;color:var(--text-mid);line-height:1.5}
+.samp-note-icon{flex-shrink:0;width:20px;height:20px;background:var(--bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text-soft);margin-top:1px}
+
+/* FAQ */
+.samp-faq{margin-top:32px}
+.samp-faq-title{font-size:20px;font-weight:800;color:var(--navy);margin-bottom:12px;letter-spacing:-.2px}
+.samp-faq-item{border-bottom:1px solid var(--border)}
+.samp-faq-item:first-of-type{border-top:1px solid var(--border)}
+.samp-faq-q{display:flex;align-items:center;justify-content:space-between;padding:16px 0;cursor:pointer;gap:16px;font-size:14px;font-weight:600;color:var(--navy);user-select:none}
+.samp-faq-q:hover{color:var(--navy)}
+.samp-faq-icon{flex-shrink:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:var(--text-soft);transition:transform .2s}
+.samp-faq-item.open .samp-faq-icon{transform:rotate(45deg)}
+.samp-faq-a{display:none;padding:0 0 16px;font-size:14px;color:var(--text-mid);line-height:1.6}
+.samp-faq-item.open .samp-faq-a{display:block}
+
+/* Sidebar */
+.samp-sidebar{position:sticky;top:84px;display:flex;flex-direction:column;gap:0}
+.samp-sidebar-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.samp-sidebar-top{padding:20px 20px 0}
+.samp-sidebar-label{font-size:11px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.samp-sidebar-label svg{color:var(--text-soft)}
+.samp-sidebar-title{font-size:18px;font-weight:800;color:var(--navy);letter-spacing:-.2px;line-height:1.2;margin-bottom:8px}
+.samp-sidebar-desc{font-size:13px;color:var(--text-soft);line-height:1.55;margin-bottom:16px}
+.samp-sidebar-btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px 0;background:var(--neon);border:none;border-radius:var(--radius-md);font-size:14px;font-weight:700;color:var(--navy);cursor:pointer;transition:background .15s;font-family:inherit;margin-bottom:10px}
+.samp-sidebar-btn-primary:hover{background:var(--neon-dark)}
+.samp-sidebar-link{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-mid);padding:0 0 12px;cursor:pointer;text-decoration:none;transition:color .15s}
+.samp-sidebar-link:hover{color:var(--navy)}
+.samp-sidebar-link svg{flex-shrink:0}
+.samp-sidebar-divider{height:1px;background:var(--border);margin:0 20px}
+.samp-sidebar-help{padding:16px 20px 20px}
+.samp-sidebar-help-title{font-size:16px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.samp-sidebar-help-desc{font-size:13px;color:var(--text-soft);line-height:1.5;margin-bottom:14px}
+.samp-sidebar-btn-outline{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px 0;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:13px;font-weight:700;color:var(--navy);cursor:pointer;transition:border-color .15s,background .15s;font-family:inherit;margin-bottom:12px}
+.samp-sidebar-btn-outline:hover{border-color:var(--navy);background:var(--bg)}
+.samp-sidebar-order-link{font-size:13px;font-weight:600;color:var(--navy);text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:gap .15s}
+.samp-sidebar-order-link:hover{gap:8px}
+
+/* Bottom CTA */
+.samp-cta{margin:0 0 0;padding-bottom:40px}
+.samp-cta-inner{background:var(--neon);border-radius:var(--radius-lg);padding:24px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.samp-cta-left{display:flex;align-items:center;gap:16px}
+.samp-cta-logo{width:36px;height:36px;background:var(--navy);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.samp-cta-logo svg{height:18px;width:auto;filter:invert(1)}
+.samp-cta-text h3{font-size:16px;font-weight:800;color:var(--navy);margin:0 0 3px;letter-spacing:-.2px}
+.samp-cta-text p{font-size:13px;color:#3a5a10;margin:0}
+.samp-cta-btn{background:var(--navy);color:var(--white);border:none;border-radius:var(--radius-pill);padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s;font-family:inherit}
+.samp-cta-btn:hover{background:#3a4040}
+
+/* Tab panels (show/hide) */
+.samp-panel{display:none}
+.samp-panel.active{display:block}
+/* Bag illustration */
+.samp-illustration{display:flex;align-items:center;justify-content:center;padding-top:4px}
+.samp-ill-bag-inner{width:160px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.samp-ill-bag-top{background:#f0f5e8;padding:14px 14px 10px;display:flex;justify-content:center}
+.samp-ill-bag-clip{width:36px;height:10px;background:#a8e030;border-radius:3px;position:relative}
+.samp-ill-bag-clip::before,.samp-ill-bag-clip::after{content:'';position:absolute;top:50%;transform:translateY(-50%);width:8px;height:16px;background:#5a7a2a;border-radius:4px}
+.samp-ill-bag-clip::before{left:-5px}
+.samp-ill-bag-clip::after{right:-5px}
+.samp-ill-bag-label{padding:12px 14px 8px;font-size:11.5px;color:var(--navy);line-height:1.5;border-bottom:1px dashed var(--border)}
+.samp-ill-line{padding:10px 14px 14px;font-size:9px;color:#ccc;line-height:1.8;letter-spacing:2px;font-family:monospace}
+/* responsive */
+@media(max-width:900px){.samp-body{grid-template-columns:1fr}.samp-sidebar{position:static}.samp-steps-area{grid-template-columns:1fr}.samp-illustration{display:none}.samp-wrap{padding:0 16px 0}.samp-header h1{font-size:26px}}
+@media(max-width:600px){.samp-tabs{gap:6px}.samp-tab{font-size:13px;padding:7px 12px}.samp-cta-inner{flex-direction:column;gap:16px}.samp-cta-btn{width:100%;text-align:center}}
+
 </style>
 <style>
 /* ════════════════════════════════════════
@@ -2447,7 +2566,7 @@ main{flex:1}
     <div class="nav-links">
       <button class="nav-link" id="nav-home" onclick="navigate('home')">Головна</button>
       <button class="nav-link" id="nav-services" onclick="goServices()">Дослідження</button>
-      <button class="nav-link" id="nav-methods" onclick="navigate('methods')">Каталог методів</button>
+      <button class="nav-link" id="nav-sampling" onclick="navigate('sampling')">Як відібрати зразок</button>
       <button class="nav-link" id="nav-status" onclick="navigate('status')">Статус замовлення</button>
     </div>
     <div class="nav-right">
@@ -3657,6 +3776,476 @@ main{flex:1}
   </footer>
 </div>
 
+<!-- ══ ЯК ВІДІБРАТИ ЗРАЗОК PAGE ══ -->
+<div class="page samp-page" id="page-sampling">
+<div class="samp-wrap">
+
+  <!-- Breadcrumb -->
+  <div class="samp-breadcrumb">
+    <a href="#" onclick="navigate('home');return false">Головна</a>
+    <span>/</span>
+    <span>Як відібрати зразок</span>
+  </div>
+
+  <!-- Header -->
+  <div class="samp-header">
+    <h1>Як відібрати зразок</h1>
+    <p>Коротко про головне. Детальні правила для кожного матеріалу — в PDF-інструкції.</p>
+  </div>
+
+  <!-- Material tabs -->
+  <div class="samp-tabs">
+    <button class="samp-tab active" onclick="sampSwitchTab('soil',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12M12 12C12 7 7 4 3 6M12 12C12 7 17 4 21 6M3 6C3 10 7 14 12 14M21 6C21 10 17 14 12 14M12 14V22"/></svg>
+      Ґрунт
+    </button>
+    <button class="samp-tab" onclick="sampSwitchTab('plants',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V2M12 2C12 2 6 6 6 13M12 2C12 2 18 6 18 13M6 13C6 18 9 21 12 22M18 13C18 18 15 21 12 22"/></svg>
+      Рослини
+    </button>
+    <button class="samp-tab" onclick="sampSwitchTab('water',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+      Вода
+    </button>
+    <button class="samp-tab" onclick="sampSwitchTab('fertilizer',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>
+      Добрива
+    </button>
+    <button class="samp-tab" onclick="sampSwitchTab('seeds',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="5" ry="8"/><path d="M12 4C12 4 8 2 5 5M12 4C12 4 16 2 19 5"/></svg>
+      Насіння
+    </button>
+    <button class="samp-tab" onclick="sampSwitchTab('grain',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12M7 7C7 9.76 9.24 12 12 12S17 9.76 17 7 14.76 2 12 2 7 4.24 7 7zM4 17C4 19.76 6.24 22 9 22M20 17C20 19.76 17.76 22 15 22"/></svg>
+      Зерно
+    </button>
+    <button class="samp-tab" onclick="sampSwitchTab('other',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+      Інші матеріали
+    </button>
+  </div>
+
+  <!-- ── PANEL: Ґрунт ── -->
+  <div class="samp-panel active" id="samp-panel-soil">
+    <div class="samp-body">
+      <!-- Left -->
+      <div class="samp-content-wrap">
+        <div class="samp-content-heading">
+          <h2>Як відібрати ґрунт</h2>
+          <p>Чотири кроки від підготовки до відправлення.</p>
+        </div>
+        <div class="samp-steps-area">
+          <div class="samp-steps">
+            <div class="samp-step">
+              <div class="samp-step-num">01</div>
+              <div class="samp-step-body">
+                <div class="samp-step-title">Підготуйтеся до відбору</div>
+                <p class="samp-step-desc">Перевірте вимоги до дослідження. Підготуйте інструмент, тару та етикетку.</p>
+              </div>
+            </div>
+            <div class="samp-step">
+              <div class="samp-step-num">02</div>
+              <div class="samp-step-body">
+                <div class="samp-step-title">Відберіть зразок</div>
+                <p class="samp-step-desc">Дотримуйтеся обраної схеми та глибини відбору. Не змішуйте матеріал із різних ділянок і глибин.</p>
+              </div>
+            </div>
+            <div class="samp-step">
+              <div class="samp-step-num">03</div>
+              <div class="samp-step-body">
+                <div class="samp-step-title">Упакуйте й підпишіть</div>
+                <p class="samp-step-desc">Зазначте назву зразка, ділянку, глибину та дату відбору. Назва має збігатися з назвою у замовленні.</p>
+              </div>
+            </div>
+            <div class="samp-step">
+              <div class="samp-step-num">04</div>
+              <div class="samp-step-body">
+                <div class="samp-step-title">Надішліть до лабораторії</div>
+                <p class="samp-step-desc">Дотримуйтеся умов зберігання й доставки, зазначених у PDF-інструкції.</p>
+                <div class="samp-step-addr">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8zM5.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM18.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>
+                  Адресу доставки отримаєте після підтвердження замовлення.
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Illustration -->
+          <div class="samp-illustration">
+            <div class="samp-ill-bag-inner">
+              <div class="samp-ill-bag-top"><div class="samp-ill-bag-clip"></div></div>
+              <div class="samp-ill-bag-label">
+                <strong>Поле 12 - ділянка А</strong><br>Ґрунт
+              </div>
+              <div class="samp-ill-line">_ _ _ _ _ _ _ _ _ _<br>_ _ _ _ _ _ _ _ _ _<br>_ _ _ _ _ _ _ _ _ _</div>
+            </div>
+          </div>
+        </div>
+        <div class="samp-note">
+          <div class="samp-note-icon">i</div>
+          Кількість матеріалу та умови відбору залежать від дослідження.
+        </div>
+
+        <!-- FAQ -->
+        <div class="samp-faq">
+          <div class="samp-faq-title">Поширені запитання</div>
+          <div class="samp-faq-item">
+            <div class="samp-faq-q" onclick="sampFaqToggle(this)">
+              <span>Скільки матеріалу потрібно для дослідження?</span>
+              <div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            </div>
+            <div class="samp-faq-a">Мінімальна кількість залежить від типу аналізу. Для стандартного агрохімічного аналізу зазвичай достатньо 0,5–1 кг змішаного зразка ґрунту.</div>
+          </div>
+          <div class="samp-faq-item">
+            <div class="samp-faq-q" onclick="sampFaqToggle(this)">
+              <span>Чи можна одним зразком замовити кілька досліджень?</span>
+              <div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            </div>
+            <div class="samp-faq-a">Так, якщо матеріалу достатньо. У замовленні вкажіть усі необхідні дослідження — лабораторія розподілить зразок самостійно.</div>
+          </div>
+          <div class="samp-faq-item">
+            <div class="samp-faq-q" onclick="sampFaqToggle(this)">
+              <span>Як зберігати зразок до відправлення?</span>
+              <div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            </div>
+            <div class="samp-faq-a">Зразок ґрунту до відправлення зберігайте у сухому прохолодному місці, захищеному від прямих сонячних променів. Відправте якомога швидше — не пізніше 5 днів після відбору.</div>
+          </div>
+          <div class="samp-faq-item">
+            <div class="samp-faq-q" onclick="sampFaqToggle(this)">
+              <span>Чи можна замовити відбір проб?</span>
+              <div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            </div>
+            <div class="samp-faq-a">Так, ми організовуємо виїзд спеціаліста для відбору проб. Зв'яжіться з нами для уточнення умов і вартості.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="samp-sidebar">
+        <div class="samp-sidebar-card">
+          <div class="samp-sidebar-top">
+            <div class="samp-sidebar-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Детальна інструкція
+            </div>
+            <div class="samp-sidebar-title">Відбір зразків ґрунту</div>
+            <div class="samp-sidebar-desc">Схеми відбору, глибина, кількість матеріалу, пакування та доставка.</div>
+            <button class="samp-sidebar-btn-primary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Завантажити PDF
+            </button>
+            <a href="#" class="samp-sidebar-link">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Довідник розмірів зразків ↓
+            </a>
+            <button class="samp-sidebar-btn-outline" style="margin-bottom:16px">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Скопіювати посилання
+            </button>
+          </div>
+          <div class="samp-sidebar-divider"></div>
+          <div class="samp-sidebar-help">
+            <div class="samp-sidebar-help-title">Потрібна допомога?</div>
+            <div class="samp-sidebar-help-desc">Підкажемо вимоги або організуємо відбір проб.</div>
+            <button class="samp-sidebar-btn-outline" onclick="openCallModal()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Отримати консультацію
+            </button>
+            <a href="#" class="samp-sidebar-order-link" onclick="openCallModal();return false">Замовити відбір проб →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom CTA -->
+    <div class="samp-cta">
+      <div class="samp-cta-inner">
+        <div class="samp-cta-left">
+          <div class="samp-cta-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 893 318" style="height:18px;width:auto"><g fill="#fff"><path d="M20 20H64V176H155V220H20Z"/><g transform="translate(14 0)"><path fill-rule="evenodd" d="M158 220L238 20H302L382 220H329L313 177H227L211 220ZM244 133H296L270 63Z"/><path fill-rule="evenodd" d="M397 20H554C597 20 619 40 619 73C619 94 609 109 590 118C614 126 626 143 626 166C626 202 603 220 558 220H397ZM442 59V98H548C566 98 574 92 574 79C574 66 566 59 548 59ZM442 138V181H552C572 181 581 174 581 160C581 145 572 138 552 138Z"/><path fill-rule="evenodd" d="M635 220L715 20H779L859 220H806L790 177H704L688 220ZM721 133H773L747 63Z"/></g></g></svg>
+          </div>
+          <div class="samp-cta-text">
+            <h3>Потрібні дослідження для вашого зразка?</h3>
+            <p>Знайдіть потрібний пакет або окреме дослідження.</p>
+          </div>
+        </div>
+        <button class="samp-cta-btn" onclick="navigate('services')">До каталогу →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PANEL: Рослини ── -->
+  <div class="samp-panel" id="samp-panel-plants">
+    <div class="samp-body">
+      <div class="samp-content-wrap">
+        <div class="samp-content-heading">
+          <h2>Як відібрати рослини</h2>
+          <p>Коротка інструкція для аналізу живлення рослин.</p>
+        </div>
+        <div class="samp-steps-area">
+          <div class="samp-steps">
+            <div class="samp-step">
+              <div class="samp-step-num">01</div>
+              <div class="samp-step-body">
+                <div class="samp-step-title">Визначте культуру та фазу розвитку</div>
+                <p class="samp-step-desc">Частина рослини та кількість матеріалу залежать від культури й фази розвитку. Перевірте їх у PDF-інструкції.</p>
+              </div>
+            </div>
+            <div class="samp-step">
+              <div class="samp-step-num">02</div>
+              <div class="samp-step-body">
+                <div class="samp-step-title">Відберіть рослинний матеріал</div>
+                <p class="samp-step-desc">Збирайте потрібну частину рослин у чисту ємність. Не змішуйте зразки з різних ділянок.</p>
+              </div>
+            </div>
+            <div class="samp-step">
+              <div class="samp-step-num">03</div>
+              <div class="samp-step-body">
+                <div class="samp-step-title">Підготуйте й підпишіть зразок</div>
+                <p class="samp-step-desc">Для аналізу живлення використовуйте чистий паперовий пакет. Зазначте назву зразка, культуру, фазу розвитку та дату.</p>
+              </div>
+            </div>
+            <div class="samp-step">
+              <div class="samp-step-num">04</div>
+              <div class="samp-step-body">
+                <div class="samp-step-title">Надішліть до лабораторії</div>
+                <p class="samp-step-desc">Дотримуйтеся умов підготовки та доставки з PDF-інструкції. Назва на пакеті має збігатися з назвою у замовленні.</p>
+                <div class="samp-step-addr">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8zM5.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM18.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>
+                  Адресу доставки отримаєте після підтвердження замовлення.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="samp-illustration">
+            <div class="samp-ill-bag-inner">
+              <div class="samp-ill-bag-top"><div class="samp-ill-bag-clip"></div></div>
+              <div class="samp-ill-bag-label">
+                <strong>Пшениця - Поле 12</strong><br>Рослинний матеріал<br><span style="color:#aaa">Дата: ___________</span>
+              </div>
+              <div class="samp-ill-line">_ _ _ _ _ _ _ _ _ _<br>_ _ _ _ _ _ _ _ _ _</div>
+            </div>
+          </div>
+        </div>
+        <div class="samp-note">
+          <div class="samp-note-icon">i</div>
+          Для аналізу живлення та діагностики хвороб вимоги до зразка відрізняються.
+        </div>
+        <div class="samp-faq">
+          <div class="samp-faq-title">Поширені запитання</div>
+          <div class="samp-faq-item">
+            <div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Яку частину рослини потрібно відібрати?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+            <div class="samp-faq-a">Залежить від культури та фази розвитку. Для більшості зернових у фазі виходу в трубку — листок прапорця або 2-й знизу лист. Детальніше — у PDF-інструкції.</div>
+          </div>
+          <div class="samp-faq-item">
+            <div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Скільки рослин або листків потрібно?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+            <div class="samp-faq-a">Зазвичай 25–50 рослин або листків з ділянки для формування змішаного зразка масою не менше 100–200 г свіжого матеріалу.</div>
+          </div>
+          <div class="samp-faq-item">
+            <div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Чи потрібно мити рослинний матеріал?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+            <div class="samp-faq-a">Для аналізу живлення — ні. Якщо на листках є бруд або пил, злегка протріть сухою серветкою. Не мийте водою — це спотворює результати.</div>
+          </div>
+          <div class="samp-faq-item">
+            <div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Як упакувати та зберігати зразок?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+            <div class="samp-faq-a">Використовуйте паперовий пакет (не поліетиленовий) — він дає матеріалу «дихати». Відправте у день відбору або зберігайте в холодильнику не довше 24 годин.</div>
+          </div>
+        </div>
+      </div>
+      <div class="samp-sidebar">
+        <div class="samp-sidebar-card">
+          <div class="samp-sidebar-top">
+            <div class="samp-sidebar-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Детальна інструкція</div>
+            <div class="samp-sidebar-title">Відбір рослинного матеріалу</div>
+            <div class="samp-sidebar-desc">Культури та фази розвитку, частини рослини, кількість матеріалу, підготовка й доставка.</div>
+            <button class="samp-sidebar-btn-primary"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Завантажити PDF</button>
+            <a href="#" class="samp-sidebar-link"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Довідник розмірів зразків ↓</a>
+            <button class="samp-sidebar-btn-outline" style="margin-bottom:16px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Скопіювати посилання</button>
+          </div>
+          <div class="samp-sidebar-divider"></div>
+          <div class="samp-sidebar-help">
+            <div class="samp-sidebar-help-title">Потрібна допомога?</div>
+            <div class="samp-sidebar-help-desc">Підкажемо, як підготувати зразок для вашого дослідження.</div>
+            <button class="samp-sidebar-btn-outline" onclick="openCallModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Отримати консультацію</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="samp-cta"><div class="samp-cta-inner"><div class="samp-cta-left"><div class="samp-cta-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 893 318" style="height:18px;width:auto"><g fill="#fff"><path d="M20 20H64V176H155V220H20Z"/><g transform="translate(14 0)"><path fill-rule="evenodd" d="M158 220L238 20H302L382 220H329L313 177H227L211 220ZM244 133H296L270 63Z"/><path fill-rule="evenodd" d="M397 20H554C597 20 619 40 619 73C619 94 609 109 590 118C614 126 626 143 626 166C626 202 603 220 558 220H397ZM442 59V98H548C566 98 574 92 574 79C574 66 566 59 548 59ZM442 138V181H552C572 181 581 174 581 160C581 145 572 138 552 138Z"/><path fill-rule="evenodd" d="M635 220L715 20H779L859 220H806L790 177H704L688 220ZM721 133H773L747 63Z"/></g></g></svg></div><div class="samp-cta-text"><h3>Потрібні дослідження для вашого зразка?</h3><p>Знайдіть потрібний пакет або окреме дослідження.</p></div></div><button class="samp-cta-btn" onclick="navigate('services')">До каталогу →</button></div></div>
+  </div>
+
+  <!-- ── PANEL: Вода ── -->
+  <div class="samp-panel" id="samp-panel-water">
+    <div class="samp-body">
+      <div class="samp-content-wrap">
+        <div class="samp-content-heading"><h2>Як відібрати воду</h2><p>Правила відбору проби води для лабораторного аналізу.</p></div>
+        <div class="samp-steps-area">
+          <div class="samp-steps">
+            <div class="samp-step"><div class="samp-step-num">01</div><div class="samp-step-body"><div class="samp-step-title">Підготуйте тару</div><p class="samp-step-desc">Використовуйте чистий посуд об'ємом 1–2 л. Перед відбором ополосніть ємність водою, яку будете відбирати.</p></div></div>
+            <div class="samp-step"><div class="samp-step-num">02</div><div class="samp-step-body"><div class="samp-step-title">Відберіть пробу</div><p class="samp-step-desc">Для свердловини — зливайте воду 5–10 хвилин перед відбором. Для відкритих джерел — відбирайте з глибини 20–30 см.</p></div></div>
+            <div class="samp-step"><div class="samp-step-num">03</div><div class="samp-step-body"><div class="samp-step-title">Зафіксуйте та підпишіть</div><p class="samp-step-desc">Щільно закрийте ємність. Зазначте джерело, дату та час відбору, назву ділянки.</p></div></div>
+            <div class="samp-step"><div class="samp-step-num">04</div><div class="samp-step-body"><div class="samp-step-title">Надішліть до лабораторії</div><p class="samp-step-desc">Відправте пробу якомога швидше — не пізніше 24 годин після відбору. Зберігайте в холодильнику.</p><div class="samp-step-addr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8zM5.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM18.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg> Адресу доставки отримаєте після підтвердження замовлення.</div></div></div>
+          </div>
+          <div class="samp-illustration"><div class="samp-ill-bag-inner"><div class="samp-ill-bag-top"><div class="samp-ill-bag-clip"></div></div><div class="samp-ill-bag-label"><strong>Свердловина №3</strong><br>Вода<br><span style="color:#aaa">Дата: ___________</span></div><div class="samp-ill-line">_ _ _ _ _ _ _ _ _ _<br>_ _ _ _ _ _ _ _ _ _</div></div></div>
+        </div>
+        <div class="samp-note"><div class="samp-note-icon">i</div>Для мікробіологічного аналізу потрібна стерильна тара — уточніть при замовленні.</div>
+        <div class="samp-faq"><div class="samp-faq-title">Поширені запитання</div>
+          <div class="samp-faq-item"><div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Яку ємність використовувати для відбору?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div><div class="samp-faq-a">Пластикова або скляна пляшка об'ємом 1–2 л. Для мікробіологічного аналізу — стерильна пляшка, яку можна отримати в лабораторії.</div></div>
+          <div class="samp-faq-item"><div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Скільки потрібно проб для аналізу?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div><div class="samp-faq-a">Зазвичай одна проба об'ємом 1 л. Для розширеного пакету аналізів може знадобитися 2 л.</div></div>
+          <div class="samp-faq-item"><div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Чи потрібно охолоджувати зразок?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div><div class="samp-faq-a">Так, для більшості аналізів зразок потрібно зберігати при температурі +2...+8°C і доставити не пізніше 24 годин.</div></div>
+          <div class="samp-faq-item"><div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Чи можна замовити виїзд для відбору?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div><div class="samp-faq-a">Так, зв'яжіться з нами для організації виїзного відбору.</div></div>
+        </div>
+      </div>
+      <div class="samp-sidebar"><div class="samp-sidebar-card"><div class="samp-sidebar-top"><div class="samp-sidebar-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Детальна інструкція</div><div class="samp-sidebar-title">Відбір проб води</div><div class="samp-sidebar-desc">Типи ємностей, правила відбору, умови зберігання та транспортування.</div><button class="samp-sidebar-btn-primary"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Завантажити PDF</button><a href="#" class="samp-sidebar-link"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Довідник розмірів зразків ↓</a><button class="samp-sidebar-btn-outline" style="margin-bottom:16px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Скопіювати посилання</button></div><div class="samp-sidebar-divider"></div><div class="samp-sidebar-help"><div class="samp-sidebar-help-title">Потрібна допомога?</div><div class="samp-sidebar-help-desc">Підкажемо вимоги або організуємо відбір проб.</div><button class="samp-sidebar-btn-outline" onclick="openCallModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Отримати консультацію</button></div></div></div>
+    </div>
+    <div class="samp-cta"><div class="samp-cta-inner"><div class="samp-cta-left"><div class="samp-cta-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 893 318" style="height:18px;width:auto"><g fill="#fff"><path d="M20 20H64V176H155V220H20Z"/><g transform="translate(14 0)"><path fill-rule="evenodd" d="M158 220L238 20H302L382 220H329L313 177H227L211 220ZM244 133H296L270 63Z"/><path fill-rule="evenodd" d="M397 20H554C597 20 619 40 619 73C619 94 609 109 590 118C614 126 626 143 626 166C626 202 603 220 558 220H397ZM442 59V98H548C566 98 574 92 574 79C574 66 566 59 548 59ZM442 138V181H552C572 181 581 174 581 160C581 145 572 138 552 138Z"/><path fill-rule="evenodd" d="M635 220L715 20H779L859 220H806L790 177H704L688 220ZM721 133H773L747 63Z"/></g></g></svg></div><div class="samp-cta-text"><h3>Потрібні дослідження для вашого зразка?</h3><p>Знайдіть потрібний пакет або окреме дослідження.</p></div></div><button class="samp-cta-btn" onclick="navigate('services')">До каталогу →</button></div></div>
+  </div>
+
+  <!-- ── PANEL: Добрива ── -->
+  <div class="samp-panel" id="samp-panel-fertilizer">
+    <div class="samp-body">
+      <div class="samp-content-wrap">
+        <div class="samp-content-heading"><h2>Як відібрати добрива</h2><p>Правила відбору зразків мінеральних і органічних добрив.</p></div>
+        <div class="samp-steps-area">
+          <div class="samp-steps">
+            <div class="samp-step"><div class="samp-step-num">01</div><div class="samp-step-body"><div class="samp-step-title">Визначте тип добрива</div><p class="samp-step-desc">Мінеральні, органічні чи рідкі добрива мають різні вимоги до відбору та упакування. Перевірте у PDF-інструкції.</p></div></div>
+            <div class="samp-step"><div class="samp-step-num">02</div><div class="samp-step-body"><div class="samp-step-title">Відберіть пробу</div><p class="samp-step-desc">Для сипучих добрив відбирайте з різних місць партії. Середній зразок формується з 5–10 точкових проб рівних частин.</p></div></div>
+            <div class="samp-step"><div class="samp-step-num">03</div><div class="samp-step-body"><div class="samp-step-title">Упакуйте й підпишіть</div><p class="samp-step-desc">Зразок вкладіть у поліетиленовий пакет, щільно зав'яжіть. Зазначте назву добрива, виробника, дату та номер партії.</p></div></div>
+            <div class="samp-step"><div class="samp-step-num">04</div><div class="samp-step-body"><div class="samp-step-title">Надішліть до лабораторії</div><p class="samp-step-desc">Дотримуйтеся умов зберігання, зазначених у PDF-інструкції.</p><div class="samp-step-addr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8zM5.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM18.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg> Адресу доставки отримаєте після підтвердження замовлення.</div></div></div>
+          </div>
+          <div class="samp-illustration"><div class="samp-ill-bag-inner"><div class="samp-ill-bag-top"><div class="samp-ill-bag-clip"></div></div><div class="samp-ill-bag-label"><strong>КАС-32</strong><br>Добриво<br><span style="color:#aaa">Партія: ___________</span></div><div class="samp-ill-line">_ _ _ _ _ _ _ _ _ _<br>_ _ _ _ _ _ _ _ _ _</div></div></div>
+        </div>
+        <div class="samp-note"><div class="samp-note-icon">i</div>Кількість матеріалу залежить від виду добрива та переліку аналізів.</div>
+        <div class="samp-faq"><div class="samp-faq-title">Поширені запитання</div>
+          <div class="samp-faq-item"><div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Скільки матеріалу потрібно для аналізу добрив?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div><div class="samp-faq-a">Зазвичай 200–500 г для сипучих добрив, 0,5 л для рідких.</div></div>
+          <div class="samp-faq-item"><div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Чи потрібно перемішувати пробу перед відбором?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div><div class="samp-faq-a">Для сипучих добрив — відбирайте з різних місць і рівнів партії, потім ретельно перемішайте об'єднаний зразок.</div></div>
+          <div class="samp-faq-item"><div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Як транспортувати рідкі добрива?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div><div class="samp-faq-a">У герметичній пластиковій або скляній ємності. Переконайтеся, що кришка щільно закрита і не може відкритися при перевезенні.</div></div>
+          <div class="samp-faq-item"><div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Чи потрібен сертифікат якості добрива?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div><div class="samp-faq-a">Не обов'язково, але за його наявності він допомагає порівняти заявлений склад з фактичним. Додайте копію до замовлення при бажанні.</div></div>
+        </div>
+      </div>
+      <div class="samp-sidebar"><div class="samp-sidebar-card"><div class="samp-sidebar-top"><div class="samp-sidebar-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Детальна інструкція</div><div class="samp-sidebar-title">Відбір зразків добрив</div><div class="samp-sidebar-desc">Типи добрив, способи відбору, упакування та транспортування.</div><button class="samp-sidebar-btn-primary"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Завантажити PDF</button><a href="#" class="samp-sidebar-link"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Довідник розмірів зразків ↓</a><button class="samp-sidebar-btn-outline" style="margin-bottom:16px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Скопіювати посилання</button></div><div class="samp-sidebar-divider"></div><div class="samp-sidebar-help"><div class="samp-sidebar-help-title">Потрібна допомога?</div><div class="samp-sidebar-help-desc">Підкажемо вимоги або організуємо відбір проб.</div><button class="samp-sidebar-btn-outline" onclick="openCallModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Отримати консультацію</button></div></div></div>
+    </div>
+    <div class="samp-cta"><div class="samp-cta-inner"><div class="samp-cta-left"><div class="samp-cta-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 893 318" style="height:18px;width:auto"><g fill="#fff"><path d="M20 20H64V176H155V220H20Z"/><g transform="translate(14 0)"><path fill-rule="evenodd" d="M158 220L238 20H302L382 220H329L313 177H227L211 220ZM244 133H296L270 63Z"/><path fill-rule="evenodd" d="M397 20H554C597 20 619 40 619 73C619 94 609 109 590 118C614 126 626 143 626 166C626 202 603 220 558 220H397ZM442 59V98H548C566 98 574 92 574 79C574 66 566 59 548 59ZM442 138V181H552C572 181 581 174 581 160C581 145 572 138 552 138Z"/><path fill-rule="evenodd" d="M635 220L715 20H779L859 220H806L790 177H704L688 220ZM721 133H773L747 63Z"/></g></g></svg></div><div class="samp-cta-text"><h3>Потрібні дослідження для вашого зразка?</h3><p>Знайдіть потрібний пакет або окреме дослідження.</p></div></div><button class="samp-cta-btn" onclick="navigate('services')">До каталогу →</button></div></div>
+  </div>
+
+  <!-- ── PANEL: Насіння ── -->
+  <div class="samp-panel" id="samp-panel-seeds">
+    <div class="samp-body">
+      <div class="samp-content-wrap">
+        <div class="samp-content-heading"><h2>Як відібрати насіння</h2><p>Правила відбору проб насіннєвого матеріалу для аналізу.</p></div>
+        <div class="samp-steps-area">
+          <div class="samp-steps">
+            <div class="samp-step"><div class="samp-step-num">01</div><div class="samp-step-body"><div class="samp-step-title">Підготуйте тару</div><p class="samp-step-desc">Використовуйте чисті паперові або тканинні мішечки. Переконайтеся, що тара суха і без запаху.</p></div></div>
+            <div class="samp-step"><div class="samp-step-num">02</div><div class="samp-step-body"><div class="samp-step-title">Відберіть середню пробу</div><p class="samp-step-desc">Відбирайте насіння з різних місць партії або мішків. Середня проба формується з 5–10 точкових проб рівних частин.</p></div></div>
+            <div class="samp-step"><div class="samp-step-num">03</div><div class="samp-step-body"><div class="samp-step-title">Запакуйте й підпишіть</div><p class="samp-step-desc">Зазначте культуру, сорт або гібрид, рік урожаю, господарство та дату відбору.</p></div></div>
+            <div class="samp-step"><div class="samp-step-num">04</div><div class="samp-step-body"><div class="samp-step-title">Надішліть до лабораторії</div><p class="samp-step-desc">Зберігайте зразки в сухому прохолодному місці. Відправте якомога швидше.</p><div class="samp-step-addr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8zM5.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM18.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg> Адресу доставки отримаєте після підтвердження замовлення.</div></div></div>
+          </div>
+          <div class="samp-illustration"><div class="samp-ill-bag-inner"><div class="samp-ill-bag-top"><div class="samp-ill-bag-clip"></div></div><div class="samp-ill-bag-label"><strong>Соняшник Лімагрейн</strong><br>Насіння<br><span style="color:#aaa">Урожай: 2026</span></div><div class="samp-ill-line">_ _ _ _ _ _ _ _ _ _<br>_ _ _ _ _ _ _ _ _ _</div></div></div>
+        </div>
+        <div class="samp-note"><div class="samp-note-icon">i</div>Маса середньої проби залежить від культури — зазвичай 500 г–1 кг.</div>
+        <div class="samp-faq"><div class="samp-faq-title">Поширені запитання</div>
+          <div class="samp-faq-item"><div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Яка мінімальна кількість насіння для аналізу?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div><div class="samp-faq-a">Залежить від культури: для зернових — 500 г, для дрібнонасінних культур — 100–200 г.</div></div>
+          <div class="samp-faq-item"><div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Чи можна аналізувати протруєне насіння?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div><div class="samp-faq-a">Так, але обов'язково вкажіть у замовленні, що насіння протруєне. Це впливає на методику деяких аналізів.</div></div>
+          <div class="samp-faq-item"><div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Що входить у стандартний аналіз насіння?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div><div class="samp-faq-a">Енергія та лабораторна схожість, чистота, вологість. Розширений пакет включає також аналіз на патогени та токсини.</div></div>
+          <div class="samp-faq-item"><div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Як зберігати насіннєвий зразок до відправлення?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div><div class="samp-faq-a">У сухому прохолодному місці при температурі не вище +20°C, подалі від прямих сонячних променів і вологи.</div></div>
+        </div>
+      </div>
+      <div class="samp-sidebar"><div class="samp-sidebar-card"><div class="samp-sidebar-top"><div class="samp-sidebar-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Детальна інструкція</div><div class="samp-sidebar-title">Відбір зразків насіння</div><div class="samp-sidebar-desc">Культури, методи відбору, кількість матеріалу, упакування та доставка.</div><button class="samp-sidebar-btn-primary"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Завантажити PDF</button><a href="#" class="samp-sidebar-link"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Довідник розмірів зразків ↓</a><button class="samp-sidebar-btn-outline" style="margin-bottom:16px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Скопіювати посилання</button></div><div class="samp-sidebar-divider"></div><div class="samp-sidebar-help"><div class="samp-sidebar-help-title">Потрібна допомога?</div><div class="samp-sidebar-help-desc">Підкажемо вимоги або організуємо відбір проб.</div><button class="samp-sidebar-btn-outline" onclick="openCallModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Отримати консультацію</button></div></div></div>
+    </div>
+    <div class="samp-cta"><div class="samp-cta-inner"><div class="samp-cta-left"><div class="samp-cta-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 893 318" style="height:18px;width:auto"><g fill="#fff"><path d="M20 20H64V176H155V220H20Z"/><g transform="translate(14 0)"><path fill-rule="evenodd" d="M158 220L238 20H302L382 220H329L313 177H227L211 220ZM244 133H296L270 63Z"/><path fill-rule="evenodd" d="M397 20H554C597 20 619 40 619 73C619 94 609 109 590 118C614 126 626 143 626 166C626 202 603 220 558 220H397ZM442 59V98H548C566 98 574 92 574 79C574 66 566 59 548 59ZM442 138V181H552C572 181 581 174 581 160C581 145 572 138 552 138Z"/><path fill-rule="evenodd" d="M635 220L715 20H779L859 220H806L790 177H704L688 220ZM721 133H773L747 63Z"/></g></g></svg></div><div class="samp-cta-text"><h3>Потрібні дослідження для вашого зразка?</h3><p>Знайдіть потрібний пакет або окреме дослідження.</p></div></div><button class="samp-cta-btn" onclick="navigate('services')">До каталогу →</button></div></div>
+  </div>
+
+  <!-- ── PANEL: Зерно ── -->
+  <div class="samp-panel" id="samp-panel-grain">
+    <div class="samp-body">
+      <div class="samp-content-wrap">
+        <div class="samp-content-heading"><h2>Як відібрати зерно</h2><p>Правила відбору зразків зерна та зернової маси для аналізу якості.</p></div>
+        <div class="samp-steps-area">
+          <div class="samp-steps">
+            <div class="samp-step"><div class="samp-step-num">01</div><div class="samp-step-body"><div class="samp-step-title">Визначте тип аналізу</div><p class="samp-step-desc">Базова якість, повний аналіз, залишки пестицидів чи мікотоксини — кожен тип має свої вимоги до відбору і кількості зразка.</p></div></div>
+            <div class="samp-step"><div class="samp-step-num">02</div><div class="samp-step-body"><div class="samp-step-title">Відберіть середню пробу</div><p class="samp-step-desc">Відбирайте зерно з різних точок партії (мішки, насип, автомобіль). Об'єднайте точкові проби й ретельно перемішайте.</p></div></div>
+            <div class="samp-step"><div class="samp-step-num">03</div><div class="samp-step-body"><div class="samp-step-title">Скоротіть і запакуйте</div><p class="samp-step-desc">Методом квартування скоротіть зразок до потрібної маси. Зазначте культуру, клас, господарство та дату відбору.</p></div></div>
+            <div class="samp-step"><div class="samp-step-num">04</div><div class="samp-step-body"><div class="samp-step-title">Надішліть до лабораторії</div><p class="samp-step-desc">Зберігайте зразок у сухому місці. Відправте якомога скоріше для отримання точних результатів.</p><div class="samp-step-addr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8zM5.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM18.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg> Адресу доставки отримаєте після підтвердження замовлення.</div></div></div>
+          </div>
+          <div class="samp-illustration"><div class="samp-ill-bag-inner"><div class="samp-ill-bag-top"><div class="samp-ill-bag-clip"></div></div><div class="samp-ill-bag-label"><strong>Пшениця 2026</strong><br>Зерно<br><span style="color:#aaa">Клас: ___________</span></div><div class="samp-ill-line">_ _ _ _ _ _ _ _ _ _<br>_ _ _ _ _ _ _ _ _ _</div></div></div>
+        </div>
+        <div class="samp-note"><div class="samp-note-icon">i</div>Для аналізу мікотоксинів мінімальна маса зразка — 2 кг.</div>
+        <div class="samp-faq"><div class="samp-faq-title">Поширені запитання</div>
+          <div class="samp-faq-item"><div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Скільки зерна потрібно для аналізу?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div><div class="samp-faq-a">Для базового аналізу якості достатньо 1 кг. Для аналізу на мікотоксини або пестициди — мінімум 2 кг.</div></div>
+          <div class="samp-faq-item"><div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Як відібрати зразок з великої партії?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div><div class="samp-faq-a">Відбирайте точкові проби рівномірно по всій партії (не менше 5 точок), об'єднайте й скоротіть методом квартування.</div></div>
+          <div class="samp-faq-item"><div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Чи можна аналізувати вологе зерно?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div><div class="samp-faq-a">Так, але вологість визначають у свіжовідібраному зразку. Для інших показників зерно попередньо підсушують у лабораторії.</div></div>
+          <div class="samp-faq-item"><div class="samp-faq-q" onclick="sampFaqToggle(this)"><span>Що таке лабораторна проба і архівна?</span><div class="samp-faq-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div><div class="samp-faq-a">Лабораторна проба — та частина, що іде на аналіз. Архівна зберігається у вас або в лабораторії 30 днів на випадок оскарження результатів.</div></div>
+        </div>
+      </div>
+      <div class="samp-sidebar"><div class="samp-sidebar-card"><div class="samp-sidebar-top"><div class="samp-sidebar-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Детальна інструкція</div><div class="samp-sidebar-title">Відбір зразків зерна</div><div class="samp-sidebar-desc">Методи відбору, кількість матеріалу, умови зберігання та доставка.</div><button class="samp-sidebar-btn-primary"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Завантажити PDF</button><a href="#" class="samp-sidebar-link"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Довідник розмірів зразків ↓</a><button class="samp-sidebar-btn-outline" style="margin-bottom:16px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Скопіювати посилання</button></div><div class="samp-sidebar-divider"></div><div class="samp-sidebar-help"><div class="samp-sidebar-help-title">Потрібна допомога?</div><div class="samp-sidebar-help-desc">Підкажемо вимоги або організуємо відбір проб.</div><button class="samp-sidebar-btn-outline" onclick="openCallModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Отримати консультацію</button></div></div></div>
+    </div>
+    <div class="samp-cta"><div class="samp-cta-inner"><div class="samp-cta-left"><div class="samp-cta-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 893 318" style="height:18px;width:auto"><g fill="#fff"><path d="M20 20H64V176H155V220H20Z"/><g transform="translate(14 0)"><path fill-rule="evenodd" d="M158 220L238 20H302L382 220H329L313 177H227L211 220ZM244 133H296L270 63Z"/><path fill-rule="evenodd" d="M397 20H554C597 20 619 40 619 73C619 94 609 109 590 118C614 126 626 143 626 166C626 202 603 220 558 220H397ZM442 59V98H548C566 98 574 92 574 79C574 66 566 59 548 59ZM442 138V181H552C572 181 581 174 581 160C581 145 572 138 552 138Z"/><path fill-rule="evenodd" d="M635 220L715 20H779L859 220H806L790 177H704L688 220ZM721 133H773L747 63Z"/></g></g></svg></div><div class="samp-cta-text"><h3>Потрібні дослідження для вашого зразка?</h3><p>Знайдіть потрібний пакет або окреме дослідження.</p></div></div><button class="samp-cta-btn" onclick="navigate('services')">До каталогу →</button></div></div>
+  </div>
+
+  <!-- ── PANEL: Інші матеріали ── -->
+  <div class="samp-panel" id="samp-panel-other">
+    <div class="samp-body">
+      <div class="samp-content-wrap">
+        <div class="samp-content-heading"><h2>Інші матеріали</h2><p>Зверніться до нас для отримання детальної інструкції з відбору зразка.</p></div>
+        <div class="samp-steps-area">
+          <div class="samp-steps">
+            <div class="samp-step"><div class="samp-step-num">01</div><div class="samp-step-body"><div class="samp-step-title">Визначте матеріал і мету дослідження</div><p class="samp-step-desc">Розкажіть, що потрібно дослідити і яка мета аналізу. Менеджер підбере відповідний метод і дасть інструкції.</p></div></div>
+            <div class="samp-step"><div class="samp-step-num">02</div><div class="samp-step-body"><div class="samp-step-title">Отримайте інструкцію</div><p class="samp-step-desc">Залежно від типу матеріалу ми надішлемо детальну PDF-інструкцію з відбору, упакування та транспортування.</p></div></div>
+            <div class="samp-step"><div class="samp-step-num">03</div><div class="samp-step-body"><div class="samp-step-title">Підготуйте й підпишіть зразок</div><p class="samp-step-desc">Дотримуйтеся отриманої інструкції. Чітко підпишіть зразок згідно з вимогами.</p></div></div>
+            <div class="samp-step"><div class="samp-step-num">04</div><div class="samp-step-body"><div class="samp-step-title">Надішліть до лабораторії</div><p class="samp-step-desc">Дотримуйтеся умов зберігання та доставки з інструкції.</p><div class="samp-step-addr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8zM5.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM18.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg> Адресу доставки отримаєте після підтвердження замовлення.</div></div></div>
+          </div>
+          <div class="samp-illustration"><div class="samp-ill-bag-inner"><div class="samp-ill-bag-top"><div class="samp-ill-bag-clip"></div></div><div class="samp-ill-bag-label"><strong>Тип матеріалу</strong><br>Зразок<br><span style="color:#aaa">Дата: ___________</span></div><div class="samp-ill-line">_ _ _ _ _ _ _ _ _ _<br>_ _ _ _ _ _ _ _ _ _</div></div></div>
+        </div>
+        <div class="samp-note"><div class="samp-note-icon">i</div>Зверніться до нас — ми проводимо аналіз широкого спектра матеріалів агропромислового виробництва.</div>
+      </div>
+      <div class="samp-sidebar"><div class="samp-sidebar-card"><div class="samp-sidebar-top"><div class="samp-sidebar-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Зв'яжіться з нами</div><div class="samp-sidebar-title">Нестандартний матеріал?</div><div class="samp-sidebar-desc">Розкажіть про ваш зразок — ми підберемо метод і надамо детальну інструкцію.</div><button class="samp-sidebar-btn-primary" onclick="openCallModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Отримати консультацію</button></div><div class="samp-sidebar-divider"></div><div class="samp-sidebar-help"><div class="samp-sidebar-help-title">Потрібна допомога?</div><div class="samp-sidebar-help-desc">Підкажемо вимоги або організуємо відбір проб.</div><button class="samp-sidebar-btn-outline" onclick="openCallModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Зв'язатися з нами</button></div></div></div>
+    </div>
+    <div class="samp-cta"><div class="samp-cta-inner"><div class="samp-cta-left"><div class="samp-cta-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 893 318" style="height:18px;width:auto"><g fill="#fff"><path d="M20 20H64V176H155V220H20Z"/><g transform="translate(14 0)"><path fill-rule="evenodd" d="M158 220L238 20H302L382 220H329L313 177H227L211 220ZM244 133H296L270 63Z"/><path fill-rule="evenodd" d="M397 20H554C597 20 619 40 619 73C619 94 609 109 590 118C614 126 626 143 626 166C626 202 603 220 558 220H397ZM442 59V98H548C566 98 574 92 574 79C574 66 566 59 548 59ZM442 138V181H552C572 181 581 174 581 160C581 145 572 138 552 138Z"/><path fill-rule="evenodd" d="M635 220L715 20H779L859 220H806L790 177H704L688 220ZM721 133H773L747 63Z"/></g></g></svg></div><div class="samp-cta-text"><h3>Потрібні дослідження для вашого зразка?</h3><p>Знайдіть потрібний пакет або окреме дослідження.</p></div></div><button class="samp-cta-btn" onclick="navigate('services')">До каталогу →</button></div></div>
+  </div>
+
+</div><!-- /samp-wrap -->
+
+  <footer class="laba-footer">
+    <div class="laba-footer-inner">
+      <div>
+        <a href="#" onclick="navigate('home');return false" class="laba-footer-logo-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 893 318" role="img" aria-hidden="true"><g fill="#202321"><path d="M20 20H64V176H155V220H20Z"/><g transform="translate(14 0)"><path fill-rule="evenodd" d="M158 220L238 20H302L382 220H329L313 177H227L211 220ZM244 133H296L270 63Z"/><path fill-rule="evenodd" d="M397 20H554C597 20 619 40 619 73C619 94 609 109 590 118C614 126 626 143 626 166C626 202 603 220 558 220H397ZM442 59V98H548C566 98 574 92 574 79C574 66 566 59 548 59ZM442 138V181H552C572 181 581 174 581 160C581 145 572 138 552 138Z"/><path fill-rule="evenodd" d="M635 220L715 20H779L859 220H806L790 177H704L688 220ZM721 133H773L747 63Z"/></g><path d="M43.351656311815674 264.82509124341794V268.8455966344413Q41.528403867049285 267.84047028668544 39.69346390661131 267.33790711280756Q37.85852394617335 266.8353439389296 35.98852143872064 266.8353439389296Q31.80439082829521 266.8353439389296 29.490262725322488 269.4884099963781Q27.17613462234976 272.14147605382664 27.17613462234976 276.9333574791742Q27.17613462234976 281.7252389045218 29.490262725322488 284.37830496197034Q31.80439082829521 287.0313710194188 35.98852143872064 287.0313710194188Q37.85852394617335 287.0313710194188 39.69346390661131 286.5288078455409Q41.528403867049285 286.026244671663 43.351656311815674 285.02111832390716V288.99487365224417Q41.55177889839244 289.8363747805979 39.623338812581835 290.25712534477475Q37.694898726771235 290.6778759089516 35.52102081185747 290.6778759089516Q29.60713788203828 290.6778759089516 26.124258211907616 286.96124592538933Q22.641378541776948 283.2446159418271 22.641378541776948 276.9333574791742Q22.641378541776948 270.5285988911487 26.159320758922355 266.8587189702728Q29.67726297606776 263.18883904939685 35.80152118797537 263.18883904939685Q37.78839885214387 263.18883904939685 39.68177639093974 263.5979020979021Q41.575153929735606 264.00696514640737 43.351656311815674 264.82509124341794Z"/></g></svg>
+        </a>
+        <div class="laba-footer-tagline">Лабораторні дослідження для агробізнесу</div>
+      </div>
+      <div class="laba-footer-col">
+        <div class="laba-footer-col-title">Дослідження</div>
+        <a href="#" onclick="srvSetMat('soil',null);navigate('services');return false;">Ґрунт</a>
+        <a href="#" onclick="srvSetMat('fertilizer',null);navigate('services');return false;">Добрива</a>
+        <a href="#" onclick="srvSetMat('water',null);navigate('services');return false;">Вода</a>
+        <a href="#" onclick="srvSetMat('seeds',null);navigate('services');return false;">Насіння</a>
+        <a href="#" onclick="srvSetMat('grain',null);navigate('services');return false;">Зерно</a>
+        <a href="#" onclick="srvSetMat('plants',null);navigate('services');return false;">Рослини</a>
+      </div>
+      <div class="laba-footer-col">
+        <div class="laba-footer-col-title">Клієнтам</div>
+        <a href="#">Оплата і доставка</a>
+        <a href="#" onclick="navigate('status');return false;">Статус замовлення</a>
+        <a href="#">Поширені запитання</a>
+      </div>
+      <div class="laba-footer-col">
+        <div class="laba-footer-col-title">Про LABA</div>
+        <a href="#">Про нас</a>
+        <a href="#">Контакти</a>
+        <button class="laba-footer-contact-btn" onclick="openCallModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Зв'язатися з нами
+        </button>
+      </div>
+    </div>
+    <div class="laba-footer-copy">
+      <span>© 2026 LABA by Zemlerob</span>
+      <div class="laba-footer-copy-links">
+        <a href="#">Політика конфіденційності</a>
+        <a href="#">Публічна оферта</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
 <!-- ADD IND MODAL -->
 <div class="add-ind-backdrop" id="addIndBackdrop">
   <div class="add-ind-modal">
@@ -4213,6 +4802,19 @@ function srvSetMatByName(name) {
   const sidebar = document.querySelector('.srv-sidebar');
   if(sidebar) sidebar.scrollIntoView({behavior:'smooth',block:'start'});
 }
+/* ── Sampling page helpers ── */
+function sampSwitchTab(mat, btn) {
+  document.querySelectorAll('.samp-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.samp-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('samp-panel-' + mat);
+  if (panel) panel.classList.add('active');
+}
+function sampFaqToggle(qEl) {
+  const item = qEl.closest('.samp-faq-item');
+  item.classList.toggle('open');
+}
+
 function goServices() {
   srvMat=''; srvFmt='all'; srvTask='season'; searchQ='';
   currentMaterial='';
@@ -6352,7 +6954,7 @@ function showToast(msg,ms=2500){
     navigate('services');
   } else if(_initHash && _initHash !== '#'){
     const _pg = _initHash.slice(1);
-    const _pages=['home','services','about','contacts','checkout','calculator'];
+    const _pages=['home','services','about','contacts','checkout','calculator','sampling'];
     if(_pages.includes(_pg)) navigate(_pg); else navigate('home');
   } else {
     navigate('home');
