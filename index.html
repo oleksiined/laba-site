@@ -2378,25 +2378,27 @@ main{flex:1}
 .ostat-samp-rejected,.ostat-samp-cancelled{background:#fee2e2;color:#b91c1c}
 
 /* Not found / contact — plain text style */
-.ostat-contact-wrap{margin-top:28px;padding-top:0}
-.ostat-contact-wrap p{color:var(--text-mid);font-size:.9rem;margin:0 0 4px}
+.ostat-contact-wrap{margin-top:28px;background:var(--white);border:1px solid var(--border-soft);border-radius:var(--radius-md);padding:20px 24px;transition:border-color .15s,box-shadow .15s}
+.ostat-contact-wrap:hover{border-color:var(--bd);box-shadow:var(--shadow-md)}
+.ostat-contact-wrap p{color:var(--text-mid);font-size:.9rem;margin:0 0 6px}
 .ostat-contact-wrap a{color:var(--navy);font-weight:600;font-size:.9rem;text-decoration:underline;text-underline-offset:3px;transition:opacity .2s}
 .ostat-contact-wrap a:hover{opacity:.7}
 
-/* FAQ — minimal rows */
-.ostat-faq{margin-top:40px;padding-top:8px}
-.ostat-faq-title{font-size:1.6rem;font-weight:800;color:var(--navy);margin:0 0 4px}
-.ostat-faq-item{border-bottom:1px solid var(--border)}
-.ostat-faq-item:first-of-type{border-top:1px solid var(--border);margin-top:20px}
-.ostat-faq-q{display:flex;align-items:center;justify-content:space-between;padding:18px 0;cursor:pointer;color:var(--navy);font-size:.95rem;font-weight:500;user-select:none;gap:16px}
-.ostat-faq-q:hover{color:var(--text-mid)}
+/* FAQ — service-row style */
+.ostat-faq{margin-top:24px}
+.ostat-faq-title{font-size:1.6rem;font-weight:800;color:var(--navy);margin:0 0 12px}
+.ostat-faq-list{background:var(--white);border:1px solid var(--border-soft);border-radius:var(--radius-md);overflow:hidden}
+.ostat-faq-item{border-bottom:1px solid var(--border-soft)}
+.ostat-faq-item:last-child{border-bottom:none}
+.ostat-faq-q{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;color:var(--navy);font-size:.95rem;font-weight:500;user-select:none;gap:16px;transition:background .15s}
+.ostat-faq-q:hover{background:#f7f9fc}
 .ostat-faq-icon{width:22px;height:22px;border:1.5px solid #c0cad4;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s}
 .ostat-faq-icon svg{transition:transform .25s;color:var(--text-soft)}
 .ostat-faq-item.open .ostat-faq-icon svg{transform:rotate(45deg)}
 .ostat-faq-item.open .ostat-faq-icon{border-color:var(--navy)}
 .ostat-faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease}
 .ostat-faq-item.open .ostat-faq-a{max-height:200px}
-.ostat-faq-a p{margin:0;padding:0 0 18px;color:var(--text-mid);font-size:.88rem;line-height:1.7}
+.ostat-faq-a p{margin:0;padding:0 20px 16px;color:var(--text-mid);font-size:.88rem;line-height:1.7}
 
 /* Bottom link */
 .ostat-bottom-link{text-align:right;margin-top:40px;padding-bottom:8px}
@@ -3670,10 +3672,10 @@ main{flex:1}
       <a href="mailto:lab@zemlerob.com.ua">Зв'язатися з менеджером →</a>
     </div>
 
-    <!-- FAQ — minimal rows -->
+    <!-- FAQ — service-row style -->
     <div class="ostat-faq">
       <div class="ostat-faq-title">Є запитання?</div>
-
+      <div class="ostat-faq-list">
       <div class="ostat-faq-item">
         <div class="ostat-faq-q" onclick="ostFaqToggle(this)">
           <span>Де мій номер замовлення?</span>
@@ -3718,6 +3720,7 @@ main{flex:1}
           <p>Спробуйте натиснути кнопку «Оновити» біля номера замовлення. Якщо статус не змінився понад тиждень — зверніться до менеджера.</p>
         </div>
       </div>
+      </div><!-- /ostat-faq-list -->
     </div>
 
     <div class="ostat-bottom-link">
