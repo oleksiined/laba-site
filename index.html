@@ -2476,6 +2476,8 @@ main{flex:1}
 .ostat-step.done .ostat-step-connector{background:var(--neon)}
 .ostat-step.active .ostat-step-connector{background:#d1d9e0}
 .ostat-step.future .ostat-step-connector{background:#d1d9e0}
+.ostat-step-connector-left{flex:1;height:2.5px;margin:0 4px;background:#d1d9e0}
+.ostat-step-connector-left.done{background:var(--neon)}
 .ostat-step:not(:first-child):not(:last-child){align-items:center}
 .ostat-step:not(:first-child):not(:last-child) .ostat-step-label{text-align:center}
 .ostat-step:last-child .ostat-step-connector{background:#d1d9e0}
@@ -7277,9 +7279,13 @@ function ostBuildCard(d) {
     }
     const iconSvg = cls === 'done' ? s.svgDone : s.svgIdle;
     const connectorCls = (cls === 'done') ? 'done' : '';
+    const isMiddle = (i > 0 && i < _OST_STEPS.length - 1);
+    const leftConnectorCls = (!cancelled && i <= stepIdx) ? 'done' : '';
+    const leftConnector = isMiddle ? `<div class="ostat-step-connector-left ${leftConnectorCls}"></div>` : '';
     stepperHtml += `
       <div class="ostat-step ${cls}">
         <div class="ostat-step-top">
+          ${leftConnector}
           <div class="ostat-step-icon">${iconSvg}</div>
           <div class="ostat-step-connector ${connectorCls}"></div>
         </div>
