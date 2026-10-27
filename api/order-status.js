@@ -62,7 +62,7 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ ok: false, error: 'Server not configured: missing SUPABASE_URL or SUPABASE_SERVICE_KEY' });
   }
 
-  const SELECT = 'order_num,status,created_at,samples,expected_at';
+  const SELECT = 'order_num,status,created_at,samples';
   let orderData = null;
 
   // Search by order_num (case-insensitive)
@@ -104,7 +104,7 @@ module.exports = async function handler(req, res) {
     status:        orderData.status || 'new',
     statusLabel:   STATUS_LABEL[orderData.status] || orderData.status,
     created_at:    orderData.created_at || null,
-    expected_at:   orderData.expected_at || null,
+    expected_at:   null,
     samples_count: samplesArr.length,
     samples:       samplesInfo,
   });
