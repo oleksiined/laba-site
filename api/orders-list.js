@@ -263,7 +263,19 @@ module.exports = async function handler(req, res) {
       };
     });
 
-    return res.status(200).json({ ok: true, orders: enriched });
+    // Build flat catalog for the admin panel: service_id/code → {name, price}
+    const catalogServices = {};
+    if (svcResult.status === 'fulfilled' && svcResult.value.status < 300) {
+      try {
+        JSON.parse(svcResult.value.body).forEach(s => {
+          const entry = { name: s.name || null, price: s.price != null ? Number(s.price) : null };
+          if (s.service_id)   catalogServices[s.service_id]   = entry;
+          if (s.service_code) catalogServices[s.service_code] = entry;
+        });
+      } catch (_) {}
+    }
+
+    return res.status(200).json({ ok: true, orders: enriched, catalogServices });
   } catch (err) {
     return res.status(500).json({ ok: false, error: err.message });
   }

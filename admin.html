@@ -1846,6 +1846,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
 <script>
 // Orders loaded from API (replaces static mock data)
 let _admOrders = [];
+let _admCatalogSvc = {}; // service_id/code → {name, price}
 
 // Map Supabase order row → admin panel format
 function _mapOrder(o) {
@@ -1943,6 +1944,7 @@ async function admLoad() {
   try {
     const data = ordersResult.status === 'fulfilled' ? ordersResult.value : null;
     if (!data || !data.ok) throw new Error(data?.error || 'fetch failed');
+    _admCatalogSvc = data.catalogServices || {};
     _admOrders = (data.orders || []).map(_mapOrder);
   } catch (err) {
     console.warn('admLoad error:', err.message);
@@ -3105,7 +3107,8 @@ function admGenAkt(o) {
                   : rawTotal !== null ? Number(rawTotal) : price * qty;
       total += sum;
       const code = it.package_id || it.packageId || it.service_code || it.code || it.name || '—';
-      const name = it.serviceName || it.displayName || it.service_name || it.name || '—';
+      const _itKey = it.package_id || it.packageId || it.service_code || it.code || it.name || '';
+      const name = it.serviceName || it.displayName || it.service_name || (_admCatalogSvc[_itKey]||{}).name || it.name || '—';
       const mat  = it.material_name || it.material || 'Ґрунт';
       tableBody.push([
         { text: i + 1,        ...tdStyle, alignment: 'center' },
@@ -3439,7 +3442,8 @@ function admGenInvoice(o) {
                      : rawTotal !== null ? Number(rawTotal) : price * qty;
       total += sum;
       const code = it.package_id || it.packageId || it.service_code || it.code || it.name || '—';
-      const name = it.serviceName || it.displayName || it.service_name || it.name || '—';
+      const _itKey = it.package_id || it.packageId || it.service_code || it.code || it.name || '';
+      const name = it.serviceName || it.displayName || it.service_name || (_admCatalogSvc[_itKey]||{}).name || it.name || '—';
       const mat  = it.material_name || it.material || 'Ґрунт';
       tableBody.push([
         { text: i + 1,        ...tdStyle, alignment: 'center' },
@@ -4187,10 +4191,12 @@ function smpSelect(id) {
         <td style="font-size:11px;color:var(--text-soft);padding:8px 6px">Пакет</td>
       </tr>`;
       pkgItems.forEach((pi,i)=>{
+        const piCode = pi.service_id||pi.service_code||'';
+        const piName = pi.name || (_admCatalogSvc[piCode]||{}).name || '—';
         html += `<tr data-pkg="${uid}" style="display:none;background:#f4f6fa">
           <td style="color:var(--text-soft);padding-left:12px;font-size:11px">${i+1}</td>
-          <td style="font-family:monospace;font-size:10px;color:var(--text-soft);white-space:nowrap">${pi.service_id||pi.service_code||'—'}</td>
-          <td style="font-size:11px;color:var(--text-primary,#333)">${pi.name||'—'}</td>
+          <td style="font-family:monospace;font-size:10px;color:var(--text-soft);white-space:nowrap">${piCode||'—'}</td>
+          <td style="font-size:11px;color:var(--text-primary,#333)">${piName}</td>
           <td style="font-size:10px;color:var(--text-soft)">Дослідження</td>
         </tr>`;
       });
