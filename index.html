@@ -2552,7 +2552,33 @@ main{flex:1}
 .mcat-drawer-std-row{display:flex;align-items:center;gap:10px;background:#f5f7fa;border-radius:8px;padding:12px 14px;margin-top:8px}
 .mcat-drawer-std-code{font-family:monospace;font-size:13px;font-weight:700;color:var(--navy)}
 .mcat-drawer-std-name{font-size:13px;color:var(--text-mid)}
-.mcat-drawer-footer{padding:16px 24px;border-top:1px solid var(--border);background:#fff}
+.mcat-drawer-footer{padding:16px 24px 20px;border-top:1px solid var(--border);background:#fff;display:flex;flex-direction:column;gap:10px}
+.mcat-drawer-footer-link{text-align:center;font-size:13px;color:var(--text-soft);text-decoration:underline;cursor:pointer;background:none;border:none;font-family:inherit;padding:0;width:100%}
+.mcat-drawer-footer-link:hover{color:var(--navy)}
+.mcat-dr-section{margin-bottom:20px}
+.mcat-dr-section:last-child{margin-bottom:0}
+.mcat-dr-h{font-size:14px;font-weight:700;color:var(--navy);margin:0 0 10px}
+.mcat-dr-desc{font-size:14px;color:var(--text-dark);line-height:1.65;margin:0}
+.mcat-dr-example{background:#f5f7fa;border-radius:10px;padding:14px 16px;margin:10px 0 0}
+.mcat-dr-example-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin:0 0 4px}
+.mcat-dr-example-val{font-size:22px;font-weight:800;color:var(--navy);margin:0}
+.mcat-dr-list{margin:0;padding:0;list-style:none}
+.mcat-dr-list li{font-size:14px;color:var(--text-dark);line-height:1.55;padding-left:18px;position:relative;margin-bottom:5px}
+.mcat-dr-list li::before{content:'';position:absolute;left:0;top:7px;width:7px;height:7px;border-radius:50%;background:var(--navy)}
+.mcat-req-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:0}
+.mcat-req-card{background:#f5f7fa;border-radius:10px;padding:14px;border:1px solid var(--border-soft);display:flex;flex-direction:column;gap:4px}
+.mcat-req-card-ico{font-size:18px;margin-bottom:2px}
+.mcat-req-card-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--text-soft)}
+.mcat-req-card-val{font-size:13px;font-weight:600;color:var(--navy)}
+.mcat-dr-std-box{background:#f5f7fa;border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px}
+.mcat-dr-std-left{font-size:13px;font-weight:600;color:var(--text-dark)}
+.mcat-dr-std-right{display:flex;align-items:center;gap:6px}
+.mcat-dr-std-code{font-size:13px;font-weight:700;color:var(--navy)}
+.mcat-dr-std-link{display:flex;align-items:center;gap:3px;font-size:13px;font-weight:700;color:var(--navy);text-decoration:none}
+.mcat-dr-std-link:hover{text-decoration:underline}
+.mcat-dr-deadline{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-mid)}
+.mcat-dr-deadline svg{flex-shrink:0}
+.mcat-drawer-head{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:16px}
 
 @media(max-width:700px){
   .mcat-hero{padding:36px 20px 28px}
@@ -4290,6 +4316,7 @@ main{flex:1}
   <div class="mcat-drawer-body" id="mdBody"></div>
   <div class="mcat-drawer-footer">
     <button class="btn-primary" style="width:100%" onclick="mcatDrawerOrder()">Переглянути дослідження →</button>
+    <button class="mcat-drawer-footer-link" onclick="mcatDrawerOrder()">Пакети з цим дослідженням</button>
   </div>
 </div>
 
@@ -7698,10 +7725,10 @@ async function loadMethodsCatalog() {
         svcId: svc.service_id || '',
       };
       if (svcMethods.length === 0) {
-        _mcatAllRows.push({ ...base, id: svc.service_id, methodName: '', std: '', tag: '', days: null, price: null });
+        _mcatAllRows.push({ ...base, id: svc.service_id, methodName: '', std: '', tag: '', days: null, price: null, svcRaw: svc, methodRaw: null });
       } else {
         svcMethods.forEach(m=>{
-          _mcatAllRows.push({ ...base, id: m.method_id, methodName: m.method_name || '', std: m.standard_code || '', tag: m.selection_note || '', days: m.turnaround_value || null, price: m.price != null ? m.price : null });
+          _mcatAllRows.push({ ...base, id: m.method_id, methodName: m.method_name || '', std: m.standard_code || '', tag: m.selection_note || '', days: m.turnaround_value || null, price: m.price != null ? m.price : null, svcRaw: svc, methodRaw: m });
         });
       }
     });
@@ -7814,29 +7841,82 @@ function mcatOpenDrawer(idx) {
   const r = _mcatFilteredRows[idx];
   if (!r) return;
   _mcatDrawerItem = r;
+  const svc = r.svcRaw || {};
+  const m   = r.methodRaw || {};
+
   const cls = _mcatMatBadgeClass[r.matId] || 'default';
   document.getElementById('mdMat').innerHTML = r.matId ? `<span class="mcat-mat-badge ${cls}">${r.matName||r.matId}</span>` : '';
   document.getElementById('mdTitle').textContent = r.svcName || '—';
-  document.getElementById('mdMethod').textContent = r.methodName ? `Метод: ${r.methodName}` : '';
+  document.getElementById('mdMethod').textContent = r.methodName || '';
 
   let body = '';
-  if (r.svcDesc) {
-    body += `<h4>Про дослідження</h4><p>${r.svcDesc}</p>`;
+
+  // — Про дослідження —
+  const desc = svc.full_description || svc.short_description || r.svcDesc || '';
+  if (desc) {
+    const exampleVal = svc.example_result || m.example_result || '';
+    body += `<div class="mcat-dr-section">
+      <div class="mcat-dr-h">Про дослідження</div>
+      <p class="mcat-dr-desc">${desc}</p>`;
+    if (exampleVal) {
+      const exampleLabel = svc.example_label || 'Приклад результату';
+      body += `<div class="mcat-dr-example"><div class="mcat-dr-example-label">${exampleLabel}</div><div class="mcat-dr-example-val">${exampleVal}</div></div>`;
+    }
+    body += `</div>`;
   }
-  if (r.std) {
-    body += `<h4>Методика та нормативний документ</h4>
-      <div class="mcat-drawer-std-row">
-        <span class="mcat-drawer-std-code">${r.std}</span>
-        <span class="mcat-drawer-std-name">${r.methodName||''}</span>
-      </div>`;
+
+  // — Коли це потрібно —
+  const whenRaw = svc.when_needed || m.when_needed || '';
+  if (whenRaw) {
+    let items = [];
+    try { items = JSON.parse(whenRaw); } catch(e) {
+      items = whenRaw.split(/\n|;/).map(s=>s.trim()).filter(Boolean);
+    }
+    if (items.length) {
+      body += `<div class="mcat-dr-section"><div class="mcat-dr-h">Коли це потрібно</div><ul class="mcat-dr-list">${items.map(i=>`<li>${i}</li>`).join('')}</ul></div>`;
+    }
   }
-  if (r.days != null) {
-    body += `<h4>Строки виконання</h4><p>Результат готовий протягом <strong>${r.days} робочих днів</strong> з моменту отримання зразка лабораторією.</p>`;
+
+  // — Вимоги до зразка —
+  const weight  = svc.sample_weight  || svc.min_weight || m.sample_weight || '';
+  const container = svc.container    || svc.sample_container || m.container || '';
+  const storage   = svc.storage      || svc.sample_storage   || m.storage   || '';
+  const matLabel  = r.matName || '';
+  if (matLabel || weight || container || storage) {
+    const cards = [
+      { ico: '🌿', label: 'Матеріал',  val: matLabel   || '—' },
+      { ico: '⚖️', label: 'Кількість', val: weight     || '—' },
+      { ico: '📦', label: 'Тара',      val: container  || '—' },
+      { ico: '❄️', label: 'Зберігання',val: storage    || '—' },
+    ];
+    body += `<div class="mcat-dr-section"><div class="mcat-dr-h">Вимоги до зразка</div><div class="mcat-req-grid">${
+      cards.map(c=>`<div class="mcat-req-card"><div class="mcat-req-card-ico">${c.ico}</div><div class="mcat-req-card-label">${c.label}</div><div class="mcat-req-card-val">${c.val}</div></div>`).join('')
+    }</div></div>`;
   }
-  if (r.tag) {
-    body += `<h4>Примітка</h4><p>${r.tag}</p>`;
+
+  // — Методика та нормативний документ —
+  if (r.methodName || r.std) {
+    const stdUrl = svc.standard_url || m.standard_url || m.standard_code_url || '';
+    const stdLink = stdUrl
+      ? `<a class="mcat-dr-std-link" href="${stdUrl}" target="_blank" rel="noopener">${r.std} <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>`
+      : (r.std ? `<span class="mcat-dr-std-code">${r.std}</span>` : '');
+    body += `<div class="mcat-dr-section"><div class="mcat-dr-h">Методика та нормативний документ</div>`;
+    if (r.methodName || r.std) {
+      body += `<div class="mcat-dr-std-box"><span class="mcat-dr-std-left">${r.methodName||'—'}</span><div class="mcat-dr-std-right">${stdLink}</div></div>`;
+    }
+    if (r.days != null) {
+      body += `<div class="mcat-dr-deadline"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Термін: ${r.days} робочих днів</div>`;
+    }
+    body += `</div>`;
   }
-  if (!body) body = '<p style="color:var(--text-soft)">Деталі по цьому методу уточнюйте у менеджера.</p>';
+
+  // — Що означає результат —
+  const interp = svc.result_interpretation || svc.interpretation || m.result_interpretation || '';
+  if (interp) {
+    body += `<div class="mcat-dr-section"><div class="mcat-dr-h">Що означає результат</div><p class="mcat-dr-desc">${interp}</p></div>`;
+  }
+
+  if (!body) body = `<p style="color:var(--text-soft);font-size:14px">Деталі по цьому методу уточнюйте у менеджера.</p>`;
 
   document.getElementById('mdBody').innerHTML = body;
   document.getElementById('mcatOverlay').classList.add('open');
