@@ -2925,10 +2925,10 @@ main{flex:1}
     <div class="mega-cols">
       <div class="mega-col">
         <h3>Дослідження</h3>
-        <button class="mega-col-link" onclick="closeMegaMenu();goServices()">Усі дослідження <span class="mega-col-arrow">›</span></button>
-        <button class="mega-col-link" onclick="closeMegaMenu();goServices()">Сезонні дослідження <span class="mega-col-arrow">›</span></button>
-        <button class="mega-col-link" onclick="closeMegaMenu();goServices()">Пакети досліджень <span class="mega-col-arrow">›</span></button>
-        <button class="mega-col-link" onclick="closeMegaMenu();goServices()">Окремі дослідження <span class="mega-col-arrow">›</span></button>
+        <button class="mega-col-link" onclick="closeMegaMenu();goAllResearch()">Усі дослідження <span class="mega-col-arrow">›</span></button>
+        <button class="mega-col-link" onclick="closeMegaMenu();goSeasonal()">Сезонні дослідження <span class="mega-col-arrow">›</span></button>
+        <button class="mega-col-link" onclick="closeMegaMenu();goPackages()">Пакети досліджень <span class="mega-col-arrow">›</span></button>
+        <button class="mega-col-link" onclick="closeMegaMenu();goIndividual()">Окремі дослідження <span class="mega-col-arrow">›</span></button>
         <button class="mega-col-link" onclick="closeMegaMenu();navigate('methods')">Каталог методів <span class="mega-col-arrow">›</span></button>
       </div>
       <div class="mega-col">
@@ -5902,6 +5902,36 @@ function goAllResearch(){
   }, 50);
 }
 
+function goPackages(){
+  srvMat=''; srvFmt='packages'; srvTask=''; srvFmtChosen=true; searchQ='';
+  document.querySelectorAll('.mat-btn,.fmt-tab').forEach(b=>b.classList.remove('active'));
+  const si=document.getElementById('searchInput'); if(si) si.value='';
+  navigate('services');
+  setTimeout(()=>{
+    document.getElementById('seasonalBtn')?.classList.remove('active');
+    document.getElementById('allResearchBtn')?.classList.remove('active');
+    document.querySelectorAll('.fmt-tab[data-fmt="packages"]').forEach(b=>b.classList.add('active'));
+    buildTasksFromGroups(); renderTaskFilter();
+    const ctx=document.getElementById('srvTaskContext');
+    if(ctx) ctx.style.display=ALL_TASKS.length?'':'none';
+    render();
+  }, 50);
+}
+function goIndividual(){
+  srvMat=''; srvFmt='individual'; srvTask=''; srvFmtChosen=true; searchQ='';
+  document.querySelectorAll('.mat-btn,.fmt-tab').forEach(b=>b.classList.remove('active'));
+  const si=document.getElementById('searchInput'); if(si) si.value='';
+  navigate('services');
+  setTimeout(()=>{
+    document.getElementById('seasonalBtn')?.classList.remove('active');
+    document.getElementById('allResearchBtn')?.classList.remove('active');
+    document.querySelectorAll('.fmt-tab[data-fmt="individual"]').forEach(b=>b.classList.add('active'));
+    buildTasksFromGroups(); renderTaskFilter();
+    const ctx=document.getElementById('srvTaskContext');
+    if(ctx) ctx.style.display=ALL_TASKS.length?'':'none';
+    render();
+  }, 50);
+}
 function srvSort(mode){ currentSort=mode; render(); }
 function toggleSortDropdown(e){
   e.stopPropagation();
