@@ -44,7 +44,17 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}
 input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 
 /* ── NAVBAR ── */
-.navbar{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;box-shadow:var(--shadow-sm)}
+.navbar{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;box-shadow:var(--shadow-sm);transition:background .3s,border-color .3s,box-shadow .3s}
+.navbar--transparent{background:transparent!important;border-bottom-color:transparent!important;box-shadow:none!important}
+.navbar--transparent .nav-logo img,.navbar--transparent .nav-logo svg{filter:brightness(0) invert(1)}
+.navbar--transparent .nav-search-bar{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25)}
+.navbar--transparent .nav-search-inp,.navbar--transparent .nav-search-inp::placeholder,.navbar--transparent .nav-search-ico{color:rgba(255,255,255,.8)}
+.navbar--transparent .nav-status-btn{color:var(--white);border-color:rgba(255,255,255,.35)}
+.navbar--transparent .nav-status-btn:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.7)}
+.navbar--transparent .nav-icon-btn{color:var(--white);border-color:rgba(255,255,255,.35)}
+.navbar--transparent .nav-icon-btn:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.7)}
+.navbar--transparent .nav-right-sep{background:rgba(255,255,255,.25)}
+.navbar--transparent .mega-menu-btn{color:var(--navy);background:var(--neon)}
 .navbar-inner{max-width:1280px;margin:0 auto;padding:0 32px;height:68px;display:flex;align-items:center;gap:0}
 .nav-logo{display:flex;align-items:center;margin-right:40px;flex-shrink:0;text-decoration:none}
 .nav-logo svg,.nav-logo img{height:44px;width:auto;display:block}
@@ -5604,6 +5614,9 @@ function navigate(page) {
   if (page === 'methods') loadMethodsCatalog();
   if (page === 'status') ostPageInit();
   if (page === 'about') { setTimeout(function(){ if(typeof initAboutPin==='function') initAboutPin(); },50); }
+  // transparent navbar only on about page
+  var nb = document.querySelector('nav.navbar');
+  if(nb) nb.classList.toggle('navbar--transparent', page === 'about');
   if (page === 'calculator') calcInit();
   document.querySelector('nav.navbar').style.display = '';
   if (page === 'checkout') {
