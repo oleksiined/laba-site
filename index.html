@@ -1726,7 +1726,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 @media(max-width:700px){.article-products-grid{grid-template-columns:1fr}.article-related-grid{grid-template-columns:1fr}.article-checklist{grid-template-columns:1fr}.article-h1{font-size:24px}.article-outer{padding:20px 16px 60px}.article-related-wrap{padding:0 16px 60px}}
 
 /* ══ ABOUT PAGE ══ */
-.about-page{background:linear-gradient(175deg,#0a1a0a 0%,#122a12 40%,#1a3a1a 70%,#0d1f0d 100%);min-height:100vh;overflow-x:hidden}
+.about-page{background:linear-gradient(175deg,#0a1a0a 0%,#122a12 40%,#1a3a1a 70%,#0d1f0d 100%);min-height:100vh}
 
 /* Pinned scrollytelling */
 .about-pin-wrap{height:220vh;position:relative}
@@ -1748,13 +1748,13 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 @media(max-width:900px){.about-pin-layout{grid-template-columns:1fr;gap:24px}.about-pin-left{flex-direction:row;align-items:center;gap:20px}.about-pin-wrap{height:400vh}}
 
 /* Hero */
-.about-hero{background:transparent;margin-top:-68px;text-align:center;overflow:hidden;position:relative;height:100vh;min-height:600px;box-sizing:border-box}
-.about-hero-inner{max-width:900px;width:100%;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10;padding:calc(68px + 48px) 32px 0;pointer-events:none}
-.about-hero h1{font-size:52px;font-weight:900;color:#fff;line-height:1.08;letter-spacing:-1.5px;margin:0 0 16px}
+.about-hero{background:linear-gradient(175deg,#0a1a0a 0%,#122a12 40%,#1a3a1a 70%,#0d1f0d 100%);margin-top:-68px;text-align:center;overflow:hidden;position:relative;height:calc(100vh - 0px);min-height:600px;box-sizing:border-box;width:100vw;margin-left:calc(50% - 50vw)}
+.about-hero-inner{max-width:900px;width:100%;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10;padding:calc(68px + 60px) 32px 0;pointer-events:none}
+.about-hero h1{font-size:52px;font-weight:900;color:#fff;line-height:1.08;letter-spacing:-1.5px;margin:0 0 20px}
 .about-hero-sub{font-size:17px;color:rgba(255,255,255,.65);line-height:1.6;max-width:480px;margin:0 auto}
-.about-hero-robots{display:flex;align-items:flex-end;justify-content:center;position:absolute;bottom:0;left:0;right:0;z-index:2;height:56%}
-.about-hero-robots img{object-fit:contain;object-position:bottom center;height:80%;width:auto;flex-shrink:0;margin:0 -12px}
-.about-hero-robots img.rob-sm{height:80%}
+.about-hero-robots{display:flex;align-items:flex-end;justify-content:center;gap:-16px;position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:2;height:48%;width:90%;max-width:1100px}
+.about-hero-robots img{object-fit:contain;object-position:bottom center;height:80%;width:auto;flex-shrink:0;margin:0 -8px}
+.about-hero-robots img.rob-sm{height:72%}
 .about-hero-robots img.rob-md{height:80%}
 .about-hero-robots img.rob-lg{height:80%}
 
