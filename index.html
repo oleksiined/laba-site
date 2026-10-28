@@ -7655,7 +7655,7 @@ async function loadMethodsCatalog() {
   document.getElementById('mcatContent').innerHTML = '<div class="mcat-loading">Завантаження...</div>';
   try {
     const [services, methods, materials] = await Promise.all([
-      _sbFetch('catalog_services','select=service_id,name,material_id,group_name,full_description,short_description,slug&status=in.(active,draft)&order=service_id.asc').catch(()=>[]),
+      _sbFetch('catalog_services','select=service_id,name,material_id,group_name,full_description,short_description,slug&status=in.(active,draft)').catch(()=>[]),
       _sbFetch('catalog_methods','select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,method_id').catch(()=>[]),
       _sbFetch('catalog_materials','select=material_id,name,sort_order&order=sort_order.asc.nullslast').catch(()=>[]),
     ]);
