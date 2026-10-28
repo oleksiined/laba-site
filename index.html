@@ -1786,10 +1786,11 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-feat-btn:hover:not(:disabled){background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.4)}
 .about-feat-btn:disabled{opacity:.25;cursor:default}
 .about-feat-counter{font-size:13px;font-weight:600;color:rgba(255,255,255,.5);min-width:40px;text-align:center}
-.about-features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
-.about-feat-card{background:rgba(255,255,255,.05);border-radius:var(--radius-lg);overflow:hidden;border:1px solid rgba(255,255,255,.08);transition:transform .4s cubic-bezier(.25,.46,.45,.94),opacity .4s ease,border-color .3s,box-shadow .3s;transform-origin:center bottom;cursor:pointer}
-.about-feat-card.active{border-color:var(--neon);box-shadow:0 0 0 1px var(--neon),0 0 32px rgba(196,255,77,.12);transform:scale(1.04);opacity:1}
-.about-feat-card:not(.active){transform:scale(0.94);opacity:0.55}
+.about-features-grid{overflow:hidden;position:relative}
+.about-feat-track{display:flex;gap:20px;transition:transform .45s cubic-bezier(.25,.46,.45,.94);will-change:transform}
+.about-feat-card{flex:0 0 320px;background:rgba(255,255,255,.05);border-radius:var(--radius-lg);overflow:hidden;border:1px solid rgba(255,255,255,.08);transition:border-color .3s,box-shadow .3s,opacity .4s;cursor:pointer}
+.about-feat-card.active{border-color:var(--neon);box-shadow:0 0 0 1px var(--neon),0 0 32px rgba(196,255,77,.12);opacity:1}
+.about-feat-card:not(.active){opacity:0.55}
 /* Progress bar */
 .about-feat-progress{margin-top:28px;position:relative;height:2px;background:rgba(255,255,255,.1);border-radius:2px}
 .about-feat-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--neon);border-radius:2px;transition:width .4s ease}
@@ -1830,16 +1831,13 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 @media(max-width:900px){.about-section{grid-template-columns:1fr;gap:20px}.about-brand{grid-template-columns:1fr}.about-hero h1{font-size:36px}}
 @media(max-width:900px){
   .about-features{padding:60px 24px}
-  .about-features-grid{grid-template-columns:repeat(2,1fr);gap:14px}
-  .about-feat-card{transform:none!important;opacity:1!important}
-  .about-feat-card.active{transform:none!important}
-  .about-feat-card:not(.active){transform:none!important;opacity:0.8!important}
+  .about-feat-card{flex:0 0 280px}
   .about-features-head{margin-bottom:24px}
   .about-features-h2{font-size:28px}
 }
 @media(max-width:600px){
   .about-features{padding:48px 20px}
-  .about-features-grid{grid-template-columns:1fr}
+  .about-feat-card{flex:0 0 calc(85vw)}
 }
 @media(max-width:600px){
   .about-features-h2{font-size:28px}.about-cta h2{font-size:30px}
@@ -4036,44 +4034,46 @@ main{flex:1}
         </div>
       </div>
       <div class="about-features-grid" id="aboutFeatGrid">
-        <!-- Card 1 -->
-        <div class="about-feat-card">
-          <div class="about-feat-img"><img src="/robot-tablet.png" alt="Замовлення онлайн"></div>
-          <div class="about-feat-body">
-            <div class="about-feat-badge done">Вже є</div>
-            <div class="about-feat-title">Замовлення онлайн</div>
-            <div class="about-feat-desc">Обирайте дослідження та оформляйте замовлення на сайті.</div>
-            <div class="about-feat-bar"><div class="about-feat-bar-fill" style="width:100%"></div></div>
+        <div class="about-feat-track" id="aboutFeatTrack">
+          <!-- Card 1 -->
+          <div class="about-feat-card active">
+            <div class="about-feat-img"><img src="/robot-tablet.png" alt="Замовлення онлайн"></div>
+            <div class="about-feat-body">
+              <div class="about-feat-badge done">Вже є</div>
+              <div class="about-feat-title">Замовлення онлайн</div>
+              <div class="about-feat-desc">Обирайте дослідження та оформляйте замовлення на сайті.</div>
+              <div class="about-feat-bar"><div class="about-feat-bar-fill" style="width:100%"></div></div>
+            </div>
           </div>
-        </div>
-        <!-- Card 2 -->
-        <div class="about-feat-card">
-          <div class="about-feat-img"><img src="/robot-hand.png" alt="Статус без кабінету"></div>
-          <div class="about-feat-body">
-            <div class="about-feat-badge done">Вже є</div>
-            <div class="about-feat-title">Статус без кабінету</div>
-            <div class="about-feat-desc">Перевіряйте етап дослідження за номером замовлення.</div>
-            <div class="about-feat-bar"><div class="about-feat-bar-fill" style="width:100%"></div></div>
+          <!-- Card 2 -->
+          <div class="about-feat-card">
+            <div class="about-feat-img"><img src="/robot-hand.png" alt="Статус без кабінету"></div>
+            <div class="about-feat-body">
+              <div class="about-feat-badge done">Вже є</div>
+              <div class="about-feat-title">Статус без кабінету</div>
+              <div class="about-feat-desc">Перевіряйте етап дослідження за номером замовлення.</div>
+              <div class="about-feat-bar"><div class="about-feat-bar-fill" style="width:100%"></div></div>
+            </div>
           </div>
-        </div>
-        <!-- Card 3 -->
-        <div class="about-feat-card">
-          <div class="about-feat-img"><img src="/robot-book.png" alt="Як відібрати зразок"></div>
-          <div class="about-feat-body">
-            <div class="about-feat-badge done">Вже є</div>
-            <div class="about-feat-title">Як відібрати зразок</div>
-            <div class="about-feat-desc">Короткі інструкції та докладні PDF для завантаження.</div>
-            <div class="about-feat-bar"><div class="about-feat-bar-fill" style="width:100%"></div></div>
+          <!-- Card 3 -->
+          <div class="about-feat-card">
+            <div class="about-feat-img"><img src="/robot-book.png" alt="Як відібрати зразок"></div>
+            <div class="about-feat-body">
+              <div class="about-feat-badge done">Вже є</div>
+              <div class="about-feat-title">Як відібрати зразок</div>
+              <div class="about-feat-desc">Короткі інструкції та докладні PDF для завантаження.</div>
+              <div class="about-feat-bar"><div class="about-feat-bar-fill" style="width:100%"></div></div>
+            </div>
           </div>
-        </div>
-        <!-- Card 4 -->
-        <div class="about-feat-card">
-          <div class="about-feat-img"><img src="/robot-clipboard.png" alt="Більше матеріалів"></div>
-          <div class="about-feat-body">
-            <div class="about-feat-badge soon">Плануємо</div>
-            <div class="about-feat-title">Більше матеріалів</div>
-            <div class="about-feat-desc">Дослідження палива та засобів захисту рослин.</div>
-            <div class="about-feat-bar"><div class="about-feat-bar-fill" style="width:30%"></div></div>
+          <!-- Card 4 -->
+          <div class="about-feat-card">
+            <div class="about-feat-img"><img src="/robot-clipboard.png" alt="Більше матеріалів"></div>
+            <div class="about-feat-body">
+              <div class="about-feat-badge soon">Плануємо</div>
+              <div class="about-feat-title">Більше матеріалів</div>
+              <div class="about-feat-desc">Дослідження палива та засобів захисту рослин.</div>
+              <div class="about-feat-bar"><div class="about-feat-bar-fill" style="width:30%"></div></div>
+            </div>
           </div>
         </div>
       </div>
@@ -8514,18 +8514,24 @@ function initAboutPin(){
   }
 }
 
-// About page features — pinned scroll, all cards visible, active card scaled up
+// About page features — horizontal scroll carousel
 let _aboutFeatIdx = 0;
 let _aboutFeatPinInited = false;
 
 function _aboutFeatRender() {
-  const grid = document.getElementById('aboutFeatGrid');
-  if (!grid) return;
-  const cards = Array.from(grid.querySelectorAll('.about-feat-card'));
+  const track = document.getElementById('aboutFeatTrack');
+  if (!track) return;
+  const cards = Array.from(track.querySelectorAll('.about-feat-card'));
   const N = cards.length;
   if (!N) return;
   _aboutFeatIdx = Math.max(0, Math.min(N - 1, _aboutFeatIdx));
 
+  // Slide track
+  const cardW = cards[0].offsetWidth;
+  const gap = 20;
+  track.style.transform = 'translateX(-' + (_aboutFeatIdx * (cardW + gap)) + 'px)';
+
+  // Active card highlight
   cards.forEach(function(c, i) { c.classList.toggle('active', i === _aboutFeatIdx); });
 
   const counter = document.getElementById('aboutFeatCounter');
@@ -8554,9 +8560,9 @@ function aboutFeatNav(dir) {
 
 function initAboutFeatPin() {
   if (_aboutFeatPinInited) return;
-  const grid = document.getElementById('aboutFeatGrid');
-  if (!grid) return;
-  const cards = Array.from(grid.querySelectorAll('.about-feat-card'));
+  const track = document.getElementById('aboutFeatTrack');
+  if (!track) return;
+  const cards = Array.from(track.querySelectorAll('.about-feat-card'));
   const N = cards.length;
   if (!N) return;
   _aboutFeatPinInited = true;
@@ -8572,10 +8578,21 @@ function initAboutFeatPin() {
     });
   }
 
-  // Click on card to activate
+  // Click on card to activate + slide to it
   cards.forEach(function(card, i) {
     card.addEventListener('click', function() { _aboutFeatIdx = i; _aboutFeatRender(); });
   });
+
+  // Touch/swipe support
+  var touchStartX = 0;
+  var grid = document.getElementById('aboutFeatGrid');
+  if (grid) {
+    grid.addEventListener('touchstart', function(e) { touchStartX = e.touches[0].clientX; }, {passive:true});
+    grid.addEventListener('touchend', function(e) {
+      var dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 40) { _aboutFeatIdx += dx < 0 ? 1 : -1; _aboutFeatRender(); }
+    }, {passive:true});
+  }
 
   _aboutFeatRender();
 }
