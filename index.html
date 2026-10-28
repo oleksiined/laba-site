@@ -1794,7 +1794,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 
 /* Brand block */
 .about-brand{max-width:1280px;margin:0 auto;padding:80px 32px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
-.about-brand-logo{font-size:80px;font-weight:900;color:#fff;letter-spacing:-4px;line-height:1}
+.about-brand-logo{line-height:1}
 .about-brand-sub{font-size:14px;color:rgba(255,255,255,.4);font-weight:500;margin-top:4px;letter-spacing:.5px}
 .about-brand-text h3{font-size:22px;font-weight:800;color:#fff;margin:0 0 12px;line-height:1.3}
 .about-brand-text p{font-size:15px;color:rgba(255,255,255,.6);line-height:1.7;margin:0 0 20px}
@@ -4103,7 +4103,7 @@ main{flex:1}
   <div style="background:#0f1710;border-top:1px solid rgba(255,255,255,.08)">
     <div class="about-brand">
       <div>
-        <div class="about-brand-logo">LABA</div>
+        <div class="about-brand-logo"><img src="" id="aboutBrandLogoImg" alt="LABA" style="height:80px;width:auto;filter:brightness(0) invert(1)"></div>
         <div class="about-brand-sub">by zemlerob</div>
       </div>
       <div class="about-brand-text">
@@ -11540,6 +11540,13 @@ function _applyRobotImages() {
   if(ctaEl) ctaEl.src = typeof _CTA_SRC !== 'undefined' ? _CTA_SRC : _ROBOT_SRC;
 }
 document.addEventListener('DOMContentLoaded', _applyRobotImages);
+
+// ── copy navbar logo into about brand section ──
+document.addEventListener('DOMContentLoaded', function(){
+  var navImg = document.querySelector('nav.navbar .nav-logo img');
+  var brandImg = document.getElementById('aboutBrandLogoImg');
+  if(navImg && brandImg) brandImg.src = navImg.src;
+});
 
 // ── transparent navbar fix for direct #about URL load ──
 document.addEventListener('DOMContentLoaded', function(){
