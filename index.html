@@ -7655,21 +7655,26 @@ async function loadMethodsCatalog() {
   if (_mcatLoaded) { mcatApplyFilters(); return; }
   document.getElementById('mcatContent').innerHTML = '<div class="mcat-loading">Завантаження...</div>';
   try {
-    const [methods, services, materials] = await Promise.all([
+    const [services, methods, materials] = await Promise.all([
+      _sbFetch('catalog_services','select=service_id,name,material_id,group_name,full_description,short_description,slug,sort_order&status=in.(active,draft)&order=sort_order.asc.nullslast,service_id').catch(()=>[]),
       _sbFetch('catalog_methods','select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,method_id').catch(()=>[]),
-      _sbFetch('catalog_services','select=service_id,name,material_id,group_name,full_description,short_description,slug&status=in.(active,draft)').catch(()=>[]),
       _sbFetch('catalog_materials','select=material_id,name,sort_order&order=sort_order.asc.nullslast').catch(()=>[]),
     ]);
-    const svcMap = {};
-    services.forEach(s=>{ svcMap[s.service_id]=s; });
     const matMap = {};
     materials.forEach(m=>{ matMap[m.material_id]=m; });
+
+    // Build methods map: service_id → [methods]
+    const methodsBySvc = {};
+    methods.forEach(m=>{
+      const sid = m.service_id || '';
+      if (!methodsBySvc[sid]) methodsBySvc[sid] = [];
+      methodsBySvc[sid].push(m);
+    });
 
     // Build material pills
     const pillsEl = document.getElementById('mcatMatPills');
     pillsEl.innerHTML = '<button class="mcat-pill active" data-mat="" onclick="mcatSetMat(this,\'\')">Усі</button>';
     materials.forEach(m=>{
-      const cls = _mcatMatBadgeClass[m.material_id] || 'default';
       pillsEl.innerHTML += `<button class="mcat-pill" data-mat="${m.material_id}" onclick="mcatSetMat(this,'${m.material_id}')">${m.name}</button>`;
     });
 
@@ -7679,25 +7684,27 @@ async function loadMethodsCatalog() {
     groupSel.innerHTML = '<option value="">Напрям дослідження</option>';
     groups.forEach(g=>{ groupSel.innerHTML += `<option value="${g}">${g}</option>`; });
 
-    // Build rows
-    _mcatAllRows = methods.map(m=>{
-      const svc = svcMap[m.service_id] || {};
+    // Build rows — primary source: catalog_services
+    _mcatAllRows = [];
+    services.forEach(svc=>{
       const mat = matMap[svc.material_id] || {};
-      return {
-        id: m.method_id,
+      const svcMethods = methodsBySvc[svc.service_id] || [];
+      const base = {
         svcName: svc.name || '',
-        methodName: m.method_name || '',
-        std: m.standard_code || '',
-        tag: m.selection_note || '',
-        days: m.turnaround_value || null,
-        price: m.price != null ? m.price : null,
         matId: svc.material_id || '',
         matName: mat.name || '',
         group: svc.group_name || '',
         svcDesc: svc.full_description || svc.short_description || '',
         svcSlug: svc.slug || '',
-        svcId: m.service_id || '',
+        svcId: svc.service_id || '',
       };
+      if (svcMethods.length === 0) {
+        _mcatAllRows.push({ ...base, id: svc.service_id, methodName: '', std: '', tag: '', days: null, price: null });
+      } else {
+        svcMethods.forEach(m=>{
+          _mcatAllRows.push({ ...base, id: m.method_id, methodName: m.method_name || '', std: m.standard_code || '', tag: m.selection_note || '', days: m.turnaround_value || null, price: m.price != null ? m.price : null });
+        });
+      }
     });
     _mcatLoaded = true;
     mcatApplyFilters();
