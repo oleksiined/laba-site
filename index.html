@@ -8557,8 +8557,8 @@ function initAboutFeatPin() {
   if (!N) return;
   _aboutFeatPinInited = true;
 
-  // Each card gets 1.5× viewport of scroll space; total outer height
-  var stepVh = 1.5;
+  // Each card gets 0.4× viewport of scroll space; total outer height
+  var stepVh = 0.4;
   outer.style.height = (N * stepVh * 100 + 100) + 'vh';
 
   // Build dots
@@ -8583,7 +8583,7 @@ function initAboutFeatPin() {
     // Only active while section is pinned (top <= 0, bottom >= vh)
     if (rect.top > 10 || rect.bottom < window.innerHeight - 10) return;
     var scrolled = -rect.top;
-    var step = window.innerHeight * stepVh;
+    var step = window.innerHeight * 0.4;
     var idx = Math.min(N - 1, Math.floor(scrolled / step));
     if (idx !== _aboutFeatIdx) { _aboutFeatIdx = idx; _aboutFeatRender(); }
   }, { passive: true });
