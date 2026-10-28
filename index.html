@@ -37,7 +37,7 @@ html{scroll-behavior:smooth}
 }
 
 *,*::before,*::after{font-family:'Manrope',system-ui,sans-serif!important}
-body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;font-family:'Manrope',system-ui,sans-serif;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;font-family:'Manrope',system-ui,sans-serif;overflow-x:hidden;max-width:100vw}
 a{text-decoration:none;color:inherit}
 /* Hide native number input spinners sitewide */
 input[type="number"]{-moz-appearance:textfield;appearance:textfield}
@@ -123,7 +123,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 
 /* ── PAGE SHELL ── */
 .page{display:none}
-.page.active{display:flex;flex-direction:column;min-height:calc(100vh - 68px)}
+.page.active{display:flex;flex-direction:column;min-height:calc(100vh - 68px);overflow-x:hidden;max-width:100vw}
 .page.active>.laba-footer{margin-top:auto}
 
 /* ══════════════════════════════
@@ -1726,7 +1726,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 @media(max-width:700px){.article-products-grid{grid-template-columns:1fr}.article-related-grid{grid-template-columns:1fr}.article-checklist{grid-template-columns:1fr}.article-h1{font-size:24px}.article-outer{padding:20px 16px 60px}.article-related-wrap{padding:0 16px 60px}}
 
 /* ══ ABOUT PAGE ══ */
-.about-page{background:linear-gradient(175deg,#0a1a0a 0%,#122a12 40%,#1a3a1a 70%,#0d1f0d 100%);min-height:100vh}
+.about-page{background:linear-gradient(175deg,#0a1a0a 0%,#122a12 40%,#1a3a1a 70%,#0d1f0d 100%);min-height:100vh;overflow-x:hidden}
 
 /* Pinned scrollytelling */
 .about-pin-wrap{height:220vh;position:relative}
@@ -1748,11 +1748,11 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 @media(max-width:900px){.about-pin-layout{grid-template-columns:1fr;gap:24px}.about-pin-left{flex-direction:row;align-items:center;gap:20px}.about-pin-wrap{height:400vh}}
 
 /* Hero */
-.about-hero{background:linear-gradient(175deg,#0a1a0a 0%,#122a12 40%,#1a3a1a 70%,#0d1f0d 100%);margin-top:-68px;text-align:center;overflow:hidden;position:relative;height:calc(100vh - 0px);min-height:600px;box-sizing:border-box;width:100vw;margin-left:calc(50% - 50vw)}
+.about-hero{background:linear-gradient(175deg,#0a1a0a 0%,#122a12 40%,#1a3a1a 70%,#0d1f0d 100%);margin-top:-68px;text-align:center;overflow:hidden;position:relative;height:100vh;min-height:600px;box-sizing:border-box}
 .about-hero-inner{max-width:900px;width:100%;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10;padding:calc(68px + 60px) 32px 0;pointer-events:none}
 .about-hero h1{font-size:52px;font-weight:900;color:#fff;line-height:1.08;letter-spacing:-1.5px;margin:0 0 20px}
 .about-hero-sub{font-size:17px;color:rgba(255,255,255,.65);line-height:1.6;max-width:480px;margin:0 auto}
-.about-hero-robots{display:flex;align-items:flex-end;justify-content:center;gap:-16px;position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:2;height:48%;width:90%;max-width:1100px}
+.about-hero-robots{display:flex;align-items:flex-end;justify-content:center;position:absolute;bottom:0;left:0;right:0;z-index:2;height:48%}
 .about-hero-robots img{object-fit:contain;object-position:bottom center;height:80%;width:auto;flex-shrink:0;margin:0 -8px}
 .about-hero-robots img.rob-sm{height:72%}
 .about-hero-robots img.rob-md{height:80%}
@@ -1815,7 +1815,19 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-cta-btn:hover{background:var(--neon-dark)}
 
 @media(max-width:900px){.about-section{grid-template-columns:1fr;gap:20px}.about-features-grid{grid-template-columns:repeat(2,1fr)}.about-brand{grid-template-columns:1fr}.about-hero h1{font-size:36px}}
-@media(max-width:600px){.about-features-grid{grid-template-columns:1fr}.about-features-h2{font-size:28px}.about-cta h2{font-size:30px}}
+@media(max-width:600px){
+  .about-features-grid{grid-template-columns:1fr}.about-features-h2{font-size:28px}.about-cta h2{font-size:30px}
+  /* about hero mobile */
+  .about-hero{height:100svh;min-height:500px}
+  .about-hero-inner{padding:calc(68px + 28px) 20px 0}
+  .about-hero h1{font-size:28px;letter-spacing:-0.5px;margin:0 0 12px}
+  .about-hero-sub{font-size:14px;max-width:100%}
+  .about-hero-robots{height:46%}
+  /* hide side robots on mobile, show only center */
+  .about-hero-robots img.rob-sm{display:none}
+  .about-hero-robots img.rob-md{height:90%}
+  .about-hero-robots img.rob-lg{height:100%;margin:0}
+}
 
 </style>
 <style>
