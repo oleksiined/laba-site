@@ -2455,65 +2455,78 @@ main{flex:1}
 }
 
 /* ══ METHODS CATALOG PAGE ══ */
-.mcat-page{display:none;flex-direction:column;min-height:calc(100vh - 60px);padding:0 0 60px}
-.mcat-page.active{display:flex}
-.mcat-hero{background:linear-gradient(135deg,var(--navy) 0%,#0a1628 100%);color:#fff;padding:52px 40px 44px;text-align:center}
-.mcat-hero h1{font-size:32px;font-weight:800;margin:0 0 10px;letter-spacing:-0.5px}
-.mcat-hero p{color:rgba(255,255,255,.62);font-size:15px;margin:0}
-
-.mcat-filters{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:60px;z-index:90;box-shadow:0 2px 12px rgba(0,0,0,.06)}
-.mcat-filters-inner{max-width:1100px;margin:0 auto;padding:16px 24px}
-.mcat-search{width:100%;box-sizing:border-box;padding:10px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;outline:none;margin-bottom:12px;transition:border-color .2s}
-.mcat-search:focus{border-color:var(--neon)}
-.mcat-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-.mcat-pill{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:13px;font-weight:500;color:var(--text-mid);cursor:pointer;transition:all .18s;font-family:inherit}
-.mcat-pill:hover{border-color:var(--neon);color:var(--neon)}
-.mcat-pill.active{background:var(--neon);border-color:var(--neon);color:#fff}
-.mcat-bottom-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.mcat-select{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;color:var(--text-dark);background:#fff;outline:none;cursor:pointer;flex:1;min-width:180px}
-.mcat-select:focus{border-color:var(--neon)}
-.mcat-clear-btn{padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;font-size:13px;color:var(--text-soft);cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .18s}
-.mcat-clear-btn:hover{border-color:#e55;color:#e55}
-
-.mcat-body{max-width:1100px;width:100%;margin:0 auto;padding:24px 24px 0;box-sizing:border-box;flex:1}
-.mcat-count{font-size:13px;color:var(--text-soft);margin-bottom:14px}
+.mcat-page{padding:0 0 60px}
+/* header */
+.mcat-header{background:var(--white);border-bottom:1px solid var(--border);padding:36px 0 28px}
+.mcat-header-inner{max-width:1200px;margin:0 auto;padding:0 40px}
+.mcat-breadcrumb{font-size:13px;color:var(--text-soft);margin-bottom:14px}
+.mcat-breadcrumb button{background:none;border:none;font-family:inherit;font-size:13px;color:var(--text-soft);cursor:pointer;padding:0}
+.mcat-breadcrumb button:hover{color:var(--navy)}
+.mcat-header-inner h1{font-size:40px;font-weight:800;color:var(--navy);margin:0 0 8px;letter-spacing:-.5px}
+.mcat-header-inner>p{font-size:16px;color:var(--text-mid);margin:0}
+/* search */
+.mcat-search-wrap{position:relative;margin-bottom:16px}
+.mcat-search-ico{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text-soft);pointer-events:none;display:flex}
+.mcat-search{width:100%;box-sizing:border-box;padding:13px 16px 13px 46px;border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:15px;font-family:inherit;outline:none;transition:border-color .2s;background:var(--white)}
+.mcat-search:focus{border-color:var(--navy)}
+/* filters */
+.mcat-filters{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:68px;z-index:90}
+.mcat-filters-inner{max-width:1200px;margin:0 auto;padding:20px 40px}
+.mcat-filter-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mcat-mat-label{font-size:14px;font-weight:600;color:var(--navy);white-space:nowrap;flex-shrink:0}
+.mcat-pills{display:flex;flex-wrap:wrap;gap:6px}
+.mcat-pill{padding:7px 16px;border-radius:var(--radius-pill);border:1.5px solid var(--border);background:#fff;font-size:13px;font-weight:500;color:var(--text-mid);cursor:pointer;transition:all .18s;font-family:inherit}
+.mcat-pill:hover{border-color:var(--navy);color:var(--navy)}
+.mcat-pill.active{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:600}
+.mcat-select{padding:8px 14px;border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:14px;font-family:inherit;color:var(--navy);background:#fff;outline:none;cursor:pointer;min-width:200px}
+.mcat-select:focus{border-color:var(--navy)}
+.mcat-clear-btn{background:none;border:none;font-size:13px;color:var(--text-soft);cursor:pointer;font-family:inherit;white-space:nowrap;padding:0;display:flex;align-items:center;gap:4px;margin-left:auto}
+.mcat-clear-btn:hover{color:var(--navy)}
+/* body */
+.mcat-body{max-width:1200px;width:100%;margin:0 auto;padding:24px 40px 0;box-sizing:border-box;flex:1}
+.mcat-count{font-size:14px;color:var(--text-soft);margin-bottom:16px}
 .mcat-loading{text-align:center;padding:60px;color:var(--text-soft);font-size:15px}
 .mcat-empty{text-align:center;padding:60px;color:var(--text-soft)}
-.mcat-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:#fff}
+/* table */
+.mcat-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-lg);background:#fff}
 .mcat-table{width:100%;border-collapse:collapse;font-size:14px}
-.mcat-table th{padding:12px 16px;text-align:left;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);border-bottom:1px solid var(--border);white-space:nowrap;background:#fafafa}
-.mcat-table td{padding:13px 16px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text-dark)}
+.mcat-table th{padding:12px 20px;text-align:left;font-weight:500;font-size:13px;color:var(--text-soft);border-bottom:1px solid var(--border);white-space:nowrap}
+.mcat-table td{padding:16px 20px;border-bottom:1px solid var(--border-soft);vertical-align:middle;color:var(--navy)}
 .mcat-table tr:last-child td{border-bottom:none}
-.mcat-table tr:hover td{background:#f9fafb}
-.mcat-svc-name{font-weight:600;font-size:14px;color:var(--text-dark)}
+.mcat-table tbody tr:hover td{background:#fafbfc}
+.mcat-table tbody tr:first-child td:first-child{border-left:3px solid var(--neon-dark)}
+.mcat-svc-name{font-weight:700;font-size:14px;color:var(--navy)}
 .mcat-method-name{font-size:13px;color:var(--text-mid);max-width:260px}
-.mcat-std{font-size:12px;color:var(--text-soft);font-family:monospace}
-.mcat-days{font-size:13px;color:var(--text-dark);white-space:nowrap}
-.mcat-price{font-size:13px;font-weight:600;color:var(--text-dark);white-space:nowrap}
-
-.mcat-mat-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+.mcat-std{font-size:13px;color:var(--text-mid)}
+.mcat-days{font-size:13px;color:var(--text-mid);white-space:nowrap}
+/* badges */
+.mcat-mat-badge{display:inline-block;padding:3px 10px;border-radius:var(--radius-pill);font-size:12px;font-weight:600;margin-right:4px}
 .mcat-mat-badge.soil{background:#e8f5e9;color:#2e7d32}
 .mcat-mat-badge.fertilizer{background:#fff3e0;color:#e65100}
 .mcat-mat-badge.plant{background:#f3e5f5;color:#6a1b9a}
 .mcat-mat-badge.water{background:#e3f2fd;color:#1565c0}
 .mcat-mat-badge.seed{background:#fce4ec;color:#880e4f}
 .mcat-mat-badge.default{background:#f0f0f0;color:#555}
-
-.mcat-detail-btn{padding:6px 14px;border:1.5px solid var(--neon);border-radius:var(--radius-sm);background:transparent;color:var(--neon);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;white-space:nowrap}
-.mcat-detail-btn:hover{background:var(--neon);color:#fff}
-
+/* detail link */
+.mcat-detail-btn{background:none;border:none;padding:0;font-size:13px;font-weight:600;color:var(--text-mid);cursor:pointer;font-family:inherit;white-space:nowrap;display:flex;align-items:center;gap:4px;transition:color .15s}
+.mcat-detail-btn:hover{color:var(--navy)}
+/* pagination */
 .mcat-pagination{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:20px;padding:0 0 8px}
 .mcat-page-btns{display:flex;gap:4px;flex-wrap:wrap}
-.mcat-page-btn{width:34px;height:34px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;font-size:13px;cursor:pointer;font-family:inherit;transition:all .18s;color:var(--text-dark)}
-.mcat-page-btn:hover{border-color:var(--neon);color:var(--neon)}
-.mcat-page-btn.active{background:var(--neon);border-color:var(--neon);color:#fff;font-weight:700}
+.mcat-page-btn{min-width:36px;height:36px;padding:0 6px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;font-size:14px;cursor:pointer;font-family:inherit;transition:all .18s;color:var(--navy)}
+.mcat-page-btn:hover{border-color:var(--navy);background:var(--bg)}
+.mcat-page-btn.active{background:var(--neon);border-color:var(--neon);color:var(--navy);font-weight:700}
 .mcat-page-btn:disabled{opacity:.4;cursor:default}
-.mcat-per-page{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-soft)}
-.mcat-per-page select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;background:#fff;cursor:pointer;color:var(--text-dark)}
-
-.mcat-cta{background:#f5f7fa;border-top:1px solid var(--border);padding:48px 24px;text-align:center}
-.mcat-cta-title{font-size:20px;font-weight:700;color:var(--text-dark);margin-bottom:8px}
-.mcat-cta-sub{font-size:14px;color:var(--text-soft);margin-bottom:20px}
+.mcat-pagination-right{display:flex;align-items:center;gap:16px;font-size:13px;color:var(--text-soft)}
+.mcat-per-page{display:flex;align-items:center;gap:8px}
+.mcat-per-page select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;background:#fff;cursor:pointer;color:var(--navy)}
+/* CTA */
+.mcat-cta{max-width:1200px;margin:28px auto 0;padding:0 40px 40px;box-sizing:border-box}
+.mcat-cta-inner{background:var(--bg);border:1px solid var(--border-soft);border-radius:var(--radius-md);padding:20px 24px;display:flex;align-items:center;gap:16px}
+.mcat-cta-ico{color:var(--text-soft);flex-shrink:0;width:36px;height:36px;border:1.5px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center}
+.mcat-cta-body{flex:1}
+.mcat-cta-body strong{font-size:14px;font-weight:700;color:var(--navy);display:block}
+.mcat-cta-body p{font-size:13px;color:var(--text-soft);margin:2px 0 0}
 
 /* drawer */
 .mcat-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400}
@@ -4188,21 +4201,28 @@ main{flex:1}
 
 <!-- ══ PAGE: METHODS CATALOG ══ -->
 <div class="page mcat-page" id="page-methods">
-  <div class="mcat-hero">
-    <h1>Каталог методів</h1>
-    <p>Повний перелік акредитованих методів досліджень лабораторії</p>
+  <div class="mcat-header">
+    <div class="mcat-header-inner">
+      <div class="mcat-breadcrumb"><button onclick="navigate('home')">Головна</button> / Каталог методів</div>
+      <h1>Каталог лабораторних методів</h1>
+      <p>Методики, нормативні документи та умови виконання досліджень.</p>
+    </div>
   </div>
   <div class="mcat-filters" id="mcatFilters">
     <div class="mcat-filters-inner">
-      <input type="text" id="mcatSearch" class="mcat-search" placeholder="Пошук за назвою дослідження або методу..." oninput="mcatFilterChange()" autocomplete="off">
-      <div class="mcat-pills" id="mcatMatPills">
-        <button class="mcat-pill active" data-mat="" onclick="mcatSetMat(this,'')">Усі</button>
+      <div class="mcat-search-wrap">
+        <span class="mcat-search-ico"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.75" stroke="currentColor" stroke-width="1.7"/><path d="M13.5 13.5l3.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+        <input type="text" id="mcatSearch" class="mcat-search" placeholder="Знайти метод, дослідження або нормативний документ" oninput="mcatFilterChange()" autocomplete="off">
       </div>
-      <div class="mcat-bottom-row">
+      <div class="mcat-filter-row">
+        <span class="mcat-mat-label">Матеріал:</span>
+        <div class="mcat-pills" id="mcatMatPills">
+          <button class="mcat-pill active" data-mat="" onclick="mcatSetMat(this,'')">Усі</button>
+        </div>
         <select class="mcat-select" id="mcatGroupSel" onchange="mcatFilterChange()">
           <option value="">Напрям дослідження</option>
         </select>
-        <button class="mcat-clear-btn" id="mcatClearBtn" onclick="mcatClearFilters()" style="display:none">✕ Очистити фільтри</button>
+        <button class="mcat-clear-btn" id="mcatClearBtn" onclick="mcatClearFilters()" style="display:none">↺ Очистити фільтри</button>
       </div>
     </div>
   </div>
@@ -4210,9 +4230,11 @@ main{flex:1}
     <div id="mcatContent"><div class="mcat-loading">Завантаження...</div></div>
   </div>
   <div class="mcat-cta">
-    <div class="mcat-cta-title">Не знайшли потрібний метод?</div>
-    <div class="mcat-cta-sub">Зверніться до нас — ми підберемо оптимальне рішення для вашого завдання</div>
-    <button class="btn-primary" onclick="navigate('checkout')">Отримати консультацію</button>
+    <div class="mcat-cta-inner">
+      <div class="mcat-cta-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+      <div class="mcat-cta-body"><strong>Не знайшли потрібний метод?</strong><p>Напишіть нам — перевіримо можливість дослідження.</p></div>
+      <button class="btn-primary" onclick="navigate('checkout')">Отримати консультацію</button>
+    </div>
   </div>
 
   <footer class="laba-footer">
@@ -7731,21 +7753,21 @@ function mcatRender() {
     return;
   }
 
-  let html = `<div class="mcat-count">Знайдено: <strong>${total}</strong> методів</div>`;
+  let html = `<div class="mcat-count">Знайдено ${total} методів</div>`;
   html += '<div class="mcat-table-wrap"><table class="mcat-table"><thead><tr>';
-  html += '<th>Дослідження</th><th>Метод</th><th>Матеріал</th><th>Нормативний документ</th><th>Термін, дн.</th><th></th>';
+  html += '<th>Дослідження</th><th>Метод</th><th>Матеріал</th><th>Нормативний документ</th><th>Термін</th><th></th>';
   html += '</tr></thead><tbody>';
   rows.forEach((r,i)=>{
     const globalIdx = start + i;
     const cls = _mcatMatBadgeClass[r.matId] || 'default';
-    const daysStr = r.days != null ? r.days : '—';
+    const daysStr = r.days != null ? r.days + ' роб. дн.' : '—';
     html += `<tr>
       <td><div class="mcat-svc-name">${r.svcName || '—'}</div></td>
       <td><div class="mcat-method-name">${r.methodName || '—'}</div></td>
       <td>${r.matId ? `<span class="mcat-mat-badge ${cls}">${r.matName || r.matId}</span>` : '—'}</td>
       <td><span class="mcat-std">${r.std || '—'}</span></td>
       <td class="mcat-days">${daysStr}</td>
-      <td><button class="mcat-detail-btn" onclick="mcatOpenDrawer(${globalIdx})">Детальніше →</button></td>
+      <td style="text-align:right"><button class="mcat-detail-btn" onclick="mcatOpenDrawer(${globalIdx})">Детальніше →</button></td>
     </tr>`;
   });
   html += '</tbody></table></div>';
@@ -7764,13 +7786,18 @@ function mcatPaginationHtml(total, pages) {
       btns += `<button class="mcat-page-btn" disabled>…</button>`;
     }
   }
+  const from = (p-1)*_mcatPerPage+1;
+  const to = Math.min(p*_mcatPerPage, total);
   return `<div class="mcat-pagination">
-    <div class="mcat-per-page">На сторінці:
-      <select onchange="mcatSetPerPage(this.value)">
-        ${[10,25,50].map(v=>`<option value="${v}"${v===_mcatPerPage?' selected':''}>${v}</option>`).join('')}
-      </select>
-    </div>
     <div class="mcat-page-btns">${btns}</div>
+    <div class="mcat-pagination-right">
+      <div class="mcat-per-page">На сторінці:
+        <select onchange="mcatSetPerPage(this.value)">
+          ${[10,25,50].map(v=>`<option value="${v}"${v===_mcatPerPage?' selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+      <span>Показано ${from}&nbsp;–&nbsp;${to} із ${total}</span>
+    </div>
   </div>`;
 }
 
