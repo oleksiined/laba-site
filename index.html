@@ -1776,18 +1776,19 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-section-link::after{content:'→';opacity:.4;margin-left:auto}
 
 /* Features carousel */
-.about-features{background:#0f1710;padding:80px 32px}
-.about-features-inner{max-width:1280px;margin:0 auto}
-.about-features-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:48px;gap:32px}
+.about-features{background:#0f1710}
+.about-feat-pin-wrap{position:relative}
+.about-feat-pin-inner{position:sticky;top:0;height:100vh;background:#0f1710;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0}
+.about-features-inner{max-width:100%;margin:0 auto;padding:0 48px}
+.about-features-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:40px;gap:32px;max-width:1280px;margin-left:auto;margin-right:auto}
 .about-features-h2{font-size:42px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.1;margin:0;max-width:480px}
 .about-features-nav{display:flex;align-items:center;gap:12px;flex-shrink:0;padding-top:8px}
-.about-feat-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(255,255,255,.2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s;font-size:18px;color:#fff}
-.about-feat-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.5)}
-.about-feat-btn:disabled{opacity:.3;cursor:default}
 .about-feat-counter{font-size:13px;font-weight:600;color:rgba(255,255,255,.5)}
-.about-features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
-.about-feat-card{background:rgba(255,255,255,.05);border-radius:var(--radius-lg);overflow:hidden;border:1px solid rgba(255,255,255,.08);transition:border-color .25s}
-.about-feat-card.active{border-color:var(--neon);box-shadow:0 0 0 1px var(--neon)}
+.about-feat-track-wrap{overflow:hidden;width:100%;cursor:grab}
+.about-feat-track-wrap:active{cursor:grabbing}
+.about-features-grid{display:flex;flex-direction:row;gap:24px;will-change:transform}
+.about-feat-card{flex:0 0 320px;width:320px;background:rgba(255,255,255,.05);border-radius:var(--radius-lg);overflow:hidden;border:1px solid rgba(255,255,255,.08);transition:transform .45s cubic-bezier(.25,.46,.45,.94),opacity .45s ease,border-color .25s,box-shadow .25s;transform-origin:center center}
+.about-feat-card.active{border-color:var(--neon);box-shadow:0 0 0 1px var(--neon),0 0 40px rgba(196,255,77,.1)}
 .about-feat-img{height:220px;background:#0d1a0d;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;position:relative}
 .about-feat-img::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(196,255,77,.12) 0%,transparent 70%);pointer-events:none}
 .about-feat-img img{height:210px;width:auto;object-fit:contain;object-position:bottom center;position:relative;z-index:1;filter:drop-shadow(0 0 20px rgba(196,255,77,.15))}
@@ -1819,9 +1820,19 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-cta-btn{display:inline-flex;align-items:center;gap:8px;background:var(--neon);color:var(--navy);border:none;border-radius:var(--radius-pill);padding:14px 28px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
 .about-cta-btn:hover{background:var(--neon-dark)}
 
-@media(max-width:900px){.about-section{grid-template-columns:1fr;gap:20px}.about-features-grid{grid-template-columns:repeat(2,1fr)}.about-brand{grid-template-columns:1fr}.about-hero h1{font-size:36px}}
+@media(max-width:900px){.about-section{grid-template-columns:1fr;gap:20px}.about-brand{grid-template-columns:1fr}.about-hero h1{font-size:36px}}
+@media(max-width:900px){
+  .about-feat-pin-wrap{height:auto!important}
+  .about-feat-pin-inner{position:relative;height:auto;padding:60px 24px}
+  .about-feat-track-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:8px}
+  .about-feat-track-wrap::-webkit-scrollbar{display:none}
+  .about-features-grid{flex-direction:row;transform:none!important;gap:16px}
+  .about-feat-card{flex:0 0 280px;width:280px;transform:none!important;opacity:1!important}
+  .about-features-inner{padding:0 24px}
+  .about-features-head{margin-bottom:28px}
+}
 @media(max-width:600px){
-  .about-features-grid{grid-template-columns:1fr}.about-features-h2{font-size:28px}.about-cta h2{font-size:30px}
+  .about-features-h2{font-size:28px}.about-cta h2{font-size:30px}
   /* about hero mobile */
   .about-hero{height:100svh;min-height:500px}
   .about-hero-inner{padding:calc(68px + 28px) 20px 0}
@@ -4002,16 +4013,17 @@ main{flex:1}
 
   <!-- Що вже працює -->
   <div class="about-features">
-    <div class="about-features-inner">
-      <div class="about-features-head">
-        <h2 class="about-features-h2">Що вже працює.<br>І що готуємо далі.</h2>
-        <div class="about-features-nav">
-          <button class="about-feat-btn" id="aboutFeatPrev" onclick="aboutFeatScroll(-1)" disabled>←</button>
-          <span class="about-feat-counter" id="aboutFeatCounter">01 / 04</span>
-          <button class="about-feat-btn" id="aboutFeatNext" onclick="aboutFeatScroll(1)">→</button>
-        </div>
-      </div>
-      <div class="about-features-grid" id="aboutFeatGrid">
+    <div class="about-feat-pin-wrap" id="aboutFeatPinWrap">
+      <div class="about-feat-pin-inner">
+        <div class="about-features-inner">
+          <div class="about-features-head">
+            <h2 class="about-features-h2">Що вже працює.<br>І що готуємо далі.</h2>
+            <div class="about-features-nav">
+              <span class="about-feat-counter" id="aboutFeatCounter">01 / 04</span>
+            </div>
+          </div>
+          <div class="about-feat-track-wrap">
+          <div class="about-features-grid" id="aboutFeatGrid">
         <!-- Card 1 -->
         <div class="about-feat-card">
           <div class="about-feat-img">
@@ -4058,6 +4070,9 @@ main{flex:1}
             <div class="about-feat-title">Більше матеріалів</div>
             <div class="about-feat-desc">Дослідження палива та засобів захисту рослин.</div>
             <div class="about-feat-bar"><div class="about-feat-bar-fill" style="width:30%"></div></div>
+          </div>
+        </div>
+          </div>
           </div>
         </div>
       </div>
@@ -5577,7 +5592,7 @@ function navigate(page) {
   else { searchQ=''; const si=document.getElementById('searchInput'); if(si) si.value=''; }
   if (page === 'methods') loadMethodsCatalog();
   if (page === 'status') ostPageInit();
-  if (page === 'about') { window.scrollTo(0,0); setTimeout(function(){ if(typeof initAboutPin==='function') initAboutPin(); },50); }
+  if (page === 'about') { window.scrollTo(0,0); setTimeout(function(){ if(typeof initAboutPin==='function') initAboutPin(); if(typeof initAboutFeatPin==='function') initAboutFeatPin(); },50); }
   // transparent navbar only on about page
   var nb = document.querySelector('nav.navbar');
   if(nb) nb.classList.toggle('navbar--transparent', page === 'about');
@@ -8493,27 +8508,67 @@ function initAboutPin(){
   }
 }
 
-// About page features carousel — highlights active card
-let _aboutFeatIdx = 0;
-function _aboutFeatUpdate() {
+// About page features — pinned horizontal scroll with center card scaling
+let _aboutFeatPinInited = false;
+function initAboutFeatPin() {
+  const wrap = document.getElementById('aboutFeatPinWrap');
   const grid = document.getElementById('aboutFeatGrid');
-  const cards = grid ? Array.from(grid.querySelectorAll('.about-feat-card')) : [];
-  const total = cards.length;
-  if (!total) return;
-  _aboutFeatIdx = ((_aboutFeatIdx % total) + total) % total;
-  cards.forEach((c, i) => c.classList.toggle('active', i === _aboutFeatIdx));
-  const counter = document.getElementById('aboutFeatCounter');
-  if (counter) counter.textContent = String(_aboutFeatIdx + 1).padStart(2,'0') + ' / ' + String(total).padStart(2,'0');
-  const prev = document.getElementById('aboutFeatPrev');
-  const next = document.getElementById('aboutFeatNext');
-  if (prev) prev.disabled = _aboutFeatIdx === 0;
-  if (next) next.disabled = _aboutFeatIdx === total - 1;
+  if (!wrap || !grid) return;
+  const cards = Array.from(grid.querySelectorAll('.about-feat-card'));
+  const N = cards.length;
+  if (!N) return;
+
+  // Set wrap height: 100vh per card (so scrolling through = N stops)
+  function setWrapHeight() {
+    if (window.innerWidth <= 900) { wrap.style.height = ''; return; }
+    wrap.style.height = (N * 100) + 'vh';
+  }
+  setWrapHeight();
+  window.addEventListener('resize', setWrapHeight, {passive:true});
+
+  let _lastStep = -1;
+  function update() {
+    if (window.innerWidth <= 900) return; // mobile: natural scroll
+    const rect = wrap.getBoundingClientRect();
+    const wrapH = wrap.offsetHeight;
+    const viewH = window.innerHeight;
+    const scrolled = Math.max(0, -rect.top);
+    const total = Math.max(1, wrapH - viewH);
+    const progress = Math.min(1, Math.max(0, scrolled / total));
+    const step = progress * (N - 1); // 0..N-1 float
+    const activeIdx = Math.round(step);
+
+    // Translate grid so active card is centered
+    const cardW = cards[0].offsetWidth;
+    const gap = 24;
+    const centerX = (window.innerWidth - cardW) / 2;
+    // grid starts at padding-left of .about-features-inner (48px)
+    const padLeft = 48;
+    const tx = centerX - padLeft - activeIdx * (cardW + gap);
+    grid.style.transform = 'translateX(' + tx + 'px)';
+
+    // Scale each card by distance from current step
+    cards.forEach(function(card, i) {
+      const dist = Math.abs(i - step);
+      const scale = Math.max(0.78, 1 - dist * 0.11);
+      const opacity = Math.max(0.35, 1 - dist * 0.28);
+      card.style.transform = 'scale(' + scale + ')';
+      card.style.opacity = opacity;
+      card.classList.toggle('active', i === activeIdx);
+    });
+
+    // Counter
+    if (activeIdx !== _lastStep) {
+      _lastStep = activeIdx;
+      const counter = document.getElementById('aboutFeatCounter');
+      if (counter) counter.textContent = String(activeIdx + 1).padStart(2,'0') + ' / ' + String(N).padStart(2,'0');
+    }
+  }
+
+  window.addEventListener('scroll', update, {passive:true});
+  update();
+  _aboutFeatPinInited = true;
 }
-function aboutFeatScroll(dir) {
-  _aboutFeatIdx += dir;
-  _aboutFeatUpdate();
-}
-document.addEventListener('DOMContentLoaded', _aboutFeatUpdate);
 </script>
 
 
