@@ -1573,29 +1573,50 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 /* ════════════════════════════════════════
    BLOG / АГРОНОМІЧНИЙ ГІД
    ════════════════════════════════════════ */
-
-/* Nav pill override for blog */
-#nav-blog.active{background:var(--navy);color:#fff!important;font-weight:600}
+/* Nav active pill — pill shape */
+#nav-blog.active{background:var(--navy);color:#fff!important;font-weight:600;border-radius:20px!important}
 #nav-blog.active:hover{background:#3a3f43;color:#fff}
-
-/* ── Blog listing ── */
-.blog-page{background:var(--bg);min-height:100vh}
-.blog-header{background:var(--white);border-bottom:1px solid var(--border-soft);padding:40px 0 36px}
-.blog-header-inner{max-width:1100px;margin:0 auto;padding:0 24px}
-.blog-header-inner h1{font-size:36px;font-weight:800;color:var(--navy);letter-spacing:-.5px;margin:0 0 6px}
-.blog-header-inner p{font-size:16px;color:var(--text-mid);margin:0}
-.blog-content{max-width:1100px;margin:0 auto;padding:40px 24px 80px}
+/* Blog page layout */
+.blog-page{background:var(--bg);min-height:100vh;display:flex;flex-direction:column}
+/* Hero header */
+.blog-header{background:var(--white);padding:48px 0 0}
+.blog-header-inner{max-width:1140px;margin:0 auto;padding:0 24px}
+.blog-breadcrumb{font-size:13px;font-weight:500;color:var(--text-soft);margin:0 0 14px;letter-spacing:.1px}
+.blog-header-inner h1{font-size:46px;font-weight:800;color:var(--navy);letter-spacing:-.8px;line-height:1.08;margin:0 0 16px}
+.blog-hero-sub{font-size:16px;color:var(--text-mid);line-height:1.65;max-width:680px;margin:0 0 36px}
+/* Filter + search bar */
+.blog-filters{max-width:1140px;margin:0 auto;padding:0 24px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.blog-tabs{display:flex;align-items:center;gap:2px;flex:1;flex-wrap:wrap}
+.blog-tab{background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:500;color:var(--text-mid);padding:7px 15px;border-radius:20px;transition:background .15s,color .15s;white-space:nowrap;line-height:1}
+.blog-tab:hover{background:var(--bg);color:var(--navy)}
+.blog-tab.active{background:var(--navy);color:#fff;font-weight:600}
+.blog-search-wrap{display:flex;align-items:center;gap:8px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-pill);padding:0 14px;height:40px;min-width:240px;max-width:310px}
+.blog-search-wrap:focus-within{border-color:var(--navy)}
+.blog-search-ico{color:var(--text-soft);flex-shrink:0;display:flex}
+.blog-search-inp{border:none;outline:none;font-size:14px;color:var(--navy);background:transparent;font-family:inherit;width:100%;min-width:0}
+.blog-search-inp::placeholder{color:var(--text-soft)}
+/* Grid */
+.blog-content{max-width:1140px;margin:0 auto;padding:4px 24px 80px;flex:1;width:100%;box-sizing:border-box}
 .blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-.blog-card{background:var(--white);border:1px solid var(--border-soft);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:box-shadow .18s,transform .18s}
-.blog-card:hover{box-shadow:0 6px 24px rgba(0,0,0,.09);transform:translateY(-2px)}
-.blog-card-img{width:100%;height:180px;object-fit:cover;display:block;background:#e8edea}
-.blog-card-img-placeholder{width:100%;height:180px;display:flex;align-items:center;justify-content:center}
-.blog-card-body{padding:18px 20px 20px}
+/* Cards */
+.blog-card{background:var(--white);border:1px solid var(--border-soft);border-radius:14px;overflow:hidden;cursor:pointer;transition:box-shadow .18s,transform .18s;display:flex;flex-direction:column}
+.blog-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.10);transform:translateY(-3px)}
+.blog-card-media{position:relative;height:210px;overflow:hidden;flex-shrink:0}
+.blog-card-photo{width:100%;height:100%;display:block}
+.blog-card-cat{position:absolute;top:12px;left:12px;background:#2e7d32;color:#fff;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:5px;letter-spacing:.2px;z-index:1}
+.blog-card-time{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.52);color:#fff;font-size:11.5px;padding:4px 9px;border-radius:5px;backdrop-filter:blur(4px);z-index:1}
+.blog-card-body{padding:18px 20px 20px;display:flex;flex-direction:column;flex:1}
+.blog-card-title{font-size:17px;font-weight:700;color:var(--navy);line-height:1.35;margin:0 0 8px}
+.blog-card-excerpt{font-size:14px;color:var(--text-mid);line-height:1.55;margin:0;flex:1}
+.blog-card-footer{display:flex;align-items:center;gap:14px;padding-top:14px;margin-top:14px;border-top:1px solid var(--border-soft)}
+.blog-card-meta{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text-soft);line-height:1}
+.blog-card-meta svg{flex-shrink:0;opacity:.7}
+.blog-card-read{margin-left:auto;display:flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:var(--navy);background:none;border:none;cursor:pointer;font-family:inherit;padding:0;transition:gap .15s,color .15s;white-space:nowrap}
+.blog-card-read:hover{color:var(--neon-dark);gap:7px}
+/* .blog-tag kept for article page compatibility */
 .blog-tag{display:inline-block;background:#e8f5e9;color:#2e7d32;font-size:12px;font-weight:700;padding:3px 9px;border-radius:4px;margin-bottom:10px;letter-spacing:.1px}
-.blog-card-title{font-size:15px;font-weight:700;color:var(--navy);line-height:1.4;margin-bottom:10px}
-.blog-card-date{font-size:13px;color:var(--text-soft)}
-@media(max-width:800px){.blog-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:540px){.blog-grid{grid-template-columns:1fr}.blog-header-inner h1{font-size:26px}}
+@media(max-width:960px){.blog-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.blog-grid{grid-template-columns:1fr}.blog-header-inner h1{font-size:30px}.blog-filters{flex-direction:column;align-items:stretch}.blog-search-wrap{max-width:100%;min-width:0}}
 
 /* ── Article detail ── */
 .article-page{background:var(--bg);min-height:100vh}
@@ -3661,46 +3682,180 @@ main{flex:1}
 
 <!-- ══ PAGE: BLOG LISTING ══ -->
 <div class="page blog-page" id="page-blog">
+  <!-- Hero header -->
   <div class="blog-header">
     <div class="blog-header-inner">
-      <h1>Агрономічний гід</h1>
-      <p>Статті та поради від агрономів-консультантів LABA</p>
+      <p class="blog-breadcrumb">Агрономічний гід</p>
+      <h1>Практичні знання для агробізнесу</h1>
+      <p class="blog-hero-sub">Статті, інструкції та рекомендації від наших агрономів, які допомагають краще розуміти результати аналізів і приймати ефективні рішення.</p>
+    </div>
+    <!-- Filter tabs + search -->
+    <div class="blog-filters">
+      <div class="blog-tabs">
+        <button class="blog-tab active" onclick="blogFilter(this,'all')">Усі статті</button>
+        <button class="blog-tab" onclick="blogFilter(this,'grunt')">Ґрунт</button>
+        <button class="blog-tab" onclick="blogFilter(this,'dobryva')">Добрива</button>
+        <button class="blog-tab" onclick="blogFilter(this,'roslyny')">Рослини</button>
+        <button class="blog-tab" onclick="blogFilter(this,'nasinnya')">Насіння</button>
+        <button class="blog-tab" onclick="blogFilter(this,'sezonni')">Сезонне</button>
+        <button class="blog-tab" onclick="blogFilter(this,'porady')">Практичні поради</button>
+      </div>
+      <div class="blog-search-wrap">
+        <span class="blog-search-ico">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.75" stroke="currentColor" stroke-width="1.6"/><path d="M13 13l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </span>
+        <input class="blog-search-inp" type="text" placeholder="Пошук статей, тем або ключових слів..." oninput="blogSearch(this.value)">
+      </div>
     </div>
   </div>
+  <!-- Article grid -->
   <div class="blog-content">
-    <div class="blog-grid">
-      <div class="blog-card" onclick="navigate('article')">
-        <div class="blog-card-img-placeholder" style="background:linear-gradient(160deg,#c8e6c9 0%,#558b2f 60%,#e65100 100%)"></div>
+    <div class="blog-grid" id="blog-grid">
+
+      <!-- 1: Ґрунт -->
+      <div class="blog-card" data-cat="grunt" onclick="navigate('article')">
+        <div class="blog-card-media">
+          <div class="blog-card-photo" style="background:linear-gradient(160deg,#c8e6c9 0%,#558b2f 55%,#e65100 100%);height:210px"></div>
+          <span class="blog-card-cat">Ґрунт</span>
+          <span class="blog-card-time">6 хв читання</span>
+        </div>
         <div class="blog-card-body">
-          <span class="blog-tag">Ґрунт</span>
           <div class="blog-card-title">Які аналізи ґрунту потрібні перед посівом кукурудзи?</div>
-          <div class="blog-card-date">12 березня 2024</div>
+          <p class="blog-card-excerpt">Розбираємо ключові показники, які допомагають оцінити потенціал поля та спланувати живлення.</p>
+          <div class="blog-card-footer">
+            <span class="blog-card-meta">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              12 березня 2024
+            </span>
+            <span class="blog-card-meta">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/></svg>
+              2 450
+            </span>
+            <button class="blog-card-read">Читати →</button>
+          </div>
         </div>
       </div>
-      <div class="blog-card">
-        <div class="blog-card-img-placeholder" style="background:linear-gradient(160deg,#dcedc8 0%,#33691e 70%,#1b5e20 100%)"></div>
+
+      <!-- 2: Добрива -->
+      <div class="blog-card" data-cat="dobryva">
+        <div class="blog-card-media">
+          <div class="blog-card-photo" style="background:linear-gradient(160deg,#f5f5dc 0%,#c8b86a 50%,#8d6e37 100%);height:210px"></div>
+          <span class="blog-card-cat" style="background:#6d4c41">Добрива</span>
+          <span class="blog-card-time">5 хв читання</span>
+        </div>
         <div class="blog-card-body">
-          <span class="blog-tag">Ґрунт</span>
           <div class="blog-card-title">Як перевірити якість добрив перед використанням?</div>
-          <div class="blog-card-date">3 березня 2024</div>
+          <p class="blog-card-excerpt">Як показники якості визначають, щоб бути впевненими у фактичному складі та ефективності добрива.</p>
+          <div class="blog-card-footer">
+            <span class="blog-card-meta">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              3 березня 2024
+            </span>
+            <span class="blog-card-meta">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/></svg>
+              1 890
+            </span>
+            <button class="blog-card-read">Читати →</button>
+          </div>
         </div>
       </div>
-      <div class="blog-card">
-        <div class="blog-card-img-placeholder" style="background:linear-gradient(160deg,#b2dfdb 0%,#00695c 70%,#004d40 100%)"></div>
+
+      <!-- 3: Рослини -->
+      <div class="blog-card" data-cat="roslyny">
+        <div class="blog-card-media">
+          <div class="blog-card-photo" style="background:linear-gradient(160deg,#a5d6a7 0%,#1b5e20 55%,#0a3d0a 100%);height:210px"></div>
+          <span class="blog-card-cat" style="background:#1565c0">Рослини</span>
+          <span class="blog-card-time">7 хв читання</span>
+        </div>
         <div class="blog-card-body">
-          <span class="blog-tag">Живлення рослин</span>
-          <div class="blog-card-title">Діагностика дефіциту елементів живлення за листком</div>
-          <div class="blog-card-date">26 лютого 2024</div>
+          <div class="blog-card-title">Діагностика дефіциту елементів живлення за листковим аналізом</div>
+          <p class="blog-card-excerpt">Як своєчасно виявити нестачу азоту, фосфору, калію та мікроелементів.</p>
+          <div class="blog-card-footer">
+            <span class="blog-card-meta">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              26 лютого 2024
+            </span>
+            <span class="blog-card-meta">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/></svg>
+              3 120
+            </span>
+            <button class="blog-card-read">Читати →</button>
+          </div>
         </div>
       </div>
-      <div class="blog-card">
-        <div class="blog-card-img-placeholder" style="background:linear-gradient(160deg,#fff9c4 0%,#f9a825 60%,#e65100 100%)"></div>
+
+      <!-- 4: Ґрунт -->
+      <div class="blog-card" data-cat="grunt">
+        <div class="blog-card-media">
+          <div class="blog-card-photo" style="background:linear-gradient(160deg,#bcaaa4 0%,#5d4037 55%,#3e2723 100%);height:210px"></div>
+          <span class="blog-card-cat">Ґрунт</span>
+          <span class="blog-card-time">6 хв читання</span>
+        </div>
         <div class="blog-card-body">
-          <span class="blog-tag">Сезонне</span>
-          <div class="blog-card-title">5 агрономічних пріоритетів перед початком сезону</div>
-          <div class="blog-card-date">5 лютого 2024</div>
+          <div class="blog-card-title">Що означає низький вміст органічної речовини в ґрунті?</div>
+          <p class="blog-card-excerpt">Як органічний вуглець впливає на родючість і що робити, щоб його підвищити.</p>
+          <div class="blog-card-footer">
+            <span class="blog-card-meta">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              19 лютого 2024
+            </span>
+            <span class="blog-card-meta">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/></svg>
+              2 110
+            </span>
+            <button class="blog-card-read">Читати →</button>
+          </div>
         </div>
       </div>
+
+      <!-- 5: Насіння -->
+      <div class="blog-card" data-cat="nasinnya">
+        <div class="blog-card-media">
+          <div class="blog-card-photo" style="background:linear-gradient(160deg,#ffe0b2 0%,#bf8040 55%,#6d4c24 100%);height:210px"></div>
+          <span class="blog-card-cat" style="background:#7b5e2a">Насіння</span>
+          <span class="blog-card-time">4 хв читання</span>
+        </div>
+        <div class="blog-card-body">
+          <div class="blog-card-title">Навіщо перевіряти якість насіння у лабораторії?</div>
+          <p class="blog-card-excerpt">Основні показники, які впливають на схожість, життєздатність та результати у полі.</p>
+          <div class="blog-card-footer">
+            <span class="blog-card-meta">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              10 лютого 2024
+            </span>
+            <span class="blog-card-meta">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/></svg>
+              1 760
+            </span>
+            <button class="blog-card-read">Читати →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6: Сезонне -->
+      <div class="blog-card" data-cat="sezonni">
+        <div class="blog-card-media">
+          <div class="blog-card-photo" style="background:linear-gradient(160deg,#fff9c4 0%,#f9a825 50%,#e65100 100%);height:210px"></div>
+          <span class="blog-card-cat" style="background:#e65100">Сезонне</span>
+          <span class="blog-card-time">5 хв читання</span>
+        </div>
+        <div class="blog-card-body">
+          <div class="blog-card-title">5 агрономічних пріоритетів перед початком весни</div>
+          <p class="blog-card-excerpt">На що звернути увагу зараз, щоб ефективно розпочати сезон і уникнути ризиків.</p>
+          <div class="blog-card-footer">
+            <span class="blog-card-meta">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              5 лютого 2024
+            </span>
+            <span class="blog-card-meta">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/></svg>
+              2 980
+            </span>
+            <button class="blog-card-read">Читати →</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
   <!-- Footer -->
@@ -4926,6 +5081,23 @@ const TASKS_BY_MAT = {
 // ═══════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════
+/* ── Blog filter & search ── */
+function blogFilter(btn, cat) {
+  document.querySelectorAll('.blog-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#blog-grid .blog-card').forEach(card => {
+    const show = cat === 'all' || card.dataset.cat === cat;
+    card.style.display = show ? '' : 'none';
+  });
+}
+function blogSearch(q) {
+  const qLow = q.toLowerCase().trim();
+  document.querySelectorAll('#blog-grid .blog-card').forEach(card => {
+    const text = card.innerText.toLowerCase();
+    card.style.display = (!qLow || text.includes(qLow)) ? '' : 'none';
+  });
+}
+
 function navigate(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
