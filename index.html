@@ -1715,6 +1715,74 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .article-rel-body{padding:14px 16px 16px}
 @media(max-width:700px){.article-products-grid{grid-template-columns:1fr}.article-related-grid{grid-template-columns:1fr}.article-checklist{grid-template-columns:1fr}.article-h1{font-size:24px}.article-outer{padding:20px 16px 60px}.article-related-wrap{padding:0 16px 60px}}
 
+/* ══ ABOUT PAGE ══ */
+.about-page{background:var(--white);min-height:100vh}
+
+/* Hero */
+.about-hero{background:linear-gradient(175deg,#0a1a0a 0%,#122a12 40%,#1a3a1a 70%,#0d1f0d 100%);padding:72px 32px 0;text-align:center;overflow:hidden;position:relative;min-height:420px;display:flex;flex-direction:column;align-items:center}
+.about-hero-inner{max-width:900px;margin:0 auto;position:relative;z-index:2}
+.about-hero h1{font-size:52px;font-weight:900;color:#fff;line-height:1.08;letter-spacing:-1.5px;margin:0 0 20px}
+.about-hero-sub{font-size:17px;color:rgba(255,255,255,.65);line-height:1.6;max-width:480px;margin:0 auto 48px}
+.about-hero-robots{display:flex;align-items:flex-end;justify-content:center;gap:0;margin-top:auto;position:relative;z-index:2;padding-bottom:0}
+.about-hero-robots img{width:180px;height:180px;object-fit:contain;filter:drop-shadow(0 8px 32px rgba(0,0,0,.4))}
+
+/* Sections */
+.about-section{max-width:1280px;margin:0 auto;padding:80px 32px;display:grid;grid-template-columns:200px 1fr;gap:32px 80px;align-items:start}
+.about-section-label{font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text-soft);text-transform:uppercase;padding-top:10px;border-left:2px solid var(--border);padding-left:12px}
+.about-section-content{}
+.about-section-h2{font-size:42px;font-weight:900;color:var(--navy);letter-spacing:-1px;line-height:1.1;margin:0 0 20px}
+.about-section-p{font-size:16px;color:var(--text-mid);line-height:1.7;margin:0 0 28px;max-width:600px}
+.about-section-links{display:flex;flex-direction:column;gap:0}
+.about-section-link{background:none;border:none;border-bottom:1px solid var(--border-soft);padding:14px 0;font-size:15px;font-weight:500;color:var(--navy);cursor:pointer;font-family:inherit;text-align:left;display:flex;align-items:center;gap:8px;transition:color .15s}
+.about-section-link:first-child{border-top:1px solid var(--border-soft)}
+.about-section-link:hover{color:var(--neon-dark)}
+.about-section-link::after{content:'→';opacity:.4;margin-left:auto}
+
+/* Features carousel */
+.about-features{background:var(--bg);padding:80px 32px}
+.about-features-inner{max-width:1280px;margin:0 auto}
+.about-features-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:48px;gap:32px}
+.about-features-h2{font-size:42px;font-weight:900;color:var(--navy);letter-spacing:-1px;line-height:1.1;margin:0;max-width:480px}
+.about-features-nav{display:flex;align-items:center;gap:12px;flex-shrink:0;padding-top:8px}
+.about-feat-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s;font-size:18px;color:var(--navy)}
+.about-feat-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+.about-feat-btn:disabled{opacity:.35;cursor:default}
+.about-feat-counter{font-size:13px;font-weight:600;color:var(--text-mid)}
+.about-features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.about-feat-card{background:var(--white);border-radius:var(--radius-lg);overflow:hidden}
+.about-feat-img{height:200px;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.about-feat-img img{width:100%;height:100%;object-fit:cover}
+.about-feat-body{padding:20px}
+.about-feat-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
+.about-feat-badge.done{color:#2e7d32}
+.about-feat-badge.done::before{content:'';width:8px;height:8px;border-radius:50%;background:#2e7d32;flex-shrink:0}
+.about-feat-badge.soon{color:var(--text-soft)}
+.about-feat-badge.soon::before{content:'';width:8px;height:8px;border-radius:50%;background:#aaa;flex-shrink:0}
+.about-feat-title{font-size:16px;font-weight:800;color:var(--navy);margin:0 0 8px;line-height:1.3}
+.about-feat-desc{font-size:13px;color:var(--text-mid);line-height:1.6;margin:0}
+.about-feat-bar{height:3px;background:var(--bg);margin-top:16px;border-radius:2px;overflow:hidden}
+.about-feat-bar-fill{height:100%;background:var(--neon-dark);border-radius:2px}
+
+/* Brand block */
+.about-brand{max-width:1280px;margin:0 auto;padding:80px 32px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.about-brand-logo{font-size:80px;font-weight:900;color:var(--navy);letter-spacing:-4px;line-height:1}
+.about-brand-sub{font-size:14px;color:var(--text-soft);font-weight:500;margin-top:4px;letter-spacing:.5px}
+.about-brand-text h3{font-size:22px;font-weight:800;color:var(--navy);margin:0 0 12px;line-height:1.3}
+.about-brand-text p{font-size:15px;color:var(--text-mid);line-height:1.7;margin:0 0 20px}
+.about-brand-link{background:none;border:none;cursor:pointer;font-size:15px;font-weight:600;color:var(--navy);font-family:inherit;padding:0;display:inline-flex;align-items:center;gap:6px;text-decoration:underline;text-decoration-color:transparent;transition:text-decoration-color .15s}
+.about-brand-link:hover{text-decoration-color:var(--navy)}
+
+/* CTA */
+.about-cta{background:var(--navy);padding:72px 32px;text-align:center;position:relative;overflow:hidden}
+.about-cta-inner{max-width:700px;margin:0 auto;position:relative;z-index:2}
+.about-cta h2{font-size:44px;font-weight:900;color:#fff;letter-spacing:-1px;margin:0 0 12px}
+.about-cta p{font-size:16px;color:rgba(255,255,255,.6);margin:0 0 32px}
+.about-cta-btn{display:inline-flex;align-items:center;gap:8px;background:var(--neon);color:var(--navy);border:none;border-radius:var(--radius-pill);padding:14px 28px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.about-cta-btn:hover{background:var(--neon-dark)}
+
+@media(max-width:900px){.about-section{grid-template-columns:1fr;gap:20px}.about-features-grid{grid-template-columns:repeat(2,1fr)}.about-brand{grid-template-columns:1fr}.about-hero h1{font-size:36px}}
+@media(max-width:600px){.about-features-grid{grid-template-columns:1fr}.about-features-h2{font-size:28px}.about-cta h2{font-size:30px}}
+
 </style>
 <style>
 /* ════════════════════════════════════════
@@ -2828,7 +2896,7 @@ main{flex:1}
       <div class="mega-col">
         <h3>Про LABA</h3>
         <button class="mega-col-link" onclick="closeMegaMenu();navigate('blog')">Агрохімічний гід <span class="mega-col-arrow">›</span></button>
-        <button class="mega-col-link" onclick="closeMegaMenu()">Про сервіс <span class="mega-col-arrow">›</span></button>
+        <button class="mega-col-link" onclick="closeMegaMenu();navigate('about')">Про сервіс <span class="mega-col-arrow">›</span></button>
         <button class="mega-col-link" onclick="closeMegaMenu()">Як ми працюємо <span class="mega-col-arrow">›</span></button>
         <button class="mega-col-link" onclick="closeMegaMenu()">Контакти <span class="mega-col-arrow">›</span></button>
         <button class="mega-col-link" onclick="closeMegaMenu()">Публічний договір <span class="mega-col-arrow">›</span></button>
@@ -2999,7 +3067,7 @@ main{flex:1}
       <div class="laba-footer-col">
         <div class="laba-footer-col-title">Про LABA</div>
         <a href="#" onclick="navigate('blog');return false;">Агрохімічний гід</a>
-        <a href="#">Про нас</a>
+        <a href="#" onclick="navigate('about');return false;">Про сервіс</a>
         <a href="#">Контакти</a>
         <button class="laba-footer-contact-btn" onclick="openCallModal()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
@@ -3233,7 +3301,7 @@ main{flex:1}
       <div class="laba-footer-col">
         <div class="laba-footer-col-title">Про LABA</div>
         <a href="#" onclick="navigate('blog');return false;">Агрохімічний гід</a>
-        <a href="#">Про нас</a>
+        <a href="#" onclick="navigate('about');return false;">Про сервіс</a>
         <a href="#">Контакти</a>
         <button class="laba-footer-contact-btn" onclick="openCallModal()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
@@ -3819,6 +3887,200 @@ main{flex:1}
   </div>
 </div>
 
+<!-- ══ PAGE: ABOUT ══ -->
+<div class="page about-page" id="page-about">
+
+  <!-- Hero -->
+  <div class="about-hero">
+    <div class="about-hero-inner">
+      <h1>Дослідження — складні.<br>Сервіс — простий.</h1>
+      <p class="about-hero-sub">Ми створюємо LABA, щоб лабораторні дослідження були доступними й зрозумілими для агробізнесу.</p>
+    </div>
+    <div class="about-hero-robots">
+      <svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:.85">
+        <rect x="55" y="20" width="50" height="40" rx="10" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"/>
+        <circle cx="70" cy="38" r="6" fill="#4caf50"/><circle cx="90" cy="38" r="6" fill="#c8e6c9"/>
+        <rect x="75" y="55" width="10" height="12" fill="#4caf50"/>
+        <rect x="40" y="65" width="80" height="55" rx="12" fill="#f1f8e9" stroke="#4caf50" stroke-width="2"/>
+        <rect x="22" y="70" width="22" height="10" rx="5" fill="#c8e6c9" stroke="#4caf50" stroke-width="1.5"/>
+        <rect x="116" y="70" width="22" height="10" rx="5" fill="#c8e6c9" stroke="#4caf50" stroke-width="1.5"/>
+        <rect x="55" y="118" width="20" height="28" rx="6" fill="#c8e6c9" stroke="#4caf50" stroke-width="1.5"/>
+        <rect x="85" y="118" width="20" height="28" rx="6" fill="#c8e6c9" stroke="#4caf50" stroke-width="1.5"/>
+        <rect x="60" y="78" width="18" height="10" rx="3" fill="#4caf50"/>
+        <rect x="82" y="78" width="18" height="10" rx="3" fill="#a5d6a7"/>
+        <line x1="70" y1="95" x2="90" y2="95" stroke="#4caf50" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <svg width="200" height="200" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:.95">
+        <rect x="50" y="15" width="60" height="45" rx="12" fill="#c8e6c9" stroke="#2e7d32" stroke-width="2"/>
+        <circle cx="68" cy="35" r="7" fill="#2e7d32"/><circle cx="68" cy="35" r="3" fill="#fff"/>
+        <circle cx="92" cy="35" r="7" fill="#81c784"/><circle cx="92" cy="35" r="3" fill="#fff"/>
+        <rect x="73" y="56" width="14" height="14" fill="#2e7d32"/>
+        <rect x="35" y="68" width="90" height="58" rx="14" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+        <rect x="18" y="74" width="20" height="12" rx="6" fill="#a5d6a7" stroke="#2e7d32" stroke-width="1.5"/>
+        <rect x="122" y="74" width="20" height="12" rx="6" fill="#a5d6a7" stroke="#2e7d32" stroke-width="1.5"/>
+        <rect x="50" y="124" width="22" height="30" rx="7" fill="#a5d6a7" stroke="#2e7d32" stroke-width="1.5"/>
+        <rect x="88" y="124" width="22" height="30" rx="7" fill="#a5d6a7" stroke="#2e7d32" stroke-width="1.5"/>
+        <rect x="56" y="82" width="22" height="12" rx="4" fill="#2e7d32"/>
+        <rect x="82" y="82" width="22" height="12" rx="4" fill="#81c784"/>
+        <path d="M65 104 Q80 112 95 104" stroke="#2e7d32" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <rect x="62" y="44" width="8" height="8" rx="2" fill="#c8e6c9"/>
+        <rect x="90" y="44" width="8" height="8" rx="2" fill="#c8e6c9"/>
+      </svg>
+      <svg width="170" height="170" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:.8">
+        <rect x="55" y="18" width="50" height="42" rx="10" fill="#dcedc8" stroke="#558b2f" stroke-width="2"/>
+        <circle cx="72" cy="36" r="6" fill="#558b2f"/><circle cx="88" cy="36" r="6" fill="#aed581"/>
+        <rect x="74" y="56" width="12" height="12" fill="#558b2f"/>
+        <rect x="38" y="66" width="84" height="56" rx="13" fill="#f9fbe7" stroke="#558b2f" stroke-width="2"/>
+        <rect x="20" y="72" width="21" height="11" rx="5" fill="#c5e1a5" stroke="#558b2f" stroke-width="1.5"/>
+        <rect x="119" y="72" width="21" height="11" rx="5" fill="#c5e1a5" stroke="#558b2f" stroke-width="1.5"/>
+        <rect x="52" y="120" width="20" height="26" rx="6" fill="#c5e1a5" stroke="#558b2f" stroke-width="1.5"/>
+        <rect x="88" y="120" width="20" height="26" rx="6" fill="#c5e1a5" stroke="#558b2f" stroke-width="1.5"/>
+        <rect x="57" y="80" width="16" height="10" rx="3" fill="#558b2f"/>
+        <rect x="87" y="80" width="16" height="10" rx="3" fill="#aed581"/>
+        <line x1="68" y1="98" x2="92" y2="98" stroke="#558b2f" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <svg width="155" height="155" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:.75">
+        <rect x="57" y="22" width="46" height="38" rx="9" fill="#f1f8e9" stroke="#33691e" stroke-width="2"/>
+        <circle cx="72" cy="38" r="5" fill="#33691e"/><circle cx="88" cy="38" r="5" fill="#b9f6ca"/>
+        <rect x="76" y="57" width="8" height="11" fill="#33691e"/>
+        <rect x="42" y="66" width="76" height="52" rx="11" fill="#f9fbe7" stroke="#33691e" stroke-width="2"/>
+        <rect x="24" y="71" width="20" height="10" rx="5" fill="#ccff90" stroke="#33691e" stroke-width="1.5"/>
+        <rect x="116" y="71" width="20" height="10" rx="5" fill="#ccff90" stroke="#33691e" stroke-width="1.5"/>
+        <rect x="56" y="116" width="18" height="24" rx="6" fill="#ccff90" stroke="#33691e" stroke-width="1.5"/>
+        <rect x="86" y="116" width="18" height="24" rx="6" fill="#ccff90" stroke="#33691e" stroke-width="1.5"/>
+        <rect x="58" y="78" width="16" height="9" rx="3" fill="#33691e"/>
+        <rect x="86" y="78" width="16" height="9" rx="3" fill="#b9f6ca"/>
+      </svg>
+      <svg width="145" height="145" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:.7">
+        <rect x="60" y="25" width="40" height="34" rx="8" fill="#e8f5e9" stroke="#1b5e20" stroke-width="2"/>
+        <circle cx="73" cy="40" r="5" fill="#1b5e20"/><circle cx="87" cy="40" r="5" fill="#a5d6a7"/>
+        <rect x="77" y="56" width="6" height="10" fill="#1b5e20"/>
+        <rect x="45" y="64" width="70" height="50" rx="10" fill="#f1f8e9" stroke="#1b5e20" stroke-width="2"/>
+        <rect x="27" y="69" width="18" height="9" rx="4" fill="#c8e6c9" stroke="#1b5e20" stroke-width="1.5"/>
+        <rect x="115" y="69" width="18" height="9" rx="4" fill="#c8e6c9" stroke="#1b5e20" stroke-width="1.5"/>
+        <rect x="58" y="112" width="16" height="22" rx="5" fill="#c8e6c9" stroke="#1b5e20" stroke-width="1.5"/>
+        <rect x="86" y="112" width="16" height="22" rx="5" fill="#c8e6c9" stroke="#1b5e20" stroke-width="1.5"/>
+        <rect x="60" y="76" width="14" height="8" rx="3" fill="#1b5e20"/>
+        <rect x="86" y="76" width="14" height="8" rx="3" fill="#a5d6a7"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Навіщо ми -->
+  <div class="about-section">
+    <div class="about-section-label">Навіщо ми</div>
+    <div class="about-section-content">
+      <h2 class="about-section-h2">Щоб перевірити якість,<br>не потрібно ставати<br>експертом у лабораторних<br>дослідженнях.</h2>
+      <p class="about-section-p">Потрібно знати, що ви хочете перевірити. А ми допоможемо обрати дослідження та пройти шлях від зразка до результату.</p>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid var(--border-soft);max-width:1280px;margin:0 auto 0;padding:0 32px"><div style="border-top:1px solid var(--border-soft)"></div></div>
+
+  <!-- Що ми робимо -->
+  <div class="about-section">
+    <div class="about-section-label">Що ми робимо</div>
+    <div class="about-section-content">
+      <h2 class="about-section-h2">Допомагаємо приймати<br>рішення на основі даних.</h2>
+      <p class="about-section-p">Перевіряємо ґрунт, добрива, воду, насіння, зерно та рослини. Щоб ви могли оцінити якість, перевірити склад і спланувати наступні дії.</p>
+      <div class="about-section-links">
+        <button class="about-section-link" onclick="navigate('services')">Обрати дослідження — онлайн</button>
+        <button class="about-section-link" onclick="navigate('sampling')">Надіслати зразок — за інструкцією</button>
+        <button class="about-section-link" onclick="navigate('status')">Перевірити статус — на сайті</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Що вже працює -->
+  <div class="about-features">
+    <div class="about-features-inner">
+      <div class="about-features-head">
+        <h2 class="about-features-h2">Що вже працює.<br>І що готуємо далі.</h2>
+        <div class="about-features-nav">
+          <button class="about-feat-btn" id="aboutFeatPrev" onclick="aboutFeatScroll(-1)" disabled>←</button>
+          <span class="about-feat-counter" id="aboutFeatCounter">01 / 04</span>
+          <button class="about-feat-btn" id="aboutFeatNext" onclick="aboutFeatScroll(1)">→</button>
+        </div>
+      </div>
+      <div class="about-features-grid" id="aboutFeatGrid">
+        <!-- Card 1 -->
+        <div class="about-feat-card">
+          <div class="about-feat-img" style="background:linear-gradient(160deg,#e8f5e9 0%,#43a047 100%)">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none"><rect x="15" y="10" width="50" height="60" rx="8" fill="#fff" fill-opacity=".3"/><rect x="22" y="20" width="36" height="6" rx="3" fill="#fff" fill-opacity=".7"/><rect x="22" y="32" width="28" height="4" rx="2" fill="#fff" fill-opacity=".5"/><rect x="22" y="42" width="32" height="4" rx="2" fill="#fff" fill-opacity=".5"/><rect x="22" y="52" width="20" height="4" rx="2" fill="#fff" fill-opacity=".5"/></svg>
+          </div>
+          <div class="about-feat-body">
+            <div class="about-feat-badge done">Вже є</div>
+            <div class="about-feat-title">Замовлення онлайн</div>
+            <div class="about-feat-desc">Обирайте дослідження та оформляйте замовлення на сайті.</div>
+            <div class="about-feat-bar"><div class="about-feat-bar-fill" style="width:100%"></div></div>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="about-feat-card">
+          <div class="about-feat-img" style="background:linear-gradient(160deg,#e3f2fd 0%,#1976d2 100%)">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none"><rect x="20" y="15" width="40" height="50" rx="8" fill="#fff" fill-opacity=".3"/><circle cx="40" cy="35" r="10" fill="#fff" fill-opacity=".5"/><rect x="28" y="52" width="24" height="4" rx="2" fill="#fff" fill-opacity=".6"/><rect x="32" y="60" width="16" height="4" rx="2" fill="#fff" fill-opacity=".4"/></svg>
+          </div>
+          <div class="about-feat-body">
+            <div class="about-feat-badge done">Вже є</div>
+            <div class="about-feat-title">Статус без кабінету</div>
+            <div class="about-feat-desc">Перевіряйте етап дослідження за номером замовлення.</div>
+            <div class="about-feat-bar"><div class="about-feat-bar-fill" style="width:100%"></div></div>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="about-feat-card">
+          <div class="about-feat-img" style="background:linear-gradient(160deg,#f3e5f5 0%,#7b1fa2 100%)">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none"><path d="M20 55 L40 20 L60 55 Z" fill="#fff" fill-opacity=".3"/><circle cx="40" cy="20" r="6" fill="#fff" fill-opacity=".6"/><rect x="25" y="58" width="30" height="5" rx="2" fill="#fff" fill-opacity=".5"/></svg>
+          </div>
+          <div class="about-feat-body">
+            <div class="about-feat-badge done">Вже є</div>
+            <div class="about-feat-title">Як відібрати зразок</div>
+            <div class="about-feat-desc">Короткі інструкції та докладні PDF для завантаження.</div>
+            <div class="about-feat-bar"><div class="about-feat-bar-fill" style="width:100%"></div></div>
+          </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="about-feat-card">
+          <div class="about-feat-img" style="background:linear-gradient(160deg,#fff8e1 0%,#f9a825 60%,#e65100 100%)">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none"><rect x="15" y="25" width="50" height="30" rx="6" fill="#fff" fill-opacity=".3"/><circle cx="30" cy="40" r="6" fill="#fff" fill-opacity=".6"/><circle cx="50" cy="40" r="6" fill="#fff" fill-opacity=".4"/><rect x="20" y="60" width="40" height="4" rx="2" fill="#fff" fill-opacity=".5"/></svg>
+          </div>
+          <div class="about-feat-body">
+            <div class="about-feat-badge soon">Плануємо</div>
+            <div class="about-feat-title">Більше матеріалів</div>
+            <div class="about-feat-desc">Дослідження палива та засобів захисту рослин.</div>
+            <div class="about-feat-bar"><div class="about-feat-bar-fill" style="width:30%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Brand -->
+  <div style="border-top:1px solid var(--border-soft)">
+    <div class="about-brand">
+      <div>
+        <div class="about-brand-logo">LABA</div>
+        <div class="about-brand-sub">by zemlerob</div>
+      </div>
+      <div class="about-brand-text">
+        <h3>Сервіс лабораторних досліджень для агробізнесу.</h3>
+        <p>Зрозумілий вибір досліджень, онлайн-замовлення та підтримка, коли потрібна допомога.</p>
+        <button class="about-brand-link" onclick="openCallModal()">Зв'язатися з нами →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="about-cta">
+    <div class="about-cta-inner">
+      <h2>Почнемо з вашої задачі?</h2>
+      <p>Допоможемо обрати дослідження.</p>
+      <button class="about-cta-btn" onclick="openCallModal()">Отримати консультацію →</button>
+    </div>
+  </div>
+
+</div>
+
 <!-- ══ PAGE: BLOG LISTING ══ -->
 <div class="page blog-page" id="page-blog">
   <!-- Hero header -->
@@ -4022,7 +4284,7 @@ main{flex:1}
       <div class="laba-footer-col">
         <div class="laba-footer-col-title">Про LABA</div>
         <a href="#" onclick="navigate('blog');return false;">Агрохімічний гід</a>
-        <a href="#">Про нас</a>
+        <a href="#" onclick="navigate('about');return false;">Про сервіс</a>
         <a href="#">Контакти</a>
         <button class="laba-footer-contact-btn" onclick="openCallModal()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
@@ -4219,7 +4481,7 @@ main{flex:1}
       <div class="laba-footer-col">
         <div class="laba-footer-col-title">Про LABA</div>
         <a href="#" onclick="navigate('blog');return false;">Агрохімічний гід</a>
-        <a href="#">Про нас</a>
+        <a href="#" onclick="navigate('about');return false;">Про сервіс</a>
         <a href="#">Контакти</a>
         <button class="laba-footer-contact-btn" onclick="openCallModal()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
@@ -4299,7 +4561,7 @@ main{flex:1}
       <div class="laba-footer-col">
         <div class="laba-footer-col-title">Про LABA</div>
         <a href="#" onclick="navigate('blog');return false;">Агрохімічний гід</a>
-        <a href="#">Про нас</a>
+        <a href="#" onclick="navigate('about');return false;">Про сервіс</a>
         <a href="#">Контакти</a>
         <button class="laba-footer-contact-btn" onclick="openCallModal()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
@@ -4453,7 +4715,7 @@ main{flex:1}
       <div class="laba-footer-col">
         <div class="laba-footer-col-title">Про LABA</div>
         <a href="#" onclick="navigate('blog');return false;">Агрохімічний гід</a>
-        <a href="#">Про нас</a>
+        <a href="#" onclick="navigate('about');return false;">Про сервіс</a>
         <a href="#">Контакти</a>
         <button class="laba-footer-contact-btn" onclick="openCallModal()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
@@ -4892,7 +5154,7 @@ main{flex:1}
       <div class="laba-footer-col">
         <div class="laba-footer-col-title">Про LABA</div>
         <a href="#" onclick="navigate('blog');return false;">Агрохімічний гід</a>
-        <a href="#">Про нас</a>
+        <a href="#" onclick="navigate('about');return false;">Про сервіс</a>
         <a href="#">Контакти</a>
         <button class="laba-footer-contact-btn" onclick="openCallModal()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
@@ -8137,6 +8399,25 @@ function ostFaqToggle(qEl) {
 
 function escHtml(str) {
   return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// About page features carousel
+let _aboutFeatPage = 0;
+function aboutFeatScroll(dir) {
+  const grid = document.getElementById('aboutFeatGrid');
+  const cards = grid ? grid.querySelectorAll('.about-feat-card') : [];
+  const total = cards.length;
+  const perPage = window.innerWidth < 600 ? 1 : window.innerWidth < 900 ? 2 : 4;
+  const maxPage = Math.ceil(total / perPage) - 1;
+  _aboutFeatPage = Math.max(0, Math.min(maxPage, _aboutFeatPage + dir));
+  const offset = _aboutFeatPage * perPage;
+  cards.forEach((c, i) => { c.style.display = (i >= offset && i < offset + perPage) ? '' : 'none'; });
+  const counter = document.getElementById('aboutFeatCounter');
+  if (counter) counter.textContent = String(_aboutFeatPage + 1).padStart(2,'0') + ' / ' + String(Math.ceil(total/perPage)).padStart(2,'0');
+  const prev = document.getElementById('aboutFeatPrev');
+  const next = document.getElementById('aboutFeatNext');
+  if (prev) prev.disabled = _aboutFeatPage === 0;
+  if (next) next.disabled = _aboutFeatPage >= maxPage;
 }
 </script>
 
