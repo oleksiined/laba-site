@@ -1782,8 +1782,9 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-feat-counter{font-size:13px;font-weight:600;color:rgba(255,255,255,.5)}
 .about-features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
 .about-feat-card{background:rgba(255,255,255,.05);border-radius:var(--radius-lg);overflow:hidden;border:1px solid rgba(255,255,255,.08)}
-.about-feat-img{height:200px;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden}
-.about-feat-img img{width:100%;height:100%;object-fit:cover}
+.about-feat-img{height:220px;background:#0d1a0d;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;position:relative}
+.about-feat-img::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(196,255,77,.12) 0%,transparent 70%);pointer-events:none}
+.about-feat-img img{height:210px;width:auto;object-fit:contain;object-position:bottom center;position:relative;z-index:1;filter:drop-shadow(0 0 20px rgba(196,255,77,.15))}
 .about-feat-body{padding:20px}
 .about-feat-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
 .about-feat-badge.done{color:var(--neon)}
@@ -3991,8 +3992,8 @@ main{flex:1}
       <div class="about-features-grid" id="aboutFeatGrid">
         <!-- Card 1 -->
         <div class="about-feat-card">
-          <div class="about-feat-img" style="background:linear-gradient(160deg,#e8f5e9 0%,#43a047 100%)">
-            <svg width="80" height="80" viewBox="0 0 80 80" fill="none"><rect x="15" y="10" width="50" height="60" rx="8" fill="#fff" fill-opacity=".3"/><rect x="22" y="20" width="36" height="6" rx="3" fill="#fff" fill-opacity=".7"/><rect x="22" y="32" width="28" height="4" rx="2" fill="#fff" fill-opacity=".5"/><rect x="22" y="42" width="32" height="4" rx="2" fill="#fff" fill-opacity=".5"/><rect x="22" y="52" width="20" height="4" rx="2" fill="#fff" fill-opacity=".5"/></svg>
+          <div class="about-feat-img">
+            <img src="/robot-tablet.png" alt="Замовлення онлайн">
           </div>
           <div class="about-feat-body">
             <div class="about-feat-badge done">Вже є</div>
@@ -4003,8 +4004,8 @@ main{flex:1}
         </div>
         <!-- Card 2 -->
         <div class="about-feat-card">
-          <div class="about-feat-img" style="background:linear-gradient(160deg,#e3f2fd 0%,#1976d2 100%)">
-            <svg width="80" height="80" viewBox="0 0 80 80" fill="none"><rect x="20" y="15" width="40" height="50" rx="8" fill="#fff" fill-opacity=".3"/><circle cx="40" cy="35" r="10" fill="#fff" fill-opacity=".5"/><rect x="28" y="52" width="24" height="4" rx="2" fill="#fff" fill-opacity=".6"/><rect x="32" y="60" width="16" height="4" rx="2" fill="#fff" fill-opacity=".4"/></svg>
+          <div class="about-feat-img">
+            <img src="/robot-hand.png" alt="Статус без кабінету">
           </div>
           <div class="about-feat-body">
             <div class="about-feat-badge done">Вже є</div>
@@ -4015,8 +4016,8 @@ main{flex:1}
         </div>
         <!-- Card 3 -->
         <div class="about-feat-card">
-          <div class="about-feat-img" style="background:linear-gradient(160deg,#f3e5f5 0%,#7b1fa2 100%)">
-            <svg width="80" height="80" viewBox="0 0 80 80" fill="none"><path d="M20 55 L40 20 L60 55 Z" fill="#fff" fill-opacity=".3"/><circle cx="40" cy="20" r="6" fill="#fff" fill-opacity=".6"/><rect x="25" y="58" width="30" height="5" rx="2" fill="#fff" fill-opacity=".5"/></svg>
+          <div class="about-feat-img">
+            <img src="/robot-book.png" alt="Як відібрати зразок">
           </div>
           <div class="about-feat-body">
             <div class="about-feat-badge done">Вже є</div>
@@ -4027,8 +4028,8 @@ main{flex:1}
         </div>
         <!-- Card 4 -->
         <div class="about-feat-card">
-          <div class="about-feat-img" style="background:linear-gradient(160deg,#fff8e1 0%,#f9a825 60%,#e65100 100%)">
-            <svg width="80" height="80" viewBox="0 0 80 80" fill="none"><rect x="15" y="25" width="50" height="30" rx="6" fill="#fff" fill-opacity=".3"/><circle cx="30" cy="40" r="6" fill="#fff" fill-opacity=".6"/><circle cx="50" cy="40" r="6" fill="#fff" fill-opacity=".4"/><rect x="20" y="60" width="40" height="4" rx="2" fill="#fff" fill-opacity=".5"/></svg>
+          <div class="about-feat-img">
+            <img src="/robot-clipboard.png" alt="Більше матеріалів">
           </div>
           <div class="about-feat-body">
             <div class="about-feat-badge soon">Плануємо</div>
