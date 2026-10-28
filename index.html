@@ -1802,9 +1802,8 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-feat-tl-dot.active{background:var(--neon)}
 .about-feat-tl-line{flex:1;height:2px;background:rgba(255,255,255,.12);border-radius:2px;transition:background .35s}
 .about-feat-tl-line.done{background:var(--neon)}
-/* Info row below timeline */
-.about-feat-info{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);padding:16px 60px 0}
-.about-feat-info-col{padding-right:24px}
+/* Single info panel below timeline */
+.about-feat-info-panel{max-width:1280px;margin:0 auto;padding:20px 60px 0;transition:opacity .18s ease,transform .18s ease}
 .about-feat-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border:1px solid;border-radius:4px;margin-bottom:10px}
 .about-feat-badge.done{color:var(--neon);border-color:var(--neon)}
 .about-feat-badge.soon{color:rgba(255,255,255,.3);border-color:rgba(255,255,255,.15)}
@@ -1840,7 +1839,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
   .about-feat-card{width:260px}
   .about-feat-carousel::before,.about-feat-carousel::after{width:calc(50vw - 140px)}
   .about-feat-timeline{padding:20px 24px 0}
-  .about-feat-info{padding:12px 24px 0}
+  .about-feat-info-panel{padding:12px 24px 0}
 }
 @media(max-width:600px){
   .about-features-head{padding:0 20px}
@@ -1849,8 +1848,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
   .about-feat-img img{height:190px}
   .about-feat-carousel::before,.about-feat-carousel::after{width:calc(50vw - 120px)}
   .about-feat-timeline{padding:16px 20px 0;grid-template-columns:repeat(4,1fr)}
-  .about-feat-info{padding:10px 20px 0;grid-template-columns:repeat(2,1fr)}
-  .about-feat-info-col:nth-child(n+3){display:none}
+  .about-feat-info-panel{padding:10px 20px 0}
 }
 @media(max-width:600px){
   .about-features-h2{font-size:28px}.about-cta h2{font-size:30px}
@@ -4067,28 +4065,11 @@ main{flex:1}
       <div class="about-feat-tl-item"><div class="about-feat-tl-dot" id="ftDot2"></div><div class="about-feat-tl-line" id="ftLine2"></div></div>
       <div class="about-feat-tl-item"><div class="about-feat-tl-dot" id="ftDot3"></div><div class="about-feat-tl-line" id="ftLine3"></div></div>
     </div>
-    <!-- Info columns -->
-    <div class="about-feat-info">
-      <div class="about-feat-info-col">
-        <div class="about-feat-badge done">Вже є</div>
-        <div class="about-feat-title active" id="ftTitle0">Замовлення онлайн</div>
-        <div class="about-feat-desc active" id="ftDesc0">Обирайте дослідження та оформляйте замовлення на сайті.</div>
-      </div>
-      <div class="about-feat-info-col">
-        <div class="about-feat-badge done">Вже є</div>
-        <div class="about-feat-title" id="ftTitle1">Статус без кабінету</div>
-        <div class="about-feat-desc" id="ftDesc1">Перевіряйте етап дослідження за номером замовлення.</div>
-      </div>
-      <div class="about-feat-info-col">
-        <div class="about-feat-badge done">Вже є</div>
-        <div class="about-feat-title" id="ftTitle2">Як відібрати зразок</div>
-        <div class="about-feat-desc" id="ftDesc2">Короткі інструкції та докладні PDF для завантаження.</div>
-      </div>
-      <div class="about-feat-info-col">
-        <div class="about-feat-badge soon">Плануємо</div>
-        <div class="about-feat-title" id="ftTitle3">Більше матеріалів</div>
-        <div class="about-feat-desc" id="ftDesc3">Дослідження палива та засобів захисту рослин.</div>
-      </div>
+    <!-- Single info panel (updates on scroll) -->
+    <div class="about-feat-info-panel" id="aboutFeatInfoPanel">
+      <div class="about-feat-badge done" id="ftBadge">Вже є</div>
+      <div class="about-feat-title" id="ftTitle">Замовлення онлайн</div>
+      <div class="about-feat-desc" id="ftDesc">Обирайте дослідження та оформляйте замовлення на сайті.</div>
     </div>
   </div>
 
@@ -8525,6 +8506,13 @@ function initAboutPin(){
 let _aboutFeatIdx = 0;
 let _aboutFeatCarouselInited = false;
 
+var _aboutFeatData = [
+  { badge: 'done', badgeText: 'Вже є', title: 'Замовлення онлайн', desc: 'Обирайте дослідження та оформляйте замовлення на сайті.' },
+  { badge: 'done', badgeText: 'Вже є', title: 'Статус без кабінету', desc: 'Перевіряйте етап дослідження за номером замовлення.' },
+  { badge: 'done', badgeText: 'Вже є', title: 'Як відібрати зразок', desc: 'Короткі інструкції та докладні PDF для завантаження.' },
+  { badge: 'soon', badgeText: 'Плануємо', title: 'Більше матеріалів', desc: 'Дослідження палива та засобів захисту рослин.' }
+];
+
 function _aboutFeatCarouselRender(idx) {
   var carousel = document.getElementById('aboutFeatCarousel');
   if (!carousel) return;
@@ -8535,12 +8523,8 @@ function _aboutFeatCarouselRender(idx) {
   for (var i = 0; i < N; i++) {
     var dot = document.getElementById('ftDot' + i);
     var line = document.getElementById('ftLine' + i);
-    var title = document.getElementById('ftTitle' + i);
-    var desc = document.getElementById('ftDesc' + i);
     if (dot) dot.classList.toggle('active', i === _aboutFeatIdx);
     if (line) line.classList.toggle('done', i < _aboutFeatIdx);
-    if (title) { title.classList.toggle('active', i === _aboutFeatIdx); }
-    if (desc) { desc.classList.toggle('active', i === _aboutFeatIdx); }
   }
   var counter = document.getElementById('aboutFeatCounter');
   if (counter) counter.textContent = String(_aboutFeatIdx + 1).padStart(2,'0') + ' / ' + String(N).padStart(2,'0');
@@ -8548,6 +8532,24 @@ function _aboutFeatCarouselRender(idx) {
   var next = document.getElementById('aboutFeatNext');
   if (prev) prev.disabled = _aboutFeatIdx === 0;
   if (next) next.disabled = _aboutFeatIdx === N - 1;
+  // Update single info panel with fade
+  var panel = document.getElementById('aboutFeatInfoPanel');
+  if (panel) {
+    panel.style.opacity = '0';
+    panel.style.transform = 'translateY(6px)';
+    clearTimeout(panel._ft);
+    panel._ft = setTimeout(function() {
+      var d = _aboutFeatData[_aboutFeatIdx] || _aboutFeatData[0];
+      var badge = document.getElementById('ftBadge');
+      var title = document.getElementById('ftTitle');
+      var desc = document.getElementById('ftDesc');
+      if (badge) { badge.className = 'about-feat-badge ' + d.badge; badge.textContent = d.badgeText; }
+      if (title) title.textContent = d.title;
+      if (desc) desc.textContent = d.desc;
+      panel.style.opacity = '1';
+      panel.style.transform = 'translateY(0)';
+    }, 140);
+  }
 }
 
 function _aboutFeatScrollToIdx(idx) {
