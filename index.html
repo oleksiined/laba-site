@@ -1748,15 +1748,15 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 @media(max-width:900px){.about-pin-layout{grid-template-columns:1fr;gap:24px}.about-pin-left{flex-direction:row;align-items:center;gap:20px}.about-pin-wrap{height:400vh}}
 
 /* Hero */
-.about-hero{background:linear-gradient(175deg,#0a1a0a 0%,#122a12 40%,#1a3a1a 70%,#0d1f0d 100%);padding:calc(68px + 60px) 32px 0;margin-top:-68px;text-align:center;overflow:hidden;position:relative;height:100vh;min-height:600px;display:flex;flex-direction:column;align-items:center;box-sizing:border-box}
+.about-hero{background:linear-gradient(175deg,#0a1a0a 0%,#122a12 40%,#1a3a1a 70%,#0d1f0d 100%);padding:calc(68px + 60px) 32px 0;margin-top:-68px;text-align:center;overflow:hidden;position:relative;height:100vh;min-height:600px;display:flex;flex-direction:column;align-items:center;box-sizing:border-box;justify-content:center}
 .about-hero-inner{max-width:900px;margin:0 auto;position:relative;z-index:2}
 .about-hero h1{font-size:52px;font-weight:900;color:#fff;line-height:1.08;letter-spacing:-1.5px;margin:0 0 20px}
 .about-hero-sub{font-size:17px;color:rgba(255,255,255,.65);line-height:1.6;max-width:480px;margin:0 auto 48px}
-.about-hero-robots{display:flex;align-items:flex-end;justify-content:center;gap:0;margin-top:auto;flex:1;position:relative;z-index:2;padding-bottom:0;max-height:400px;overflow:hidden}
-.about-hero-robots img{object-fit:contain;object-position:bottom center;filter:drop-shadow(0 8px 32px rgba(0,0,0,.5))}
-.about-hero-robots img.rob-sm{height:220px;width:auto}
-.about-hero-robots img.rob-md{height:280px;width:auto}
-.about-hero-robots img.rob-lg{height:360px;width:auto}
+.about-hero-robots{display:flex;align-items:flex-end;justify-content:center;gap:-16px;margin-top:auto;flex:1;position:relative;z-index:2;padding-bottom:0;overflow:visible}
+.about-hero-robots img{object-fit:contain;object-position:bottom center;mix-blend-mode:screen}
+.about-hero-robots img.rob-sm{height:240px;width:auto}
+.about-hero-robots img.rob-md{height:300px;width:auto}
+.about-hero-robots img.rob-lg{height:380px;width:auto}
 
 /* Sections */
 .about-section{max-width:1280px;margin:0 auto;padding:80px 32px;display:grid;grid-template-columns:200px 1fr;gap:32px 80px;align-items:start}
