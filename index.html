@@ -1775,40 +1775,45 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-section-link:hover{color:var(--neon-dark)}
 .about-section-link::after{content:'→';opacity:.4;margin-left:auto}
 
-/* Features — sticky scroll, neon border jumps card to card */
-.about-features{background:#0f1710}
-.about-feat-scroll-outer{position:relative}
-.about-feat-scroll-inner{position:sticky;top:0;height:100vh;display:flex;align-items:center;overflow:hidden;background:#0f1710}
-.about-feat-pin-wrap{max-width:1280px;margin:0 auto;padding:0 48px;width:100%}
-.about-features-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:36px;gap:32px}
+/* Features — horizontal snap carousel, monobank-style */
+.about-features{background:#0f1710;padding:80px 0}
+.about-features-head{max-width:1280px;margin:0 auto;padding:0 60px;margin-bottom:48px;display:flex;align-items:flex-end;justify-content:space-between;gap:32px}
 .about-features-h2{font-size:42px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.1;margin:0;max-width:480px}
 .about-features-sub{font-size:15px;color:rgba(255,255,255,.5);line-height:1.5;margin:8px 0 0}
-.about-features-nav{display:flex;align-items:center;gap:12px;flex-shrink:0;padding-top:8px}
+.about-features-nav{display:flex;align-items:center;gap:12px;flex-shrink:0}
 .about-feat-btn{width:44px;height:44px;border-radius:var(--radius-lg);border:1.5px solid rgba(255,255,255,.2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s;font-size:18px;color:#fff;font-family:inherit}
 .about-feat-btn:hover:not(:disabled){background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.4)}
 .about-feat-btn:disabled{opacity:.25;cursor:default}
 .about-feat-counter{font-size:13px;font-weight:600;color:rgba(255,255,255,.5);min-width:40px;text-align:center}
-/* Image cards grid — cards contain ONLY image */
-.about-features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.about-feat-card{border-radius:14px;overflow:hidden;border:2px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);transition:border-color .3s ease,box-shadow .3s ease,opacity .3s ease;cursor:pointer}
-.about-feat-card.active{border-color:var(--neon);box-shadow:0 0 0 1px var(--neon),0 0 32px rgba(196,255,77,.2);opacity:1}
-.about-feat-card:not(.active){opacity:0.4}
-.about-feat-img{height:200px;background:#0d1a0d;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;position:relative}
+/* Carousel track */
+.about-feat-carousel{overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;display:flex;gap:16px;padding:20px 0}
+.about-feat-carousel::-webkit-scrollbar{display:none}
+.about-feat-carousel::before,.about-feat-carousel::after{content:'';flex-shrink:0;width:calc(50vw - 175px)}
+/* Cards */
+.about-feat-card{flex-shrink:0;width:320px;scroll-snap-align:center;border-radius:20px;border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);overflow:hidden;transform:scale(0.85);opacity:0.45;transition:transform .35s ease,opacity .35s ease,border-color .35s ease,box-shadow .35s ease;cursor:pointer}
+.about-feat-card.active{transform:scale(1);opacity:1;border-color:var(--neon);box-shadow:0 0 0 1px var(--neon),0 0 40px rgba(196,255,77,.18)}
+.about-feat-img{height:260px;background:#0d1a0d;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;position:relative}
 .about-feat-img::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(196,255,77,.1) 0%,transparent 70%);pointer-events:none}
-.about-feat-img img{height:195px;width:auto;object-fit:contain;object-position:bottom center;position:relative;z-index:1;filter:drop-shadow(0 0 16px rgba(196,255,77,.15))}
-/* Progress bar */
-.about-feat-progress{margin-top:14px;position:relative;height:2px;background:rgba(255,255,255,.1);border-radius:2px}
-.about-feat-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--neon);border-radius:2px;transition:width .35s ease}
-.about-feat-dots{display:flex;position:absolute;top:50%;transform:translateY(-50%);left:0;right:0;justify-content:space-between}
-.about-feat-dot{width:8px;height:8px;background:rgba(255,255,255,.2);transition:background .3s;border:2px solid #0f1710}
-.about-feat-dot.active{background:var(--neon)}
-/* Info row below progress: badge + title + desc */
-.about-feat-info{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
-.about-feat-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 8px;border:1px solid;border-radius:4px;margin-bottom:10px}
+.about-feat-img img{height:240px;width:auto;object-fit:contain;object-position:bottom center;position:relative;z-index:1;filter:drop-shadow(0 0 16px rgba(196,255,77,.15))}
+/* Timeline row */
+.about-feat-timeline{max-width:1280px;margin:0 auto;padding:28px 60px 0;display:grid;grid-template-columns:repeat(4,1fr)}
+.about-feat-tl-item{display:flex;align-items:center}
+.about-feat-tl-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid #0f1710;flex-shrink:0;transition:background .3s;cursor:pointer}
+.about-feat-tl-dot.active{background:var(--neon)}
+.about-feat-tl-line{flex:1;height:2px;background:rgba(255,255,255,.12);border-radius:2px;transition:background .35s}
+.about-feat-tl-line.done{background:var(--neon)}
+/* Info row below timeline */
+.about-feat-info{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);padding:16px 60px 0}
+.about-feat-info-col{padding-right:24px}
+.about-feat-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border:1px solid;border-radius:4px;margin-bottom:10px}
 .about-feat-badge.done{color:var(--neon);border-color:var(--neon)}
-.about-feat-badge.soon{color:rgba(255,255,255,.35);border-color:rgba(255,255,255,.2)}
-.about-feat-title{font-size:20px;font-weight:800;color:#fff;margin:0 0 6px;line-height:1.3}
-.about-feat-desc{font-size:15px;color:rgba(255,255,255,.55);line-height:1.5;margin:0}
+.about-feat-badge.soon{color:rgba(255,255,255,.3);border-color:rgba(255,255,255,.15)}
+.about-feat-title{font-size:20px;font-weight:800;margin:0 0 6px;line-height:1.3;transition:color .3s}
+.about-feat-title.active{color:#fff}
+.about-feat-title:not(.active){color:rgba(255,255,255,.3)}
+.about-feat-desc{font-size:15px;line-height:1.5;margin:0;transition:color .3s}
+.about-feat-desc.active{color:rgba(255,255,255,.55)}
+.about-feat-desc:not(.active){color:rgba(255,255,255,.2)}
 
 /* Brand block */
 .about-brand{max-width:1280px;margin:0 auto;padding:80px 32px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
@@ -1829,19 +1834,23 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 
 @media(max-width:900px){.about-section{grid-template-columns:1fr;gap:20px}.about-brand{grid-template-columns:1fr}.about-hero h1{font-size:36px}}
 @media(max-width:900px){
-  .about-feat-scroll-inner{height:auto;position:relative;padding:60px 0}
-  .about-feat-scroll-outer{height:auto!important}
-  .about-feat-pin-wrap{padding:0 24px}
-  .about-features-grid{grid-template-columns:repeat(2,1fr);gap:10px}
-  .about-feat-info{grid-template-columns:repeat(2,1fr);gap:10px}
-  .about-feat-card{opacity:1!important}
-  .about-features-head{margin-bottom:24px}
+  .about-features{padding:60px 0}
+  .about-features-head{padding:0 24px;margin-bottom:32px;flex-direction:column;gap:16px}
   .about-features-h2{font-size:28px}
+  .about-feat-card{width:260px}
+  .about-feat-carousel::before,.about-feat-carousel::after{width:calc(50vw - 140px)}
+  .about-feat-timeline{padding:20px 24px 0}
+  .about-feat-info{padding:12px 24px 0}
 }
 @media(max-width:600px){
-  .about-feat-pin-wrap{padding:0 20px}
-  .about-features-grid{grid-template-columns:1fr}
-  .about-feat-info{grid-template-columns:1fr}
+  .about-features-head{padding:0 20px}
+  .about-feat-card{width:220px}
+  .about-feat-img{height:200px}
+  .about-feat-img img{height:190px}
+  .about-feat-carousel::before,.about-feat-carousel::after{width:calc(50vw - 120px)}
+  .about-feat-timeline{padding:16px 20px 0;grid-template-columns:repeat(4,1fr)}
+  .about-feat-info{padding:10px 20px 0;grid-template-columns:repeat(2,1fr)}
+  .about-feat-info-col:nth-child(n+3){display:none}
 }
 @media(max-width:600px){
   .about-features-h2{font-size:28px}.about-cta h2{font-size:30px}
@@ -4025,64 +4034,60 @@ main{flex:1}
 
   <!-- Що вже працює -->
   <div class="about-features">
-    <div class="about-feat-scroll-outer" id="aboutFeatOuter">
-      <div class="about-feat-scroll-inner">
-        <div class="about-feat-pin-wrap" id="aboutFeatPinWrap">
-          <div class="about-features-head">
-            <div>
-              <h2 class="about-features-h2">Що вже працює.<br>І що готуємо далі.</h2>
-              <p class="about-features-sub">Корисні можливості, які вже є,<br>і те, що плануємо додати.</p>
-            </div>
-            <div class="about-features-nav">
-              <button class="about-feat-btn" id="aboutFeatPrev" onclick="aboutFeatNav(-1)" disabled>←</button>
-              <button class="about-feat-btn" id="aboutFeatNext" onclick="aboutFeatNav(1)">→</button>
-              <span class="about-feat-counter" id="aboutFeatCounter">01 / 04</span>
-            </div>
-          </div>
-          <!-- Image cards: only robot images -->
-          <div class="about-features-grid" id="aboutFeatGrid">
-            <div class="about-feat-card active">
-              <div class="about-feat-img"><img src="/robot-tablet.png" alt="Замовлення онлайн"></div>
-            </div>
-            <div class="about-feat-card">
-              <div class="about-feat-img"><img src="/robot-hand.png" alt="Статус без кабінету"></div>
-            </div>
-            <div class="about-feat-card">
-              <div class="about-feat-img"><img src="/robot-book.png" alt="Як відібрати зразок"></div>
-            </div>
-            <div class="about-feat-card">
-              <div class="about-feat-img"><img src="/robot-clipboard.png" alt="Більше матеріалів"></div>
-            </div>
-          </div>
-          <!-- Progress bar -->
-          <div class="about-feat-progress" id="aboutFeatProgress">
-            <div class="about-feat-progress-fill" id="aboutFeatFill" style="width:25%"></div>
-            <div class="about-feat-dots" id="aboutFeatDots"></div>
-          </div>
-          <!-- Info row: badge + title + desc -->
-          <div class="about-feat-info">
-            <div>
-              <div class="about-feat-badge done">Вже є</div>
-              <div class="about-feat-title">Замовлення онлайн</div>
-              <div class="about-feat-desc">Обирайте дослідження та оформляйте замовлення на сайті.</div>
-            </div>
-            <div>
-              <div class="about-feat-badge done">Вже є</div>
-              <div class="about-feat-title">Статус без кабінету</div>
-              <div class="about-feat-desc">Перевіряйте етап дослідження за номером замовлення.</div>
-            </div>
-            <div>
-              <div class="about-feat-badge done">Вже є</div>
-              <div class="about-feat-title">Як відібрати зразок</div>
-              <div class="about-feat-desc">Короткі інструкції та докладні PDF для завантаження.</div>
-            </div>
-            <div>
-              <div class="about-feat-badge soon">Плануємо</div>
-              <div class="about-feat-title">Більше матеріалів</div>
-              <div class="about-feat-desc">Дослідження палива та засобів захисту рослин.</div>
-            </div>
-          </div>
-        </div>
+    <div class="about-features-head">
+      <div>
+        <h2 class="about-features-h2">Що вже працює.<br>І що готуємо далі.</h2>
+        <p class="about-features-sub">Корисні можливості, які вже є,<br>і те, що плануємо додати.</p>
+      </div>
+      <div class="about-features-nav">
+        <button class="about-feat-btn" id="aboutFeatPrev" onclick="aboutFeatCarouselNav(-1)" disabled>←</button>
+        <button class="about-feat-btn" id="aboutFeatNext" onclick="aboutFeatCarouselNav(1)">→</button>
+        <span class="about-feat-counter" id="aboutFeatCounter">01 / 04</span>
+      </div>
+    </div>
+    <!-- Horizontal carousel -->
+    <div class="about-feat-carousel" id="aboutFeatCarousel">
+      <div class="about-feat-card active" data-i="0">
+        <div class="about-feat-img"><img src="/robot-tablet.png" alt="Замовлення онлайн"></div>
+      </div>
+      <div class="about-feat-card" data-i="1">
+        <div class="about-feat-img"><img src="/robot-hand.png" alt="Статус без кабінету"></div>
+      </div>
+      <div class="about-feat-card" data-i="2">
+        <div class="about-feat-img"><img src="/robot-book.png" alt="Як відібрати зразок"></div>
+      </div>
+      <div class="about-feat-card" data-i="3">
+        <div class="about-feat-img"><img src="/robot-clipboard.png" alt="Більше матеріалів"></div>
+      </div>
+    </div>
+    <!-- Timeline -->
+    <div class="about-feat-timeline">
+      <div class="about-feat-tl-item"><div class="about-feat-tl-dot active" id="ftDot0"></div><div class="about-feat-tl-line" id="ftLine0"></div></div>
+      <div class="about-feat-tl-item"><div class="about-feat-tl-dot" id="ftDot1"></div><div class="about-feat-tl-line" id="ftLine1"></div></div>
+      <div class="about-feat-tl-item"><div class="about-feat-tl-dot" id="ftDot2"></div><div class="about-feat-tl-line" id="ftLine2"></div></div>
+      <div class="about-feat-tl-item"><div class="about-feat-tl-dot" id="ftDot3"></div><div class="about-feat-tl-line" id="ftLine3"></div></div>
+    </div>
+    <!-- Info columns -->
+    <div class="about-feat-info">
+      <div class="about-feat-info-col">
+        <div class="about-feat-badge done">Вже є</div>
+        <div class="about-feat-title active" id="ftTitle0">Замовлення онлайн</div>
+        <div class="about-feat-desc active" id="ftDesc0">Обирайте дослідження та оформляйте замовлення на сайті.</div>
+      </div>
+      <div class="about-feat-info-col">
+        <div class="about-feat-badge done">Вже є</div>
+        <div class="about-feat-title" id="ftTitle1">Статус без кабінету</div>
+        <div class="about-feat-desc" id="ftDesc1">Перевіряйте етап дослідження за номером замовлення.</div>
+      </div>
+      <div class="about-feat-info-col">
+        <div class="about-feat-badge done">Вже є</div>
+        <div class="about-feat-title" id="ftTitle2">Як відібрати зразок</div>
+        <div class="about-feat-desc" id="ftDesc2">Короткі інструкції та докладні PDF для завантаження.</div>
+      </div>
+      <div class="about-feat-info-col">
+        <div class="about-feat-badge soon">Плануємо</div>
+        <div class="about-feat-title" id="ftTitle3">Більше матеріалів</div>
+        <div class="about-feat-desc" id="ftDesc3">Дослідження палива та засобів захисту рослин.</div>
       </div>
     </div>
   </div>
@@ -8516,74 +8521,89 @@ function initAboutPin(){
   }
 }
 
-// About page features — sticky scroll, neon border jumps card to card
+// About page features — horizontal snap carousel
 let _aboutFeatIdx = 0;
-let _aboutFeatPinInited = false;
+let _aboutFeatCarouselInited = false;
 
-function _aboutFeatRender() {
-  var grid = document.getElementById('aboutFeatGrid');
-  if (!grid) return;
-  var cards = Array.from(grid.querySelectorAll('.about-feat-card'));
+function _aboutFeatCarouselRender(idx) {
+  var carousel = document.getElementById('aboutFeatCarousel');
+  if (!carousel) return;
+  var cards = Array.from(carousel.querySelectorAll('.about-feat-card'));
   var N = cards.length;
-  if (!N) return;
-  _aboutFeatIdx = Math.max(0, Math.min(N - 1, _aboutFeatIdx));
+  _aboutFeatIdx = Math.max(0, Math.min(N - 1, idx));
   cards.forEach(function(c, i) { c.classList.toggle('active', i === _aboutFeatIdx); });
+  for (var i = 0; i < N; i++) {
+    var dot = document.getElementById('ftDot' + i);
+    var line = document.getElementById('ftLine' + i);
+    var title = document.getElementById('ftTitle' + i);
+    var desc = document.getElementById('ftDesc' + i);
+    if (dot) dot.classList.toggle('active', i === _aboutFeatIdx);
+    if (line) line.classList.toggle('done', i < _aboutFeatIdx);
+    if (title) { title.classList.toggle('active', i === _aboutFeatIdx); }
+    if (desc) { desc.classList.toggle('active', i === _aboutFeatIdx); }
+  }
   var counter = document.getElementById('aboutFeatCounter');
   if (counter) counter.textContent = String(_aboutFeatIdx + 1).padStart(2,'0') + ' / ' + String(N).padStart(2,'0');
   var prev = document.getElementById('aboutFeatPrev');
   var next = document.getElementById('aboutFeatNext');
   if (prev) prev.disabled = _aboutFeatIdx === 0;
   if (next) next.disabled = _aboutFeatIdx === N - 1;
-  var fill = document.getElementById('aboutFeatFill');
-  if (fill) fill.style.width = (((_aboutFeatIdx + 1) / N) * 100) + '%';
-  var dotsWrap = document.getElementById('aboutFeatDots');
-  if (dotsWrap) dotsWrap.querySelectorAll('.about-feat-dot').forEach(function(d, i) { d.classList.toggle('active', i === _aboutFeatIdx); });
 }
 
-function aboutFeatNav(dir) { _aboutFeatIdx += dir; _aboutFeatRender(); }
+function _aboutFeatScrollToIdx(idx) {
+  var carousel = document.getElementById('aboutFeatCarousel');
+  if (!carousel) return;
+  var cards = Array.from(carousel.querySelectorAll('.about-feat-card'));
+  var card = cards[idx];
+  if (!card) return;
+  var target = card.offsetLeft + card.offsetWidth / 2 - carousel.clientWidth / 2;
+  carousel.scrollTo({ left: target, behavior: 'smooth' });
+}
+
+function aboutFeatCarouselNav(dir) {
+  _aboutFeatScrollToIdx(_aboutFeatIdx + dir);
+}
 
 function initAboutFeatPin() {
-  if (_aboutFeatPinInited) return;
-  var outer = document.getElementById('aboutFeatOuter');
-  var grid = document.getElementById('aboutFeatGrid');
-  if (!outer || !grid) return;
-  var cards = Array.from(grid.querySelectorAll('.about-feat-card'));
+  if (_aboutFeatCarouselInited) return;
+  var carousel = document.getElementById('aboutFeatCarousel');
+  if (!carousel) return;
+  var cards = Array.from(carousel.querySelectorAll('.about-feat-card'));
   var N = cards.length;
   if (!N) return;
-  _aboutFeatPinInited = true;
+  _aboutFeatCarouselInited = true;
 
-  // Each card gets 0.4× viewport of scroll space; total outer height
-  var stepVh = 0.4;
-  outer.style.height = (N * stepVh * 100 + 100) + 'vh';
-
-  // Build dots
-  var dotsWrap = document.getElementById('aboutFeatDots');
-  if (dotsWrap && !dotsWrap.children.length) {
-    cards.forEach(function(_, i) {
-      var d = document.createElement('div');
-      d.className = 'about-feat-dot' + (i === 0 ? ' active' : '');
-      d.onclick = function() { _aboutFeatIdx = i; _aboutFeatRender(); };
-      dotsWrap.appendChild(d);
-    });
+  // Dot clicks
+  for (var i = 0; i < N; i++) {
+    (function(idx) {
+      var dot = document.getElementById('ftDot' + idx);
+      if (dot) dot.addEventListener('click', function() { _aboutFeatScrollToIdx(idx); });
+    })(i);
   }
 
-  // Click card to jump to it
+  // Card clicks
   cards.forEach(function(card, i) {
-    card.addEventListener('click', function() { _aboutFeatIdx = i; _aboutFeatRender(); });
+    card.addEventListener('click', function() { _aboutFeatScrollToIdx(i); });
   });
 
-  // Scroll-driven: update active card based on scroll progress through outer
-  window.addEventListener('scroll', function() {
-    var rect = outer.getBoundingClientRect();
-    // Only active while section is pinned (top <= 0, bottom >= vh)
-    if (rect.top > 10 || rect.bottom < window.innerHeight - 10) return;
-    var scrolled = -rect.top;
-    var step = window.innerHeight * 0.4;
-    var idx = Math.min(N - 1, Math.floor(scrolled / step));
-    if (idx !== _aboutFeatIdx) { _aboutFeatIdx = idx; _aboutFeatRender(); }
+  // Scroll → active
+  var _ticking = false;
+  carousel.addEventListener('scroll', function() {
+    if (_ticking) return;
+    _ticking = true;
+    requestAnimationFrame(function() {
+      var center = carousel.scrollLeft + carousel.clientWidth / 2;
+      var closest = 0, minDist = Infinity;
+      cards.forEach(function(c, i) {
+        var dist = Math.abs(c.offsetLeft + c.offsetWidth / 2 - center);
+        if (dist < minDist) { minDist = dist; closest = i; }
+      });
+      _aboutFeatCarouselRender(closest);
+      _ticking = false;
+    });
   }, { passive: true });
 
-  _aboutFeatRender();
+  _aboutFeatCarouselRender(0);
 }
 </script>
 
