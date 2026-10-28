@@ -1781,7 +1781,8 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-feat-btn:disabled{opacity:.3;cursor:default}
 .about-feat-counter{font-size:13px;font-weight:600;color:rgba(255,255,255,.5)}
 .about-features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
-.about-feat-card{background:rgba(255,255,255,.05);border-radius:var(--radius-lg);overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+.about-feat-card{background:rgba(255,255,255,.05);border-radius:var(--radius-lg);overflow:hidden;border:1px solid rgba(255,255,255,.08);transition:border-color .25s}
+.about-feat-card.active{border-color:var(--neon);box-shadow:0 0 0 1px var(--neon)}
 .about-feat-img{height:220px;background:#0d1a0d;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;position:relative}
 .about-feat-img::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(196,255,77,.12) 0%,transparent 70%);pointer-events:none}
 .about-feat-img img{height:210px;width:auto;object-fit:contain;object-position:bottom center;position:relative;z-index:1;filter:drop-shadow(0 0 20px rgba(196,255,77,.15))}
@@ -8446,24 +8447,27 @@ function initAboutPin(){
   }
 }
 
-// About page features carousel
-let _aboutFeatPage = 0;
-function aboutFeatScroll(dir) {
+// About page features carousel — highlights active card
+let _aboutFeatIdx = 0;
+function _aboutFeatUpdate() {
   const grid = document.getElementById('aboutFeatGrid');
-  const cards = grid ? grid.querySelectorAll('.about-feat-card') : [];
+  const cards = grid ? Array.from(grid.querySelectorAll('.about-feat-card')) : [];
   const total = cards.length;
-  const perPage = window.innerWidth < 600 ? 1 : window.innerWidth < 900 ? 2 : 4;
-  const maxPage = Math.ceil(total / perPage) - 1;
-  _aboutFeatPage = Math.max(0, Math.min(maxPage, _aboutFeatPage + dir));
-  const offset = _aboutFeatPage * perPage;
-  cards.forEach((c, i) => { c.style.display = (i >= offset && i < offset + perPage) ? '' : 'none'; });
+  if (!total) return;
+  _aboutFeatIdx = ((_aboutFeatIdx % total) + total) % total;
+  cards.forEach((c, i) => c.classList.toggle('active', i === _aboutFeatIdx));
   const counter = document.getElementById('aboutFeatCounter');
-  if (counter) counter.textContent = String(_aboutFeatPage + 1).padStart(2,'0') + ' / ' + String(Math.ceil(total/perPage)).padStart(2,'0');
+  if (counter) counter.textContent = String(_aboutFeatIdx + 1).padStart(2,'0') + ' / ' + String(total).padStart(2,'0');
   const prev = document.getElementById('aboutFeatPrev');
   const next = document.getElementById('aboutFeatNext');
-  if (prev) prev.disabled = _aboutFeatPage === 0;
-  if (next) next.disabled = _aboutFeatPage >= maxPage;
+  if (prev) prev.disabled = _aboutFeatIdx === 0;
+  if (next) next.disabled = _aboutFeatIdx === total - 1;
 }
+function aboutFeatScroll(dir) {
+  _aboutFeatIdx += dir;
+  _aboutFeatUpdate();
+}
+document.addEventListener('DOMContentLoaded', _aboutFeatUpdate);
 </script>
 
 
