@@ -1570,6 +1570,83 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 @media(max-width:900px){.samp-body{grid-template-columns:1fr}.samp-sidebar{position:static}.samp-step-img{display:none}.samp-steps-area{flex-direction:column}.samp-illustration{display:none}.samp-wrap{padding:0 16px 0}.samp-header h1{font-size:26px}}
 @media(max-width:600px){.samp-tabs{gap:6px}.samp-tab{font-size:13px;padding:7px 12px}.samp-cta-inner{flex-direction:column;gap:16px}.samp-cta-btn{width:100%;text-align:center}}
 
+/* ════════════════════════════════════════
+   BLOG / АГРОНОМІЧНИЙ ГІД
+   ════════════════════════════════════════ */
+
+/* Nav pill override for blog */
+#nav-blog.active{background:var(--navy);color:#fff!important;font-weight:600}
+#nav-blog.active:hover{background:#3a3f43;color:#fff}
+
+/* ── Blog listing ── */
+.blog-page{background:var(--bg);min-height:100vh}
+.blog-header{background:var(--white);border-bottom:1px solid var(--border-soft);padding:40px 0 36px}
+.blog-header-inner{max-width:1100px;margin:0 auto;padding:0 24px}
+.blog-header-inner h1{font-size:36px;font-weight:800;color:var(--navy);letter-spacing:-.5px;margin:0 0 6px}
+.blog-header-inner p{font-size:16px;color:var(--text-mid);margin:0}
+.blog-content{max-width:1100px;margin:0 auto;padding:40px 24px 80px}
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.blog-card{background:var(--white);border:1px solid var(--border-soft);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:box-shadow .18s,transform .18s}
+.blog-card:hover{box-shadow:0 6px 24px rgba(0,0,0,.09);transform:translateY(-2px)}
+.blog-card-img{width:100%;height:180px;object-fit:cover;display:block;background:#e8edea}
+.blog-card-img-placeholder{width:100%;height:180px;display:flex;align-items:center;justify-content:center}
+.blog-card-body{padding:18px 20px 20px}
+.blog-tag{display:inline-block;background:#e8f5e9;color:#2e7d32;font-size:12px;font-weight:700;padding:3px 9px;border-radius:4px;margin-bottom:10px;letter-spacing:.1px}
+.blog-card-title{font-size:15px;font-weight:700;color:var(--navy);line-height:1.4;margin-bottom:10px}
+.blog-card-date{font-size:13px;color:var(--text-soft)}
+@media(max-width:800px){.blog-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.blog-grid{grid-template-columns:1fr}.blog-header-inner h1{font-size:26px}}
+
+/* ── Article detail ── */
+.article-page{background:var(--bg);min-height:100vh}
+.article-outer{max-width:740px;margin:0 auto;padding:32px 24px 80px}
+.article-back{display:inline-flex;align-items:center;gap:6px;color:var(--text-mid);font-size:14px;font-weight:500;background:none;border:none;cursor:pointer;padding:0;margin-bottom:22px;transition:color .15s;font-family:inherit}
+.article-back:hover{color:var(--navy)}
+.article-meta-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.article-meta-tag{background:#e8f5e9;color:#2e7d32;font-size:12px;font-weight:700;padding:3px 9px;border-radius:4px;letter-spacing:.1px}
+.article-meta-sep{color:var(--border);font-size:14px}
+.article-meta-time{display:flex;align-items:center;gap:5px;color:var(--text-mid);font-size:13px}
+.article-meta-date{color:var(--text-mid);font-size:13px}
+.article-h1{font-size:34px;font-weight:800;color:var(--navy);line-height:1.18;letter-spacing:-.4px;margin:0 0 20px}
+.article-author{display:flex;align-items:center;gap:12px;margin-bottom:26px}
+.article-author-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#d0d8dd;flex-shrink:0}
+.article-author-name{font-size:14px;font-weight:700;color:var(--navy);line-height:1.3}
+.article-author-role{font-size:13px;color:var(--text-mid)}
+.article-hero{width:100%;border-radius:14px;display:block;margin-bottom:24px;object-fit:cover;height:340px;background:#c8dbd0}
+.article-lead{font-size:16px;color:var(--text-mid);line-height:1.7;margin-bottom:32px}
+.article-h2{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.2px;margin:0 0 10px}
+.article-p{font-size:15px;color:var(--text);line-height:1.7;margin-bottom:16px}
+.article-checklist{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;margin-bottom:40px}
+.article-check-item{display:flex;align-items:flex-start;gap:8px;font-size:14px;color:var(--text);line-height:1.5}
+.article-check-icon{flex-shrink:0;margin-top:1px;color:#2e7d32}
+
+/* Products in article */
+.article-products{margin-bottom:44px}
+.article-products-title{font-size:20px;font-weight:800;color:var(--navy);letter-spacing:-.2px;margin:0 0 4px}
+.article-products-sub{font-size:14px;color:var(--text-mid);margin:0 0 20px}
+.article-products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.article-product-card{background:var(--white);border:1px solid var(--border-soft);border-radius:var(--radius-md);padding:16px;display:flex;flex-direction:column;gap:0}
+.article-product-icon{color:var(--text-soft);margin-bottom:10px}
+.article-product-name{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;line-height:1.3}
+.article-product-desc{font-size:13px;color:var(--text-mid);line-height:1.5;margin-bottom:14px;flex:1}
+.article-product-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
+.article-product-price{font-size:13px;color:var(--text-mid);white-space:nowrap}
+.article-product-btn{display:flex;align-items:center;gap:5px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius-sm);padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap}
+.article-product-btn:hover{background:#3a3f43}
+
+/* Related articles in article */
+.article-related-wrap{max-width:740px;margin:0 auto;padding:0 24px 80px}
+.article-related-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.article-related-title{font-size:20px;font-weight:800;color:var(--navy)}
+.article-related-all{background:none;border:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--navy);font-family:inherit;padding:0;display:flex;align-items:center;gap:4px}
+.article-related-all:hover{text-decoration:underline}
+.article-related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.article-rel-card{background:var(--white);border:1px solid var(--border-soft);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:box-shadow .18s,transform .18s}
+.article-rel-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);transform:translateY(-2px)}
+.article-rel-img{width:100%;height:120px;object-fit:cover;display:block;background:#e0e8e4}
+.article-rel-body{padding:14px 16px 16px}
+@media(max-width:700px){.article-products-grid{grid-template-columns:1fr}.article-related-grid{grid-template-columns:1fr}.article-checklist{grid-template-columns:1fr}.article-h1{font-size:24px}.article-outer{padding:20px 16px 60px}.article-related-wrap{padding:0 16px 60px}}
+
 </style>
 <style>
 /* ════════════════════════════════════════
@@ -2573,6 +2650,7 @@ main{flex:1}
     <div class="nav-links">
       <button class="nav-link" id="nav-home" onclick="navigate('home')">Головна</button>
       <button class="nav-link" id="nav-services" onclick="goServices()">Дослідження</button>
+      <button class="nav-link" id="nav-blog" onclick="navigate('blog')">Агрономічний гід</button>
       <button class="nav-link" id="nav-methods" onclick="navigate('methods')">Каталог методів</button>
       <button class="nav-link" id="nav-sampling" onclick="navigate('sampling')">Як відібрати зразок</button>
       <button class="nav-link" id="nav-status" onclick="navigate('status')">Статус замовлення</button>
@@ -2602,6 +2680,7 @@ main{flex:1}
   <div class="mobile-menu-links">
     <button class="mobile-menu-link" onclick="closeMobileMenu();navigate('home')">Головна</button>
     <button class="mobile-menu-link" onclick="closeMobileMenu();goServices()">Дослідження</button>
+    <button class="mobile-menu-link" onclick="closeMobileMenu();navigate('blog')">Агрономічний гід</button>
     <button class="mobile-menu-link" onclick="closeMobileMenu();navigate('methods')">Каталог методів</button>
     <button class="mobile-menu-link" onclick="closeMobileMenu();navigate('status')">Статус замовлення</button>
   </div>
@@ -3577,6 +3656,199 @@ main{flex:1}
       Питання: <strong>097 816 46 78</strong> · <a href="mailto:order@zemlerob.com.ua" style="color:var(--t2)">order@zemlerob.com.ua</a>
     </p>
     <button class="btn-new-order" onclick="startOver()">Нове замовлення</button>
+  </div>
+</div>
+
+<!-- ══ PAGE: BLOG LISTING ══ -->
+<div class="page blog-page" id="page-blog">
+  <div class="blog-header">
+    <div class="blog-header-inner">
+      <h1>Агрономічний гід</h1>
+      <p>Статті та поради від агрономів-консультантів LABA</p>
+    </div>
+  </div>
+  <div class="blog-content">
+    <div class="blog-grid">
+      <div class="blog-card" onclick="navigate('article')">
+        <div class="blog-card-img-placeholder" style="background:linear-gradient(160deg,#c8e6c9 0%,#558b2f 60%,#e65100 100%)"></div>
+        <div class="blog-card-body">
+          <span class="blog-tag">Ґрунт</span>
+          <div class="blog-card-title">Які аналізи ґрунту потрібні перед посівом кукурудзи?</div>
+          <div class="blog-card-date">12 березня 2024</div>
+        </div>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-img-placeholder" style="background:linear-gradient(160deg,#dcedc8 0%,#33691e 70%,#1b5e20 100%)"></div>
+        <div class="blog-card-body">
+          <span class="blog-tag">Ґрунт</span>
+          <div class="blog-card-title">Як перевірити якість добрив перед використанням?</div>
+          <div class="blog-card-date">3 березня 2024</div>
+        </div>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-img-placeholder" style="background:linear-gradient(160deg,#b2dfdb 0%,#00695c 70%,#004d40 100%)"></div>
+        <div class="blog-card-body">
+          <span class="blog-tag">Живлення рослин</span>
+          <div class="blog-card-title">Діагностика дефіциту елементів живлення за листком</div>
+          <div class="blog-card-date">26 лютого 2024</div>
+        </div>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-img-placeholder" style="background:linear-gradient(160deg,#fff9c4 0%,#f9a825 60%,#e65100 100%)"></div>
+        <div class="blog-card-body">
+          <span class="blog-tag">Сезонне</span>
+          <div class="blog-card-title">5 агрономічних пріоритетів перед початком сезону</div>
+          <div class="blog-card-date">5 лютого 2024</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE: ARTICLE ══ -->
+<div class="page article-page" id="page-article">
+  <div class="article-outer">
+    <button class="article-back" onclick="navigate('blog')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      До всіх статей
+    </button>
+
+    <div class="article-meta-row">
+      <span class="article-meta-tag">Ґрунт</span>
+      <span class="article-meta-sep">|</span>
+      <span class="article-meta-time">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        6 хв читання
+      </span>
+      <span class="article-meta-sep">|</span>
+      <span class="article-meta-date">12 березня 2024</span>
+    </div>
+
+    <h1 class="article-h1">Які аналізи ґрунту потрібні перед посівом кукурудзи?</h1>
+
+    <div class="article-author">
+      <div class="article-author-avatar" style="background:linear-gradient(135deg,#b2dfdb,#4db6ac);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#00695c">О</div>
+      <div>
+        <div class="article-author-name">Олена Коваленко</div>
+        <div class="article-author-role">Агроном-консультант LABA</div>
+      </div>
+    </div>
+
+    <div class="article-hero" style="background:linear-gradient(160deg,#c8e6c9 0%,#558b2f 55%,#e65100 100%);display:flex;align-items:flex-end;border-radius:14px;height:340px;margin-bottom:24px"></div>
+
+    <p class="article-lead">Кукурудза має високі вимоги до родючості ґрунту та забезпеченості елементами живлення. Лабораторний аналіз допомагає оцінити потенціал поля, вчасно виявити обмеження та запланувати ефективну програму живлення.</p>
+
+    <h2 class="article-h2">Чому важливо провести аналіз ґрунту?</h2>
+    <p class="article-p">Аналіз ґрунту дозволяє зрозуміти, які елементи живлення вже доступні рослинам, чи є ризики кислотності, засолення або нестачі мікроелементів. Це допомагає:</p>
+
+    <div class="article-checklist">
+      <div class="article-check-item">
+        <svg class="article-check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        оптимізувати витрати на добрива;
+      </div>
+      <div class="article-check-item">
+        <svg class="article-check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        планувати сівозміну та інші агрономічні заходи;
+      </div>
+      <div class="article-check-item">
+        <svg class="article-check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        підвищити врожайність і якість зерна;
+      </div>
+      <div class="article-check-item">
+        <svg class="article-check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        зменшити ризики деградації ґрунту;
+      </div>
+      <div class="article-check-item">
+        <svg class="article-check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        уникнути дефіциту елементів живлення в критичні фази розвитку;
+      </div>
+      <div class="article-check-item">
+        <svg class="article-check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        приймати рішення на основі точних даних, а не припущень.
+      </div>
+    </div>
+
+    <div class="article-products">
+      <div class="article-products-title">Рекомендовані дослідження LABA</div>
+      <div class="article-products-sub">Ці аналізи найчастіше використовують для планування живлення кукурудзи.</div>
+      <div class="article-products-grid">
+        <div class="article-product-card">
+          <div class="article-product-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+          </div>
+          <div class="article-product-name">Базовий чекап ґрунту</div>
+          <div class="article-product-desc">Основні показники родючості для планування живлення кукурудзи та інших культур.</div>
+          <div class="article-product-footer">
+            <span class="article-product-price">від 950 грн</span>
+            <button class="article-product-btn" onclick="goServices()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              До кошика
+            </button>
+          </div>
+        </div>
+        <div class="article-product-card">
+          <div class="article-product-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+          </div>
+          <div class="article-product-name">Мінеральний азот у ґрунті</div>
+          <div class="article-product-desc">Визначення нітратної та амонійної форм азоту.</div>
+          <div class="article-product-footer">
+            <span class="article-product-price">від 650 грн</span>
+            <button class="article-product-btn" onclick="goServices()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              До кошика
+            </button>
+          </div>
+        </div>
+        <div class="article-product-card">
+          <div class="article-product-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+          </div>
+          <div class="article-product-name">Фосфор і калій у ґрунті</div>
+          <div class="article-product-desc">Оцінка забезпеченості доступними формами фосфору та калію.</div>
+          <div class="article-product-footer">
+            <span class="article-product-price">від 520 грн</span>
+            <button class="article-product-btn" onclick="goServices()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              До кошика
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="article-related-wrap">
+    <div class="article-related-head">
+      <div class="article-related-title">Рекомендовані статті</div>
+      <button class="article-related-all" onclick="navigate('blog')">Усі статті →</button>
+    </div>
+    <div class="article-related-grid">
+      <div class="article-rel-card" onclick="navigate('blog')">
+        <div class="article-rel-img" style="background:linear-gradient(160deg,#dcedc8 0%,#33691e 100%)"></div>
+        <div class="article-rel-body">
+          <span class="blog-tag">Ґрунт</span>
+          <div class="blog-card-title" style="font-size:14px;margin-top:6px">Як перевірити якість добрив перед використанням?</div>
+          <div class="blog-card-date" style="margin-top:6px">3 березня 2024</div>
+        </div>
+      </div>
+      <div class="article-rel-card" onclick="navigate('blog')">
+        <div class="article-rel-img" style="background:linear-gradient(160deg,#b2dfdb 0%,#00695c 100%)"></div>
+        <div class="article-rel-body">
+          <span class="blog-tag">Живлення рослин</span>
+          <div class="blog-card-title" style="font-size:14px;margin-top:6px">Діагностика дефіциту елементів живлення за листком</div>
+          <div class="blog-card-date" style="margin-top:6px">26 лютого 2024</div>
+        </div>
+      </div>
+      <div class="article-rel-card" onclick="navigate('blog')">
+        <div class="article-rel-img" style="background:linear-gradient(160deg,#fff9c4 0%,#f9a825 60%,#e65100 100%)"></div>
+        <div class="article-rel-body">
+          <span class="blog-tag">Сезонне</span>
+          <div class="blog-card-title" style="font-size:14px;margin-top:6px">5 агрономічних пріоритетів перед початком сезону</div>
+          <div class="blog-card-date" style="margin-top:6px">5 лютого 2024</div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
