@@ -1737,9 +1737,9 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-pin-dots{display:flex;flex-direction:column;gap:10px;padding-left:12px}
 .about-pin-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);transition:background .3s,transform .3s;cursor:pointer}
 .about-pin-dot.active{background:var(--neon);transform:scale(1.3)}
-.about-pin-content{position:relative;min-height:320px}
-.about-pin-slide{position:absolute;top:0;left:0;width:100%;opacity:0;transform:translateY(20px);transition:opacity .3s ease-out,transform .3s ease-out;pointer-events:none}
-.about-pin-slide.active{opacity:1;transform:translateY(0);pointer-events:auto;position:relative}
+.about-pin-content{position:relative;height:340px}
+.about-pin-slide{position:absolute;top:0;left:0;width:100%;opacity:0;transform:translateY(16px);transition:opacity .35s ease-out,transform .35s ease-out;pointer-events:none}
+.about-pin-slide.active{opacity:1;transform:translateY(0);pointer-events:auto}
 .about-pin-progress-wrap{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.1)}
 .about-pin-progress-bar{height:100%;background:var(--neon);transition:width .08s linear;width:0%}
 .about-pin-inner .about-section-h2{color:#fff}
@@ -1770,38 +1770,38 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-section-link::after{content:'→';opacity:.4;margin-left:auto}
 
 /* Features carousel */
-.about-features{background:var(--bg);padding:80px 32px}
+.about-features{background:#0f1710;padding:80px 32px}
 .about-features-inner{max-width:1280px;margin:0 auto}
 .about-features-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:48px;gap:32px}
-.about-features-h2{font-size:42px;font-weight:900;color:var(--navy);letter-spacing:-1px;line-height:1.1;margin:0;max-width:480px}
+.about-features-h2{font-size:42px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.1;margin:0;max-width:480px}
 .about-features-nav{display:flex;align-items:center;gap:12px;flex-shrink:0;padding-top:8px}
-.about-feat-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s;font-size:18px;color:var(--navy)}
-.about-feat-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
-.about-feat-btn:disabled{opacity:.35;cursor:default}
-.about-feat-counter{font-size:13px;font-weight:600;color:var(--text-mid)}
+.about-feat-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(255,255,255,.2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s;font-size:18px;color:#fff}
+.about-feat-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.5)}
+.about-feat-btn:disabled{opacity:.3;cursor:default}
+.about-feat-counter{font-size:13px;font-weight:600;color:rgba(255,255,255,.5)}
 .about-features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
-.about-feat-card{background:var(--white);border-radius:var(--radius-lg);overflow:hidden}
+.about-feat-card{background:rgba(255,255,255,.05);border-radius:var(--radius-lg);overflow:hidden;border:1px solid rgba(255,255,255,.08)}
 .about-feat-img{height:200px;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .about-feat-img img{width:100%;height:100%;object-fit:cover}
 .about-feat-body{padding:20px}
 .about-feat-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
-.about-feat-badge.done{color:#2e7d32}
-.about-feat-badge.done::before{content:'';width:8px;height:8px;border-radius:50%;background:#2e7d32;flex-shrink:0}
-.about-feat-badge.soon{color:var(--text-soft)}
-.about-feat-badge.soon::before{content:'';width:8px;height:8px;border-radius:50%;background:#aaa;flex-shrink:0}
-.about-feat-title{font-size:16px;font-weight:800;color:var(--navy);margin:0 0 8px;line-height:1.3}
-.about-feat-desc{font-size:13px;color:var(--text-mid);line-height:1.6;margin:0}
+.about-feat-badge.done{color:var(--neon)}
+.about-feat-badge.done::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--neon);flex-shrink:0}
+.about-feat-badge.soon{color:rgba(255,255,255,.35)}
+.about-feat-badge.soon::before{content:'';width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);flex-shrink:0}
+.about-feat-title{font-size:16px;font-weight:800;color:#fff;margin:0 0 8px;line-height:1.3}
+.about-feat-desc{font-size:13px;color:rgba(255,255,255,.55);line-height:1.6;margin:0}
 .about-feat-bar{height:3px;background:var(--bg);margin-top:16px;border-radius:2px;overflow:hidden}
 .about-feat-bar-fill{height:100%;background:var(--neon-dark);border-radius:2px}
 
 /* Brand block */
 .about-brand{max-width:1280px;margin:0 auto;padding:80px 32px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
-.about-brand-logo{font-size:80px;font-weight:900;color:var(--navy);letter-spacing:-4px;line-height:1}
-.about-brand-sub{font-size:14px;color:var(--text-soft);font-weight:500;margin-top:4px;letter-spacing:.5px}
-.about-brand-text h3{font-size:22px;font-weight:800;color:var(--navy);margin:0 0 12px;line-height:1.3}
-.about-brand-text p{font-size:15px;color:var(--text-mid);line-height:1.7;margin:0 0 20px}
-.about-brand-link{background:none;border:none;cursor:pointer;font-size:15px;font-weight:600;color:var(--navy);font-family:inherit;padding:0;display:inline-flex;align-items:center;gap:6px;text-decoration:underline;text-decoration-color:transparent;transition:text-decoration-color .15s}
-.about-brand-link:hover{text-decoration-color:var(--navy)}
+.about-brand-logo{font-size:80px;font-weight:900;color:#fff;letter-spacing:-4px;line-height:1}
+.about-brand-sub{font-size:14px;color:rgba(255,255,255,.4);font-weight:500;margin-top:4px;letter-spacing:.5px}
+.about-brand-text h3{font-size:22px;font-weight:800;color:#fff;margin:0 0 12px;line-height:1.3}
+.about-brand-text p{font-size:15px;color:rgba(255,255,255,.6);line-height:1.7;margin:0 0 20px}
+.about-brand-link{background:none;border:none;cursor:pointer;font-size:15px;font-weight:600;color:var(--neon);font-family:inherit;padding:0;display:inline-flex;align-items:center;gap:6px;text-decoration:underline;text-decoration-color:transparent;transition:text-decoration-color .15s}
+.about-brand-link:hover{text-decoration-color:var(--neon)}
 
 /* CTA */
 .about-cta{background:var(--navy);padding:72px 32px;text-align:center;position:relative;overflow:hidden}
@@ -4106,7 +4106,7 @@ main{flex:1}
   </div>
 
   <!-- Brand -->
-  <div style="border-top:1px solid var(--border-soft)">
+  <div style="background:#0f1710;border-top:1px solid rgba(255,255,255,.08)">
     <div class="about-brand">
       <div>
         <div class="about-brand-logo">LABA</div>
