@@ -1813,7 +1813,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-feat-btn:disabled{opacity:.25;cursor:default}
 .about-feat-counter{font-size:13px;font-weight:600;color:rgba(255,255,255,.5);min-width:40px;text-align:center}
 /* Drag carousel */
-.about-feat-swiper{overflow:visible;padding:24px 0;padding-left:max(60px,calc((100vw - 1280px)/2 + 60px))}
+.about-feat-swiper{overflow:visible;padding:24px 0}
 .about-fp-next-btn{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:13px;font-family:inherit;padding:10px 20px;border-radius:100px;cursor:pointer;transition:background .2s,color .2s,border-color .2s;white-space:nowrap}
 .about-fp-next-btn:hover{background:rgba(196,255,77,.12);border-color:rgba(196,255,77,.3);color:var(--neon)}
 .about-feat-slide{width:380px!important;height:auto}
@@ -8803,6 +8803,15 @@ function aboutFeatCarouselNav(dir) {
   else _aboutFeatSwiper.slidePrev();
 }
 
+function _alignFeatSwiperToHead() {
+  var headDiv = document.querySelector('.about-features-head > div:first-child');
+  var swiperEl = document.getElementById('aboutFeatSwiperEl');
+  if (!headDiv || !swiperEl) return;
+  var left = headDiv.getBoundingClientRect().left;
+  swiperEl.style.paddingLeft = Math.max(20, left) + 'px';
+  if (_aboutFeatSwiper) _aboutFeatSwiper.update();
+}
+
 function initAboutFeatPin() {
   if (_aboutFeatSwiper) return;
   var el = document.getElementById('aboutFeatSwiperEl');
@@ -8821,6 +8830,7 @@ function initAboutFeatPin() {
       slideChange: function() { _aboutFeatSyncUI(this.activeIndex, N); },
       init: function() {
         _aboutFeatSyncUI(0, N);
+        setTimeout(_alignFeatSwiperToHead, 0);
         for (var i = 0; i < N; i++) {
           (function(idx, sw) {
             var dot = document.getElementById('ftDot' + idx);
@@ -8837,11 +8847,13 @@ function destroyAboutFeatPin() {
 }
 var _featResizeTimer = null;
 window.addEventListener('resize', function() {
-  if (!_aboutFeatSwiper) return;
   clearTimeout(_featResizeTimer);
   _featResizeTimer = setTimeout(function() {
-    destroyAboutFeatPin();
-    initAboutFeatPin();
+    if (_aboutFeatSwiper) {
+      destroyAboutFeatPin();
+      initAboutFeatPin();
+    }
+    _alignFeatSwiperToHead();
   }, 200);
 });
 </script>
