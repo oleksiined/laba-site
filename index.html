@@ -8818,6 +8818,7 @@ function initAboutFeatPin() {
   if (_aboutFeatSwiper) return;
   var el = document.getElementById('aboutFeatSwiperEl');
   if (!el || typeof Swiper === 'undefined') return;
+  _alignFeatSwiperToHead();
   var N = el.querySelectorAll('.swiper-slide').length;
   _aboutFeatSwiper = new Swiper(el, {
     slidesPerView: 'auto',
@@ -8832,7 +8833,6 @@ function initAboutFeatPin() {
       slideChange: function() { _aboutFeatSyncUI(this.activeIndex, N); },
       init: function() {
         _aboutFeatSyncUI(0, N);
-        _alignFeatSwiperToHead();
         for (var i = 0; i < N; i++) {
           (function(idx, sw) {
             var dot = document.getElementById('ftDot' + idx);
@@ -8854,8 +8854,9 @@ window.addEventListener('resize', function() {
     if (_aboutFeatSwiper) {
       destroyAboutFeatPin();
       initAboutFeatPin();
+    } else {
+      _alignFeatSwiperToHead();
     }
-    _alignFeatSwiperToHead();
   }, 200);
 });
 </script>
