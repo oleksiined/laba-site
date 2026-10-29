@@ -1785,12 +1785,11 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-feat-btn:hover:not(:disabled){background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.4)}
 .about-feat-btn:disabled{opacity:.25;cursor:default}
 .about-feat-counter{font-size:13px;font-weight:600;color:rgba(255,255,255,.5);min-width:40px;text-align:center}
-/* Carousel track */
-.about-feat-carousel{overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;display:flex;gap:16px;padding:20px 0}
-.about-feat-carousel::-webkit-scrollbar{display:none}
-.about-feat-carousel::before,.about-feat-carousel::after{content:'';flex-shrink:0;width:calc(50vw - 175px)}
+/* Cards row — fixed positions, drag changes active */
+.about-feat-carousel{display:flex;gap:16px;padding:20px 60px;max-width:1280px;margin:0 auto;box-sizing:border-box;user-select:none;cursor:grab}
+.about-feat-carousel.dragging{cursor:grabbing}
 /* Cards */
-.about-feat-card{flex-shrink:0;width:320px;scroll-snap-align:center;border-radius:20px;border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);overflow:hidden;transform:scale(0.85);opacity:0.45;transition:transform .35s ease,opacity .35s ease,border-color .35s ease,box-shadow .35s ease;cursor:pointer}
+.about-feat-card{flex:1;min-width:0;border-radius:20px;border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);overflow:hidden;transform:scale(0.88);opacity:0.45;transition:transform .4s ease,opacity .4s ease,border-color .4s ease,box-shadow .4s ease;cursor:grab;pointer-events:none}
 .about-feat-card.active{transform:scale(1);opacity:1;border-color:var(--neon);box-shadow:0 0 0 1px var(--neon),0 0 40px rgba(196,255,77,.18)}
 .about-feat-img{height:260px;background:#0d1a0d;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;position:relative}
 .about-feat-img::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(196,255,77,.1) 0%,transparent 70%);pointer-events:none}
@@ -1832,17 +1831,15 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
   .about-features{padding:60px 0}
   .about-features-head{padding:0 24px;margin-bottom:32px;flex-direction:column;gap:16px}
   .about-features-h2{font-size:28px}
-  .about-feat-card{width:260px}
-  .about-feat-carousel::before,.about-feat-carousel::after{width:calc(50vw - 140px)}
+  .about-feat-carousel{padding:16px 24px;gap:10px}
   .about-feat-timeline{padding:20px 24px 0}
   .about-feat-info-panel{padding:12px 24px 0}
 }
 @media(max-width:600px){
   .about-features-head{padding:0 20px}
-  .about-feat-card{width:220px}
   .about-feat-img{height:200px}
   .about-feat-img img{height:190px}
-  .about-feat-carousel::before,.about-feat-carousel::after{width:calc(50vw - 120px)}
+  .about-feat-carousel{padding:12px 20px;gap:8px}
   .about-feat-timeline{padding:16px 20px 0;grid-template-columns:repeat(4,1fr)}
   .about-feat-info-panel{padding:10px 20px 0}
 }
@@ -8551,11 +8548,8 @@ function _aboutFeatCarouselRender(idx) {
 function _aboutFeatScrollToIdx(idx) {
   var carousel = document.getElementById('aboutFeatCarousel');
   if (!carousel) return;
-  var cards = Array.from(carousel.querySelectorAll('.about-feat-card'));
-  var card = cards[idx];
-  if (!card) return;
-  var target = card.offsetLeft + card.offsetWidth / 2 - carousel.clientWidth / 2;
-  carousel.scrollTo({ left: target, behavior: 'smooth' });
+  var N = carousel.querySelectorAll('.about-feat-card').length;
+  _aboutFeatCarouselRender(Math.max(0, Math.min(N - 1, idx)));
 }
 
 function aboutFeatCarouselNav(dir) {
@@ -8566,8 +8560,7 @@ function initAboutFeatPin() {
   if (_aboutFeatCarouselInited) return;
   var carousel = document.getElementById('aboutFeatCarousel');
   if (!carousel) return;
-  var cards = Array.from(carousel.querySelectorAll('.about-feat-card'));
-  var N = cards.length;
+  var N = carousel.querySelectorAll('.about-feat-card').length;
   if (!N) return;
   _aboutFeatCarouselInited = true;
 
@@ -8579,26 +8572,43 @@ function initAboutFeatPin() {
     })(i);
   }
 
-  // Card clicks
-  cards.forEach(function(card, i) {
-    card.addEventListener('click', function() { _aboutFeatScrollToIdx(i); });
+  // Drag to change active (mouse)
+  var _dragStart = null;
+  var _dragThreshold = 60;
+  var _dragged = false;
+  carousel.addEventListener('mousedown', function(e) {
+    _dragStart = e.clientX;
+    _dragged = false;
+    carousel.classList.add('dragging');
+  });
+  window.addEventListener('mousemove', function(e) {
+    if (_dragStart === null) return;
+    var diff = _dragStart - e.clientX;
+    if (Math.abs(diff) > _dragThreshold && !_dragged) {
+      _dragged = true;
+      if (diff > 0) _aboutFeatScrollToIdx(_aboutFeatIdx + 1);
+      else _aboutFeatScrollToIdx(_aboutFeatIdx - 1);
+      _dragStart = e.clientX;
+    }
+  });
+  window.addEventListener('mouseup', function() {
+    _dragStart = null;
+    carousel.classList.remove('dragging');
   });
 
-  // Scroll → active
-  var _ticking = false;
-  carousel.addEventListener('scroll', function() {
-    if (_ticking) return;
-    _ticking = true;
-    requestAnimationFrame(function() {
-      var center = carousel.scrollLeft + carousel.clientWidth / 2;
-      var closest = 0, minDist = Infinity;
-      cards.forEach(function(c, i) {
-        var dist = Math.abs(c.offsetLeft + c.offsetWidth / 2 - center);
-        if (dist < minDist) { minDist = dist; closest = i; }
-      });
-      _aboutFeatCarouselRender(closest);
-      _ticking = false;
-    });
+  // Touch swipe
+  var _touchStart = null;
+  carousel.addEventListener('touchstart', function(e) {
+    _touchStart = e.touches[0].clientX;
+  }, { passive: true });
+  carousel.addEventListener('touchend', function(e) {
+    if (_touchStart === null) return;
+    var diff = _touchStart - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) _aboutFeatScrollToIdx(_aboutFeatIdx + 1);
+      else _aboutFeatScrollToIdx(_aboutFeatIdx - 1);
+    }
+    _touchStart = null;
   }, { passive: true });
 
   _aboutFeatCarouselRender(0);
