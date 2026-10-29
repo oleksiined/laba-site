@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LABA — Лабораторні дослідження (Варіант 2)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -1786,12 +1787,13 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-feat-btn:disabled{opacity:.25;cursor:default}
 .about-feat-counter{font-size:13px;font-weight:600;color:rgba(255,255,255,.5);min-width:40px;text-align:center}
 /* Drag carousel */
-.about-feat-carousel-wrap{overflow:hidden;position:relative;cursor:grab;user-select:none}
-.about-feat-carousel-wrap.dragging{cursor:grabbing}
-.about-feat-carousel{display:flex;gap:20px;padding:20px 0;will-change:transform}
+.about-feat-swiper{overflow:hidden;padding:20px 0}
+.about-feat-slide{width:320px!important;height:auto}
+@media(max-width:900px){.about-feat-slide{width:240px!important}}
+@media(max-width:600px){.about-feat-slide{width:200px!important}}
 /* Cards */
-.about-feat-card{flex-shrink:0;width:320px;border-radius:20px;border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);overflow:hidden;transform:scale(0.85);opacity:0.4;transition:transform .4s cubic-bezier(.25,.46,.45,.94),opacity .4s ease,border-color .4s ease,box-shadow .4s ease}
-.about-feat-card.active{transform:scale(1);opacity:1;border-color:var(--neon);box-shadow:0 0 0 1px var(--neon),0 0 40px rgba(196,255,77,.18)}
+.about-feat-card{width:100%;border-radius:20px;border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);overflow:hidden;transform:scale(0.85);opacity:0.4;transition:transform .4s cubic-bezier(.25,.46,.45,.94),opacity .4s ease,border-color .4s ease,box-shadow .4s ease}
+.swiper-slide-active .about-feat-card{transform:scale(1);opacity:1;border-color:var(--neon);box-shadow:0 0 0 1px var(--neon),0 0 40px rgba(196,255,77,.18)}
 .about-feat-img{height:260px;background:#0d1a0d;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;position:relative}
 .about-feat-img::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(196,255,77,.1) 0%,transparent 70%);pointer-events:none}
 .about-feat-img img{height:240px;width:auto;object-fit:contain;object-position:bottom center;position:relative;z-index:1;filter:drop-shadow(0 0 16px rgba(196,255,77,.15))}
@@ -1804,7 +1806,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-feat-tl-line.done{background:var(--neon)}
 /* Text inside each card */
 .about-feat-card-text{padding:16px 20px 20px;opacity:0;transition:opacity .35s ease}
-.about-feat-card.active .about-feat-card-text{opacity:1}
+.swiper-slide-active .about-feat-card-text{opacity:1}
 .about-feat-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border:1px solid;border-radius:4px;margin-bottom:10px}
 .about-feat-badge.done{color:var(--neon);border-color:var(--neon)}
 .about-feat-badge.soon{color:rgba(255,255,255,.3);border-color:rgba(255,255,255,.15)}
@@ -1833,13 +1835,11 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
   .about-features{padding:60px 0}
   .about-features-head{padding:0 24px;margin-bottom:32px;flex-direction:column;gap:16px}
   .about-features-h2{font-size:28px}
-  .about-feat-card{width:240px}
   .about-feat-timeline{padding:20px 24px 0}
   .about-feat-info-panel{padding:12px 24px 0}
 }
 @media(max-width:600px){
   .about-features-head{padding:0 20px}
-  .about-feat-card{width:200px}
   .about-feat-img{height:200px}
   .about-feat-img img{height:190px}
   .about-feat-timeline{padding:16px 20px 0;grid-template-columns:repeat(4,1fr)}
@@ -2875,6 +2875,7 @@ main{flex:1}
 }
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
@@ -4038,43 +4039,51 @@ main{flex:1}
         <span class="about-feat-counter" id="aboutFeatCounter">01 / 04</span>
       </div>
     </div>
-    <!-- Drag carousel -->
-    <div class="about-feat-carousel-wrap" id="aboutFeatCarouselWrap">
-    <div class="about-feat-carousel" id="aboutFeatCarousel">
-      <div class="about-feat-card active" data-i="0">
-        <div class="about-feat-img"><img src="/robot-tablet.png" alt="Замовлення онлайн"></div>
-        <div class="about-feat-card-text">
-          <div class="about-feat-badge done">Вже є</div>
-          <div class="about-feat-title">Замовлення онлайн</div>
-          <div class="about-feat-desc">Обирайте дослідження та оформляйте замовлення на сайті.</div>
+    <!-- Swiper carousel -->
+    <div class="swiper about-feat-swiper" id="aboutFeatSwiperEl">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide about-feat-slide">
+          <div class="about-feat-card">
+            <div class="about-feat-img"><img src="/robot-tablet.png" alt="Замовлення онлайн"></div>
+            <div class="about-feat-card-text">
+              <div class="about-feat-badge done">Вже є</div>
+              <div class="about-feat-title">Замовлення онлайн</div>
+              <div class="about-feat-desc">Обирайте дослідження та оформляйте замовлення на сайті.</div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="about-feat-card" data-i="1">
-        <div class="about-feat-img"><img src="/robot-hand.png" alt="Статус без кабінету"></div>
-        <div class="about-feat-card-text">
-          <div class="about-feat-badge done">Вже є</div>
-          <div class="about-feat-title">Статус без кабінету</div>
-          <div class="about-feat-desc">Перевіряйте етап дослідження за номером замовлення.</div>
+        <div class="swiper-slide about-feat-slide">
+          <div class="about-feat-card">
+            <div class="about-feat-img"><img src="/robot-hand.png" alt="Статус без кабінету"></div>
+            <div class="about-feat-card-text">
+              <div class="about-feat-badge done">Вже є</div>
+              <div class="about-feat-title">Статус без кабінету</div>
+              <div class="about-feat-desc">Перевіряйте етап дослідження за номером замовлення.</div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="about-feat-card" data-i="2">
-        <div class="about-feat-img"><img src="/robot-book.png" alt="Як відібрати зразок"></div>
-        <div class="about-feat-card-text">
-          <div class="about-feat-badge done">Вже є</div>
-          <div class="about-feat-title">Як відібрати зразок</div>
-          <div class="about-feat-desc">Короткі інструкції та докладні PDF для завантаження.</div>
+        <div class="swiper-slide about-feat-slide">
+          <div class="about-feat-card">
+            <div class="about-feat-img"><img src="/robot-book.png" alt="Як відібрати зразок"></div>
+            <div class="about-feat-card-text">
+              <div class="about-feat-badge done">Вже є</div>
+              <div class="about-feat-title">Як відібрати зразок</div>
+              <div class="about-feat-desc">Короткі інструкції та докладні PDF для завантаження.</div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="about-feat-card" data-i="3">
-        <div class="about-feat-img"><img src="/robot-clipboard.png" alt="Більше матеріалів"></div>
-        <div class="about-feat-card-text">
-          <div class="about-feat-badge soon">Плануємо</div>
-          <div class="about-feat-title">Більше матеріалів</div>
-          <div class="about-feat-desc">Дослідження палива та засобів захисту рослин.</div>
+        <div class="swiper-slide about-feat-slide">
+          <div class="about-feat-card">
+            <div class="about-feat-img"><img src="/robot-clipboard.png" alt="Більше матеріалів"></div>
+            <div class="about-feat-card-text">
+              <div class="about-feat-badge soon">Плануємо</div>
+              <div class="about-feat-title">Більше матеріалів</div>
+              <div class="about-feat-desc">Дослідження палива та засобів захисту рослин.</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    </div><!-- /about-feat-carousel-wrap -->
     <!-- Timeline -->
     <div class="about-feat-timeline">
       <div class="about-feat-tl-item"><div class="about-feat-tl-dot active" id="ftDot0"></div><div class="about-feat-tl-line" id="ftLine0"></div></div>
@@ -8513,154 +8522,56 @@ function initAboutPin(){
   }
 }
 
-// About page features — horizontal snap carousel
-let _aboutFeatIdx = 0;
-let _aboutFeatCarouselInited = false;
+// About page features — Swiper carousel
+var _aboutFeatSwiper = null;
 
-function _aboutFeatCarouselRender(idx) {
-  var carousel = document.getElementById('aboutFeatCarousel');
-  if (!carousel) return;
-  var cards = Array.from(carousel.querySelectorAll('.about-feat-card'));
-  var N = cards.length;
-  _aboutFeatIdx = Math.max(0, Math.min(N - 1, idx));
-  cards.forEach(function(c, i) { c.classList.toggle('active', i === _aboutFeatIdx); });
+function _aboutFeatSyncUI(idx, N) {
   for (var i = 0; i < N; i++) {
     var dot = document.getElementById('ftDot' + i);
     var line = document.getElementById('ftLine' + i);
-    if (dot) dot.classList.toggle('active', i === _aboutFeatIdx);
-    if (line) line.classList.toggle('done', i < _aboutFeatIdx);
+    if (dot) dot.classList.toggle('active', i === idx);
+    if (line) line.classList.toggle('done', i < idx);
   }
   var counter = document.getElementById('aboutFeatCounter');
-  if (counter) counter.textContent = String(_aboutFeatIdx + 1).padStart(2,'0') + ' / ' + String(N).padStart(2,'0');
+  if (counter) counter.textContent = String(idx + 1).padStart(2,'0') + ' / ' + String(N).padStart(2,'0');
   var prev = document.getElementById('aboutFeatPrev');
   var next = document.getElementById('aboutFeatNext');
-  if (prev) prev.disabled = _aboutFeatIdx === 0;
-  if (next) next.disabled = _aboutFeatIdx === N - 1;
-}
-
-var _AFC_CARD_W = 320;
-var _AFC_GAP = 20;
-
-function _afcTargetX(idx, wrapW) {
-  return wrapW / 2 - _AFC_CARD_W / 2 - idx * (_AFC_CARD_W + _AFC_GAP);
-}
-
-function _afcGetCurrentX(track) {
-  var m = new (window.DOMMatrix || window.WebKitCSSMatrix)(window.getComputedStyle(track).transform);
-  return m.m41 !== undefined ? m.m41 : (m.e || 0);
-}
-
-function _afcSetX(track, x, animated) {
-  track.style.transition = animated ? 'transform .4s cubic-bezier(.25,.46,.45,.94)' : 'none';
-  track.style.transform = 'translateX(' + x + 'px)';
-}
-
-function _afcSnapToIdx(idx, wrapW) {
-  var track = document.getElementById('aboutFeatCarousel');
-  if (!track) return;
-  _aboutFeatCarouselRender(idx);
-  _afcSetX(track, _afcTargetX(idx, wrapW), true);
-}
-
-function _aboutFeatScrollToIdx(idx) {
-  var wrap = document.getElementById('aboutFeatCarouselWrap');
-  if (!wrap) return;
-  var N = wrap.querySelectorAll('.about-feat-card').length;
-  _afcSnapToIdx(Math.max(0, Math.min(N - 1, idx)), wrap.clientWidth);
+  if (prev) prev.disabled = idx === 0;
+  if (next) next.disabled = idx === N - 1;
 }
 
 function aboutFeatCarouselNav(dir) {
-  _aboutFeatScrollToIdx(_aboutFeatIdx + dir);
+  if (!_aboutFeatSwiper) return;
+  if (dir > 0) _aboutFeatSwiper.slideNext();
+  else _aboutFeatSwiper.slidePrev();
 }
 
 function initAboutFeatPin() {
-  if (_aboutFeatCarouselInited) return;
-  var wrap = document.getElementById('aboutFeatCarouselWrap');
-  var track = document.getElementById('aboutFeatCarousel');
-  if (!wrap || !track) return;
-  var cards = Array.from(track.querySelectorAll('.about-feat-card'));
-  var N = cards.length;
-  if (!N) return;
-  _aboutFeatCarouselInited = true;
-
-  // Read card width from actual rendered size
-  function cardW() { return cards[0] ? cards[0].offsetWidth : _AFC_CARD_W; }
-  function stepW() { return cardW() + _AFC_GAP; }
-  function targetX(idx) { return wrap.clientWidth / 2 - cardW() / 2 - idx * stepW(); }
-
-  // Initial position (no animation)
-  _aboutFeatCarouselRender(0);
-  _afcSetX(track, targetX(0), false);
-
-  // Dot clicks
-  for (var i = 0; i < N; i++) {
-    (function(idx) {
-      var dot = document.getElementById('ftDot' + idx);
-      if (dot) dot.addEventListener('click', function() {
-        _aboutFeatCarouselRender(idx);
-        _afcSetX(track, targetX(idx), true);
-      });
-    })(i);
-  }
-
-  // Drag state
-  var _down = false, _startX = 0, _startTX = 0;
-
-  function startDrag(clientX) {
-    _down = true;
-    _startX = clientX;
-    _startTX = _afcGetCurrentX(track);
-    track.style.transition = 'none';
-    wrap.classList.add('dragging');
-  }
-
-  function moveDrag(clientX) {
-    if (!_down) return;
-    var dx = clientX - _startX;
-    var newX = _startTX + dx;
-    track.style.transform = 'translateX(' + newX + 'px)';
-    // Live scale: interpolate between cards
-    var progress = _aboutFeatIdx - dx / stepW();
-    cards.forEach(function(c, i) {
-      var dist = Math.min(Math.abs(i - progress), 1.5);
-      var sc = 1 - dist * 0.1;
-      var op = 1 - dist * 0.4;
-      c.style.transform = 'scale(' + Math.max(0.85, sc) + ')';
-      c.style.opacity = Math.max(0.3, op);
-      c.style.borderColor = dist < 0.3 ? 'var(--neon)' : '';
-    });
-  }
-
-  function endDrag(clientX) {
-    if (!_down) return;
-    _down = false;
-    wrap.classList.remove('dragging');
-    // Reset inline styles — let CSS classes take over
-    cards.forEach(function(c) { c.style.transform = ''; c.style.opacity = ''; c.style.borderColor = ''; });
-    // Find closest card
-    var finalX = _startTX + (clientX - _startX);
-    var best = 0, bestDist = Infinity;
-    for (var i = 0; i < N; i++) {
-      var d = Math.abs(finalX - targetX(i));
-      if (d < bestDist) { bestDist = d; best = i; }
+  if (_aboutFeatSwiper) return;
+  var el = document.getElementById('aboutFeatSwiperEl');
+  if (!el || typeof Swiper === 'undefined') return;
+  var N = el.querySelectorAll('.swiper-slide').length;
+  _aboutFeatSwiper = new Swiper(el, {
+    slidesPerView: 'auto',
+    centeredSlides: true,
+    spaceBetween: 20,
+    grabCursor: true,
+    speed: 400,
+    on: {
+      slideChange: function() {
+        _aboutFeatSyncUI(this.activeIndex, N);
+      },
+      init: function() {
+        _aboutFeatSyncUI(0, N);
+        // Dot clicks
+        for (var i = 0; i < N; i++) {
+          (function(idx, sw) {
+            var dot = document.getElementById('ftDot' + idx);
+            if (dot) dot.addEventListener('click', function() { sw.slideTo(idx); });
+          })(i, this);
+        }
+      }
     }
-    _aboutFeatCarouselRender(best);
-    _afcSetX(track, targetX(best), true);
-  }
-
-  // Mouse
-  wrap.addEventListener('mousedown', function(e) { e.preventDefault(); startDrag(e.clientX); });
-  window.addEventListener('mousemove', function(e) { moveDrag(e.clientX); });
-  window.addEventListener('mouseup', function(e) { endDrag(e.clientX); });
-
-  // Touch
-  wrap.addEventListener('touchstart', function(e) { startDrag(e.touches[0].clientX); }, { passive: true });
-  wrap.addEventListener('touchmove', function(e) { moveDrag(e.touches[0].clientX); }, { passive: true });
-  wrap.addEventListener('touchend', function(e) { endDrag(e.changedTouches[0].clientX); }, { passive: true });
-
-  // Resize: reposition without animation
-  window.addEventListener('resize', function() {
-    _afcSetX(track, targetX(_aboutFeatIdx), false);
   });
 }
 </script>
