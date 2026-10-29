@@ -8804,12 +8804,14 @@ function aboutFeatCarouselNav(dir) {
 }
 
 function _alignFeatSwiperToHead() {
-  var headDiv = document.querySelector('.about-features-head > div:first-child');
   var swiperEl = document.getElementById('aboutFeatSwiperEl');
-  if (!headDiv || !swiperEl) return;
-  var left = headDiv.getBoundingClientRect().left;
-  swiperEl.style.paddingLeft = Math.max(20, left) + 'px';
-  if (_aboutFeatSwiper) _aboutFeatSwiper.update();
+  if (!swiperEl) return;
+  var w = window.innerWidth;
+  var pl;
+  if (w <= 600) pl = 20;
+  else if (w <= 900) pl = 24;
+  else pl = Math.max(60, (w - 1280) / 2 + 60);
+  swiperEl.style.paddingLeft = pl + 'px';
 }
 
 function initAboutFeatPin() {
@@ -8830,7 +8832,7 @@ function initAboutFeatPin() {
       slideChange: function() { _aboutFeatSyncUI(this.activeIndex, N); },
       init: function() {
         _aboutFeatSyncUI(0, N);
-        setTimeout(_alignFeatSwiperToHead, 0);
+        _alignFeatSwiperToHead();
         for (var i = 0; i < N; i++) {
           (function(idx, sw) {
             var dot = document.getElementById('ftDot' + idx);
