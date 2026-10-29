@@ -1777,7 +1777,8 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-section-link::after{content:'→';opacity:.4;margin-left:auto}
 
 /* Features — horizontal snap carousel, monobank-style */
-.about-features{background:#0f1710;padding:80px 0}
+.about-feat-scroll-wrap{position:relative;height:calc(4 * 100vh)}
+.about-features{background:#0f1710;padding:80px 0;position:sticky;top:68px;height:calc(100vh - 68px);box-sizing:border-box;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
 .about-features-head{max-width:1280px;margin:0 auto;padding:0 60px;margin-bottom:48px;display:flex;align-items:flex-end;justify-content:space-between;gap:32px}
 .about-features-h2{font-size:42px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.1;margin:0;max-width:480px}
 .about-features-sub{font-size:15px;color:rgba(255,255,255,.5);line-height:1.5;margin:8px 0 0}
@@ -4043,7 +4044,8 @@ main{flex:1}
   </div>
 
   <!-- Що вже працює -->
-  <div class="about-features">
+  <div class="about-feat-scroll-wrap" id="aboutFeatScrollWrap">
+  <div class="about-features" id="aboutFeatSticky">
     <div class="about-features-head">
       <div>
         <h2 class="about-features-h2">Що вже працює.<br>І що готуємо далі.</h2>
@@ -4108,6 +4110,7 @@ main{flex:1}
       <div class="about-feat-tl-item"><div class="about-feat-tl-dot" id="ftDot3"></div><div class="about-feat-tl-line" id="ftLine3"></div></div>
     </div>
   </div>
+  </div><!-- /about-feat-scroll-wrap -->
 
   <!-- Brand -->
   <div style="background:#0f1710;border-top:1px solid rgba(255,255,255,.08)">
@@ -5644,6 +5647,7 @@ function blogSearch(q) {
 
 function navigate(page) {
   closeMegaMenu();
+  if (page !== 'about' && typeof destroyAboutFeatPin === 'function') destroyAboutFeatPin();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
   const pageEl = document.getElementById('page-' + page);
@@ -8578,28 +8582,27 @@ function initAboutPin(){
   }
 }
 
-// About page features — Swiper carousel
+// About page features — Scroll-driven Swiper
 var _aboutFeatSwiper = null;
+var _aboutFeatScrollListener = null;
 
 function _aboutFeatSyncUI(idx, N) {
-  for (var i = 0; i < N; i++) {
-    var dot = document.getElementById('ftDot' + i);
-    var line = document.getElementById('ftLine' + i);
-    if (dot) dot.classList.toggle('active', i === idx);
-    if (line) line.classList.toggle('done', i < idx);
-  }
   var counter = document.getElementById('aboutFeatCounter');
   if (counter) counter.textContent = String(idx + 1).padStart(2,'0') + ' / ' + String(N).padStart(2,'0');
-  var prev = document.getElementById('aboutFeatPrev');
-  var next = document.getElementById('aboutFeatNext');
-  if (prev) prev.disabled = false;
-  if (next) next.disabled = false;
 }
 
 function aboutFeatCarouselNav(dir) {
   if (!_aboutFeatSwiper) return;
-  if (dir > 0) _aboutFeatSwiper.slideNext();
-  else _aboutFeatSwiper.slidePrev();
+  var wrap = document.getElementById('aboutFeatScrollWrap');
+  if (!wrap) return;
+  var wrapTop = wrap.getBoundingClientRect().top + window.scrollY;
+  var wrapH = wrap.offsetHeight;
+  var N = _aboutFeatSwiper.slides.length;
+  var segH = wrapH / N;
+  var curIdx = _aboutFeatSwiper.activeIndex;
+  var targetIdx = Math.max(0, Math.min(N - 1, curIdx + dir));
+  var targetScroll = wrapTop + segH * targetIdx + segH * 0.5;
+  window.scrollTo({ top: targetScroll, behavior: 'smooth' });
 }
 
 function initAboutFeatPin() {
@@ -8611,25 +8614,45 @@ function initAboutFeatPin() {
     slidesPerView: 'auto',
     centeredSlides: true,
     spaceBetween: 20,
-    grabCursor: true,
-    speed: 500,
-    rewind: true,
+    allowTouchMove: false,
+    speed: 600,
     on: {
-      slideChange: function() {
-        _aboutFeatSyncUI(this.activeIndex, N);
-      },
-      init: function() {
-        _aboutFeatSyncUI(0, N);
-        // Dot clicks
-        for (var i = 0; i < N; i++) {
-          (function(idx, sw) {
-            var dot = document.getElementById('ftDot' + idx);
-            if (dot) dot.addEventListener('click', function() { sw.slideTo(idx); });
-          })(i, this);
-        }
-      }
+      init: function() { _aboutFeatSyncUI(0, N); }
     }
   });
+
+  // Scroll-driven logic
+  var wrap = document.getElementById('aboutFeatScrollWrap');
+  if (!wrap) return;
+
+  function onScroll() {
+    var wrapTop = wrap.getBoundingClientRect().top + window.scrollY;
+    var wrapH = wrap.offsetHeight;
+    var scrolled = window.scrollY - wrapTop;
+    var segH = wrapH / N;
+    var idx = Math.floor(scrolled / segH);
+    idx = Math.max(0, Math.min(N - 1, idx));
+    if (_aboutFeatSwiper.activeIndex !== idx) {
+      _aboutFeatSwiper.slideTo(idx);
+      _aboutFeatSyncUI(idx, N);
+    }
+  }
+
+  if (_aboutFeatScrollListener) window.removeEventListener('scroll', _aboutFeatScrollListener);
+  _aboutFeatScrollListener = onScroll;
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
+function destroyAboutFeatPin() {
+  if (_aboutFeatScrollListener) {
+    window.removeEventListener('scroll', _aboutFeatScrollListener);
+    _aboutFeatScrollListener = null;
+  }
+  if (_aboutFeatSwiper) {
+    _aboutFeatSwiper.destroy(true, true);
+    _aboutFeatSwiper = null;
+  }
 }
 </script>
 
