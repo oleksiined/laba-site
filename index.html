@@ -1793,7 +1793,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-section-link::after{content:'→';opacity:.4;margin-left:auto}
 
 /* Features — horizontal snap carousel, monobank-style */
-.about-features{background:#0f1710;padding:36px 0 28px}
+.about-features{background:#0f1710;padding:36px 0 28px;min-height:100vh;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center}
 .about-features-head{max-width:1280px;margin:0 auto;padding:0 60px;margin-bottom:28px;display:flex;align-items:flex-end;justify-content:space-between;gap:32px}
 .about-features-h2{font-size:42px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.1;margin:0;max-width:480px}
 .about-features-sub{font-size:15px;color:rgba(255,255,255,.5);line-height:1.5;margin:8px 0 0}
@@ -8574,7 +8574,7 @@ function _aboutFPGoTo(sec){
   _aboutFP.section = sec;
   var track = document.getElementById('aboutFpTrack');
   if(track) track.style.transform = 'translateY(' + (-sec * 100) + 'vh)';
-  if(sec === 2 && typeof initAboutFeatPin === 'function') initAboutFeatPin();
+  if(sec === 2 && typeof initAboutFeatPin === 'function') setTimeout(initAboutFeatPin, 800);
 }
 
 function _aboutFPStep(dir){
@@ -8687,6 +8687,7 @@ function _aboutFeatSyncUI(idx, N) {
 }
 
 function aboutFeatCarouselNav(dir) {
+  if (!_aboutFeatSwiper) initAboutFeatPin();
   if (!_aboutFeatSwiper) return;
   if (dir > 0) _aboutFeatSwiper.slideNext();
   else _aboutFeatSwiper.slidePrev();
