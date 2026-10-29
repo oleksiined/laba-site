@@ -1751,7 +1751,8 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-fp-track{will-change:transform;transition:transform .75s cubic-bezier(.77,0,.175,1)}
 .about-fp-slide{height:100vh;overflow:hidden;position:relative}
 .about-fp-slide--last{height:100vh;overflow:hidden;background:#0a1a0a;display:flex;flex-direction:column;position:relative}
-.about-last-brand{padding:56px max(60px,calc((100vw - 1280px)/2 + 60px));border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.about-last-brand-wrap{flex:1;display:flex;align-items:center;padding-top:68px}
+.about-last-brand{padding:0 max(60px,calc((100vw - 1280px)/2 + 60px));width:100%}
 .about-last-brand__logo{height:28px;width:auto;margin-bottom:4px;filter:brightness(0) invert(1)}
 .about-last-brand__by{font-size:11px;color:rgba(255,255,255,.3);letter-spacing:.08em;margin-bottom:24px}
 .about-last-brand__title{font-size:clamp(22px,2.8vw,36px);font-weight:800;color:#fff;line-height:1.2;margin-bottom:14px;max-width:560px}
@@ -4178,13 +4179,14 @@ main{flex:1}
 
   <!-- FP Slide 3: Footer -->
   <div class="about-fp-slide about-fp-slide--last">
-  <div style="flex:1"></div>
-  <div class="about-last-brand">
-    <img src="" id="aboutLastBrandLogo" alt="LABA" class="about-last-brand__logo">
-    <p class="about-last-brand__by">by zemlerob</p>
-    <h2 class="about-last-brand__title">Сервіс лабораторних досліджень для агробізнесу.</h2>
-    <p class="about-last-brand__sub">Зрозумілий вибір досліджень, онлайн-замовлення та підтримка, коли потрібна допомога.</p>
-    <button class="about-last-brand__cta" onclick="openCallModal()">Зв'язатися з нами <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+  <div class="about-last-brand-wrap">
+    <div class="about-last-brand">
+      <img src="" id="aboutLastBrandLogo" alt="LABA" class="about-last-brand__logo">
+      <p class="about-last-brand__by">by zemlerob</p>
+      <h2 class="about-last-brand__title">Сервіс лабораторних досліджень для агробізнесу.</h2>
+      <p class="about-last-brand__sub">Зрозумілий вибір досліджень, онлайн-замовлення та підтримка, коли потрібна допомога.</p>
+      <button class="about-last-brand__cta" onclick="openCallModal()">Зв'язатися з нами <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+    </div>
   </div>
   <footer class="about-footer">
     <div class="about-footer-inner">
