@@ -1824,13 +1824,27 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-brand-link{background:none;border:none;cursor:pointer;font-size:15px;font-weight:600;color:var(--neon);font-family:inherit;padding:0;display:inline-flex;align-items:center;gap:6px;text-decoration:underline;text-decoration-color:transparent;transition:text-decoration-color .15s}
 .about-brand-link:hover{text-decoration-color:var(--neon)}
 
-/* CTA */
-.about-cta{background:var(--navy);padding:72px 32px;text-align:center;position:relative;overflow:hidden}
-.about-cta-inner{max-width:700px;margin:0 auto;position:relative;z-index:2}
-.about-cta h2{font-size:44px;font-weight:900;color:#fff;letter-spacing:-1px;margin:0 0 12px}
-.about-cta p{font-size:16px;color:rgba(255,255,255,.6);margin:0 0 32px}
-.about-cta-btn{display:inline-flex;align-items:center;gap:8px;background:var(--neon);color:var(--navy);border:none;border-radius:var(--radius-pill);padding:14px 28px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
-.about-cta-btn:hover{background:var(--neon-dark)}
+/* Footer */
+.about-footer{background:linear-gradient(160deg,#0d1f0d 0%,#122a12 50%,#0a1a0a 100%);padding:64px 32px 40px;position:relative;overflow:hidden}
+.about-footer::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 0%,rgba(196,255,77,.06) 0%,transparent 70%);pointer-events:none}
+.about-footer-inner{max-width:1280px;margin:0 auto;position:relative;z-index:2}
+.about-footer-top{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:40px;padding-bottom:48px;border-bottom:1px solid rgba(255,255,255,.08)}
+.about-footer-brand{}
+.about-footer-logo{height:32px;width:auto;margin-bottom:10px;filter:brightness(0) invert(1)}
+.about-footer-tagline{font-size:13px;color:rgba(255,255,255,.4);line-height:1.5;margin-bottom:20px}
+.about-footer-contact{display:flex;flex-direction:column;gap:8px}
+.about-footer-contact a{font-size:14px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s}
+.about-footer-contact a:hover{color:var(--neon)}
+.about-footer-col h4{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);margin:0 0 16px}
+.about-footer-col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.about-footer-col ul li button{background:none;border:none;padding:0;font-size:14px;color:rgba(255,255,255,.55);cursor:pointer;font-family:inherit;text-align:left;transition:color .15s}
+.about-footer-col ul li button:hover{color:var(--neon)}
+.about-footer-col ul li button:disabled{opacity:.3;cursor:default}
+.about-footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:28px;gap:16px;flex-wrap:wrap}
+.about-footer-copy{font-size:13px;color:rgba(255,255,255,.25)}
+.about-footer-made{font-size:12px;color:rgba(255,255,255,.18)}
+@media(max-width:900px){.about-footer-top{grid-template-columns:1fr 1fr;gap:32px}}
+@media(max-width:600px){.about-footer-top{grid-template-columns:1fr;gap:24px}.about-footer-bottom{flex-direction:column;align-items:flex-start}}
 
 @media(max-width:900px){.about-section{grid-template-columns:1fr;gap:20px}.about-brand{grid-template-columns:1fr}.about-hero h1{font-size:36px}}
 @media(max-width:900px){
@@ -4110,14 +4124,54 @@ main{flex:1}
     </div>
   </div>
 
-  <!-- CTA -->
-  <div class="about-cta">
-    <div class="about-cta-inner">
-      <h2>Почнемо з вашої задачі?</h2>
-      <p>Допоможемо обрати дослідження.</p>
-      <button class="about-cta-btn" onclick="openCallModal()">Отримати консультацію →</button>
+  <!-- Footer -->
+  <footer class="about-footer">
+    <div class="about-footer-inner">
+      <div class="about-footer-top">
+        <!-- Brand -->
+        <div class="about-footer-brand">
+          <img src="" id="aboutFooterLogoImg" alt="LABA" class="about-footer-logo">
+          <p class="about-footer-tagline">Сервіс лабораторних досліджень для агробізнесу</p>
+          <div class="about-footer-contact">
+            <a href="tel:+380XXXXXXXXX">+38 (0XX) XXX-XX-XX</a>
+            <a href="mailto:order@zemlerob.com.ua">order@zemlerob.com.ua</a>
+          </div>
+        </div>
+        <!-- Клієнтам -->
+        <div class="about-footer-col">
+          <h4>Клієнтам</h4>
+          <ul>
+            <li><button onclick="navigate('services')">Як оформити замовлення</button></li>
+            <li><button onclick="navigate('sampling')">Як відібрати зразок</button></li>
+            <li><button onclick="navigate('sampling')">Як надіслати зразок</button></li>
+            <li><button onclick="navigate('payment')">Оплата</button></li>
+            <li><button onclick="navigate('status')">Статус замовлення</button></li>
+          </ul>
+        </div>
+        <!-- Дослідження -->
+        <div class="about-footer-col">
+          <h4>Дослідження</h4>
+          <ul>
+            <li><button onclick="navigate('research')">Каталог досліджень</button></li>
+            <li><button onclick="navigate('methods')">Методи аналізу</button></li>
+            <li><button onclick="navigate('blog')">Агрономічний гід</button></li>
+          </ul>
+        </div>
+        <!-- Компанія -->
+        <div class="about-footer-col">
+          <h4>Компанія</h4>
+          <ul>
+            <li><button onclick="navigate('about')">Про сервіс</button></li>
+            <li><button onclick="openCallModal()">Зв'язатися з нами</button></li>
+          </ul>
+        </div>
+      </div>
+      <div class="about-footer-bottom">
+        <span class="about-footer-copy">© 2024–2025 ТОВ КОМПАНІЯ ЗЕМЛЕРОБ</span>
+        <span class="about-footer-made">by zemlerob</span>
+      </div>
     </div>
-  </div>
+  </footer>
 
 </div>
 
@@ -11598,11 +11652,13 @@ function _applyRobotImages() {
 }
 document.addEventListener('DOMContentLoaded', _applyRobotImages);
 
-// ── copy navbar logo into about brand section ──
+// ── copy navbar logo into about brand & footer sections ──
 document.addEventListener('DOMContentLoaded', function(){
   var navImg = document.querySelector('nav.navbar .nav-logo img');
   var brandImg = document.getElementById('aboutBrandLogoImg');
+  var footerImg = document.getElementById('aboutFooterLogoImg');
   if(navImg && brandImg) brandImg.src = navImg.src;
+  if(navImg && footerImg) footerImg.src = navImg.src;
 });
 
 // ── transparent navbar fix for direct #about URL load ──
