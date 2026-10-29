@@ -1810,6 +1810,10 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-feat-counter{font-size:13px;font-weight:600;color:rgba(255,255,255,.5);min-width:40px;text-align:center}
 /* Drag carousel */
 .about-feat-swiper{overflow:hidden;padding:0}
+.about-feat-slide{width:calc(25% - 15px)!important}
+@media(max-width:1100px){.about-feat-slide{width:calc(33.333% - 14px)!important}}
+@media(max-width:768px){.about-feat-slide{width:calc(50% - 10px)!important}}
+@media(max-width:480px){.about-feat-slide{width:85%!important}}
 .about-fp-next-btn{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:13px;font-family:inherit;padding:10px 20px;border-radius:100px;cursor:pointer;transition:background .2s,color .2s,border-color .2s;white-space:nowrap}
 .about-fp-next-btn:hover{background:rgba(196,255,77,.12);border-color:rgba(196,255,77,.3);color:var(--neon)}
 /* Cards */
@@ -8780,7 +8784,7 @@ function initAboutFeatPin() {
   if (!el || typeof Swiper === 'undefined') return;
   var N = el.querySelectorAll('.swiper-slide').length;
   _aboutFeatSwiper = new Swiper(el, {
-    slidesPerView: 4,
+    slidesPerView: 'auto',
     centeredSlides: false,
     spaceBetween: 20,
     grabCursor: true,
@@ -8788,12 +8792,6 @@ function initAboutFeatPin() {
     rewind: true,
     slidesPerGroup: 1,
     slideToClickedSlide: true,
-    breakpoints: {
-      0: { slidesPerView: 1.2, spaceBetween: 12 },
-      600: { slidesPerView: 2, spaceBetween: 16 },
-      900: { slidesPerView: 3, spaceBetween: 20 },
-      1100: { slidesPerView: 4, spaceBetween: 20 }
-    },
     on: {
       slideChange: function() { _aboutFeatSyncUI(this.activeIndex, N); },
       init: function() {
