@@ -1810,6 +1810,8 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-feat-counter{font-size:13px;font-weight:600;color:rgba(255,255,255,.5);min-width:40px;text-align:center}
 /* Drag carousel */
 .about-feat-swiper{overflow:visible;padding:24px 0}
+.about-fp-next-btn{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:13px;font-family:inherit;padding:10px 20px;border-radius:100px;cursor:pointer;transition:background .2s,color .2s,border-color .2s;white-space:nowrap}
+.about-fp-next-btn:hover{background:rgba(196,255,77,.12);border-color:rgba(196,255,77,.3);color:var(--neon)}
 .about-feat-slide{width:380px!important;height:auto}
 @media(max-width:900px){.about-feat-slide{width:240px!important}}
 @media(max-width:600px){.about-feat-slide{width:200px!important}}
@@ -4089,7 +4091,7 @@ main{flex:1}
   </div>
 
   <!-- FP Slide 2: Features carousel -->
-  <div class="about-fp-slide about-fp-slide--features">
+  <div class="about-fp-slide about-fp-slide--features" style="position:relative">
   <div class="about-features">
     <div class="about-features-head">
       <div>
@@ -4155,6 +4157,10 @@ main{flex:1}
       <div class="about-feat-tl-item"><div class="about-feat-tl-dot" id="ftDot3"></div><div class="about-feat-tl-line" id="ftLine3"></div></div>
     </div>
   </div>
+  <button class="about-fp-next-btn" onclick="_aboutFPGoTo(3)">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    Далі
+  </button>
   </div>
 
   <!-- FP Slide 3: Footer -->
