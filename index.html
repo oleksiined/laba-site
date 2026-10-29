@@ -8149,16 +8149,22 @@ function showToast(msg,ms=2500){
   localStorage.removeItem('laba_notes');
 
   // Відкриваємо сторінку з хешу або Головну
-  const _initHash = location.hash;
-  if(_initHash.startsWith('#card-')){
-    navigate('services');
-  } else if(_initHash && _initHash !== '#'){
-    const _pg = _initHash.slice(1);
-    const _pages=['home','services','about','contacts','checkout','calculator','sampling'];
-    if(_pages.includes(_pg)) navigate(_pg); else navigate('home');
-  } else {
-    navigate('home');
+  const _ALL_PAGES=['home','services','about','contacts','checkout','calculator','sampling','blog','article','status','methods','payment','confirm','samples'];
+  function _navigateFromHash(hash) {
+    if(hash.startsWith('#card-')){
+      navigate('services');
+    } else if(hash && hash !== '#'){
+      const _pg = hash.slice(1);
+      if(_ALL_PAGES.includes(_pg)) navigate(_pg); else navigate('home');
+    } else {
+      navigate('home');
+    }
   }
+  _navigateFromHash(location.hash);
+  window.addEventListener('popstate', function(e){
+    if(e.state && e.state.page) navigate(e.state.page);
+    else _navigateFromHash(location.hash);
+  });
   // Скидаємо матеріал — показуємо всі послуги
   srvMat = ''; currentMaterial = '';
   updateCartUI();
