@@ -8536,8 +8536,8 @@ function _aboutFeatSyncUI(idx, N) {
   if (counter) counter.textContent = String(idx + 1).padStart(2,'0') + ' / ' + String(N).padStart(2,'0');
   var prev = document.getElementById('aboutFeatPrev');
   var next = document.getElementById('aboutFeatNext');
-  if (prev) prev.disabled = idx === 0;
-  if (next) next.disabled = idx === N - 1;
+  if (prev) prev.disabled = false;
+  if (next) next.disabled = false;
 }
 
 function aboutFeatCarouselNav(dir) {
@@ -8557,9 +8557,10 @@ function initAboutFeatPin() {
     spaceBetween: 20,
     grabCursor: true,
     speed: 400,
+    loop: true,
     on: {
       slideChange: function() {
-        _aboutFeatSyncUI(this.activeIndex, N);
+        _aboutFeatSyncUI(this.realIndex, N);
       },
       init: function() {
         _aboutFeatSyncUI(0, N);
@@ -8567,7 +8568,7 @@ function initAboutFeatPin() {
         for (var i = 0; i < N; i++) {
           (function(idx, sw) {
             var dot = document.getElementById('ftDot' + idx);
-            if (dot) dot.addEventListener('click', function() { sw.slideTo(idx); });
+            if (dot) dot.addEventListener('click', function() { sw.slideToLoop(idx); });
           })(i, this);
         }
       }
