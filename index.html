@@ -8808,9 +8808,12 @@ function initAboutFeatPin() {
   var el = document.getElementById('aboutFeatSwiperEl');
   if (!el || typeof Swiper === 'undefined') return;
   var N = el.querySelectorAll('.swiper-slide').length;
+  var _featOffset = Math.max(60, (window.innerWidth - 1280) / 2 + 60);
   _aboutFeatSwiper = new Swiper(el, {
     slidesPerView: 'auto',
-    centeredSlides: true,
+    centeredSlides: false,
+    slidesOffsetBefore: _featOffset,
+    slidesOffsetAfter: _featOffset,
     spaceBetween: 20,
     grabCursor: true,
     speed: 500,
@@ -8835,6 +8838,15 @@ function initAboutFeatPin() {
 function destroyAboutFeatPin() {
   if (_aboutFeatSwiper) { _aboutFeatSwiper.destroy(true, true); _aboutFeatSwiper = null; }
 }
+var _featResizeTimer = null;
+window.addEventListener('resize', function() {
+  if (!_aboutFeatSwiper) return;
+  clearTimeout(_featResizeTimer);
+  _featResizeTimer = setTimeout(function() {
+    destroyAboutFeatPin();
+    initAboutFeatPin();
+  }, 200);
+});
 </script>
 
 
