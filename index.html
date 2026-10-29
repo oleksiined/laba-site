@@ -1750,7 +1750,14 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-page{background:linear-gradient(175deg,#0a1a0a 0%,#122a12 40%,#1a3a1a 70%,#0d1f0d 100%);height:100vh;overflow:hidden}
 .about-fp-track{will-change:transform;transition:transform .75s cubic-bezier(.77,0,.175,1)}
 .about-fp-slide{height:100vh;overflow:hidden;position:relative}
-.about-fp-slide--last{height:100vh;overflow:hidden;background:#0a1a0a;display:flex;flex-direction:column;justify-content:flex-end;position:relative}
+.about-fp-slide--last{height:100vh;overflow:hidden;background:#0a1a0a;display:flex;flex-direction:column;position:relative}
+.about-last-brand{padding:56px max(60px,calc((100vw - 1280px)/2 + 60px));border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.about-last-brand__logo{height:28px;width:auto;margin-bottom:4px;filter:brightness(0) invert(1)}
+.about-last-brand__by{font-size:11px;color:rgba(255,255,255,.3);letter-spacing:.08em;margin-bottom:24px}
+.about-last-brand__title{font-size:clamp(22px,2.8vw,36px);font-weight:800;color:#fff;line-height:1.2;margin-bottom:14px;max-width:560px}
+.about-last-brand__sub{font-size:15px;color:rgba(255,255,255,.45);line-height:1.6;max-width:480px;margin-bottom:28px}
+.about-last-brand__cta{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--neon);text-decoration:none;cursor:pointer;background:none;border:none;padding:0;transition:opacity .15s}
+.about-last-brand__cta:hover{opacity:.75}
 
 /* Pinned scrollytelling */
 .about-pin-wrap{height:100vh;position:relative}
@@ -1849,11 +1856,11 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 
 /* Footer */
 .about-fp-slide--features{height:100vh;overflow:hidden;position:relative}
-.about-footer{background:#0a1a0a;padding:64px 32px 40px;position:relative;overflow:hidden;height:100vh;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center}
+.about-footer{background:#0a1a0a;padding:48px max(32px,calc((100vw - 1280px)/2 + 60px)) 36px;position:relative;overflow:hidden;box-sizing:border-box;flex-shrink:0}
 .about-footer-social{display:flex;align-items:center;gap:12px;margin-top:20px}
 .about-footer-social a{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.07);color:rgba(255,255,255,.55);transition:background .15s,color .15s;text-decoration:none}
 .about-footer-social a:hover{background:rgba(196,255,77,.15);color:var(--neon)}
-.about-footer-inner{max-width:1280px;margin:0 auto;position:relative;z-index:2}
+.about-footer-inner{position:relative;z-index:2}
 .about-footer-top{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:40px;padding-bottom:48px;border-bottom:1px solid rgba(255,255,255,.08)}
 .about-footer-brand{}
 .about-footer-logo{height:32px;width:auto;margin-bottom:10px;filter:brightness(0) invert(1)}
@@ -4171,10 +4178,14 @@ main{flex:1}
 
   <!-- FP Slide 3: Footer -->
   <div class="about-fp-slide about-fp-slide--last">
-  <button class="about-fp-next-btn" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)" onclick="navigate('services')">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-    Далі
-  </button>
+  <div style="flex:1"></div>
+  <div class="about-last-brand">
+    <img src="" id="aboutLastBrandLogo" alt="LABA" class="about-last-brand__logo">
+    <p class="about-last-brand__by">by zemlerob</p>
+    <h2 class="about-last-brand__title">Сервіс лабораторних досліджень для агробізнесу.</h2>
+    <p class="about-last-brand__sub">Зрозумілий вибір досліджень, онлайн-замовлення та підтримка, коли потрібна допомога.</p>
+    <button class="about-last-brand__cta" onclick="openCallModal()">Зв'язатися з нами <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+  </div>
   <footer class="about-footer">
     <div class="about-footer-inner">
       <div class="about-footer-top">
@@ -11847,8 +11858,10 @@ document.addEventListener('DOMContentLoaded', function(){
   var navImg = document.querySelector('nav.navbar .nav-logo img');
   var brandImg = document.getElementById('aboutBrandLogoImg');
   var footerImg = document.getElementById('aboutFooterLogoImg');
+  var lastBrandImg = document.getElementById('aboutLastBrandLogo');
   if(navImg && brandImg) brandImg.src = navImg.src;
   if(navImg && footerImg) footerImg.src = navImg.src;
+  if(navImg && lastBrandImg) lastBrandImg.src = navImg.src;
 });
 
 // ── transparent navbar fix for direct #about URL load ──
