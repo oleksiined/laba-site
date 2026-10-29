@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://laba.zemlerob.com.ua/sitemap.xml
