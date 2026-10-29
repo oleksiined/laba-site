@@ -1813,7 +1813,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-feat-btn:disabled{opacity:.25;cursor:default}
 .about-feat-counter{font-size:13px;font-weight:600;color:rgba(255,255,255,.5);min-width:40px;text-align:center}
 /* Drag carousel */
-.about-feat-swiper{overflow:visible;padding:24px 0;box-sizing:border-box;width:100%}
+.about-feat-swiper{overflow:visible;padding:24px 0;box-sizing:border-box;width:100%;padding-left:max(60px,calc((100vw - 1280px)/2 + 60px))}
 .about-fp-next-btn{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:13px;font-family:inherit;padding:10px 20px;border-radius:100px;cursor:pointer;transition:background .2s,color .2s,border-color .2s;white-space:nowrap}
 .about-fp-next-btn:hover{background:rgba(196,255,77,.12);border-color:rgba(196,255,77,.3);color:var(--neon)}
 .about-feat-slide{width:380px!important;height:auto}
@@ -1883,12 +1883,14 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 @media(max-width:900px){.about-section{grid-template-columns:1fr;gap:20px}.about-brand{grid-template-columns:1fr}.about-hero h1{font-size:36px}}
 @media(max-width:900px){
   .about-features{padding:60px 0}
+  .about-feat-swiper{padding-left:24px}
   .about-features-head{padding:88px 24px 0;margin-bottom:32px;flex-direction:column;gap:16px}
   .about-features-h2{font-size:28px}
   .about-feat-timeline{padding:20px 24px 0}
   .about-feat-info-panel{padding:12px 24px 0}
 }
 @media(max-width:600px){
+  .about-feat-swiper{padding-left:20px}
   .about-features-head{padding:80px 20px 0}
   .about-feat-img{height:200px}
   .about-feat-img img{height:190px}
@@ -8803,22 +8805,10 @@ function aboutFeatCarouselNav(dir) {
   else _aboutFeatSwiper.slidePrev();
 }
 
-function _alignFeatSwiperToHead() {
-  var swiperEl = document.getElementById('aboutFeatSwiperEl');
-  if (!swiperEl) return;
-  var w = window.innerWidth;
-  var pl;
-  if (w <= 600) pl = 20;
-  else if (w <= 900) pl = 24;
-  else pl = Math.max(60, (w - 1280) / 2 + 60);
-  swiperEl.style.paddingLeft = pl + 'px';
-}
-
 function initAboutFeatPin() {
   if (_aboutFeatSwiper) return;
   var el = document.getElementById('aboutFeatSwiperEl');
   if (!el || typeof Swiper === 'undefined') return;
-  _alignFeatSwiperToHead();
   var N = el.querySelectorAll('.swiper-slide').length;
   _aboutFeatSwiper = new Swiper(el, {
     slidesPerView: 'auto',
@@ -8854,8 +8844,6 @@ window.addEventListener('resize', function() {
     if (_aboutFeatSwiper) {
       destroyAboutFeatPin();
       initAboutFeatPin();
-    } else {
-      _alignFeatSwiperToHead();
     }
   }, 200);
 });
