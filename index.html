@@ -8612,12 +8612,11 @@ function initAboutFeatPin() {
     centeredSlides: true,
     spaceBetween: 20,
     grabCursor: true,
-    speed: 400,
-    loop: true,
-    loopAdditionalSlides: 4,
+    speed: 500,
+    rewind: true,
     on: {
       slideChange: function() {
-        _aboutFeatSyncUI(this.realIndex, N);
+        _aboutFeatSyncUI(this.activeIndex, N);
       },
       init: function() {
         _aboutFeatSyncUI(0, N);
@@ -8625,7 +8624,7 @@ function initAboutFeatPin() {
         for (var i = 0; i < N; i++) {
           (function(idx, sw) {
             var dot = document.getElementById('ftDot' + idx);
-            if (dot) dot.addEventListener('click', function() { sw.slideToLoop(idx); });
+            if (dot) dot.addEventListener('click', function() { sw.slideTo(idx); });
           })(i, this);
         }
       }
