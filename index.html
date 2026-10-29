@@ -1735,7 +1735,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-page{background:linear-gradient(175deg,#0a1a0a 0%,#122a12 40%,#1a3a1a 70%,#0d1f0d 100%);height:100vh;overflow:hidden}
 .about-fp-track{will-change:transform;transition:transform .75s cubic-bezier(.77,0,.175,1)}
 .about-fp-slide{height:100vh;overflow:hidden;position:relative}
-.about-fp-slide--last{height:100vh;overflow-y:auto}
+.about-fp-slide--last{height:100vh;overflow-y:auto;background:#0f1710}
 
 /* Pinned scrollytelling */
 .about-pin-wrap{height:100vh;position:relative}
@@ -4051,8 +4051,8 @@ main{flex:1}
   </div>
   </div>
 
-  <!-- FP Slide 2: Features -->
-  <div class="about-fp-slide">
+  <!-- FP Slide 2: Features + Brand + Footer -->
+  <div class="about-fp-slide about-fp-slide--last">
   <!-- Що вже працює -->
   <div class="about-features">
     <div class="about-features-head">
@@ -4119,10 +4119,7 @@ main{flex:1}
       <div class="about-feat-tl-item"><div class="about-feat-tl-dot" id="ftDot3"></div><div class="about-feat-tl-line" id="ftLine3"></div></div>
     </div>
   </div>
-  </div>
 
-  <!-- FP Slide 3: Brand + Footer -->
-  <div class="about-fp-slide about-fp-slide--last">
   <!-- Brand -->
   <div style="background:#0f1710;border-top:1px solid rgba(255,255,255,.08)">
     <div class="about-brand">
@@ -8571,6 +8568,7 @@ function _aboutFPStep(dir){
   if(_aboutFP.busy) return;
   var sec = _aboutFP.section;
   var tIdx = _aboutFP.textIdx;
+  var LAST = 2;
   if(dir > 0){
     if(sec === 1 && tIdx < 2){
       _aboutFP.busy = true;
@@ -8578,7 +8576,7 @@ function _aboutFPStep(dir){
       setTimeout(function(){ _aboutFP.busy = false; }, 600);
       return;
     }
-    if(sec < 3){
+    if(sec < LAST){
       _aboutFP.busy = true;
       if(sec === 0) _aboutFPShowText(0);
       _aboutFPGoTo(sec + 1);
@@ -8593,7 +8591,7 @@ function _aboutFPStep(dir){
     }
     if(sec > 0){
       _aboutFP.busy = true;
-      if(sec === 2) _aboutFP.textIdx = 2;
+      if(sec === LAST) _aboutFP.textIdx = 2;
       _aboutFPGoTo(sec - 1);
       setTimeout(function(){ _aboutFP.busy = false; }, 850);
     }
@@ -8617,8 +8615,19 @@ function initAboutFullpage(){
   var page = document.getElementById('page-about');
   if(!page) return;
 
+  var LAST = 2;
   page.addEventListener('wheel', function(e){
-    if(_aboutFP.section === 3) return;
+    var sec = _aboutFP.section;
+    if(sec === LAST){
+      // On last slide: intercept scroll-up only when at top of the slide
+      var lastEl = page.querySelector('.about-fp-slide--last');
+      if(e.deltaY < 0 && lastEl && lastEl.scrollTop === 0){
+        e.preventDefault();
+        _aboutFPStep(-1);
+      }
+      // scroll-down passes through to let the slide scroll internally
+      return;
+    }
     e.preventDefault();
     _aboutFPStep(e.deltaY > 0 ? 1 : -1);
   }, {passive: false});
@@ -8627,8 +8636,13 @@ function initAboutFullpage(){
     _aboutFP.touchStartY = e.touches[0].clientY;
   }, {passive: true});
   page.addEventListener('touchend', function(e){
-    if(_aboutFP.section === 3) return;
+    var sec = _aboutFP.section;
     var dy = _aboutFP.touchStartY - e.changedTouches[0].clientY;
+    if(sec === LAST){
+      var lastEl = page.querySelector('.about-fp-slide--last');
+      if(dy < -40 && lastEl && lastEl.scrollTop === 0) _aboutFPStep(-1);
+      return;
+    }
     if(Math.abs(dy) > 40) _aboutFPStep(dy > 0 ? 1 : -1);
   }, {passive: true});
 
