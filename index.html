@@ -8400,7 +8400,8 @@ async function loadMethodsCatalog() {
     _mcatLoaded = true;
     mcatApplyFilters();
   } catch(e) {
-    document.getElementById('mcatContent').innerHTML = '<div class="mcat-empty">Помилка завантаження. Спробуйте пізніше.</div>';
+    const isTimeout = e && e.name === 'AbortError';
+    document.getElementById('mcatContent').innerHTML = `<div class="mcat-empty">${isTimeout ? 'Сервер не відповідає. Перевірте підключення або спробуйте пізніше.' : 'Помилка завантаження. Спробуйте пізніше.'}</div>`;
   }
 }
 
@@ -9944,14 +9945,23 @@ const _matIdToKey = {
 // ─── Supabase fetch helper ─────────────────────────────────────────────────
 async function _sbFetch(table, params = '') {
   const url = `${SUPABASE_URL}/rest/v1/${table}?${params}`;
-  const r = await fetch(url, {
-    headers: {
-      'apikey':        SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-    },
-  });
-  if (!r.ok) throw new Error(`Supabase ${table}: ${r.status}`);
-  return r.json();
+  const ctrl = new AbortController();
+  const tid = setTimeout(()=>ctrl.abort(), 12000);
+  try {
+    const r = await fetch(url, {
+      signal: ctrl.signal,
+      headers: {
+        'apikey':        SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    });
+    clearTimeout(tid);
+    if (!r.ok) throw new Error(`Supabase ${table}: ${r.status}`);
+    return r.json();
+  } catch(e) {
+    clearTimeout(tid);
+    throw e;
+  }
 }
 
 // ─── Завантаження каталогу з Supabase ─────────────────────────────────────
