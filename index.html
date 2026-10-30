@@ -6871,7 +6871,7 @@ function buildIndTooltip(ind){
     <div class="ind-tooltip-label">Метод дослідження</div>
     ${m ? `<div class="ind-tooltip-name">${m.name}</div>
     <div class="ind-tooltip-std">${m.std}</div>
-    <a class="ind-tooltip-link" href="#" onclick="event.preventDefault();navigateToMethod(${JSON.stringify(m.id||null)},${JSON.stringify(m.std||null)})">Докладніше про метод →</a>` : `<div class="ind-tooltip-name" style="color:var(--text-soft);font-weight:500">Уточнюється в лабораторії</div>`}
+    <a class="ind-tooltip-link" href="#" data-meth-id="${(m.id||'').replace(/"/g,'&quot;')}" data-meth-std="${(m.std||'').replace(/"/g,'&quot;')}" onclick="event.preventDefault();navigateToMethod(this.dataset.methId||null,this.dataset.methStd||null)">Докладніше про метод →</a>` : `<div class="ind-tooltip-name" style="color:var(--text-soft);font-weight:500">Уточнюється в лабораторії</div>`}
   </div>`;
 }
 // Короткі назви чипів по коду показника
@@ -8131,7 +8131,7 @@ function saveOrderToHistory(order) {
       const m=d.method;
       _cp.innerHTML=
         (d.tooltip?`<div class="chip-pop-desc-text" style="margin-bottom:${m?'10px':'0'}">${d.tooltip}</div>`:'')+
-        (m?`<div class="chip-pop-label">Метод дослідження</div><div class="chip-pop-mname">${m.name}</div>${m.std&&m.std!==m.name?`<div class="chip-pop-std">${m.std}</div>`:''}<div style="margin-top:8px"><a class="chip-pop-link" href="#" onclick="event.preventDefault();navigateToMethod(${JSON.stringify(m.id||null)},${JSON.stringify(m.std||null)})">Докладніше про метод →</a></div>`:'');
+        (m?`<div class="chip-pop-label">Метод дослідження</div><div class="chip-pop-mname">${m.name}</div>${m.std&&m.std!==m.name?`<div class="chip-pop-std">${m.std}</div>`:''}<div style="margin-top:8px"><a class="chip-pop-link" href="#" data-meth-id="${(m.id||'').replace(/"/g,'&quot;')}" data-meth-std="${(m.std||'').replace(/"/g,'&quot;')}" onclick="event.preventDefault();navigateToMethod(this.dataset.methId||null,this.dataset.methStd||null)">Докладніше про метод →</a></div>`:'');
       _cpCancelHide();
       _cp.classList.add('show');
       _positionChipPop(el);
