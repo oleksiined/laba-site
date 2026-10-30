@@ -5917,6 +5917,7 @@ function navigate(page) {
   } else {
     stepBar.style.display = 'none';
   }
+  const nsi2=document.getElementById('navSearchInp'); if(nsi2){nsi2.value='';} const nsd2=document.getElementById('navSearchDrop'); if(nsd2){nsd2.innerHTML='';nsd2.style.display='none';}
   if (page === 'services') { if(!srvMat) { srvMat=''; currentMaterial=''; srvFmtChosen=false; const ctx=document.getElementById('srvTaskContext'); if(ctx) ctx.style.display='none'; } buildTasksFromGroups(); renderTaskFilter(); render(); }
   else { searchQ=''; const si=document.getElementById('searchInput'); if(si) si.value=''; }
   if (page === 'methods') loadMethodsCatalog();
