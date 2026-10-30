@@ -6871,7 +6871,7 @@ function buildIndTooltip(ind){
     <div class="ind-tooltip-label">Метод дослідження</div>
     ${m ? `<div class="ind-tooltip-name">${m.name}</div>
     <div class="ind-tooltip-std">${m.std}</div>
-    <a class="ind-tooltip-link" href="#" onclick="return false;">Докладніше про метод →</a>` : `<div class="ind-tooltip-name" style="color:var(--text-soft);font-weight:500">Уточнюється в лабораторії</div>`}
+    <a class="ind-tooltip-link" href="#" onclick="event.preventDefault();navigateToMethod(${JSON.stringify(m.id||null)},${JSON.stringify(m.std||null)})">Докладніше про метод →</a>` : `<div class="ind-tooltip-name" style="color:var(--text-soft);font-weight:500">Уточнюється в лабораторії</div>`}
   </div>`;
 }
 // Короткі назви чипів по коду показника
@@ -8131,7 +8131,7 @@ function saveOrderToHistory(order) {
       const m=d.method;
       _cp.innerHTML=
         (d.tooltip?`<div class="chip-pop-desc-text" style="margin-bottom:${m?'10px':'0'}">${d.tooltip}</div>`:'')+
-        (m?`<div class="chip-pop-label">Метод дослідження</div><div class="chip-pop-mname">${m.name}</div>${m.std&&m.std!==m.name?`<div class="chip-pop-std">${m.std}</div>`:''}<div style="margin-top:8px"><a class="chip-pop-link" href="#" onclick="return false">Докладніше про метод →</a></div>`:'');
+        (m?`<div class="chip-pop-label">Метод дослідження</div><div class="chip-pop-mname">${m.name}</div>${m.std&&m.std!==m.name?`<div class="chip-pop-std">${m.std}</div>`:''}<div style="margin-top:8px"><a class="chip-pop-link" href="#" onclick="event.preventDefault();navigateToMethod(${JSON.stringify(m.id||null)},${JSON.stringify(m.std||null)})">Докладніше про метод →</a></div>`:'');
       _cpCancelHide();
       _cp.classList.add('show');
       _positionChipPop(el);
@@ -8375,6 +8375,29 @@ function mcatPaginationHtml(total, pages) {
 
 function mcatGoPage(p) { _mcatPage=p; mcatRender(); window.scrollTo({top:document.getElementById('mcatContent').getBoundingClientRect().top+window.scrollY-120,behavior:'smooth'}); }
 function mcatSetPerPage(v) { _mcatPerPage=parseInt(v)||10; _mcatPage=1; mcatRender(); }
+
+function navigateToMethod(methodId, fallbackStd) {
+  navigate('methods');
+  var _attempt = function(tries) {
+    if (!_mcatLoaded) {
+      if (tries > 30) return;
+      return setTimeout(function(){ _attempt(tries+1); }, 200);
+    }
+    _mcatMat = ''; _mcatGroup = ''; _mcatSearch = '';
+    var searchEl = document.getElementById('mcatSearchInput');
+    if (searchEl) searchEl.value = '';
+    mcatApplyFilters();
+    var idx = -1;
+    if (methodId) idx = _mcatAllRows.findIndex(function(r){ return r.id === methodId; });
+    if (idx < 0 && fallbackStd) idx = _mcatAllRows.findIndex(function(r){ return r.std === fallbackStd; });
+    if (idx < 0) return;
+    _mcatFilteredRows = _mcatAllRows.slice();
+    _mcatPage = Math.floor(idx / _mcatPerPage) + 1;
+    mcatRender();
+    setTimeout(function(){ mcatOpenDrawer(idx); }, 150);
+  };
+  setTimeout(function(){ _attempt(0); }, 350);
+}
 
 function mcatOpenDrawer(idx) {
   const r = _mcatFilteredRows[idx];
