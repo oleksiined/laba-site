@@ -8785,46 +8785,57 @@ function destroyAboutFullpage(){
   if(track) track.style.transform = '';
 }
 
-// About page features — custom carousel (no Swiper JS)
+// About page features — custom carousel
 var _featIdx = 0;
 var _featN = 4;
 var _featTrack = null;
 var _featSlides = null;
+var _featReady = false;
 
 function _featInit() {
+  if (_featReady) return;
   var el = document.getElementById('aboutFeatSwiperEl');
   if (!el) return;
   _featTrack = el.querySelector('.swiper-wrapper');
-  _featSlides = el.querySelectorAll('.swiper-slide');
+  _featSlides = Array.prototype.slice.call(el.querySelectorAll('.swiper-slide'));
   _featN = _featSlides.length;
-  var startX = 0;
-  el.addEventListener('touchstart', function(e){ startX = e.touches[0].clientX; }, {passive:true});
-  el.addEventListener('touchend', function(e){ var dx=e.changedTouches[0].clientX-startX; if(Math.abs(dx)>40) aboutFeatCarouselNav(dx<0?1:-1); }, {passive:true});
-  var msx=0, mdown=false;
-  el.addEventListener('mousedown', function(e){ msx=e.clientX; mdown=true; e.preventDefault(); });
-  window.addEventListener('mouseup', function(e){ if(!mdown) return; mdown=false; var dx=e.clientX-msx; if(Math.abs(dx)>40) aboutFeatCarouselNav(dx<0?1:-1); });
+  if (!_featN || !_featTrack) return;
+  _featReady = true;
+  // touch swipe on carousel
+  var swipeStartX = 0;
+  el.addEventListener('touchstart', function(e){ swipeStartX = e.touches[0].clientX; }, {passive:true});
+  el.addEventListener('touchend', function(e){ var dx = e.changedTouches[0].clientX - swipeStartX; if (Math.abs(dx) > 50) aboutFeatCarouselNav(dx < 0 ? 1 : -1); }, {passive:true});
+  // mouse drag on carousel
+  var dragX = 0, isDragging = false;
+  el.addEventListener('mousedown', function(e){ dragX = e.clientX; isDragging = true; });
+  window.addEventListener('mousemove', function(e){ if (isDragging && Math.abs(e.clientX - dragX) > 5) el.style.cursor = 'grabbing'; });
+  window.addEventListener('mouseup', function(e){
+    if (!isDragging) return;
+    isDragging = false;
+    el.style.cursor = '';
+    var dx = e.clientX - dragX;
+    if (Math.abs(dx) > 50) aboutFeatCarouselNav(dx < 0 ? 1 : -1);
+  });
   _featRender(true);
 }
 
 function _featRender(instant) {
-  if (!_featTrack || !_featSlides || !_featSlides.length) return;
-  var slideW = _featSlides[0].offsetWidth;
-  var tx = -_featIdx * (slideW + 20);
+  if (!_featReady || !_featTrack || !_featSlides || !_featSlides.length) return;
+  // use offsetLeft for exact position regardless of gaps/margins
+  var tx = -(_featSlides[_featIdx].offsetLeft);
   _featTrack.style.transition = instant ? 'none' : 'transform .5s cubic-bezier(.25,.46,.45,.94)';
   _featTrack.style.transform = 'translateX(' + tx + 'px)';
-  for (var i = 0; i < _featSlides.length; i++) {
-    _featSlides[i].classList.toggle('swiper-slide-active', i === _featIdx);
-  }
+  _featSlides.forEach(function(s, i){ s.classList.toggle('swiper-slide-active', i === _featIdx); });
   _featSyncUI();
 }
 
 function _featSyncUI() {
   var counter = document.getElementById('aboutFeatCounter');
-  if (counter) counter.textContent = String(_featIdx+1).padStart(2,'0') + ' / ' + String(_featN).padStart(2,'0');
+  if (counter) counter.textContent = String(_featIdx + 1).padStart(2, '0') + ' / ' + String(_featN).padStart(2, '0');
   var prev = document.getElementById('aboutFeatPrev');
   var next = document.getElementById('aboutFeatNext');
-  if (prev) { prev.disabled=_featIdx===0; prev.style.opacity=_featIdx===0?'0.3':'1'; prev.style.pointerEvents=_featIdx===0?'none':''; }
-  if (next) { next.disabled=_featIdx===_featN-1; next.style.opacity=_featIdx===_featN-1?'0.3':'1'; next.style.pointerEvents=_featIdx===_featN-1?'none':''; }
+  if (prev) { prev.disabled = _featIdx === 0; prev.style.opacity = _featIdx === 0 ? '0.3' : '1'; prev.style.pointerEvents = _featIdx === 0 ? 'none' : ''; }
+  if (next) { next.disabled = _featIdx === _featN - 1; next.style.opacity = _featIdx === _featN - 1 ? '0.3' : '1'; next.style.pointerEvents = _featIdx === _featN - 1 ? 'none' : ''; }
 }
 
 function aboutFeatCarouselNav(dir) {
@@ -8842,7 +8853,7 @@ window.addEventListener('resize', function() {
   _featResizeTimer = setTimeout(function(){ _featRender(true); }, 200);
 });
 
-document.addEventListener('DOMContentLoaded', function(){ _featInit(); });
+document.addEventListener('DOMContentLoaded', _featInit);
 </script>
 
 
