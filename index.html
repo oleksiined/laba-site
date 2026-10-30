@@ -1815,6 +1815,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 /* Drag carousel */
 .about-feat-swiper-wrap{margin-left:max(60px,calc((100vw - 1280px)/2 + 60px));overflow:hidden}
 .about-feat-swiper{overflow:visible;padding:24px 0;width:100%}
+.about-feat-swiper .swiper-wrapper{display:flex;gap:20px;will-change:transform;transition:transform .5s cubic-bezier(.25,.46,.45,.94);touch-action:pan-y}
 .about-fp-next-btn{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:13px;font-family:inherit;padding:10px 20px;border-radius:100px;cursor:pointer;transition:background .2s,color .2s,border-color .2s;white-space:nowrap}
 .about-fp-next-btn:hover{background:rgba(196,255,77,.12);border-color:rgba(196,255,77,.3);color:var(--neon)}
 .about-feat-slide{width:380px!important;height:auto}
@@ -2926,7 +2927,6 @@ main{flex:1}
 }
 
 </style>
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
@@ -4120,7 +4120,7 @@ main{flex:1}
     <div class="about-feat-swiper-wrap">
     <div class="swiper about-feat-swiper" id="aboutFeatSwiperEl">
       <div class="swiper-wrapper">
-        <div class="swiper-slide about-feat-slide">
+        <div class="swiper-slide about-feat-slide swiper-slide-active">
           <div class="about-feat-card">
             <div class="about-feat-img"><img src="/robot-tablet.png" alt="Замовлення онлайн"></div>
             <div class="about-feat-card-text">
@@ -8785,73 +8785,64 @@ function destroyAboutFullpage(){
   if(track) track.style.transform = '';
 }
 
-// About page features — Swiper carousel
-var _aboutFeatSwiper = null;
+// About page features — custom carousel (no Swiper JS)
+var _featIdx = 0;
+var _featN = 4;
+var _featTrack = null;
+var _featSlides = null;
 
-function _aboutFeatSyncUI(idx, N) {
-  for (var i = 0; i < N; i++) {
-    var dot = document.getElementById('ftDot' + i);
-    var line = document.getElementById('ftLine' + i);
-    if (dot) dot.classList.toggle('active', i === idx);
-    if (line) line.classList.toggle('done', i < idx);
+function _featInit() {
+  var el = document.getElementById('aboutFeatSwiperEl');
+  if (!el) return;
+  _featTrack = el.querySelector('.swiper-wrapper');
+  _featSlides = el.querySelectorAll('.swiper-slide');
+  _featN = _featSlides.length;
+  var startX = 0;
+  el.addEventListener('touchstart', function(e){ startX = e.touches[0].clientX; }, {passive:true});
+  el.addEventListener('touchend', function(e){ var dx=e.changedTouches[0].clientX-startX; if(Math.abs(dx)>40) aboutFeatCarouselNav(dx<0?1:-1); }, {passive:true});
+  var msx=0, mdown=false;
+  el.addEventListener('mousedown', function(e){ msx=e.clientX; mdown=true; e.preventDefault(); });
+  window.addEventListener('mouseup', function(e){ if(!mdown) return; mdown=false; var dx=e.clientX-msx; if(Math.abs(dx)>40) aboutFeatCarouselNav(dx<0?1:-1); });
+  _featRender(true);
+}
+
+function _featRender(instant) {
+  if (!_featTrack || !_featSlides || !_featSlides.length) return;
+  var slideW = _featSlides[0].offsetWidth;
+  var tx = -_featIdx * (slideW + 20);
+  _featTrack.style.transition = instant ? 'none' : 'transform .5s cubic-bezier(.25,.46,.45,.94)';
+  _featTrack.style.transform = 'translateX(' + tx + 'px)';
+  for (var i = 0; i < _featSlides.length; i++) {
+    _featSlides[i].classList.toggle('swiper-slide-active', i === _featIdx);
   }
+  _featSyncUI();
+}
+
+function _featSyncUI() {
   var counter = document.getElementById('aboutFeatCounter');
-  if (counter) counter.textContent = String(idx + 1).padStart(2,'0') + ' / ' + String(N).padStart(2,'0');
+  if (counter) counter.textContent = String(_featIdx+1).padStart(2,'0') + ' / ' + String(_featN).padStart(2,'0');
   var prev = document.getElementById('aboutFeatPrev');
   var next = document.getElementById('aboutFeatNext');
-  if (prev) { prev.disabled = idx === 0; prev.style.opacity = idx === 0 ? '0.3' : ''; prev.style.pointerEvents = idx === 0 ? 'none' : ''; }
-  if (next) { next.disabled = idx === N - 1; next.style.opacity = idx === N - 1 ? '0.3' : ''; next.style.pointerEvents = idx === N - 1 ? 'none' : ''; }
+  if (prev) { prev.disabled=_featIdx===0; prev.style.opacity=_featIdx===0?'0.3':'1'; prev.style.pointerEvents=_featIdx===0?'none':''; }
+  if (next) { next.disabled=_featIdx===_featN-1; next.style.opacity=_featIdx===_featN-1?'0.3':'1'; next.style.pointerEvents=_featIdx===_featN-1?'none':''; }
 }
 
 function aboutFeatCarouselNav(dir) {
-  if (!_aboutFeatSwiper) initAboutFeatPin();
-  if (!_aboutFeatSwiper) return;
-  if (dir > 0) _aboutFeatSwiper.slideNext();
-  else _aboutFeatSwiper.slidePrev();
+  var ni = _featIdx + dir;
+  if (ni < 0 || ni >= _featN) return;
+  _featIdx = ni;
+  _featRender(false);
 }
 
-function initAboutFeatPin() {
-  if (_aboutFeatSwiper) return;
-  var el = document.getElementById('aboutFeatSwiperEl');
-  if (!el || typeof Swiper === 'undefined') return;
-  var N = el.querySelectorAll('.swiper-slide').length;
-  _aboutFeatSwiper = new Swiper(el, {
-    slidesPerView: 'auto',
-    centeredSlides: false,
-    spaceBetween: 20,
-    grabCursor: true,
-    speed: 500,
-    loop: false,
-    slidesPerGroup: 1,
-    slideToClickedSlide: true,
-    on: {
-      slideChange: function() { _aboutFeatSyncUI(this.activeIndex, N); },
-      init: function() {
-        _aboutFeatSyncUI(0, N);
-        for (var i = 0; i < N; i++) {
-          (function(idx, sw) {
-            var dot = document.getElementById('ftDot' + idx);
-            if (dot) dot.addEventListener('click', function() { sw.slideTo(idx); });
-          })(i, this);
-        }
-      }
-    }
-  });
-}
+function initAboutFeatPin() { _featInit(); }
 
-function destroyAboutFeatPin() {
-  if (_aboutFeatSwiper) { _aboutFeatSwiper.destroy(true, true); _aboutFeatSwiper = null; }
-}
 var _featResizeTimer = null;
 window.addEventListener('resize', function() {
   clearTimeout(_featResizeTimer);
-  _featResizeTimer = setTimeout(function() {
-    if (_aboutFeatSwiper) {
-      destroyAboutFeatPin();
-      initAboutFeatPin();
-    }
-  }, 200);
+  _featResizeTimer = setTimeout(function(){ _featRender(true); }, 200);
 });
+
+document.addEventListener('DOMContentLoaded', function(){ _featInit(); });
 </script>
 
 
