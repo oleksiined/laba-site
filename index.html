@@ -2698,8 +2698,18 @@ main{flex:1}
 .mcat-pill{padding:7px 16px;border-radius:var(--radius-pill);border:1.5px solid var(--border);background:#fff;font-size:13px;font-weight:500;color:var(--text-mid);cursor:pointer;transition:all .18s;font-family:inherit}
 .mcat-pill:hover{border-color:var(--navy);color:var(--navy)}
 .mcat-pill.active{background:var(--neon);border-color:var(--neon);color:var(--navy);font-weight:600}
-.mcat-select{padding:8px 14px;border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:14px;font-family:inherit;color:var(--navy);background:#fff;outline:none;cursor:pointer;min-width:200px}
-.mcat-select:focus{border-color:var(--navy)}
+.mcat-group-wrap{position:relative}
+.mcat-group-btn{display:flex;align-items:center;gap:8px;border:1.5px solid var(--border);border-radius:10px;padding:7px 14px;font-size:13px;font-weight:500;color:var(--text);background:var(--white);cursor:pointer;outline:none;white-space:nowrap;transition:border-color .15s;font-family:inherit}
+.mcat-group-btn:hover{border-color:#b0b8c0}
+.mcat-group-btn.active{border-color:var(--navy);color:var(--navy)}
+.mcat-group-btn svg{flex-shrink:0;color:#9ca3af;transition:transform .2s}
+.mcat-group-btn.open svg.chevron{transform:rotate(180deg)}
+.mcat-group-dropdown{position:absolute;top:calc(100% + 6px);left:0;min-width:240px;max-width:340px;background:var(--white);border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.10);z-index:200;overflow:hidden;display:none;max-height:320px;overflow-y:auto}
+.mcat-group-dropdown.open{display:block}
+.mcat-group-option{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-size:13px;color:var(--text);cursor:pointer;transition:background .12s;border:none;background:none;width:100%;text-align:left;font-family:inherit}
+.mcat-group-option:hover{background:#f5f6f7}
+.mcat-group-option.active{background:#edf4ff;font-weight:500}
+.mcat-group-option .check{color:var(--neon-dark);flex-shrink:0}
 .mcat-clear-btn{background:none;border:none;font-size:13px;color:var(--text-soft);cursor:pointer;font-family:inherit;white-space:nowrap;padding:0;display:flex;align-items:center;gap:4px;margin-left:auto}
 .mcat-clear-btn:hover{color:var(--navy)}
 /* body */
@@ -4734,9 +4744,15 @@ main{flex:1}
         <div class="mcat-pills" id="mcatMatPills">
           <button class="mcat-pill active" data-mat="" onclick="mcatSetMat(this,'')">Усі</button>
         </div>
-        <select class="mcat-select" id="mcatGroupSel" onchange="mcatFilterChange()">
-          <option value="">Напрям дослідження</option>
-        </select>
+        <div class="mcat-group-wrap" id="mcatGroupWrap">
+          <button class="mcat-group-btn" id="mcatGroupBtn" onclick="mcatToggleGroup(event)">
+            <span id="mcatGroupLabel">Напрям дослідження</span>
+            <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="mcat-group-dropdown" id="mcatGroupDropdown">
+            <button class="mcat-group-option active" data-val="" onclick="mcatGroupPick('','Напрям дослідження',this)">Усі напрями<span class="check">✓</span></button>
+          </div>
+        </div>
         <button class="mcat-clear-btn" id="mcatClearBtn" onclick="mcatClearFilters()" style="display:none">↺ Очистити фільтри</button>
         <div class="mcat-sort" id="mcatSortWrap">
           <button class="mcat-sort-btn" id="mcatSortBtn" onclick="mcatToggleSort(event)">
@@ -8421,10 +8437,10 @@ async function loadMethodsCatalog() {
     });
 
     // Build group dropdown
-    const groupSel = document.getElementById('mcatGroupSel');
+    const groupDrop = document.getElementById('mcatGroupDropdown');
     const groups = [...new Set(services.map(s=>s.group_name).filter(Boolean))].sort();
-    groupSel.innerHTML = '<option value="">Напрям дослідження</option>';
-    groups.forEach(g=>{ groupSel.innerHTML += `<option value="${g}">${g}</option>`; });
+    groupDrop.innerHTML = '<button class="mcat-group-option active" data-val="" onclick="mcatGroupPick(\'\',\'Напрям дослідження\',this)">Усі напрями<span class="check">✓</span></button>';
+    groups.forEach(g=>{ groupDrop.innerHTML += `<button class="mcat-group-option" data-val="${g}" onclick="mcatGroupPick('${g.replace(/'/g,"\\'")}','${g.replace(/'/g,"\\'")}',this)">${g}</button>`; });
 
     // Build rows — primary source: catalog_services
     _mcatAllRows = [];
@@ -8463,9 +8479,40 @@ function mcatSetMat(btn, matId) {
   mcatApplyFilters();
 }
 
+function mcatToggleGroup(e){
+  e.stopPropagation();
+  const btn=document.getElementById('mcatGroupBtn');
+  const drop=document.getElementById('mcatGroupDropdown');
+  const open=drop.classList.toggle('open');
+  btn.classList.toggle('open',open);
+  if(open) { document.addEventListener('click',mcatCloseGroup,{once:true}); }
+}
+function mcatCloseGroup(){
+  document.getElementById('mcatGroupDropdown').classList.remove('open');
+  document.getElementById('mcatGroupBtn').classList.remove('open');
+}
+function mcatGroupPick(val,label,el){
+  _mcatGroup=val;
+  const lbl=document.getElementById('mcatGroupLabel');
+  if(lbl) lbl.textContent=val?label:'Напрям дослідження';
+  const btn=document.getElementById('mcatGroupBtn');
+  if(btn) btn.classList.toggle('active',!!val);
+  document.querySelectorAll('.mcat-group-option').forEach(o=>{
+    const isActive=o.dataset.val===val;
+    o.classList.toggle('active',isActive);
+    const chk=o.querySelector('.check');
+    if(chk) chk.style.display=isActive?'':'none';
+    else if(isActive){ const s=document.createElement('span');s.className='check';s.textContent='✓';o.appendChild(s); }
+  });
+  mcatCloseGroup();
+  _mcatPage=1; mcatApplyFilters();
+  const anyFilter=_mcatMat||_mcatGroup||_mcatSearch;
+  const cb=document.getElementById('mcatClearBtn');
+  if(cb) cb.style.display=anyFilter?'':'none';
+}
+
 function mcatFilterChange() {
   _mcatSearch = (document.getElementById('mcatSearch').value || '').toLowerCase().trim();
-  _mcatGroup = document.getElementById('mcatGroupSel').value || '';
   _mcatPage = 1;
   mcatApplyFilters();
 }
@@ -8473,7 +8520,16 @@ function mcatFilterChange() {
 function mcatClearFilters() {
   _mcatMat = ''; _mcatGroup = ''; _mcatSearch = ''; _mcatPage = 1;
   document.getElementById('mcatSearch').value = '';
-  document.getElementById('mcatGroupSel').value = '';
+  const lbl=document.getElementById('mcatGroupLabel');
+  if(lbl) lbl.textContent='Напрям дослідження';
+  const btn=document.getElementById('mcatGroupBtn');
+  if(btn) btn.classList.remove('active');
+  document.querySelectorAll('.mcat-group-option').forEach(o=>{
+    const isAll=o.dataset.val==='';
+    o.classList.toggle('active',isAll);
+    const chk=o.querySelector('.check');
+    if(chk) chk.style.display=isAll?'':'none';
+  });
   document.querySelectorAll('.mcat-pill').forEach(p=>p.classList.toggle('active', p.dataset.mat===''));
   mcatApplyFilters();
 }
