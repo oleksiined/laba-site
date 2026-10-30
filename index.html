@@ -6596,7 +6596,12 @@ function changeCollapsedQty(safeCode, delta){
 }
 
 function inputCollapsedQty(safeCode, val){
+  if(val===''||val===null) return;
   const v = Math.max(1, Math.min(9999, parseInt(val)||1));
+  const inp = document.getElementById('cqty-'+safeCode);
+  if(inp && inp.value!=='' && String(v)!==String(val)) inp.value=v;
+  const label = document.getElementById('cqty-label-'+safeCode);
+  if(label) label.textContent = v+' зразків у кошику';
   const idx = cart.findIndex(c=>c.code===safeCode&&c.type==='pkg');
   if(idx>=0){ cart[idx].qty=v; saveCart(); updateCartUI(); }
   syncCollapsedQty(safeCode);
@@ -6647,11 +6652,12 @@ function changeIndQty(safeCode, delta){
 }
 
 function inputIndQty(safeCode, val){
+  if(val===''||val===null) return;
   const _n = _PKG_NAMES[safeCode]||{};
   const price = _n.price||0;
   const v = Math.max(1, parseInt(val)||1);
   const inp = document.getElementById('cqty-'+safeCode);
-  if(inp) inp.value = v;
+  if(inp && inp.value!=='' && String(v)!==String(val)) inp.value=v;
   const decBtn = document.getElementById('cdec-'+safeCode);
   if(decBtn) decBtn.disabled = v<=1;
   const label = document.getElementById('cqty-label-'+safeCode);
@@ -6841,7 +6847,8 @@ function makeRow(item, type){
             <div class="srv-qty-counter-sm">
               <button id="cdec-${safeCode}" onclick="changeIndQty('${safeCode}',-1)" disabled>−</button>
               <input id="cqty-${safeCode}" type="number" value="1" min="1" max="9999"
-                oninput="inputIndQty('${safeCode}',this.value)">
+                oninput="inputIndQty('${safeCode}',this.value)"
+                onblur="if(!this.value||parseInt(this.value)<1){this.value=1;inputIndQty('${safeCode}',1)}">
               <button onclick="changeIndQty('${safeCode}',1)">+</button>
             </div>
           </div>
@@ -6933,12 +6940,15 @@ function makeRow(item, type){
     <div class="srv-right-col" onclick="event.stopPropagation()">
       <!-- кнопки: верх -->
       <div class="srv-right-btns">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
         <div class="srv-qty-inline ${inCart?'open':''}" id="czone-${safeCode}" style="flex-direction:row;align-items:center">
           <div class="srv-qty-counter-sm">
             <button id="cdec-${safeCode}" onclick="changeCollapsedQty('${safeCode}',-1)" title="${qty<=1?'Видалити з кошика':'Зменшити'}" style="${qty<=1?'color:#EF4444':''}">${qty<=1?'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><polyline points="2,4 14,4"/><path d="M5 4V3h6v1M6 7v5M10 7v5" stroke-linecap="round"/><rect x="3" y="4" width="10" height="9" rx="1.5"/></svg>':'−'}</button>
-            <input id="cqty-${safeCode}" type="number" value="${qty}" min="1" max="9999" oninput="inputCollapsedQty('${safeCode}',this.value)">
+            <input id="cqty-${safeCode}" type="number" value="${qty}" min="1" max="9999" oninput="inputCollapsedQty('${safeCode}',this.value)" onblur="if(!this.value||parseInt(this.value)<1){this.value=1;inputCollapsedQty('${safeCode}',1)}">
             <button onclick="changeCollapsedQty('${safeCode}',1)">+</button>
           </div>
+        </div>
+        <span id="cqty-label-${safeCode}" style="font-size:11px;color:var(--t3);font-weight:500;white-space:nowrap">${inCart?qty+' зразків у кошику':''}</span>
         </div>
         <button class="srv-cart-icon" id="cicon-${safeCode}"
           style="${inCart?'display:none':''}"
@@ -6960,7 +6970,6 @@ function makeRow(item, type){
         <div class="srv-right-price-sub">
           <span id="cprice-sub-${safeCode}" style="display:block">${inCart?((item.price||0).toLocaleString('uk-UA')+' грн × '+qty):''}</span>
           <span id="cprice-label-${safeCode}" style="${inCart?'display:none':''}">${inCart?'':'Ціна за 1 зразок'}</span>
-          <span id="cqty-label-${safeCode}" style="display:block;color:var(--t3);font-weight:500">${inCart?'зразків у кошику':''}</span>
         </div>
       </div>
     </div>
