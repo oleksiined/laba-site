@@ -5470,23 +5470,23 @@ const SEARCH_SYNONYMS = {
   'чекап': ['чекап', 'аналіз', 'дослідження', 'перевірка', 'checkup'],
   'аналіз': ['аналіз', 'дослідження', 'перевірка', 'чекап', 'тест'],
   // Хімічні елементи та показники
-  'азот': ['азот', 'nitrogen', 'n', 'нітрат', 'нітроген', 'амоній', 'no3', 'nh4'],
+  'азот': ['азот', 'nitrogen', 'нітрат', 'нітроген', 'амоній', 'no3', 'nh4'],
   'нітрат': ['нітрат', 'no3', 'азот', 'nitrogen'],
-  'фосфор': ['фосфор', 'phosphorus', 'p', 'p2o5', 'фосфати'],
-  'калій': ['калій', 'potassium', 'k', 'k2o', 'калі'],
+  'фосфор': ['фосфор', 'phosphorus', 'p2o5', 'фосфати'],
+  'калій': ['калій', 'potassium', 'k2o', 'калі'],
   'гумус': ['гумус', 'humus', 'органіка', 'органічна речовина', 'org'],
   'ph': ['ph', 'кислотність', 'реакція', 'лужність', 'кисл'],
   'кислотність': ['кислотність', 'ph', 'реакція середовища', 'лужність'],
   'солі': ['солі', 'засоленість', 'ec', 'провідність', 'електропровідність'],
   'мікроелементи': ['мікроелементи', 'мікро', 'залізо', 'марганець', 'цинк', 'мідь', 'бор', 'fe', 'mn', 'zn', 'cu', 'b'],
-  'залізо': ['залізо', 'fe', 'iron'],
-  'марганець': ['марганець', 'mn', 'manganese'],
-  'цинк': ['цинк', 'zn', 'zinc'],
-  'мідь': ['мідь', 'cu', 'copper'],
-  'бор': ['бор', 'b', 'boron'],
-  'кальцій': ['кальцій', 'ca', 'calcium'],
-  'магній': ['магній', 'mg', 'magnesium'],
-  'сірка': ['сірка', 's', 'sulfur', 'сульфат'],
+  'залізо': ['залізо', 'iron'],
+  'марганець': ['марганець', 'manganese'],
+  'цинк': ['цинк', 'zinc'],
+  'мідь': ['мідь', 'copper'],
+  'бор': ['бор', 'boron'],
+  'кальцій': ['кальцій', 'calcium'],
+  'магній': ['магній', 'magnesium'],
+  'сірка': ['сірка', 'sulfur', 'сульфат'],
   // Вода
   'вода': ['вода', 'water', 'зрошення', 'полив', 'свердловина', 'криниця'],
   'питна': ['питна', 'питної якості', 'водопостачання', 'drinking'],
@@ -6397,10 +6397,26 @@ function getSrvItems(){
   if(srvTask && srvTask!=='all') items=items.filter(i=>i.groups&&i.groups.includes(srvTask));
   if(searchQ){
     const expandedQ = expandSearchQuery(searchQ);
+    // Фільтруємо розширені слова: короткі (< 3 символів) перевіряємо лише як цілі слова
     const qWords = expandedQ.split(/\s+/).filter(Boolean);
     items=items.filter(i=>{
-      const haystack=(i.name+' '+i.desc+' '+i.descRich+' '+(i.keywords||'')+' '+(i.params||[]).join(' ')+' '+(i.groups||[]).join(' ')+' '+(i.tags||[]).map(t=>((t?.s||t)+' '+(t?.tooltip||''))).join(' ')).toLowerCase();
-      return qWords.some(w=>haystack.includes(w));
+      const haystack=(
+        (i.name||'')+' '+
+        (i.desc||'')+' '+
+        (i.descRich||'')+' '+
+        (i.keywords||'')+' '+
+        (i.params||[]).join(' ')+' '+
+        (i.groups||[]).join(' ')+' '+
+        (i.tags||[]).map(t=>((t?.s||t)+' '+(t?.tooltip||''))).join(' ')
+      ).toLowerCase();
+      return qWords.some(w=>{
+        if(!w) return false;
+        if(w.length <= 2){
+          // Короткі слова: лише як ціле слово (word boundary)
+          return new RegExp('(?:^|[^а-яіїєёa-z0-9])'+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?:$|[^а-яіїєёa-z0-9])','i').test(haystack);
+        }
+        return haystack.includes(w);
+      });
     });
   }
   if(currentSort==='price_asc') items.sort((a,b)=>(a.price||0)-(b.price||0));
