@@ -1805,15 +1805,15 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 /* Features — horizontal snap carousel, monobank-style */
 .about-features{background:#0f1710;padding:0;height:100vh;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;padding-top:68px}
 .about-features-head{padding-top:max(88px,calc(68px + 1.5vw));padding-left:max(60px,calc((100vw - 1280px) / 2 + 60px));padding-right:max(60px,calc((100vw - 1280px) / 2 + 60px));margin-bottom:36px;display:flex;align-items:flex-end;justify-content:space-between;gap:32px}
-.about-features-h2{font-size:56px;font-weight:900;color:#fff;letter-spacing:-1.5px;line-height:1.05;margin:0;max-width:600px}
-.about-features-sub{font-size:17px;color:rgba(255,255,255,.5);line-height:1.5;margin:12px 0 0}
+.about-features-h2{font-size:44px;font-weight:900;color:#fff;letter-spacing:-1.5px;line-height:1.05;margin:0;max-width:600px}
+.about-features-sub{font-size:16px;color:rgba(255,255,255,.5);line-height:1.5;margin:12px 0 0}
 .about-features-nav{display:flex;align-items:center;gap:12px;flex-shrink:0}
 .about-feat-btn{width:44px;height:44px;border-radius:var(--radius-lg);border:1.5px solid rgba(255,255,255,.2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s;font-size:18px;color:#fff;font-family:inherit}
 .about-feat-btn:hover:not(:disabled){background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.4)}
 .about-feat-btn:disabled{opacity:.25;cursor:default}
 .about-feat-counter{font-size:13px;font-weight:600;color:rgba(255,255,255,.5);min-width:40px;text-align:center}
 /* Drag carousel */
-.about-feat-swiper-wrap{padding-left:max(60px,calc((100vw - 1280px)/2 + 60px));overflow:visible}
+.about-feat-swiper-wrap{margin-left:max(60px,calc((100vw - 1280px)/2 + 60px));overflow:hidden}
 .about-feat-swiper{overflow:visible;padding:24px 0;width:100%}
 .about-fp-next-btn{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:13px;font-family:inherit;padding:10px 20px;border-radius:100px;cursor:pointer;transition:background .2s,color .2s,border-color .2s;white-space:nowrap}
 .about-fp-next-btn:hover{background:rgba(196,255,77,.12);border-color:rgba(196,255,77,.3);color:var(--neon)}
@@ -1840,9 +1840,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .about-feat-desc{font-size:15px;line-height:1.55;color:rgba(255,255,255,.2);transition:color .4s ease}
 .swiper-slide-active .about-feat-title{color:#fff}
 .swiper-slide-active .about-feat-desc{color:rgba(255,255,255,.65)}
-.about-feat-next-hint{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.4);cursor:pointer;margin-top:16px;transition:border-color .3s,color .3s,background .3s}
-.swiper-slide-active .about-feat-next-hint{border-color:var(--neon);color:var(--neon);background:rgba(196,255,77,.08)}
-.about-feat-next-hint:hover{border-color:var(--neon);color:var(--neon);background:rgba(196,255,77,.15)}
+.about-feat-next-hint{display:none}
 .about-feat-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border:1px solid;border-radius:4px;margin-bottom:10px;background:transparent}
 .about-feat-badge.done{color:var(--neon);border-color:var(--neon)}
 .about-feat-badge.soon{color:rgba(255,255,255,.3);border-color:rgba(255,255,255,.15)}
@@ -1884,14 +1882,14 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 @media(max-width:900px){.about-section{grid-template-columns:1fr;gap:20px}.about-brand{grid-template-columns:1fr}.about-hero h1{font-size:36px}}
 @media(max-width:900px){
   .about-features{padding:60px 0}
-  .about-feat-swiper-wrap{padding-left:24px}
+  .about-feat-swiper-wrap{margin-left:24px}
   .about-features-head{padding:88px 24px 0;margin-bottom:32px;flex-direction:column;gap:16px}
   .about-features-h2{font-size:28px}
   .about-feat-timeline{padding:20px 24px 0}
   .about-feat-info-panel{padding:12px 24px 0}
 }
 @media(max-width:600px){
-  .about-feat-swiper-wrap{padding-left:20px}
+  .about-feat-swiper-wrap{margin-left:20px}
   .about-features-head{padding:80px 20px 0}
   .about-feat-img{height:200px}
   .about-feat-img img{height:190px}
@@ -8799,6 +8797,10 @@ function _aboutFeatSyncUI(idx, N) {
   }
   var counter = document.getElementById('aboutFeatCounter');
   if (counter) counter.textContent = String(idx + 1).padStart(2,'0') + ' / ' + String(N).padStart(2,'0');
+  var prev = document.getElementById('aboutFeatPrev');
+  var next = document.getElementById('aboutFeatNext');
+  if (prev) { prev.disabled = idx === 0; prev.style.opacity = idx === 0 ? '0.3' : ''; prev.style.pointerEvents = idx === 0 ? 'none' : ''; }
+  if (next) { next.disabled = idx === N - 1; next.style.opacity = idx === N - 1 ? '0.3' : ''; next.style.pointerEvents = idx === N - 1 ? 'none' : ''; }
 }
 
 function aboutFeatCarouselNav(dir) {
@@ -8819,7 +8821,7 @@ function initAboutFeatPin() {
     spaceBetween: 20,
     grabCursor: true,
     speed: 500,
-    rewind: true,
+    loop: false,
     slidesPerGroup: 1,
     slideToClickedSlide: true,
     on: {
