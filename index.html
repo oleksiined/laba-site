@@ -79,8 +79,18 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .mmb-bars{display:flex}.mmb-close{display:none}
 .mega-menu-btn.open .mmb-bars{display:none}.mega-menu-btn.open .mmb-close{display:flex}
 /* Nav search */
-.nav-search-bar{flex:1;max-width:560px;display:flex;align-items:center;gap:10px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-md);height:44px;padding:0 16px;min-width:0;transition:border-color .15s}
+.nav-search-bar{flex:1;max-width:560px;display:flex;align-items:center;gap:10px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-md);height:44px;padding:0 16px;min-width:0;transition:border-color .15s;position:relative}
 .nav-search-bar:focus-within{border-color:var(--navy)}
+.nav-search-drop{display:none;position:absolute;top:calc(100% + 8px);left:-1px;right:-1px;background:#fff;border:1.5px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.13);z-index:9999;overflow:hidden}
+.nsdr-section{padding:6px 0}
+.nsdr-head{padding:8px 16px 4px;font-size:11px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.06em}
+.nsdr-item{display:block;width:100%;text-align:left;border:none;background:none;padding:8px 16px;font-size:14px;color:var(--navy);font-family:inherit;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.4}
+.nsdr-item:hover{background:#f5f4f0}
+.nsdr-item-sub{font-size:12px;color:var(--text-soft);margin-left:6px}
+.nsdr-more{display:block;width:100%;text-align:left;border:none;background:none;padding:5px 16px 10px;font-size:13px;color:var(--green);font-weight:600;font-family:inherit;cursor:pointer}
+.nsdr-more:hover{text-decoration:underline}
+.nsdr-divider{height:1px;background:var(--border);margin:0 12px}
+.nsdr-empty{padding:14px 16px;font-size:14px;color:var(--text-soft)}
 .nav-search-ico{color:var(--text-soft);flex-shrink:0;display:flex}
 .nav-search-inp{border:none;outline:none;font-size:15px;color:var(--navy);background:transparent;font-family:inherit;width:100%;min-width:0}
 .nav-search-inp::placeholder{color:var(--text-soft)}
@@ -2947,9 +2957,10 @@ main{flex:1}
       Меню
     </button>
     <!-- Search -->
-    <div class="nav-search-bar">
+    <div class="nav-search-bar" id="navSearchBar">
       <span class="nav-search-ico"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.75" stroke="currentColor" stroke-width="1.7"/><path d="M13.5 13.5l3.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
-      <input class="nav-search-inp" type="text" placeholder="Назва дослідження або код" oninput="navSearch(this.value)">
+      <input class="nav-search-inp" id="navSearchInp" type="text" placeholder="Назва дослідження або код" oninput="navSearch(this.value)" onkeydown="navSearchKey(event)" onfocus="if(!_mcatLoaded)loadMethodsCatalog()">
+      <div class="nav-search-drop" id="navSearchDrop"></div>
     </div>
     <!-- Right controls -->
     <div class="nav-right">
@@ -5739,15 +5750,114 @@ function closeMegaMenu() {
   document.getElementById('megaMenuBtn').classList.remove('open');
   document.body.style.overflow = '';
 }
+let _navDropSrvHits = [];
+let _navDropMcatHits = [];
+
 function navSearch(q) {
-  if (!q.trim()) return;
-  closeMegaMenu();
+  const drop = document.getElementById('navSearchDrop');
+  if (!q.trim()) { drop.style.display='none'; return; }
+  const qLow = q.toLowerCase().trim();
+  const expandedQ = expandSearchQuery(qLow);
+  const qWords = expandedQ.split(/\s+/).filter(Boolean);
+  // Search services
+  _navDropSrvHits = [];
+  Object.values(SERVICES).forEach(function(srv) {
+    [...(srv.packages||[]),...(srv.individual||[])].forEach(function(item) {
+      if(_navDropSrvHits.length>=5) return;
+      const hay=(item.name+' '+(item.desc||'')+' '+(item.descRich||'')+' '+(item.keywords||'')+' '+(item.params||[]).join(' ')).toLowerCase();
+      if(qWords.some(function(w){return hay.includes(w);})) _navDropSrvHits.push(item);
+    });
+  });
+  // Search methods catalog
+  _navDropMcatHits = [];
+  if(_mcatLoaded) {
+    for(var ri=0;ri<_mcatAllRows.length;ri++){
+      if(_navDropMcatHits.length>=5) break;
+      var r=_mcatAllRows[ri];
+      if(r.svcName.toLowerCase().includes(qLow)||r.methodName.toLowerCase().includes(qLow)||(r.std&&r.std.toLowerCase().includes(qLow)))
+        _navDropMcatHits.push(r);
+    }
+  }
+  if(!_navDropSrvHits.length && !_navDropMcatHits.length) {
+    drop.innerHTML='<div class="nsdr-empty">Нічого не знайдено</div>';
+    drop.style.display='block'; return;
+  }
+  var html='';
+  if(_navDropSrvHits.length) {
+    html+='<div class="nsdr-section"><div class="nsdr-head">Дослідження</div>';
+    _navDropSrvHits.forEach(function(item,i){
+      var n=(item.name||'').replace(/</g,'&lt;');
+      html+='<button class="nsdr-item" onclick="_navGoSrv('+i+')">'+n+'</button>';
+    });
+    html+='<button class="nsdr-more" onclick="_navGoSrvAll()">Всі результати у Дослідженнях →</button></div>';
+  }
+  if(_navDropSrvHits.length&&_navDropMcatHits.length) html+='<div class="nsdr-divider"></div>';
+  if(_navDropMcatHits.length) {
+    html+='<div class="nsdr-section"><div class="nsdr-head">Каталог методів</div>';
+    _navDropMcatHits.forEach(function(r,i){
+      var n=(r.svcName||'').replace(/</g,'&lt;');
+      var m=(r.methodName||'').replace(/</g,'&lt;');
+      html+='<button class="nsdr-item" onclick="_navGoMcat('+i+')"><span>'+n+'</span><span class="nsdr-item-sub">'+m+'</span></button>';
+    });
+    html+='<button class="nsdr-more" onclick="_navGoMcatAll()">Всі результати у Каталозі методів →</button></div>';
+  }
+  drop.innerHTML=html;
+  drop.style.display='block';
+}
+function navSearchKey(e) {
+  if(e.key==='Escape'){_hideNavDrop();e.target.blur();}
+  if(e.key==='Enter'){var q=e.target.value.trim();if(q){_navGoSrvAll();}}
+}
+function _hideNavDrop(){var d=document.getElementById('navSearchDrop');if(d)d.style.display='none';}
+function _clearNavSearch(){_hideNavDrop();var i=document.getElementById('navSearchInp');if(i)i.value='';}
+function _navGoSrv(i) {
+  var item=_navDropSrvHits[i]; if(!item) return;
+  var q=document.getElementById('navSearchInp').value;
+  _clearNavSearch();
+  srvMat=''; srvFmt='all'; srvTask='all'; searchQ=q.toLowerCase(); currentMaterial='';
   navigate('services');
   setTimeout(function(){
-    const si = document.getElementById('searchInput');
-    if (si) { si.value = q; searchQ = q.toLowerCase(); render(); }
-  }, 80);
+    var si=document.getElementById('searchInput'); if(si) si.value=q;
+    render();
+    setTimeout(function(){
+      var safe=(item.code||'').replace(/[^a-zA-Z0-9_-]/g,'_');
+      var el=document.getElementById('srow-'+safe);
+      if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('expanded');}
+    },150);
+  },80);
 }
+function _navGoSrvAll() {
+  var q=document.getElementById('navSearchInp').value.trim();
+  _clearNavSearch();
+  srvMat=''; srvFmt='all'; srvTask='all'; searchQ=q.toLowerCase(); currentMaterial='';
+  navigate('services');
+  setTimeout(function(){var si=document.getElementById('searchInput');if(si)si.value=q;render();},80);
+}
+function _navGoMcat(i) {
+  var r=_navDropMcatHits[i]; if(!r) return;
+  var idx=_mcatAllRows.indexOf(r); if(idx<0) return;
+  _clearNavSearch();
+  navigate('methods');
+  setTimeout(function(){
+    _mcatFilteredRows=_mcatAllRows.slice();
+    _mcatPage=Math.floor(idx/_mcatPerPage)+1;
+    mcatRender();
+    setTimeout(function(){mcatOpenDrawer(idx);},150);
+  },350);
+}
+function _navGoMcatAll() {
+  var q=document.getElementById('navSearchInp').value.trim();
+  _clearNavSearch();
+  navigate('methods');
+  setTimeout(function(){
+    var inp=document.getElementById('mcatSearch');
+    if(inp){inp.value=q;mcatFilterChange();}
+  },500);
+}
+document.addEventListener('click',function(e){
+  var bar=document.getElementById('navSearchBar');
+  if(bar&&!bar.contains(e.target))_hideNavDrop();
+});
 
 /* ── Blog filter & search ── */
 function blogFilter(btn, cat) {
