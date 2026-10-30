@@ -2683,6 +2683,17 @@ main{flex:1}
 .mcat-filters{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:68px;z-index:90}
 .mcat-filters-inner{max-width:1200px;margin:0 auto;padding:20px 40px}
 .mcat-filter-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mcat-sort{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-mid);position:relative;margin-left:auto}
+.mcat-sort-btn{display:flex;align-items:center;gap:8px;border:1.5px solid var(--border);border-radius:10px;padding:7px 14px;font-size:13px;font-weight:500;color:var(--text);background:var(--white);cursor:pointer;outline:none;white-space:nowrap;transition:border-color .15s}
+.mcat-sort-btn:hover{border-color:#b0b8c0}
+.mcat-sort-btn svg{flex-shrink:0;color:#9ca3af;transition:transform .2s}
+.mcat-sort-btn.open svg.chevron{transform:rotate(180deg)}
+.mcat-sort-dropdown{position:absolute;top:calc(100% + 6px);right:0;width:100%;min-width:220px;background:var(--white);border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.10);z-index:200;overflow:hidden;display:none}
+.mcat-sort-dropdown.open{display:block}
+.mcat-sort-option{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-size:13px;color:var(--text);cursor:pointer;transition:background .12s;border:none;width:100%;background:none;font-family:inherit;text-align:left}
+.mcat-sort-option:hover{background:#f5f6f7}
+.mcat-sort-option.active{background:#edf4ff;font-weight:500}
+.mcat-sort-option .check{color:var(--neon-dark);flex-shrink:0}
 .mcat-mat-label{font-size:14px;font-weight:600;color:var(--navy);white-space:nowrap;flex-shrink:0}
 .mcat-pills{display:flex;flex-wrap:wrap;gap:6px}
 .mcat-pill{padding:7px 16px;border-radius:var(--radius-pill);border:1.5px solid var(--border);background:#fff;font-size:13px;font-weight:500;color:var(--text-mid);cursor:pointer;transition:all .18s;font-family:inherit}
@@ -4728,6 +4739,20 @@ main{flex:1}
           <option value="">Напрям дослідження</option>
         </select>
         <button class="mcat-clear-btn" id="mcatClearBtn" onclick="mcatClearFilters()" style="display:none">↺ Очистити фільтри</button>
+        <div class="mcat-sort" id="mcatSortWrap">
+          <button class="mcat-sort-btn" id="mcatSortBtn" onclick="mcatToggleSort(event)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/></svg>
+            <span id="mcatSortLabel">За назвою: А–Я</span>
+            <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="mcat-sort-dropdown" id="mcatSortDropdown">
+            <button class="mcat-sort-option active" data-val="alpha" onclick="mcatSortPick('alpha','За назвою: А–Я',this)">За назвою: А–Я<span class="check">✓</span></button>
+            <button class="mcat-sort-option" data-val="method" onclick="mcatSortPick('method','За методом: А–Я',this)">За методом: А–Я</button>
+            <button class="mcat-sort-option" data-val="std" onclick="mcatSortPick('std','За нормативним документом',this)">За нормативним документом</button>
+            <button class="mcat-sort-option" data-val="days_asc" onclick="mcatSortPick('days_asc','Спочатку швидші',this)">Спочатку швидші</button>
+            <button class="mcat-sort-option" data-val="days_desc" onclick="mcatSortPick('days_desc','Спочатку довші',this)">Спочатку довші</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -8334,6 +8359,7 @@ let _mcatMat = '';
 let _mcatGroup = '';
 let _mcatSearch = '';
 let _mcatDrawerItem = null;
+let _mcatSort = 'alpha';
 
 const _mcatMatBadgeClass = {
   'MAT-01':'soil','MAT-02':'fertilizer','MAT-03':'plant','MAT-04':'water','MAT-05':'seed'
@@ -8435,10 +8461,47 @@ function mcatApplyFilters() {
     if (q && !r.svcName.toLowerCase().includes(q) && !r.methodName.toLowerCase().includes(q) && !r.std.toLowerCase().includes(q)) return false;
     return true;
   });
+  // Sort
+  _mcatFilteredRows.sort((a,b)=>{
+    if (_mcatSort === 'alpha')     return (a.svcName||'').localeCompare(b.svcName||'','uk');
+    if (_mcatSort === 'method')    return (a.methodName||'').localeCompare(b.methodName||'','uk');
+    if (_mcatSort === 'std')       return (a.std||'').localeCompare(b.std||'','uk');
+    if (_mcatSort === 'days_asc')  return (a.days??999)-(b.days??999);
+    if (_mcatSort === 'days_desc') return (b.days??-1)-(a.days??-1);
+    return 0;
+  });
   const anyFilter = _mcatMat || _mcatGroup || _mcatSearch;
   document.getElementById('mcatClearBtn').style.display = anyFilter ? '' : 'none';
   mcatRender();
 }
+
+function mcatToggleSort(e) {
+  e.stopPropagation();
+  const btn=document.getElementById('mcatSortBtn');
+  const dd=document.getElementById('mcatSortDropdown');
+  const open=dd.classList.toggle('open');
+  btn.classList.toggle('open',open);
+}
+function mcatSortPick(val,label,el) {
+  _mcatSort=val; _mcatPage=1;
+  document.getElementById('mcatSortLabel').textContent=label;
+  document.querySelectorAll('.mcat-sort-option').forEach(o=>{
+    o.classList.toggle('active',o.dataset.val===val);
+    const ch=o.querySelector('.check');
+    if(val===o.dataset.val){if(!ch){o.insertAdjacentHTML('beforeend','<span class="check">✓</span>');}}
+    else{if(ch)ch.remove();}
+  });
+  document.getElementById('mcatSortDropdown').classList.remove('open');
+  document.getElementById('mcatSortBtn').classList.remove('open');
+  mcatApplyFilters();
+}
+document.addEventListener('click',function(e){
+  const wrap=document.getElementById('mcatSortWrap');
+  if(wrap&&!wrap.contains(e.target)){
+    document.getElementById('mcatSortDropdown')?.classList.remove('open');
+    document.getElementById('mcatSortBtn')?.classList.remove('open');
+  }
+});
 
 function mcatRender() {
   const total = _mcatFilteredRows.length;
@@ -9430,9 +9493,6 @@ function renderGroups(gs) {
       ${p.termDays ? `<div class="gc-term"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Термін виконання: до ${p.termDays} робочих днів</div>` : ''}
       ${inds.length ? `<div class="gc-add-inds">${inds.map(i=>`<span class="gc-ind-tag">${i.name}</span>`).join('')}</div>` : ''}
       <div class="gc-actions">
-        <button class="act-btn" title="Копіювати" onclick="copyGroup(decodeURIComponent('${k}'))">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        </button>
         <button class="act-btn act-btn-del" title="Видалити" onclick="openDelModal(decodeURIComponent('${k}'), ${g.qty})">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
         </button>
