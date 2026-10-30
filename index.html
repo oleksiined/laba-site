@@ -8702,9 +8702,18 @@ function _aboutFPStep(dir){
       setTimeout(function(){ _aboutFP.busy = false; }, 600);
       return;
     }
+    // sec=2: scroll scrolls through carousel cards before going to footer
+    if(sec === 2 && _featReady && _featIdx < _featN - 1){
+      _aboutFP.busy = true;
+      aboutFeatCarouselNav(1);
+      setTimeout(function(){ _aboutFP.busy = false; }, 600);
+      return;
+    }
     if(sec < LAST){
       _aboutFP.busy = true;
       if(sec === 0) _aboutFPShowText(0);
+      // entering carousel from above: reset to first card
+      if(sec === 1 && _featReady){ _featIdx = 0; _featRender(true); }
       _aboutFPGoTo(sec + 1);
       setTimeout(function(){ _aboutFP.busy = false; }, 850);
     }
@@ -8715,9 +8724,20 @@ function _aboutFPStep(dir){
       setTimeout(function(){ _aboutFP.busy = false; }, 600);
       return;
     }
+    // sec=2: scroll back through carousel cards before going to text slide
+    if(sec === 2 && _featReady && _featIdx > 0){
+      _aboutFP.busy = true;
+      aboutFeatCarouselNav(-1);
+      setTimeout(function(){ _aboutFP.busy = false; }, 600);
+      return;
+    }
     if(sec > 0){
       _aboutFP.busy = true;
-      if(sec === LAST) _aboutFP.textIdx = 2;
+      if(sec === LAST){
+        _aboutFP.textIdx = 2;
+        // entering carousel from footer: jump to last card so user scrolls back through it
+        if(_featReady){ _featIdx = _featN - 1; _featRender(true); }
+      }
       _aboutFPGoTo(sec - 1);
       setTimeout(function(){ _aboutFP.busy = false; }, 850);
     }
