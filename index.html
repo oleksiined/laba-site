@@ -3587,7 +3587,7 @@ main{flex:1}
       <div class="modal-head"><h3>Замовити дзвінок</h3><p>Ми звʼяжемось найближчим часом</p></div>
       <div class="modal-body">
         <div class="form-row"><label>Ваше імʼя *</label><input type="text" id="callName" placeholder="Іван Петренко"></div>
-        <div class="form-row"><label>Телефон *</label><input type="tel" id="callPhone" placeholder="+38 0XX XXX XX XX"></div>
+        <div class="form-row"><label>Телефон *</label><input type="tel" id="callPhone" value="+38" placeholder="+380XXXXXXXXXX" oninput="phoneAutoFormat(this)" onblur="validatePhone(this)"></div>
         <div class="form-row"><label>Коментар</label><textarea id="callComment" placeholder="Ваше запитання..."></textarea></div>
       </div>
       <div class="modal-actions">
