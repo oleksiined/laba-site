@@ -5858,6 +5858,16 @@ function setCartQty(index,value){
 }
 
 function changeCartQty(index,delta){ if(cart[index]) setCartQty(index,getCartQty(cart[index])+delta); }
+function _ckUpdateInline(inputEl,index){
+  var item=cart[index]; if(!item) return;
+  var qty=getCartQty(item);
+  var row=inputEl.closest('.checkout-item');
+  if(!row) return;
+  var tot=row.querySelector('.checkout-item-total');
+  if(tot) tot.textContent=(qty*(item.price||0)).toLocaleString('uk-UA')+' грн';
+  var minusBtn=row.querySelector('.checkout-qty button:first-child');
+  if(minusBtn) minusBtn.disabled=qty<=1;
+}
 
 function removeCartItem(index){ cart.splice(index,1); saveCart(); updateCartUI(); render(); }
 
@@ -7209,7 +7219,7 @@ function renderCheckout(){
     <div class="checkout-unit-price">${item.price?.toLocaleString('uk-UA')||'—'} грн</div>
     <div class="checkout-qty">
       <button onclick="changeCartQty(${i},-1);renderCheckout()" ${qty<=1?'disabled':''}>−</button>
-      <input type="number" value="${qty}" min="1" max="9999" oninput="setCartQty(${i},this.value);renderCheckout()">
+      <input type="number" value="${qty}" min="1" max="9999" oninput="setCartQty(${i},this.value);_ckUpdateInline(this,${i})" onchange="renderCheckout()" onblur="renderCheckout()">
       <button onclick="changeCartQty(${i},1);renderCheckout()">+</button>
     </div>
     <div class="checkout-item-total-label">Сума</div>
