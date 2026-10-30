@@ -9411,18 +9411,36 @@ function increase(el) {
   const gs = nc_groups(); const g = gs.find(x => x.sig === k); if (!g) return;
   const t = NC_S.samples.find(s => s.id === g.ids[0]);
   NC_S.samples.push(nc_mk(nc_newId(), t.materialId, t.packageId, t.additionalIndicatorIds));
+  syncCartFromSamples();
   nc_render();
 }
 function decrease(el) {
   const k = _sigFromEl(el);
   const gs = nc_groups(); const g = gs.find(x => x.sig === k); if (!g || g.qty <= 1) return;
   NC_S.samples = NC_S.samples.filter(s => s.id !== g.ids[g.ids.length-1]);
+  syncCartFromSamples();
   nc_render();
+}
+function syncCartFromSamples() {
+  // Rebuild cart[] to match NC_S.samples so the services page stays in sync
+  const counts = {};
+  NC_S.samples.forEach(s => { counts[s.packageId] = (counts[s.packageId] || 0) + 1; });
+  // Remove pkg entries no longer present; keep non-pkg entries (individual services)
+  cart = cart.filter(c => c.type !== 'pkg' || counts[c.code]);
+  // Update qty for remaining pkg entries
+  cart.forEach(c => { if (c.type === 'pkg' && counts[c.code]) c.qty = counts[c.code]; });
+  // Update _lastCartKey so navigate('checkout') doesn't rebuild from cart on re-entry
+  if (typeof NC_S !== 'undefined') {
+    NC_S._lastCartKey = JSON.stringify(cart.map(c=>c.code+':'+(c.qty||getCartQty(c)))) +
+      '|' + JSON.stringify((typeof samples!=='undefined'&&samples||[]).map(s=>(s.id||'')+'='+(s.extras||[]).map(e=>e.id).join(',')));
+  }
+  saveCart(); updateCartUI();
 }
 function delGroup(k) {
   const g = nc_groups().find(x => x.sig === k); if (!g) return;
   const rm = new Set(g.ids);
   NC_S.samples = NC_S.samples.filter(s => !rm.has(s.id));
+  syncCartFromSamples();
   nc_render();
 }
 function copyGroup(k) {
