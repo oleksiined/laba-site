@@ -10356,7 +10356,7 @@ async function loadCatalogFromSupabase() {
 
     // ── Оновлюємо SERVICES (стара сторінка каталогу) ──
     const _matKeyToSvcKey  = { soil:'soil', water:'water', fertilizer:'fertilizer', seeds:'seeds', grain:'grain', plant:'plants' };
-    const _matKeyToLabel   = { soil:'Ґрунт', water:'Вода', fertilizer:'Добрива', seeds:'Насіння', grain:'Зерно', plant:'Рослини' };
+    const _matKeyToLabel   = { soil:'Ґрунт', water:'Вода', fertilizer:'Добрива', seeds:'Насіння', grain:'Зерно', plant:'Рослини', plants:'Рослини' };
     Object.values(SERVICES).forEach(s => { s.packages = []; s.individual = []; });
     // Build service lookup for package keyword enrichment
     const svcById = {};
