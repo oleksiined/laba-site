@@ -8047,10 +8047,25 @@ function openCallModal(){
   if(bd){ bd.classList.add('open'); document.body.style.overflow='hidden'; }
 }
 function closeCallModal(){ const bd=document.getElementById('callModalBackdrop'); if(bd)bd.classList.remove('open'); document.body.style.overflow=''; }
-function submitCallModal(){
-  const name=document.getElementById('callName')?.value?.trim();
-  const phone=document.getElementById('callPhone')?.value?.trim();
-  if(!name||!phone){ showToast('Введіть імʼя та телефон'); return; }
+async function submitCallModal(){
+  const nameEl=document.getElementById('callName');
+  const phoneEl=document.getElementById('callPhone');
+  const commentEl=document.getElementById('callComment');
+  const name=(nameEl?.value||'').trim();
+  const phone=(phoneEl?.value||'').trim();
+  const comment=(commentEl?.value||'').trim();
+  if(!name){ showToast('Введіть імʼя'); return; }
+  if(!phone||phone.length<13){ showToast('Введіть коректний номер телефону'); return; }
+  const btn=document.querySelector('#callFormBody .btn-submit');
+  if(btn){ btn.disabled=true; btn.textContent='Надсилаємо…'; }
+  try{
+    await fetch('/api/call-request',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name,phone,comment})
+    });
+  }catch(e){ console.warn('call-request error',e); }
+  if(btn){ btn.disabled=false; btn.textContent='Надіслати'; }
   const sc=document.getElementById('callSuccessScreen');
   const form=document.getElementById('callFormBody');
   if(sc){ sc.classList.add('show'); if(form)form.style.display='none'; }
