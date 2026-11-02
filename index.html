@@ -10391,7 +10391,14 @@ async function loadCatalogFromSupabase() {
         material: _matKeyToLabel[mk] || mk,
         days:     pkg.turnaround_value || 5,
         tags:     pkgTags(pkg.package_id), tasks:[], params:[], bundles:[],
-        seasonal: pkg.is_seasonal === true,
+        seasonal: (function(){
+          if (!pkg.is_seasonal) return false;
+          // Якщо є дати — перевіряємо чи зараз в діапазоні
+          const today = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+          if (pkg.seasonal_start_date && today < pkg.seasonal_start_date) return false;
+          if (pkg.seasonal_end_date   && today > pkg.seasonal_end_date)   return false;
+          return true;
+        })(),
         groups:   pkg.package_group ? [pkg.package_group] : [],
         desc:           pkg.short_description || '',
         descRich:       pkg.full_description || pkg.short_description || '',
