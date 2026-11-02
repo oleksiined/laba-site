@@ -10190,6 +10190,23 @@ async function loadCatalogFromSupabase() {
       return;
     }
 
+    // ── Build dynamic material_id → SERVICES-key mapping from catalog_materials ──
+    // Це надійніше ніж захардкоджені MAT-коди, бо прив'язується до назви матеріалу
+    const _nameToSvcKey = {
+      'Ґрунт':'soil', 'Добрива':'fertilizer', 'Вода':'water',
+      'Насіння':'seeds', 'Зерно':'grain', 'Рослини':'plants', 'Рослина':'plants',
+    };
+    const _matIdToKey = {}; // shadows outer const — built from live catalog_materials
+    for (const mat of materials) {
+      const k = _nameToSvcKey[mat.name];
+      if (mat.material_id && k) _matIdToKey[mat.material_id] = k;
+    }
+    // Fallback якщо catalog_materials порожній
+    if (!Object.keys(_matIdToKey).length) {
+      Object.assign(_matIdToKey, {'MAT-01':'soil','MAT-02':'fertilizer','MAT-03':'seeds','MAT-04':'grain','MAT-05':'water','MAT-06':'plant'});
+    }
+    console.log('[catalog] matIdToKey:', _matIdToKey, '| services total:', services.length);
+
     // ── Build pkg → [{service_id, method_id}] map (зберігаємо method_id з Package Items) ──
     const pkgIncluded = {};     // package_id → [service_id, ...] (для NC_CATALOG сумісності)
     const pkgItemsFull = {};    // package_id → [{service_id, method_id}, ...]
