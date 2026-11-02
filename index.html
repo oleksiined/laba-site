@@ -6420,12 +6420,12 @@ function getSrvItems(){
   if(mat && SERVICES[mat]) {
     const srv = SERVICES[mat];
     pkgs = (srvFmt==='packages'||srvFmt==='all') ? srv.packages.filter(pkgFilter).map(p=>({...p,_type:'pkg'})) : [];
-    inds = (srvFmt==='individual'||srvFmt==='all') ? (srv.individual||[]).map(p=>({...p,_type:'ind'})) : [];
+    inds = (!isSeasonal && (srvFmt==='individual'||srvFmt==='all')) ? (srv.individual||[]).map(p=>({...p,_type:'ind'})) : [];
   } else {
     // Всі матеріали
     Object.values(SERVICES).forEach(srv => {
       if(srvFmt==='packages'||srvFmt==='all') pkgs.push(...(srv.packages||[]).filter(pkgFilter).map(p=>({...p,_type:'pkg'})));
-      if(srvFmt==='individual'||srvFmt==='all') inds.push(...(srv.individual||[]).map(p=>({...p,_type:'ind'})));
+      if(!isSeasonal && (srvFmt==='individual'||srvFmt==='all')) inds.push(...(srv.individual||[]).map(p=>({...p,_type:'ind'})));
     });
   }
   let items = [...pkgs,...inds];
