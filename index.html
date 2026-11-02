@@ -8963,7 +8963,9 @@ var _aboutFP = {
   busy: false,
   inited: false,
   touchStartY: 0,
-  LABELS: ['Навіщо ми','Що ми робимо','Як це працює']
+  LABELS: ['Навіщо ми','Що ми робимо','Як це працює'],
+  wheelAccum: 0,
+  wheelResetTimer: null
 };
 
 function _aboutFPShowText(idx){
@@ -9059,17 +9061,31 @@ function initAboutFullpage(){
   page.addEventListener('wheel', function(e){
     var sec = _aboutFP.section;
     if(sec === LAST){
-      // On last slide: intercept scroll-up only when at top of the slide
       var lastEl = page.querySelector('.about-fp-slide--last');
       if(e.deltaY < 0 && lastEl && lastEl.scrollTop === 0){
         e.preventDefault();
         _aboutFPStep(-1);
       }
-      // scroll-down passes through to let the slide scroll internally
       return;
     }
     e.preventDefault();
-    _aboutFPStep(e.deltaY > 0 ? 1 : -1);
+    if(_aboutFP.busy){
+      // drain accumulator so leftover touchpad events don't queue up
+      _aboutFP.wheelAccum = 0;
+      clearTimeout(_aboutFP.wheelResetTimer);
+      return;
+    }
+    // Accumulate delta — requires intentional scroll before stepping
+    _aboutFP.wheelAccum += e.deltaY;
+    clearTimeout(_aboutFP.wheelResetTimer);
+    _aboutFP.wheelResetTimer = setTimeout(function(){ _aboutFP.wheelAccum = 0; }, 200);
+    var THRESHOLD = 60;
+    if(Math.abs(_aboutFP.wheelAccum) >= THRESHOLD){
+      var dir = _aboutFP.wheelAccum > 0 ? 1 : -1;
+      _aboutFP.wheelAccum = 0;
+      clearTimeout(_aboutFP.wheelResetTimer);
+      _aboutFPStep(dir);
+    }
   }, {passive: false});
 
   page.addEventListener('touchstart', function(e){
