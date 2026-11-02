@@ -10206,6 +10206,7 @@ async function loadCatalogFromSupabase() {
       Object.assign(_matIdToKey, {'MAT-01':'soil','MAT-02':'fertilizer','MAT-03':'seeds','MAT-04':'grain','MAT-05':'water','MAT-06':'plant'});
     }
     console.log('[catalog] matIdToKey:', _matIdToKey, '| services total:', services.length);
+    console.log('[catalog] services sample (first 5):', services.slice(0,5).map(s=>({id:s.service_id,mat:s.material_id,status:s.status,standalone:s.orderable_standalone})));
 
     // ── Build pkg → [{service_id, method_id}] map (зберігаємо method_id з Package Items) ──
     const pkgIncluded = {};     // package_id → [service_id, ...] (для NC_CATALOG сумісності)
@@ -10383,12 +10384,14 @@ async function loadCatalogFromSupabase() {
         deliverables:   pkg.result_deliverables ? pkg.result_deliverables.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean) : null,
       });
     }
+    let _dbgSkipStatus=0, _dbgSkipStandalone=0, _dbgSkipNoSvc=0, _dbgAdded=0;
     for (const svc of services) {
-      if (svc.status !== 'active') continue;
-      if (svc.orderable_standalone === false) continue;
+      if (svc.status !== 'active' && svc.status !== 'draft') { _dbgSkipStatus++; continue; }
+      if (svc.orderable_standalone === false) { _dbgSkipStandalone++; continue; }
       const mk = _matIdToKey[svc.material_id] || 'soil';
       const sk = _matKeyToSvcKey[mk] || mk;
-      if (!SERVICES[sk]) continue;
+      if (!SERVICES[sk]) { _dbgSkipNoSvc++; continue; }
+      _dbgAdded++;
       SERVICES[sk].individual.push({
         code:        svc.service_id,
         slug:        svc.slug || svc.service_id,
@@ -10404,6 +10407,8 @@ async function loadCatalogFromSupabase() {
         exampleUrl: svc.report_example_url || null,
       });
     }
+    const _indivCounts = {}; for (const k of Object.keys(SERVICES)) _indivCounts[k]=SERVICES[k].individual.length;
+    console.log('[catalog] SERVICES.individual counts:', _indivCounts, '| added:', _dbgAdded, 'skip-status:', _dbgSkipStatus, 'skip-standalone:', _dbgSkipStandalone, 'skip-noSvc:', _dbgSkipNoSvc);
     // ── Показуємо тільки матеріали з Supabase ──
     if (materials.length) {
       const _matKeyNorm = { plant: 'plants' };
