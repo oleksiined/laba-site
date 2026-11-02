@@ -4794,7 +4794,7 @@ main{flex:1}
     <div class="mcat-cta-inner">
       <div class="mcat-cta-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
       <div class="mcat-cta-body"><strong>Не знайшли потрібний метод?</strong><p>Напишіть нам — перевіримо можливість дослідження.</p></div>
-      <button class="btn-primary" onclick="navigate('checkout')">Отримати консультацію</button>
+      <button class="btn-primary" onclick="openCallModal()">Отримати консультацію</button>
     </div>
   </div>
 
@@ -7084,7 +7084,7 @@ function buildIndTooltip(ind){
     <div class="ind-tooltip-label">Метод дослідження</div>
     ${m ? `<div class="ind-tooltip-name">${m.name}</div>
     <div class="ind-tooltip-std">${m.std}</div>
-    <a class="ind-tooltip-link" href="#" data-meth-id="${(m.id||'').replace(/"/g,'&quot;')}" data-meth-std="${(m.std||'').replace(/"/g,'&quot;')}" onclick="event.preventDefault();navigateToMethod(this.dataset.methId||null,this.dataset.methStd||null)">Докладніше про метод →</a>` : `<div class="ind-tooltip-name" style="color:var(--text-soft);font-weight:500">Уточнюється в лабораторії</div>`}
+    <a class="ind-tooltip-link" href="#" data-meth-id="${(m.id||'').replace(/"/g,'&quot;')}" data-meth-std="${(m.std||'').replace(/"/g,'&quot;')}" data-svc-id="${(m.svcId||'').replace(/"/g,'&quot;')}" onclick="event.preventDefault();navigateToMethod(this.dataset.methId||null,this.dataset.methStd||null,this.dataset.svcId||null)">Докладніше про метод →</a>` : `<div class="ind-tooltip-name" style="color:var(--text-soft);font-weight:500">Уточнюється в лабораторії</div>`}
   </div>`;
 }
 // Короткі назви чипів по коду показника
@@ -8371,7 +8371,7 @@ function saveOrderToHistory(order) {
       const m=d.method;
       _cp.innerHTML=
         (d.tooltip?`<div class="chip-pop-desc-text" style="margin-bottom:${m?'10px':'0'}">${d.tooltip}</div>`:'')+
-        (m?`<div class="chip-pop-label">Метод дослідження</div><div class="chip-pop-mname">${m.name}</div>${m.std&&m.std!==m.name?`<div class="chip-pop-std">${m.std}</div>`:''}<div style="margin-top:8px"><a class="chip-pop-link" href="#" data-meth-id="${(m.id||'').replace(/"/g,'&quot;')}" data-meth-std="${(m.std||'').replace(/"/g,'&quot;')}" onclick="event.preventDefault();navigateToMethod(this.dataset.methId||null,this.dataset.methStd||null)">Докладніше про метод →</a></div>`:'');
+        (m?`<div class="chip-pop-label">Метод дослідження</div><div class="chip-pop-mname">${m.name}</div>${m.std&&m.std!==m.name?`<div class="chip-pop-std">${m.std}</div>`:''}<div style="margin-top:8px"><a class="chip-pop-link" href="#" data-meth-id="${(m.id||'').replace(/"/g,'&quot;')}" data-meth-std="${(m.std||'').replace(/"/g,'&quot;')}" data-svc-id="${(m.svcId||'').replace(/"/g,'&quot;')}" onclick="event.preventDefault();navigateToMethod(this.dataset.methId||null,this.dataset.methStd||null,this.dataset.svcId||null)">Докладніше про метод →</a></div>`:'');
       _cpCancelHide();
       _cp.classList.add('show');
       _positionChipPop(el);
@@ -8695,27 +8695,35 @@ function mcatPaginationHtml(total, pages) {
 function mcatGoPage(p) { _mcatPage=p; mcatRender(); window.scrollTo({top:document.getElementById('mcatContent').getBoundingClientRect().top+window.scrollY-120,behavior:'smooth'}); }
 function mcatSetPerPage(v) { _mcatPerPage=parseInt(v)||10; _mcatPage=1; mcatRender(); }
 
-function navigateToMethod(methodId, fallbackStd) {
+function navigateToMethod(methodId, fallbackStd, svcId) {
+  // Close chip popover if open
+  var cp = document.getElementById('chipPopover');
+  if (cp) cp.classList.remove('show');
   navigate('methods');
   var _attempt = function(tries) {
     if (!_mcatLoaded) {
-      if (tries > 30) return;
+      if (tries > 40) return;
       return setTimeout(function(){ _attempt(tries+1); }, 200);
     }
     _mcatMat = ''; _mcatGroup = ''; _mcatSearch = '';
     var searchEl = document.getElementById('mcatSearch');
     if (searchEl) searchEl.value = '';
-    mcatApplyFilters();
-    var idx = -1;
-    if (methodId) idx = _mcatAllRows.findIndex(function(r){ return r.id === methodId; });
-    if (idx < 0 && fallbackStd) idx = _mcatAllRows.findIndex(function(r){ return r.std === fallbackStd; });
-    if (idx < 0) return;
+    // Reset filtered rows to full list (unsorted) before searching
     _mcatFilteredRows = _mcatAllRows.slice();
+    var idx = -1;
+    if (methodId) idx = _mcatAllRows.findIndex(function(r){ return String(r.id) === String(methodId); });
+    if (idx < 0 && fallbackStd) idx = _mcatAllRows.findIndex(function(r){ return r.std && String(r.std) === String(fallbackStd); });
+    if (idx < 0 && svcId) idx = _mcatAllRows.findIndex(function(r){ return String(r.svcId) === String(svcId); });
+    if (idx < 0) {
+      // At least show the full catalog with filters cleared
+      mcatApplyFilters();
+      return;
+    }
     _mcatPage = Math.floor(idx / _mcatPerPage) + 1;
     mcatRender();
-    setTimeout(function(){ mcatOpenDrawer(idx); }, 150);
+    setTimeout(function(){ mcatOpenDrawer(idx); }, 200);
   };
-  setTimeout(function(){ _attempt(0); }, 350);
+  setTimeout(function(){ _attempt(0); }, 400);
 }
 
 function mcatOpenDrawer(idx) {
@@ -10266,6 +10274,7 @@ async function loadCatalogFromSupabase() {
       if (!sid) continue;
       const mo = {
         id:    m.method_id,
+        svcId: sid,
         name:  m.method_name   || '',
         std:   m.standard_code || '',
         tag:   m.selection_note || '',
