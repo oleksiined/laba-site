@@ -4611,7 +4611,7 @@ main{flex:1}
           <div class="article-product-name">Базовий чекап ґрунту</div>
           <div class="article-product-desc">Основні показники родючості для планування живлення кукурудзи та інших культур.</div>
           <div class="article-product-footer">
-            <span class="article-product-price">від 1 130 грн</span>
+            <span class="article-product-price" data-pkg-name="Базовий чекап ґрунту">від 1 130 грн</span>
             <button class="article-product-btn" onclick="goServiceSearch('Базовий чекап ґрунту')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
               До досліджень
@@ -4625,7 +4625,7 @@ main{flex:1}
           <div class="article-product-name">Мінеральний азот у ґрунті</div>
           <div class="article-product-desc">Визначення нітратної та амонійної форм азоту.</div>
           <div class="article-product-footer">
-            <span class="article-product-price">від 720 грн</span>
+            <span class="article-product-price" data-pkg-name="Мінеральний азот у ґрунті">від 720 грн</span>
             <button class="article-product-btn" onclick="goServiceSearch('Мінеральний азот')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
               До досліджень
@@ -4639,7 +4639,7 @@ main{flex:1}
           <div class="article-product-name">Фосфор і калій у ґрунті</div>
           <div class="article-product-desc">Оцінка забезпеченості доступними формами фосфору та калію.</div>
           <div class="article-product-footer">
-            <span class="article-product-price">від 660 грн</span>
+            <span class="article-product-price" data-pkg-name="Фосфор і калій у ґрунті">від 660 грн</span>
             <button class="article-product-btn" onclick="goServiceSearch('Фосфор і калій')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
               До досліджень
@@ -10456,11 +10456,31 @@ async function loadCatalogFromSupabase() {
     // ── Перерендеримо якщо каталог вже відкритий ──
     if (typeof nc_render === 'function') try { nc_render(); } catch(e) {}
     if (typeof ns_render === 'function') try { ns_render(); } catch(e) {}
+    fillArticlePrices();
 
     console.log(`✅ Каталог з Supabase: ${packages.length} пакетів, ${services.length} послуг`);
   } catch (err) {
     console.warn('⚠ Supabase catalog load failed, using hardcoded data:', err.message);
   }
+}
+
+// Заповнює ціни в статтях з каталогу SERVICES
+function fillArticlePrices() {
+  // Будуємо плоский список пакетів: {name, price}
+  const allPkgs = [];
+  Object.values(SERVICES).forEach(srv => {
+    (srv.packages || []).forEach(p => { if (p.name && p.price != null) allPkgs.push(p); });
+  });
+  document.querySelectorAll('[data-pkg-name]').forEach(el => {
+    const search = el.dataset.pkgName.toLowerCase();
+    // Шукаємо точний збіг, потім часткове включення
+    const found = allPkgs.find(p => p.name.toLowerCase() === search)
+                || allPkgs.find(p => p.name.toLowerCase().includes(search))
+                || allPkgs.find(p => search.includes(p.name.toLowerCase()));
+    if (found && found.price > 0) {
+      el.textContent = `від ${found.price.toLocaleString('uk-UA')} грн`;
+    }
+  });
 }
 
 // Запускаємо після завантаження сторінки
