@@ -6413,20 +6413,23 @@ function renderTaskFilter(){
 
 function getSrvItems(){
   const mat = srvMat;
+  const isSeasonal = srvTask === 'season';
+  // seasonal=true → показуємо тільки в сезонних; seasonal=false/undefined → тільки в пакетних
+  const pkgFilter = p => isSeasonal ? p.seasonal === true : p.seasonal !== true;
   let pkgs = [], inds = [];
   if(mat && SERVICES[mat]) {
     const srv = SERVICES[mat];
-    pkgs = (srvFmt==='packages'||srvFmt==='all') ? srv.packages.map(p=>({...p,_type:'pkg'})) : [];
+    pkgs = (srvFmt==='packages'||srvFmt==='all') ? srv.packages.filter(pkgFilter).map(p=>({...p,_type:'pkg'})) : [];
     inds = (srvFmt==='individual'||srvFmt==='all') ? (srv.individual||[]).map(p=>({...p,_type:'ind'})) : [];
   } else {
     // Всі матеріали
     Object.values(SERVICES).forEach(srv => {
-      if(srvFmt==='packages'||srvFmt==='all') pkgs.push(...(srv.packages||[]).map(p=>({...p,_type:'pkg'})));
+      if(srvFmt==='packages'||srvFmt==='all') pkgs.push(...(srv.packages||[]).filter(pkgFilter).map(p=>({...p,_type:'pkg'})));
       if(srvFmt==='individual'||srvFmt==='all') inds.push(...(srv.individual||[]).map(p=>({...p,_type:'ind'})));
     });
   }
   let items = [...pkgs,...inds];
-  if(srvTask && srvTask!=='all') items=items.filter(i=>i.groups&&i.groups.includes(srvTask));
+  if(srvTask && srvTask!=='all' && srvTask!=='season') items=items.filter(i=>i.groups&&i.groups.includes(srvTask));
   if(searchQ){
     const expandedQ = expandSearchQuery(searchQ);
     // Фільтруємо розширені слова: короткі (< 3 символів) перевіряємо лише як цілі слова
@@ -10375,6 +10378,7 @@ async function loadCatalogFromSupabase() {
         material: _matKeyToLabel[mk] || mk,
         days:     pkg.turnaround_value || 5,
         tags:     pkgTags(pkg.package_id), tasks:[], params:[], bundles:[],
+        seasonal: pkg.is_seasonal === true,
         groups:   pkg.package_group ? [pkg.package_group] : [],
         desc:           pkg.short_description || '',
         descRich:       pkg.full_description || pkg.short_description || '',
