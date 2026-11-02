@@ -164,7 +164,7 @@ function buildClientEmailHtml(o) {
       Маєте питання? Зв'яжіться з нами:
     </p>
     <p style="font-size:14px;color:#333;margin:0 0 32px">
-      📞 <a href="tel:+380670000000" style="color:#111;font-weight:600">+380 67 000 00 00</a><br>
+      📞 <a href="tel:+380671819967" style="color:#111;font-weight:600">+380 67 000 00 00</a><br>
       🌐 <a href="https://laba.zemlerob.com.ua" style="color:#111">laba.zemlerob.com.ua</a>
     </p>
 
@@ -388,7 +388,7 @@ function buildInvoiceHtml(o) {
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td style="font-size:12px;color:#888">
-            📞 <a href="tel:+380670000000" style="color:#555">+380 67 000 00 00</a> &nbsp;|&nbsp;
+            📞 <a href="tel:+380671819967" style="color:#555">+380 67 000 00 00</a> &nbsp;|&nbsp;
             🌐 <a href="https://laba.zemlerob.com.ua" style="color:#555">laba.zemlerob.com.ua</a>
           </td>
           <td style="text-align:right;font-size:11px;color:#aaa">LABA by Zemlerob · Рахунок сформовано автоматично</td>
