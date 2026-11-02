@@ -6645,7 +6645,8 @@ function inputCollapsedQty(safeCode, val){
 // Для ind показників — теж миттєво
 function clickIndCartIcon(safeCode, name, price, qty, event){
   event.stopPropagation();
-  openAddIndModal(safeCode, name, price, qty||1);
+  const _mk = (_PKG_NAMES[safeCode]||{}).materialKey||'';
+  openAddIndModal(safeCode, name, price, qty||1, _mk);
 }
 
 // Клік на іконку окремого показника — відкриває модал "Куди додати"
@@ -6653,7 +6654,7 @@ function clickIndCartIcon(safeCode, name, price, qty, event){
 function clickIndIcon(safeCode, event){
   event.stopPropagation();
   const _n = _PKG_NAMES[safeCode]||{};
-  openAddIndModal(safeCode, _n.name||safeCode, _n.price||0, 1);
+  openAddIndModal(safeCode, _n.name||safeCode, _n.price||0, 1, _n.materialKey||'');
 }
 
 function showIndCounter(safeCode, qty){
@@ -6845,7 +6846,7 @@ function makeRow(item, type){
   const safeCode = item.code.replace(/[^a-zA-Z0-9-]/g,'');
   const itemSlug = (item.slug||item.code).replace(/[^a-zA-Z0-9-]/g,'');
   // Зберігаємо назву і ціну в словнику — не передаємо в inline onclick щоб уникнути проблем зі спецсимволами
-  _PKG_NAMES[safeCode] = { name: item.name, price: item.price||0 };
+  _PKG_NAMES[safeCode] = { name: item.name, price: item.price||0, materialKey: item.materialKey||'' };
   const qty = getRowQty(safeCode);
   const subtotal = (item.price||0)*qty;
 
@@ -7203,8 +7204,8 @@ function indAlreadyInSample(sampleObj, indCode){
   return false;
 }
 
-function openAddIndModal(code, name, price, qty){
-  addIndCurrentInd = {code, name, price, qty: qty||1};
+function openAddIndModal(code, name, price, qty, materialKey){
+  addIndCurrentInd = {code, name, price, qty: qty||1, materialKey: materialKey||''};
   addIndSelections = {};
   addIndNewSample = false;
 
@@ -7229,20 +7230,20 @@ function renderAddIndList(){
   const ind = addIndCurrentInd;
   if(!ind||!list) return;
 
-  const indPfx = indPrefix(ind.code); // префікс показника: '01', '02', ...
+  const indMk = ind.materialKey || _svcMatKey(ind.code); // матеріальний ключ показника
 
   let html = '';
 
   if(!samples.length){
     html = renderAddIndNewOpt();
   } else {
-    // Скільки сумісних зразків (той самий префікс)
-    const compatSamples = samples.filter(s => indPrefix(s.itemCode) === indPfx);
-    const incompatSamples = samples.filter(s => indPrefix(s.itemCode) !== indPfx);
+    // Скільки сумісних зразків (той самий матеріал)
+    const compatSamples = samples.filter(s => s.material === indMk);
+    const incompatSamples = samples.filter(s => s.material !== indMk);
 
     samples.forEach((s,i)=>{
       const alreadyHas = indAlreadyInSample(s, ind.code);
-      const incompatPrefix = indPrefix(s.itemCode) !== indPfx;
+      const incompatPrefix = s.material !== indMk;
       const disabled = alreadyHas || incompatPrefix;
       const checked = addIndSelections[s.id]===true;
       let note = '';
@@ -7278,7 +7279,7 @@ function renderAddIndNewOpt(){
   const ind = addIndCurrentInd;
   if(!ind) return '';
   const checked = addIndNewSample;
-  const withPrep = needsSamplePrep(ind.code);
+  const withPrep = needsSamplePrep(ind.materialKey || _svcMatKey(ind.code));
   const subText = withPrep
     ? `Пробопідготовка ${SAMPLE_PREP_PRICE} грн буде додана`
     : `Окремий зразок для цього дослідження`;
@@ -7301,11 +7302,11 @@ function toggleAddIndAll(){
   const nowAll = addIndSelections['__all']===true;
   addIndSelections = {};
   if(!nowAll){
-    const indPfx = indPrefix(addIndCurrentInd.code);
+    const indMk = addIndCurrentInd.materialKey || _svcMatKey(addIndCurrentInd.code);
     addIndSelections['__all'] = true;
     samples.forEach(s=>{
-      // Тільки сумісні зразки (однаковий префікс) і без дублю
-      if(indPrefix(s.itemCode)===indPfx && !indAlreadyInSample(s,addIndCurrentInd.code))
+      // Тільки сумісні зразки (однаковий матеріал) і без дублю
+      if(s.material===indMk && !indAlreadyInSample(s,addIndCurrentInd.code))
         addIndSelections[s.id]=true;
     });
   }
@@ -7321,7 +7322,7 @@ function updateAddIndFooter(){
   const ind = addIndCurrentInd;
   const selSamples = samples.filter(s=>addIndSelections[s.id]===true);
   const hasNew = addIndNewSample;
-  const withPrep = hasNew && needsSamplePrep(ind.code);
+  const withPrep = hasNew && needsSamplePrep(ind.materialKey || _svcMatKey(ind.code));
   const total = selSamples.length*ind.price + (hasNew ? (ind.price + (withPrep?SAMPLE_PREP_PRICE:0)) : 0);
   const totalSamples = selSamples.length + (hasNew?1:0);
 
@@ -7342,8 +7343,24 @@ function indPrefix(code){
   if (m) return m[1];
   return code.split('-')[0];
 }
-// Чи є пробопідготовка для цього матеріалу (тільки грунт = 01)
-function needsSamplePrep(code){ return indPrefix(code)==='01'; }
+// Визначає матеріальний ключ по коду пакету або показника
+// Підтримує: Supabase package IDs, синтетичні '_ind_04_...' коди, старі '04-1-001' коди
+function _svcMatKey(code) {
+  if (!code) return 'soil';
+  const _pfxMap = {'01':'soil','02':'fertilizer','03':'seeds','04':'grain','05':'water','06':'plants'};
+  // Синтетичні коди _ind_04_...
+  const indM = code.match(/^_ind_(\d+)_/);
+  if (indM) return _pfxMap[indM[1]] || 'soil';
+  // Пошук у SERVICES (для Supabase package_id / slug)
+  for (const sk of Object.keys(SERVICES)) {
+    if ((SERVICES[sk].packages||[]).some(p => p.code === code)) return sk;
+    if ((SERVICES[sk].individual||[]).some(p => p.code === code)) return sk;
+  }
+  // Fallback: перший сегмент коду ('01', '04' тощо)
+  return _pfxMap[code.split('-')[0]] || 'soil';
+}
+// Чи є пробопідготовка — тільки для Ґрунту (materialKey === 'soil')
+function needsSamplePrep(materialKey){ return materialKey === 'soil'; }
 
 function confirmAddInd(){
   const ind = addIndCurrentInd;
@@ -7361,7 +7378,7 @@ function confirmAddInd(){
   if(addIndNewSample){
     const qty = ind.qty||1;
     const prefix = indPrefix(ind.code);
-    const withPrep = needsSamplePrep(ind.code);
+    const withPrep = needsSamplePrep(ind.materialKey || _svcMatKey(ind.code));
     cart.push({
       code:'_ind_'+prefix+'_'+Date.now(),
       type:'sample_ind_group',
@@ -7524,11 +7541,7 @@ function buildSamples() {
     // For individual indicator groups, use first indicator's code for material detection
     const codeForMat = (item.type === 'sample_ind_group' && (item.indicators||[]).length)
       ? item.indicators[0].code : item.code;
-    const mat = codeForMat.startsWith('05') ? 'water'
-              : codeForMat.startsWith('02') ? 'fertilizer'
-              : codeForMat.startsWith('03') ? 'seeds'
-              : codeForMat.startsWith('04') ? 'grain'
-              : codeForMat.startsWith('06') ? 'plants' : 'soil';
+    const mat = _svcMatKey(codeForMat);
     for (let n = 1; n <= qty; n++) {
       globalIdx++;
       const existing = samples.find(s => s.itemCode === item.code && s.numInItem === n);
@@ -9373,7 +9386,7 @@ const NC_CATALOG = {
     // Окремі показники (віртуальні пакети для індивідуальних послуг)
     soil_individual:         { id:'soil_individual',         name:'Окремі показники (Ґрунт)',    baseName:'Пробопідготовка', materialId:'soil',       price:150, termDays:5, included:[] },
     soil_individual_no_prep: { id:'soil_individual_no_prep', name:'Окремі показники (Ґрунт)',    materialId:'soil',       price:0,   termDays:5, included:[] },
-    water_individual:        { id:'water_individual',        name:'Окремі показники (Вода)',     baseName:'Пробопідготовка', materialId:'water',      price:150, termDays:4, included:[] },
+    water_individual:        { id:'water_individual',        name:'Окремі показники (Вода)',     materialId:'water',      price:0,   termDays:4, included:[] },
     plant_individual:        { id:'plant_individual',        name:'Окремі показники (Рослини)',  materialId:'plant',      price:0,   termDays:5, included:[] },
     fertilizer_individual:   { id:'fertilizer_individual',   name:'Окремі показники (Добрива)', materialId:'fertilizer', price:0,   termDays:5, included:[] },
     seeds_individual:        { id:'seeds_individual',        name:'Окремі показники (Насіння)', materialId:'seeds',      price:0,   termDays:5, included:[] },
@@ -10403,6 +10416,7 @@ async function loadCatalogFromSupabase() {
         name:        svc.name || svc.service_id,
         price:    svc.price,
         material: _matKeyToLabel[mk] || mk,
+        materialKey: mk,
         desc:       svc.short_description || '',
         descRich:   svc.full_description || '',
         keywords:   svc.search_keywords || '',
