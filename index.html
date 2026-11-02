@@ -4745,7 +4745,7 @@ main{flex:1}
 <div class="page mcat-page" id="page-methods">
   <div class="mcat-header">
     <div class="mcat-header-inner">
-      <h1>Агрохімічний гід</h1>
+      <h1>Каталог методів</h1>
       <p>Методики, нормативні документи та умови виконання досліджень.</p>
     </div>
   </div>
@@ -8479,10 +8479,12 @@ async function loadMethodsCatalog() {
 
     // Build material pills
     const pillsEl = document.getElementById('mcatMatPills');
-    pillsEl.innerHTML = '<button class="mcat-pill active" data-mat="" onclick="mcatSetMat(this,\'\')">Усі</button>';
+    let pillsHtml = '<button class="mcat-pill active" data-mat="" onclick="mcatSetMat(this,\'\')">Усі</button>';
     materials.forEach(m=>{
-      pillsEl.innerHTML += `<button class="mcat-pill" data-mat="${m.material_id}" onclick="mcatSetMat(this,'${m.material_id}')">${m.name}</button>`;
+      const mid = (m.material_id||'').replace(/'/g,'&#39;').replace(/"/g,'&quot;');
+      pillsHtml += `<button class="mcat-pill" data-mat="${mid}" onclick="mcatSetMat(this,'${mid}')">${m.name||''}</button>`;
     });
+    pillsEl.innerHTML = pillsHtml;
 
     // Build group dropdown
     const groupDrop = document.getElementById('mcatGroupDropdown');
