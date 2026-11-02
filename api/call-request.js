@@ -3,30 +3,50 @@
 
 const https = require('https');
 
-function httpsPost(url, key, body) {
+function httpsReq(hostname, path, key, method, body) {
   return new Promise((resolve, reject) => {
-    const u = new URL(url);
-    const data = JSON.stringify(body);
-    const req = https.request({
-      hostname: u.hostname,
-      path: u.pathname,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(data),
-        'apikey': key,
-        'Authorization': `Bearer ${key}`,
-        'Prefer': 'return=representation',
-      },
-    }, r => {
+    const data = body ? JSON.stringify(body) : null;
+    const headers = {
+      'apikey': key,
+      'Authorization': `Bearer ${key}`,
+    };
+    if (data) {
+      headers['Content-Type'] = 'application/json';
+      headers['Content-Length'] = Buffer.byteLength(data);
+      headers['Prefer'] = 'return=representation';
+    }
+    const req = https.request({ hostname, path, method: method || 'GET', headers }, r => {
       let raw = '';
       r.on('data', c => raw += c);
       r.on('end', () => resolve({ status: r.statusCode, body: raw }));
     });
     req.on('error', reject);
-    req.write(data);
+    if (data) req.write(data);
     req.end();
   });
+}
+
+// Генерує наступний порядковий номер CR260001, CR260002, ...
+async function nextCallRequestNum(host, key) {
+  const now = new Date();
+  const yy = String(now.getFullYear()).slice(2);
+  const prefix = `CR${yy}`;
+  try {
+    const r = await httpsReq(
+      host,
+      `/rest/v1/orders?order_num=like.${encodeURIComponent(prefix + '%')}&select=order_num&order=order_num.desc&limit=1`,
+      key
+    );
+    if (r.status < 300) {
+      const rows = JSON.parse(r.body);
+      if (rows && rows.length) {
+        const last = rows[0].order_num; // e.g. "CR260007"
+        const seq = parseInt(last.slice(prefix.length), 10);
+        if (!isNaN(seq)) return `${prefix}${String(seq + 1).padStart(4, '0')}`;
+      }
+    }
+  } catch (_) { /* fallback below */ }
+  return `${prefix}0001`;
 }
 
 module.exports = async function handler(req, res) {
@@ -57,13 +77,14 @@ module.exports = async function handler(req, res) {
   const key = process.env.SUPABASE_SERVICE_KEY;
   if (!url || !key) return res.status(500).json({ ok: false, error: 'Supabase not configured' });
 
-  // Generate a simple order num: CR + timestamp
+  // Generate sequential order num: CR{yy}{0001, 0002, ...}
+  const host = new URL(url).hostname;
+
+  const orderNum = await nextCallRequestNum(host, key);
   const now = new Date();
-  const yy = String(now.getFullYear()).slice(2);
-  const mm = String(now.getMonth() + 1).padStart(2, '0');
   const dd = String(now.getDate()).padStart(2, '0');
-  const ts = String(now.getTime()).slice(-4);
-  const orderNum = `CR${yy}${mm}${dd}${ts}`;
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const yy = String(now.getFullYear()).slice(2);
   const date = `${dd}.${mm}.20${yy}`;
 
   const payload = {
@@ -84,7 +105,7 @@ module.exports = async function handler(req, res) {
   };
 
   try {
-    const result = await httpsPost(`${url}/rest/v1/orders`, key, payload);
+    const result = await httpsReq(host, '/rest/v1/orders', key, 'POST', payload);
     if (result.status >= 300) {
       console.error('Supabase error:', result.status, result.body);
       return res.status(500).json({ ok: false, error: `Supabase ${result.status}` });
