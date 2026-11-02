@@ -10204,10 +10204,10 @@ async function _sbFetch(table, params = '') {
 async function loadCatalogFromSupabase() {
   try {
     const [services, packages, pkgItems, methods, materials, serviceChips] = await Promise.all([
-      _sbFetch('catalog_services',      'select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,service_id'),
-      _sbFetch('catalog_packages',      'select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,package_id'),
+      _sbFetch('catalog_services',      'select=*&or=(status.in.(active,draft),status.is.null)&order=sort_order.asc.nullslast,service_id'),
+      _sbFetch('catalog_packages',      'select=*&or=(status.in.(active,draft),status.is.null)&order=sort_order.asc.nullslast,package_id'),
       _sbFetch('catalog_package_items', 'select=*'),
-      _sbFetch('catalog_methods',       'select=*&status=in.(active,draft)&order=sort_order.asc.nullslast,method_id').catch(e=>{console.warn('methods fetch:',e);return[];}),
+      _sbFetch('catalog_methods',       'select=*&or=(status.in.(active,draft),status.is.null)&order=sort_order.asc.nullslast,method_id').catch(e=>{console.warn('methods fetch:',e);return[];}),
       _sbFetch('catalog_materials',     'select=material_id,name,status,sort_order&order=sort_order.asc.nullslast,material_id').catch(e=>{console.warn('materials fetch:',e);return[];}),
       _sbFetch('catalog_service_chips', 'select=*&order=sort_order.asc.nullslast,label').catch(e=>{console.warn('service_chips fetch:',e);return[];}),
     ]);
