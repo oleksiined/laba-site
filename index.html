@@ -3594,22 +3594,40 @@ main{flex:1}
 <div class="modal-backdrop" id="callModalBackdrop" onclick="if(event.target===this)closeCallModal()">
   <div class="modal-box">
     <div id="callFormView">
-      <div class="modal-head"><h3>Замовити дзвінок</h3><p>Ми звʼяжемось найближчим часом</p></div>
-      <div class="modal-body">
+      <div class="modal-head" style="display:flex;align-items:center;justify-content:space-between;padding-bottom:0">
+        <span style="font-size:17px;font-weight:900;letter-spacing:-0.5px;color:var(--navy)">LABA<span style="color:var(--neon-dark)">.</span></span>
+        <button onclick="closeCallModal()" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:22px;line-height:1;padding:4px">×</button>
+      </div>
+      <div class="modal-head" style="padding-top:6px"><h3>Замовити дзвінок</h3><p>Ми звʼяжемось найближчим часом</p></div>
+      <div class="modal-body" id="callFormBody">
         <div class="form-row"><label>Ваше імʼя *</label><input type="text" id="callName" placeholder="Іван Петренко"></div>
         <div class="form-row"><label>Телефон *</label><input type="tel" id="callPhone" value="+38" placeholder="+380XXXXXXXXXX" oninput="phoneAutoFormat(this)" onblur="validatePhone(this)"></div>
         <div class="form-row"><label>Коментар</label><textarea id="callComment" placeholder="Ваше запитання..."></textarea></div>
       </div>
-      <div class="modal-actions">
+      <div class="modal-actions" id="callFormActions">
         <button class="btn-cancel" onclick="closeCallModal()">Скасувати</button>
         <button class="btn-submit" onclick="submitCallModal()">Надіслати</button>
       </div>
     </div>
-    <div class="success-screen" id="callSuccess">
-      <div class="s-icon">✅</div>
-      <h3>Заявку отримано!</h3>
-      <p>Зателефонуємо найближчим часом.</p>
-      <br><button class="btn-submit" style="max-width:160px;margin:0 auto;display:block" onclick="closeCallModal()">Закрити</button>
+  </div>
+</div>
+
+<!-- CALL SUCCESS MODAL -->
+<div id="call-success-modal" class="m-overlay hidden" style="align-items:center;justify-content:center">
+  <div class="modal" style="max-width:620px;width:100%;padding:0;overflow:hidden;border-radius:20px;position:relative">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:28px 32px 0">
+      <span style="font-size:18px;font-weight:900;letter-spacing:-0.5px;color:var(--navy)">LABA<span style="color:var(--neon-dark)">.</span></span>
+      <button onclick="closeCallSuccess()" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:22px;line-height:1;padding:4px">×</button>
+    </div>
+    <div style="display:flex;align-items:stretch;min-height:340px">
+      <div style="flex:1;padding:20px 32px 32px;display:flex;flex-direction:column;justify-content:center">
+        <h2 style="font-size:32px;font-weight:900;color:var(--navy);line-height:1.15;margin-bottom:16px">Дякуємо за<br>звернення!</h2>
+        <p style="font-size:15px;color:var(--t2);line-height:1.6;margin-bottom:28px">Наш менеджер зателефонує вам, очікуйте дзвінок найближчим часом!</p>
+        <button class="btn-primary" style="width:100%;padding:16px;font-size:16px;font-weight:700;border-radius:14px" onclick="closeCallSuccess()">Закрити</button>
+      </div>
+      <div style="flex:0 0 200px;position:relative;overflow:hidden;display:flex;align-items:flex-end;justify-content:center">
+        <img src="/robot.png" alt="" style="width:180px;height:auto;display:block;margin-bottom:0;filter:drop-shadow(0 6px 18px rgba(0,0,0,.10))">
+      </div>
     </div>
   </div>
 </div>
@@ -8047,6 +8065,7 @@ function openCallModal(){
   if(bd){ bd.classList.add('open'); document.body.style.overflow='hidden'; }
 }
 function closeCallModal(){ const bd=document.getElementById('callModalBackdrop'); if(bd)bd.classList.remove('open'); document.body.style.overflow=''; }
+function closeCallSuccess(){ const m=document.getElementById('call-success-modal'); if(m){ m.classList.add('hidden'); m.style.display='none'; } document.body.style.overflow=''; }
 async function submitCallModal(){
   const nameEl=document.getElementById('callName');
   const phoneEl=document.getElementById('callPhone');
@@ -8066,10 +8085,9 @@ async function submitCallModal(){
     });
   }catch(e){ console.warn('call-request error',e); }
   if(btn){ btn.disabled=false; btn.textContent='Надіслати'; }
-  const sc=document.getElementById('callSuccessScreen');
-  const form=document.getElementById('callFormBody');
-  if(sc){ sc.classList.add('show'); if(form)form.style.display='none'; }
-  showToast('Дякуємо! Зателефонуємо скоро.');
+  closeCallModal();
+  const csm=document.getElementById('call-success-modal');
+  if(csm){ csm.classList.remove('hidden'); csm.style.display='flex'; document.body.style.overflow='hidden'; }
 }
 
 // ═══════════════════════════════════════════════
@@ -9212,12 +9230,15 @@ document.addEventListener('DOMContentLoaded', _featInit);
 <!-- ══ QUICK ORDER MODAL ══ -->
 <div id="quick-order-modal" class="m-overlay hidden" onclick="if(event.target===this)closeQuickOrder()">
   <div class="modal qo-modal">
-    <div class="modal-hd">
+    <div class="modal-hd" style="flex-direction:column;align-items:stretch;gap:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:17px;font-weight:900;letter-spacing:-0.5px;color:var(--navy)">LABA<span style="color:var(--neon-dark)">.</span></span>
+        <button class="modal-close" onclick="closeQuickOrder()">×</button>
+      </div>
       <div>
         <h2 class="modal-title">Швидке замовлення</h2>
         <p class="qo-subtitle">Залишіть контакти — менеджер уточнить деталі та допоможе завершити замовлення.</p>
       </div>
-      <button class="modal-close" onclick="closeQuickOrder()">×</button>
     </div>
     <div class="modal-body qo-body">
       <div class="qo-fields">
