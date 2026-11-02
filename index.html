@@ -3614,20 +3614,18 @@ main{flex:1}
 
 <!-- CALL SUCCESS MODAL -->
 <div id="call-success-modal" class="m-overlay hidden" style="align-items:center;justify-content:center">
-  <div class="modal" style="max-width:620px;width:100%;padding:0;overflow:hidden;border-radius:20px;position:relative">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:28px 32px 0">
+  <div class="modal" style="max-width:620px;width:100%;padding:0;overflow:visible;border-radius:20px;position:relative">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:28px 32px 0;position:relative;z-index:2">
       <img id="callSuccessLogo" src="" alt="LABA" style="height:38px;width:auto;display:block">
       <button onclick="closeCallSuccess()" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:22px;line-height:1;padding:4px">×</button>
     </div>
-    <div style="display:flex;align-items:stretch;min-height:340px">
-      <div style="flex:1;padding:20px 32px 32px;display:flex;flex-direction:column;justify-content:center">
+    <div style="display:flex;align-items:stretch;min-height:320px;position:relative">
+      <div style="flex:1;padding:20px 32px 32px;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2;max-width:340px">
         <h2 style="font-size:32px;font-weight:900;color:var(--navy);line-height:1.15;margin-bottom:16px">Дякуємо за<br>звернення!</h2>
         <p style="font-size:15px;color:var(--t2);line-height:1.6;margin-bottom:28px">Наш менеджер зателефонує вам, очікуйте дзвінок найближчим часом!</p>
         <button class="btn-primary" style="width:100%;padding:16px;font-size:16px;font-weight:700;border-radius:14px" onclick="closeCallSuccess()">Закрити</button>
       </div>
-      <div style="flex:0 0 220px;position:relative;overflow:hidden">
-        <img src="/robot.png" alt="" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);height:100%;width:auto;max-width:none;filter:drop-shadow(0 6px 18px rgba(0,0,0,.10))">
-      </div>
+      <img src="/robot.png" alt="" style="position:absolute;bottom:0;right:-10px;height:110%;width:auto;max-width:none;z-index:1;filter:drop-shadow(0 6px 18px rgba(0,0,0,.10))">
     </div>
   </div>
 </div>
