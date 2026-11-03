@@ -6402,7 +6402,7 @@ function renderTaskFilter(){
   if(!opts) return;
   if(!ALL_TASKS.length) buildTasksFromGroups();
   const ctx = document.getElementById('srvTaskContext');
-  if(!srvFmtChosen) {
+  if(srvFmt === 'all' && srvTask !== 'season') {
     if(ctx) ctx.style.display='none';
     opts.innerHTML='';
     return;
