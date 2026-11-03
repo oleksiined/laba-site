@@ -2809,6 +2809,15 @@ main{flex:1}
 .mcat-dr-deadline{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-mid)}
 .mcat-dr-deadline svg{flex-shrink:0}
 .mcat-drawer-head{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:16px}
+.mcat-ref-scale-meta{margin:0 0 10px}
+.mcat-ref-scale-name{font-size:15px;font-weight:700;color:var(--text-dark);margin:0 0 2px}
+.mcat-ref-scale-unit{font-size:12px;color:var(--text-soft);margin:0}
+.mcat-ref-bands{display:flex;gap:4px;margin:0 0 8px;border-radius:8px;overflow:hidden}
+.mcat-ref-band{flex:1;height:28px}
+.mcat-ref-labels{display:flex;gap:4px}
+.mcat-ref-label{flex:1;text-align:center}
+.mcat-ref-label-code{font-size:12px;font-weight:700;color:var(--text-dark)}
+.mcat-ref-label-range{font-size:11px;color:var(--text-soft);line-height:1.3}
 
 @media(max-width:700px){
   .mcat-hero{padding:36px 20px 28px}
@@ -8452,6 +8461,9 @@ let _mcatGroup = '';
 let _mcatSearch = '';
 let _mcatDrawerItem = null;
 let _mcatSort = 'alpha';
+let _refLinkByMethod = {};
+let _refScaleById    = {};
+let _refBandsByRef   = {};
 
 const _mcatMatBadgeClass = {
   'MAT-01':'soil','MAT-02':'fertilizer','MAT-03':'plant','MAT-04':'water','MAT-05':'seed'
@@ -8464,13 +8476,24 @@ async function loadMethodsCatalog() {
   if (_mcatLoaded) { mcatApplyFilters(); return; }
   document.getElementById('mcatContent').innerHTML = '<div class="mcat-loading">Завантаження...</div>';
   try {
-    const [services, methods, materials] = await Promise.all([
+    const [services, methods, materials, refLinks, refScales, refBands] = await Promise.all([
       _sbFetch('catalog_services','select=*').catch(()=>[]),
       _sbFetch('catalog_methods','select=*&order=sort_order.asc.nullslast,method_id').catch(()=>[]),
       _sbFetch('catalog_materials','select=material_id,name,sort_order&order=sort_order.asc.nullslast').catch(()=>[]),
+      _sbFetch('catalog_reference_links','select=link_id,reference_id,method_id').catch(()=>[]),
+      _sbFetch('catalog_reference_scales','select=reference_id,parameter_name,symbol,unit,scale_type').catch(()=>[]),
+      _sbFetch('catalog_reference_bands','select=band_id,reference_id,sort_order,level_code,level_name,source_range&order=sort_order.asc.nullslast').catch(()=>[]),
     ]);
     const matMap = {};
     materials.forEach(m=>{ matMap[m.material_id]=m; });
+
+    // Build reference lookup maps
+    _refLinkByMethod = {};
+    refLinks.forEach(l=>{ if(l.method_id) _refLinkByMethod[l.method_id]=l; });
+    _refScaleById = {};
+    refScales.forEach(s=>{ if(s.reference_id) _refScaleById[s.reference_id]=s; });
+    _refBandsByRef = {};
+    refBands.forEach(b=>{ if(!b.reference_id) return; (_refBandsByRef[b.reference_id]=_refBandsByRef[b.reference_id]||[]).push(b); });
 
     // Build methods map: service_id → [methods]
     const methodsBySvc = {};
@@ -8731,6 +8754,34 @@ function navigateToMethod(methodId, fallbackStd, svcId) {
   setTimeout(function(){ _attempt(0); }, 400);
 }
 
+const _BAND_COLORS = {
+  VL:'#e05252', L:'#e88c3a', M:'#e8c93a', H:'#52a861', VH:'#4a8fc4', EH:'#7b52a8',
+  VL1:'#e05252', L1:'#e88c3a', M1:'#e8c93a', H1:'#52a861', VH1:'#4a8fc4',
+};
+const _BAND_COLORS_FALLBACK = ['#e05252','#e88c3a','#e8c93a','#52a861','#4a8fc4','#7b52a8'];
+
+function renderRefScale(scale, bands) {
+  const sorted = [...bands].sort((a,b)=>(a.sort_order??999)-(b.sort_order??999));
+  const name   = scale.parameter_name || '';
+  const symbol = scale.symbol ? ` (${scale.symbol})` : '';
+  const unit   = scale.unit  || '';
+  const barsHtml = sorted.map((b,i)=>{
+    const col = _BAND_COLORS[b.level_code] || _BAND_COLORS_FALLBACK[i % _BAND_COLORS_FALLBACK.length];
+    const tip = (b.level_name||b.level_code||'').replace(/"/g,'&quot;');
+    return `<div class="mcat-ref-band" style="background:${col}" title="${tip}"></div>`;
+  }).join('');
+  const labelsHtml = sorted.map(b=>{
+    const range = (b.source_range||'').replace(/–/g,'–');
+    return `<div class="mcat-ref-label"><div class="mcat-ref-label-code">${b.level_code||''}</div><div class="mcat-ref-label-range">${range}</div></div>`;
+  }).join('');
+  return `<div class="mcat-dr-section">
+    <div class="mcat-dr-h">Референтні значення</div>
+    <div class="mcat-ref-scale-meta">${name?`<div class="mcat-ref-scale-name">${name}${symbol}</div>`:''}${unit?`<div class="mcat-ref-scale-unit">Референтні діапазони, ${unit}</div>`:''}</div>
+    <div class="mcat-ref-bands">${barsHtml}</div>
+    <div class="mcat-ref-labels">${labelsHtml}</div>
+  </div>`;
+}
+
 function mcatOpenDrawer(idx) {
   const r = _mcatFilteredRows[idx];
   if (!r) return;
@@ -8757,6 +8808,17 @@ function mcatOpenDrawer(idx) {
       body += `<div class="mcat-dr-example"><div class="mcat-dr-example-label">${exampleLabel}</div><div class="mcat-dr-example-val">${exampleVal}</div></div>`;
     }
     body += `</div>`;
+  }
+
+  // — Референтні значення —
+  const _methodId = r.id || (r.methodRaw && r.methodRaw.method_id) || '';
+  if (_methodId && _refLinkByMethod[_methodId]) {
+    const _refId = _refLinkByMethod[_methodId].reference_id;
+    const _scale = _refScaleById[_refId];
+    const _bands = _refBandsByRef[_refId] || [];
+    if (_scale && _bands.length) {
+      body += renderRefScale(_scale, _bands);
+    }
   }
 
   // — Коли це потрібно —
