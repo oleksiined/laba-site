@@ -182,6 +182,12 @@ async function upsert(table, conflictCol, rows) {
   }
 }
 
+// dedup helper: залишає тільки перший рядок для кожного унікального ключа
+function dedup(rows, key) {
+  const seen = new Set();
+  return rows.filter(r => { const k = r[key]; if (seen.has(k)) return false; seen.add(k); return true; });
+}
+
 // bool helper: 'true'/true/1 → true, інше → false
 function toBool(v, defaultVal = false) {
   if (v === true || v === 1) return true;
@@ -483,12 +489,12 @@ async function syncCatalog(debug = false) {
   ]);
 
   await Promise.all([
-    upsert('catalog_materials',         'material_id',         matRows),
-    upsert('catalog_services',          'service_id',          svcRows),
-    upsert('catalog_packages',          'package_id',          pkgRows),
-    upsert('catalog_methods',           'method_id',           methRows),
-    upsert('catalog_result_parameters', 'result_parameter_id', resParRows),
-    upsert('catalog_sample_forms',      'form_id',             sFormRows),
+    upsert('catalog_materials',         'material_id',         dedup(matRows,    'material_id')),
+    upsert('catalog_services',          'service_id',          dedup(svcRows,    'service_id')),
+    upsert('catalog_packages',          'package_id',          dedup(pkgRows,    'package_id')),
+    upsert('catalog_methods',           'method_id',           dedup(methRows,   'method_id')),
+    upsert('catalog_result_parameters', 'result_parameter_id', dedup(resParRows, 'result_parameter_id')),
+    upsert('catalog_sample_forms',      'form_id',             dedup(sFormRows,  'form_id')),
   ]);
 
   if (itemRows.length) {
