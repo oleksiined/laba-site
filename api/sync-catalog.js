@@ -8,6 +8,10 @@ const https = require('https');
 const GS_ID = '1xn9CNpcReL0QyC8-bRxQEZ0JyVA2JsNJrx51DMjUL4g';
 const GS_PUB_ID = '2PACX-1vRbHG3iOUp6zr4eRsePrcvkEvxKMynoS3zTpocb3_8RE8PM1IED2gT9LUmsojORbelT6ixv3gttqY2W';
 
+// GID-и листів (отримати: Файл → Поширити → Опублікувати у Вебі → окремий лист → URL)
+// Визначити gid: відкрити лист у таблиці, в URL буде #gid=XXXXXXXX
+const GS_GIDS = [1137445460, 0, 19007006, 423697960, 1515954684, 2059362348, 1799615401];
+
 // ─── CSV parser (RFC 4180) ────────────────────────────────────────────────────
 function parseCsv(text) {
   const rows = [];
@@ -53,10 +57,23 @@ function httpGet(url, redirects) {
   });
 }
 
-function gsFetch(sheetName) {
+// Detect sheet type from header columns
+function detectSheet(cols) {
+  const h = cols.join(',');
+  if (cols.includes('chip_id'))                  return 'Service Chips';
+  if (cols.includes('result_parameter_id'))      return 'Result Parameters';
+  if (cols.includes('package_id') && cols.includes('service_id') && !cols.includes('indicators_count')) return 'Package Items';
+  if (cols.includes('package_id'))               return 'Packages';
+  if (cols.includes('method_id') && !cols.includes('service_type')) return 'Methods';
+  if (cols.includes('service_id') || cols.includes('service_type')) return 'Services';
+  if (cols.includes('material_id'))              return 'Materials';
+  return null; // README або невідомий
+}
+
+function gsFetch(gid) {
   return new Promise((resolve, reject) => {
-    // published CSV — не потребує auth, без редиректів
-    const url = `https://docs.google.com/spreadsheets/d/e/${GS_PUB_ID}/pub?output=csv&sheet=${encodeURIComponent(sheetName)}`;
+    // published CSV з gid=NUMBER — не потребує auth
+    const url = `https://docs.google.com/spreadsheets/d/e/${GS_PUB_ID}/pub?output=csv&gid=${gid}`;
     Promise.resolve(httpGet(url)).then(res => {
       const chunks = [];
       res.on('data', d => chunks.push(d));
@@ -64,7 +81,7 @@ function gsFetch(sheetName) {
         try {
           // Перевіряємо HTTP статус
           if (res.statusCode !== 200) {
-            reject(new Error(`CSV for "${sheetName}" returned HTTP ${res.statusCode}`));
+            reject(new Error(`CSV for gid=${gid} returned HTTP ${res.statusCode}`));
             return;
           }
           const raw = Buffer.concat(chunks).toString('utf8');
@@ -72,13 +89,13 @@ function gsFetch(sheetName) {
           const rawTrimmed = raw.replace(/^﻿/, '').trimStart();
           // HTML (редирект на логін)
           if (rawTrimmed.startsWith('<') || rawTrimmed.includes('<!DOCTYPE') || rawTrimmed.includes('<html')) {
-            reject(new Error(`CSV for "${sheetName}" returned HTML (sheet not public?)`));
+            reject(new Error(`CSV for gid=${gid} returned HTML (sheet not public?)`));
             return;
           }
-          // gviz error format: {"version":"0.6","status":"error",...} або google.visualization.Query.setResponse(...)
+          // gviz error format
           if (rawTrimmed.startsWith('google.visualization') || rawTrimmed.startsWith('{"version"') ||
               (rawTrimmed.startsWith('{') && rawTrimmed.includes('"status"'))) {
-            reject(new Error(`CSV for "${sheetName}" returned gviz error: ${rawTrimmed.substring(0, 120)}`));
+            reject(new Error(`CSV for gid=${gid} returned gviz error: ${rawTrimmed.substring(0, 120)}`));
             return;
           }
           const cleanStr = v => {
@@ -93,9 +110,11 @@ function gsFetch(sheetName) {
               .trim();
           };
           const allRows = parseCsv(raw);
-          if (allRows.length < 2) { resolve({ cols: [], rows: [] }); return; }
+          if (allRows.length < 2) { resolve({ sheet: null, cols: [], rows: [] }); return; }
           // Рядок 0 = англ. назви колонок (для коду), рядок 1 = укр. описи (пропускаємо)
           const cols = allRows[0].map(c => c.trim());
+          const sheet = detectSheet(cols);
+          if (!sheet) { resolve({ sheet: null, cols, rows: [] }); return; } // README або невідомий — пропускаємо
           const dataRows = allRows.slice(2); // slice(2): пропускаємо рядок 1 (укр. описи)
           const result = dataRows.map(row => {
             const obj = {};
@@ -105,7 +124,7 @@ function gsFetch(sheetName) {
             });
             return obj;
           }).filter(r => Object.values(r).some(v => v !== null));
-          resolve({ cols, rows: result });
+          resolve({ sheet, cols, rows: result });
         } catch (e) {
           reject(new Error(`Parse error for sheet "${sheetName}": ${e.message}`));
         }
@@ -172,18 +191,26 @@ function toBool(v, defaultVal = false) {
 
 // ─── Головна функція синку ────────────────────────────────────────────────────
 async function syncCatalog(debug = false) {
-  const [svcRaw, pkgRaw, itemRaw, methRaw, matRaw, resParRaw, svcRelRaw, sFormRaw, sFormFldRaw, svcChipsRaw] = await Promise.all([
-    gsFetch('Services'),
-    gsFetch('Packages'),
-    gsFetch('Package Items'),
-    gsFetch('Methods'),
-    gsFetch('Materials'),
-    gsFetch('Result Parameters'),
-    gsFetch('Service Relations'),
-    gsFetch('Sample Forms'),
-    gsFetch('Sample Form Fields'),
-    gsFetch('Service Chips'),
-  ]);
+  // Завантажуємо всі GID-и паралельно, потім розкладаємо по типах по заголовку
+  const allFetched = await Promise.all(GS_GIDS.map(gid => gsFetch(gid)));
+
+  const empty = { sheet: null, cols: [], rows: [] };
+  const bySheet = {};
+  for (const f of allFetched) {
+    if (f.sheet) bySheet[f.sheet] = f;
+  }
+
+  const svcRaw      = bySheet['Services']          || empty;
+  const pkgRaw      = bySheet['Packages']          || empty;
+  const itemRaw     = bySheet['Package Items']     || empty;
+  const methRaw     = bySheet['Methods']           || empty;
+  const matRaw      = bySheet['Materials']         || empty;
+  const resParRaw   = bySheet['Result Parameters'] || empty;
+  const svcChipsRaw = bySheet['Service Chips']     || empty;
+  // Ці листи не в таблиці, залишаємо порожніми
+  const svcRelRaw   = empty;
+  const sFormRaw    = empty;
+  const sFormFldRaw = empty;
 
   const services       = svcRaw.rows;
   const packages       = pkgRaw.rows;
@@ -191,9 +218,9 @@ async function syncCatalog(debug = false) {
   const methods        = methRaw.rows;
   const materials      = matRaw.rows;
   const resultParams   = resParRaw.rows;
-  const serviceRelations = svcRelRaw.rows;
-  const sampleForms      = sFormRaw.rows;
-  const sampleFormFields = sFormFldRaw.rows;
+  const serviceRelations = [];
+  const sampleForms      = [];
+  const sampleFormFields = [];
   const serviceChips     = svcChipsRaw.rows;
 
   const now = new Date().toISOString();
@@ -337,56 +364,16 @@ async function syncCatalog(debug = false) {
   if (debug) {
     return {
       debug: true,
-      materials_sheet: {
-        cols: matRaw.cols,
-        total_rows: materials.length,
-        first_row: materials[0] || null,
-        filtered: matRows.length,
-      },
-      services_sheet: {
-        cols: svcRaw.cols,
-        total_rows: services.length,
-        first_row: services[0] || null,
-        filtered: svcRows.length,
-      },
-      packages_sheet: {
-        cols: pkgRaw.cols,
-        total_rows: packages.length,
-        first_row: packages[0] || null,
-        filtered: pkgRows.length,
-      },
-      items_sheet: {
-        cols: itemRaw.cols,
-        total_rows: pkgItems.length,
-        first_row: pkgItems[0] || null,
-        filtered: itemRows.length,
-      },
-      methods_sheet: {
-        cols: methRaw.cols,
-        total_rows: methods.length,
-        first_row: methods[0] || null,
-        filtered: methRows.length,
-      },
-      result_parameters_sheet: {
-        cols: resParRaw.cols,
-        total_rows: resultParams.length,
-        first_row: resultParams[0] || null,
-      },
-      service_relations_sheet: {
-        cols: svcRelRaw.cols,
-        total_rows: serviceRelations.length,
-        first_row: serviceRelations[0] || null,
-      },
-      sample_forms_sheet: {
-        cols: sFormRaw.cols,
-        total_rows: sampleForms.length,
-        first_row: sampleForms[0] || null,
-      },
-      sample_form_fields_sheet: {
-        cols: sFormFldRaw.cols,
-        total_rows: sampleFormFields.length,
-        first_row: sampleFormFields[0] || null,
-      },
+      gids_detected: Object.fromEntries(
+        allFetched.map((f, i) => [GS_GIDS[i], f.sheet || '(skipped)']),
+      ),
+      materials_sheet:         { cols: matRaw.cols,    rows: materials.length,    filtered: matRows.length },
+      services_sheet:          { cols: svcRaw.cols,    rows: services.length,     filtered: svcRows.length },
+      packages_sheet:          { cols: pkgRaw.cols,    rows: packages.length,     filtered: pkgRows.length },
+      items_sheet:             { cols: itemRaw.cols,   rows: pkgItems.length,     filtered: itemRows.length },
+      methods_sheet:           { cols: methRaw.cols,   rows: methods.length,      filtered: methRows.length },
+      result_parameters_sheet: { cols: resParRaw.cols, rows: resultParams.length },
+      service_chips_sheet:     { cols: svcChipsRaw.cols, rows: serviceChips.length, filtered: svcChipRows.length },
     };
   }
 
@@ -471,8 +458,8 @@ async function syncCatalog(debug = false) {
   if (totalFiltered === 0) {
     throw new Error(
       `Синк скасовано: після фільтрації отримано 0 валідних рядків ` +
-      `(raw: services=${services.length}, packages=${packages.length}, methods=${methods.length}, materials=${materials.length}). ` +
-      `Схоже, gviz повернув HTML замість CSV. Дані в БД не змінені.`
+      `(services=${services.length}, packages=${packages.length}, methods=${methods.length}, materials=${materials.length}). ` +
+      `Перевірте що таблиця опублікована (Файл → Поширити → Опублікувати у Вебі) і GID-и правильні. Дані в БД не змінені.`
     );
   }
 
