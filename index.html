@@ -5910,28 +5910,7 @@ function _navGoMcat(i) {
     setTimeout(function(){mcatOpenDrawer(idx);},150);
   },350);
 }
-function goToMethod(methodId) {
-  function _open() {
-    var idx = _mcatAllRows.findIndex(function(r){ return r.methodId == methodId; });
-    if (idx < 0) return;
-    _mcatFilteredRows = _mcatAllRows.slice();
-    _mcatPage = Math.floor(idx / _mcatPerPage) + 1;
-    mcatRender();
-    setTimeout(function(){ mcatOpenDrawer(idx); }, 150);
-  }
-  navigate('methods');
-  if (_mcatLoaded) {
-    setTimeout(_open, 350);
-  } else {
-    loadMethodsCatalog();
-    var attempts = 0;
-    var poll = setInterval(function(){
-      attempts++;
-      if (_mcatLoaded) { clearInterval(poll); setTimeout(_open, 150); }
-      else if (attempts > 40) { clearInterval(poll); }
-    }, 150);
-  }
-}
+
 function _navGoMcatAll() {
   var q=document.getElementById('navSearchInp').value.trim();
   _clearNavSearch();
@@ -6960,7 +6939,7 @@ function makeRow(item, type){
         <div style="font-size:14px;font-weight:700;color:var(--navy)">${item.methods[0].name}</div>
         ${item.methods[0].std && item.methods[0].std !== item.methods[0].name ? `<div style="font-size:12px;color:var(--text-soft);margin-top:2px">${item.methods[0].std}</div>` : ''}
       </div>
-      ${item.methods[0].days?`<div style="flex-shrink:0;text-align:right"><div style="font-size:11px;color:var(--text-soft);margin-bottom:2px">Строк виконання</div><div style="font-size:13px;font-weight:600;color:var(--navy);white-space:nowrap">${item.methods[0].days} роб. ${item.methods[0].days===1?'день':item.methods[0].days<5?'дні':'днів'}</div></div>`:''}
+      <a href="#" style="color:var(--t2);font-weight:600;font-size:13px;text-decoration:none;flex-shrink:0;white-space:nowrap" onclick="event.preventDefault();navigateToMethod('${item.methods[0].id}','${item.methods[0].std||''}')">Докладніше про метод →</a>
     </div>
     </div>`:''}
     ${item.methods?.length>1?`
@@ -6977,7 +6956,7 @@ function makeRow(item, type){
           ${m.std && m.std !== m.name ? `<div style="font-size:12px;color:var(--text-soft);margin-top:1px">${m.std}</div>` : ''}
         </div>
         ${m.tag?`<span style="font-size:12px;color:var(--text-soft);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:2px 10px;white-space:nowrap">${m.tag}</span>`:''}
-        <a href="#" style="color:var(--t2);font-weight:600;font-size:13px;text-decoration:none;flex-shrink:0;white-space:nowrap" onclick="event.stopPropagation();event.preventDefault();goToMethod('${m.id}')">Докладніше про метод →</a>
+        <a href="#" style="color:var(--t2);font-weight:600;font-size:13px;text-decoration:none;flex-shrink:0;white-space:nowrap" onclick="event.stopPropagation();event.preventDefault();navigateToMethod('${m.id}','${m.std||''}')">Докладніше про метод →</a>
       </label>`).join('')}
     </div>
     <div style="font-size:13px;margin-top:8px;padding-bottom:16px"><a href="#" style="color:var(--t2);font-weight:600;text-decoration:none" onclick="event.preventDefault();showToast('Буде доступно після публікації')">Як обрати метод? →</a></div>
