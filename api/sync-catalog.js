@@ -437,10 +437,15 @@ async function syncCatalog(debug = false) {
       synced_at:     now,
     }));
 
-  // Захист від wipе: якщо всі основні sheets дали 0 рядків — не чіпаємо БД
-  const totalFetched = services.length + packages.length + methods.length + materials.length;
-  if (totalFetched === 0) {
-    throw new Error('Всі sheets повернули 0 рядків — синк скасовано для запобігання втраті даних. Перевірте доступ до Google Sheets (можливо, потрібна авторизація).');
+  // Захист від wipe: перевіряємо кількість ВАЛІДНИХ рядків після фільтрації
+  // (HTML парситься як CSV і дає rows, але жоден не має service_id — тому перевіряємо filtered, не raw)
+  const totalFiltered = svcRows.length + pkgRows.length + methRows.length + matRows.length;
+  if (totalFiltered === 0) {
+    throw new Error(
+      `Синк скасовано: після фільтрації отримано 0 валідних рядків ` +
+      `(raw: services=${services.length}, packages=${packages.length}, methods=${methods.length}, materials=${materials.length}). ` +
+      `Схоже, gviz повернув HTML замість CSV. Дані в БД не змінені.`
+    );
   }
 
   // DELETE всіх таблиць і вставляємо нові (повна заміна — дзеркало Sheet)
