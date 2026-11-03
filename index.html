@@ -6276,15 +6276,16 @@ function srvResetFilters() {
 }
 
 function goSeasonal(){
-  srvMat=''; srvFmt='all'; srvTask='season'; searchQ='';
+  srvMat=''; srvFmt='packages'; srvTask='season'; srvFmtChosen=true; searchQ='';
   document.querySelectorAll('.mat-btn,.fmt-tab').forEach(b=>b.classList.remove('active'));
   document.getElementById('searchInput').value='';
   navigate('services');
   setTimeout(()=>{
     document.getElementById('seasonalBtn')?.classList.add('active');
     document.getElementById('allResearchBtn')?.classList.remove('active');
+    buildTasksFromGroups(); renderTaskFilter();
     const ctx = document.getElementById('srvTaskContext');
-    if(ctx) ctx.style.display='none';
+    if(ctx) ctx.style.display = ALL_TASKS.length ? '' : 'none';
     render();
   }, 50);
 }
@@ -6384,8 +6385,10 @@ function buildTasksFromGroups(){
     });
   } else {
     // Групи з Packages → package_group (збережено в groups[])
+    const isSeasonal = srvTask === 'season';
     srvsToScan.forEach(srv => {
       (srv.packages||[]).forEach(item => {
+        if(isSeasonal && !item.seasonal) return;
         (item.groups||[]).forEach(g => {
           if(g && !seen.has(g)){ seen.add(g); groups.push(g); }
         });
