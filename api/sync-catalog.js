@@ -59,9 +59,9 @@ function httpGet(url, redirects) {
 
 // Detect sheet type from header columns
 function detectSheet(cols) {
-  const h = cols.join(',');
-  if (cols.includes('chip_id'))                  return 'Service Chips';
+  // result_parameter_id перевіряємо ДО chip_id (бо Result Parameters також має chip_id колонку)
   if (cols.includes('result_parameter_id'))      return 'Result Parameters';
+  if (cols.includes('chip_id'))                  return 'Service Chips';
   if (cols.includes('package_id') && cols.includes('service_id') && !cols.includes('indicators_count')) return 'Package Items';
   if (cols.includes('package_id'))               return 'Packages';
   if (cols.includes('method_id') && !cols.includes('service_type')) return 'Methods';
