@@ -37,10 +37,11 @@ function parseCsv(text) {
   return rows;
 }
 
-// ─── gviz fetch (CSV — нормальне UTF-8 кодування) ────────────────────────────
+// ─── fetch CSV через export (надійніше за gviz) ───────────────────────────────
 function gsFetch(sheetName) {
   return new Promise((resolve, reject) => {
-    const url = `https://docs.google.com/spreadsheets/d/${GS_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+    // export?format=csv&sheet=NAME — не потребує auth для публічних таблиць
+    const url = `https://docs.google.com/spreadsheets/d/${GS_ID}/export?format=csv&sheet=${encodeURIComponent(sheetName)}`;
     https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
       const chunks = [];
       res.on('data', d => chunks.push(d));
@@ -48,7 +49,7 @@ function gsFetch(sheetName) {
         try {
           // Перевіряємо HTTP статус
           if (res.statusCode !== 200) {
-            reject(new Error(`gviz CSV for "${sheetName}" returned HTTP ${res.statusCode}`));
+            reject(new Error(`CSV for "${sheetName}" returned HTTP ${res.statusCode}`));
             return;
           }
           const raw = Buffer.concat(chunks).toString('utf8');
@@ -56,13 +57,13 @@ function gsFetch(sheetName) {
           const rawTrimmed = raw.replace(/^﻿/, '').trimStart();
           // HTML (редирект на логін)
           if (rawTrimmed.startsWith('<') || rawTrimmed.includes('<!DOCTYPE') || rawTrimmed.includes('<html')) {
-            reject(new Error(`gviz CSV for "${sheetName}" returned HTML (auth required?)`));
+            reject(new Error(`CSV for "${sheetName}" returned HTML (sheet not public?)`));
             return;
           }
           // gviz error format: {"version":"0.6","status":"error",...} або google.visualization.Query.setResponse(...)
           if (rawTrimmed.startsWith('google.visualization') || rawTrimmed.startsWith('{"version"') ||
               (rawTrimmed.startsWith('{') && rawTrimmed.includes('"status"'))) {
-            reject(new Error(`gviz CSV for "${sheetName}" returned gviz error: ${rawTrimmed.substring(0, 120)}`));
+            reject(new Error(`CSV for "${sheetName}" returned gviz error: ${rawTrimmed.substring(0, 120)}`));
             return;
           }
           const cleanStr = v => {
