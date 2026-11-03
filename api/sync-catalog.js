@@ -38,11 +38,25 @@ function parseCsv(text) {
 }
 
 // ─── fetch CSV через export (надійніше за gviz) ───────────────────────────────
+function httpGet(url, redirects) {
+  redirects = redirects === undefined ? 5 : redirects;
+  return new Promise((resolve, reject) => {
+    https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
+      if ((res.statusCode === 301 || res.statusCode === 302 || res.statusCode === 307 || res.statusCode === 308) && res.headers.location && redirects > 0) {
+        res.resume();
+        resolve(httpGet(res.headers.location, redirects - 1));
+        return;
+      }
+      resolve(res);
+    }).on('error', reject);
+  });
+}
+
 function gsFetch(sheetName) {
   return new Promise((resolve, reject) => {
     // export?format=csv&sheet=NAME — не потребує auth для публічних таблиць
     const url = `https://docs.google.com/spreadsheets/d/${GS_ID}/export?format=csv&sheet=${encodeURIComponent(sheetName)}`;
-    https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
+    Promise.resolve(httpGet(url)).then(res => {
       const chunks = [];
       res.on('data', d => chunks.push(d));
       res.on('end', () => {
@@ -95,7 +109,8 @@ function gsFetch(sheetName) {
           reject(new Error(`Parse error for sheet "${sheetName}": ${e.message}`));
         }
       });
-    }).on('error', reject);
+      res.on('error', reject);
+    }).catch(reject);
   });
 }
 
