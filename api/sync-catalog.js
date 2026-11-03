@@ -10,7 +10,7 @@ const GS_PUB_ID = '2PACX-1vRbHG3iOUp6zr4eRsePrcvkEvxKMynoS3zTpocb3_8RE8PM1IED2gT
 
 // GID-и листів (отримати: Файл → Поширити → Опублікувати у Вебі → окремий лист → URL)
 // Визначити gid: відкрити лист у таблиці, в URL буде #gid=XXXXXXXX
-const GS_GIDS = [1137445460, 0, 19007006, 423697960, 1515954684, 2059362348, 1799615401];
+const GS_GIDS = [1137445460, 0, 19007006, 423697960, 1515954684, 2059362348, 1799615401, 497010836, 474462136, 937864224];
 
 // ─── CSV parser (RFC 4180) ────────────────────────────────────────────────────
 function parseCsv(text) {
@@ -67,6 +67,9 @@ function detectSheet(cols) {
   if (cols.includes('method_id') && !cols.includes('service_type')) return 'Methods';
   if (cols.includes('service_id') || cols.includes('service_type')) return 'Services';
   if (cols.includes('material_id'))              return 'Materials';
+  if (cols.includes('scale_type'))               return 'Reference Scales';
+  if (cols.includes('band_id'))                  return 'Reference Bands';
+  if (cols.includes('link_id'))                  return 'Reference Links';
   return null; // README або невідомий
 }
 
@@ -217,7 +220,10 @@ async function syncCatalog(debug = false) {
   const methRaw     = bySheet['Methods']           || empty;
   const matRaw      = bySheet['Materials']         || empty;
   const resParRaw   = bySheet['Result Parameters'] || empty;
-  const svcChipsRaw = bySheet['Service Chips']     || empty;
+  const svcChipsRaw  = bySheet['Service Chips']     || empty;
+  const refScalesRaw = bySheet['Reference Scales']  || empty;
+  const refBandsRaw  = bySheet['Reference Bands']   || empty;
+  const refLinksRaw  = bySheet['Reference Links']   || empty;
   // Ці листи не в таблиці, залишаємо порожніми
   const svcRelRaw   = empty;
   const sFormRaw    = empty;
@@ -233,6 +239,9 @@ async function syncCatalog(debug = false) {
   const sampleForms      = [];
   const sampleFormFields = [];
   const serviceChips     = svcChipsRaw.rows;
+  const refScales        = refScalesRaw.rows;
+  const refBands         = refBandsRaw.rows;
+  const refLinks         = refLinksRaw.rows;
 
   const now = new Date().toISOString();
 
@@ -463,6 +472,71 @@ async function syncCatalog(debug = false) {
       synced_at:     now,
     }));
 
+  // ── Reference Scales ──
+  const refScaleRows = refScales
+    .filter(r => r.reference_id)
+    .map(r => ({
+      reference_id:   r.reference_id,
+      material_id:    r.material_id    || null,
+      parameter_code: r.parameter_code || null,
+      parameter_name: r.parameter_name || null,
+      symbol:         r.symbol         || null,
+      unit:           r.unit           || null,
+      scale_type:     r.scale_type     || null,
+      labels:         r.labels         || null,
+      chart_mode:     r.chart_mode     || null,
+      auto_interpret: toBool(r.auto_interpret, false),
+      review_status:  r.review_status  || null,
+      review_note:    r.review_note    || null,
+      source_title:   r.source_title   || null,
+      source_date:    r.source_date    || null,
+      source_page:    r.source_page    ? Number(r.source_page) : null,
+      defined_bands:  r.defined_bands  ? Number(r.defined_bands) : null,
+      language:       r.language       || null,
+      usage_note:     r.usage_note     || null,
+      synced_at:      now,
+    }));
+
+  // ── Reference Bands ──
+  const refBandRows = refBands
+    .filter(r => r.band_id)
+    .map(r => ({
+      band_id:            r.band_id,
+      reference_id:       r.reference_id       || null,
+      sort_order:         r.sort_order         ? Number(r.sort_order) : null,
+      level_code:         r.level_code         || null,
+      level_name:         r.level_name         || null,
+      source_range:       r.source_range       || null,
+      min_value:          r.min_value != null && r.min_value !== '' ? Number(r.min_value) : null,
+      max_value:          r.max_value != null && r.max_value !== '' ? Number(r.max_value) : null,
+      min_operator:       r.min_operator       || null,
+      max_operator:       r.max_operator       || null,
+      source_range_unit:  r.source_range_unit  || null,
+      auto_interpret:     toBool(r.auto_interpret, true),
+      review_note:        r.review_note        || null,
+      source_title:       r.source_title       || null,
+      source_page:        r.source_page        ? Number(r.source_page) : null,
+      synced_at:          now,
+    }));
+
+  // ── Reference Links ──
+  const refLinkRows = refLinks
+    .filter(r => r.link_id)
+    .map(r => ({
+      link_id:              r.link_id,
+      reference_id:         r.reference_id         || null,
+      service_id:           r.service_id           || null,
+      method_id:            r.method_id            || null,
+      result_parameter_id:  r.result_parameter_id  || null,
+      method_variant:       r.method_variant       || null,
+      mapping_status:       r.mapping_status       || null,
+      chart_auto_enabled:   toBool(r.chart_auto_enabled, false),
+      mapping_note:         r.mapping_note         || null,
+      site_usage_note:      r.site_usage_note      || null,
+      source_title:         r.source_title         || null,
+      synced_at:            now,
+    }));
+
   // Захист від wipe: перевіряємо кількість ВАЛІДНИХ рядків після фільтрації
   // (HTML парситься як CSV і дає rows, але жоден не має service_id — тому перевіряємо filtered, не raw)
   const totalFiltered = svcRows.length + pkgRows.length + methRows.length + matRows.length;
@@ -486,6 +560,9 @@ async function syncCatalog(debug = false) {
     sbRequest('DELETE', 'catalog_sample_forms?form_id=neq.__none__',                       null).catch(() => {}),
     sbRequest('DELETE', 'catalog_sample_form_fields?form_id=neq.__none__',                 null).catch(() => {}),
     sbRequest('DELETE', 'catalog_service_chips?service_id=neq.__none__',                   null).catch(() => {}),
+    sbRequest('DELETE', 'catalog_reference_scales?reference_id=neq.__none__',             null).catch(() => {}),
+    sbRequest('DELETE', 'catalog_reference_bands?band_id=neq.__none__',                   null).catch(() => {}),
+    sbRequest('DELETE', 'catalog_reference_links?link_id=neq.__none__',                   null).catch(() => {}),
   ]);
 
   await Promise.all([
@@ -509,6 +586,15 @@ async function syncCatalog(debug = false) {
   if (svcChipRows.length) {
     await upsert('catalog_service_chips', 'service_id,label', svcChipRows);
   }
+  if (refScaleRows.length) {
+    await upsert('catalog_reference_scales', 'reference_id', dedup(refScaleRows, 'reference_id'));
+  }
+  if (refBandRows.length) {
+    await upsert('catalog_reference_bands', 'band_id', dedup(refBandRows, 'band_id'));
+  }
+  if (refLinkRows.length) {
+    await upsert('catalog_reference_links', 'link_id', dedup(refLinkRows, 'link_id'));
+  }
 
   return {
     materials:          matRows.length,
@@ -521,6 +607,9 @@ async function syncCatalog(debug = false) {
     sampleForms:        sFormRows.length,
     sampleFormFields:   sFormFldRows.length,
     serviceChips:       svcChipRows.length,
+    referenceScales:    refScaleRows.length,
+    referenceBands:     refBandRows.length,
+    referenceLinks:     refLinkRows.length,
     syncedAt:           now,
   };
 }
