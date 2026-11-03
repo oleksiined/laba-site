@@ -404,6 +404,55 @@ function buildInvoiceHtml(o) {
 </html>`;
 }
 
+// ─── SMS (Turbo SMS) ─────────────────────────────────────────────────────────
+
+function buildSmsAdminText(o) {
+  const name  = o.client?.name  || '—';
+  const phone = o.client?.phone || '—';
+  const total = Number(o.total || 0).toLocaleString('uk-UA');
+  return `LABA: Нове замовлення ${o.orderNum}\n${name}\n${phone}\nСума: ${total} грн`;
+}
+
+function buildSmsClientText(o) {
+  const firstName = (o.client?.name || '').split(' ')[0] || '';
+  const greeting  = firstName ? `, ${firstName}` : '';
+  return `LABA${greeting}: Замовлення ${o.orderNum} прийнято. Менеджер зв'яжеться найближчим часом. Дякуємо!`;
+}
+
+async function sendTurboSms(phones, text) {
+  const token  = process.env.TURBOSMS_TOKEN;
+  const sender = process.env.TURBOSMS_SENDER || 'LABA';
+  if (!token) throw new Error('TURBOSMS_TOKEN not set');
+  if (!phones || phones.length === 0) throw new Error('No recipients');
+
+  const body = JSON.stringify({
+    recipients: phones,
+    sms: { sender, text },
+  });
+
+  return new Promise((resolve, reject) => {
+    const req = https.request({
+      hostname: 'api.turbosms.ua',
+      path:     '/message/send.json',
+      method:   'POST',
+      headers: {
+        'Content-Type':   'application/json',
+        'Content-Length': Buffer.byteLength(body),
+        'Authorization':  `Bearer ${token}`,
+      },
+    }, res => {
+      let raw = '';
+      res.on('data', c => raw += c);
+      res.on('end', () => {
+        try { resolve(JSON.parse(raw)); } catch (_) { resolve(raw); }
+      });
+    });
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
 // ─── Supabase helper ─────────────────────────────────────────────────────────
 
 async function saveOrderToSupabase(order) {
@@ -561,7 +610,32 @@ module.exports = async function handler(req, res) {
     notifErrors.push({ channel: 'telegram', message: err.message });
   }
 
-  // 2b. Email to client
+  // 2b. SMS notifications
+  if (process.env.TURBOSMS_TOKEN) {
+    // SMS to admin/team
+    const adminPhone = process.env.ADMIN_PHONE;
+    if (adminPhone) {
+      try {
+        await sendTurboSms([adminPhone], buildSmsAdminText(order));
+      } catch (err) {
+        console.warn('SMS admin error (non-fatal):', err.message);
+        notifErrors.push({ channel: 'sms_admin', message: err.message });
+      }
+    }
+
+    // SMS to client (opt-in via CLIENT_SMS=true)
+    const clientPhone = order.client?.phone;
+    if (clientPhone && process.env.CLIENT_SMS === 'true') {
+      try {
+        await sendTurboSms([clientPhone], buildSmsClientText(order));
+      } catch (err) {
+        console.warn('SMS client error (non-fatal):', err.message);
+        notifErrors.push({ channel: 'sms_client', message: err.message });
+      }
+    }
+  }
+
+  // 2c. Email to client
   const clientEmail = order.client?.email;
   if (clientEmail && process.env.SMTP_HOST) {
     const transporter = nodemailer.createTransport({
@@ -601,7 +675,7 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // 2c. Team email
+  // 2d. Team email
   const teamEmail = process.env.TEAM_EMAIL;
   if (teamEmail && process.env.SMTP_HOST) {
     try {
