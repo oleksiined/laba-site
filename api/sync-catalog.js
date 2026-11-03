@@ -6,6 +6,7 @@
 const https = require('https');
 
 const GS_ID = '1xn9CNpcReL0QyC8-bRxQEZ0JyVA2JsNJrx51DMjUL4g';
+const GS_PUB_ID = '2PACX-1vRbHG3iOUp6zr4eRsePrcvkEvxKMynoS3zTpocb3_8RE8PM1IED2gT9LUmsojORbelT6ixv3gttqY2W';
 
 // ─── CSV parser (RFC 4180) ────────────────────────────────────────────────────
 function parseCsv(text) {
@@ -54,8 +55,8 @@ function httpGet(url, redirects) {
 
 function gsFetch(sheetName) {
   return new Promise((resolve, reject) => {
-    // export?format=csv&sheet=NAME — не потребує auth для публічних таблиць
-    const url = `https://docs.google.com/spreadsheets/d/${GS_ID}/export?format=csv&sheet=${encodeURIComponent(sheetName)}`;
+    // published CSV — не потребує auth, без редиректів
+    const url = `https://docs.google.com/spreadsheets/d/e/${GS_PUB_ID}/pub?output=csv&sheet=${encodeURIComponent(sheetName)}`;
     Promise.resolve(httpGet(url)).then(res => {
       const chunks = [];
       res.on('data', d => chunks.push(d));
