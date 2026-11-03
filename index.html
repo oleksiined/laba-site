@@ -8508,7 +8508,7 @@ async function loadMethodsCatalog() {
     let pillsHtml = '<button class="mcat-pill active" data-mat="" onclick="mcatSetMat(this,\'\')">Усі</button>';
     materials.forEach(m=>{
       const mid = (m.material_id||'').replace(/'/g,'&#39;').replace(/"/g,'&quot;');
-      pillsHtml += `<button class="mcat-pill" data-mat="${mid}" onclick="mcatSetMat(this,'${mid}')">${m.name||''}</button>`;
+      pillsHtml += `<button class="mcat-pill" data-mat="${mid}" onclick="mcatSetMat(this,'${mid}')">${m.name || _mcatMatLabel[m.material_id] || m.material_id}</button>`;
     });
     pillsEl.innerHTML = pillsHtml;
 
@@ -8526,7 +8526,7 @@ async function loadMethodsCatalog() {
       const base = {
         svcName: svc.name || '',
         matId: svc.material_id || '',
-        matName: mat.name || '',
+        matName: mat.name || _mcatMatLabel[svc.material_id] || '',
         group: svc.group_name || '',
         svcDesc: svc.full_description || svc.short_description || '',
         svcSlug: svc.slug || '',
