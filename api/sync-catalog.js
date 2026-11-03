@@ -19,11 +19,24 @@ function gsFetch(sheetName) {
           const json = JSON.parse(data.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, ''));
           const cols = json.table.cols.map(c => c.label || c.id);
           const rows = (json.table.rows || []).slice(1); // рядок 0 = опис колонок укр.
+          const cleanStr = v => {
+            if (typeof v !== 'string') return v;
+            return v
+              .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '') // control chars
+              .replace(/­/g, '')   // soft hyphen
+              .replace(/​/g, '')   // zero-width space
+              .replace(/‌/g, '')   // zero-width non-joiner
+              .replace(/‍/g, '')   // zero-width joiner
+              .replace(/﻿/g, '')   // BOM
+              .replace(/�/g, '')   // replacement character
+              .trim();
+          };
           const result = rows.map(row => {
             const obj = {};
             cols.forEach((col, i) => {
               const cell = row.c && row.c[i];
-              obj[col] = (cell && cell.v !== null && cell.v !== undefined) ? cell.v : null;
+              const val = (cell && cell.v !== null && cell.v !== undefined) ? cell.v : null;
+              obj[col] = typeof val === 'string' ? cleanStr(val) : val;
             });
             return obj;
           }).filter(r => Object.values(r).some(v => v !== null));
