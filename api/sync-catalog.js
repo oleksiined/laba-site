@@ -59,6 +59,10 @@ function httpGet(url, redirects) {
 
 // Detect sheet type from header columns
 function detectSheet(cols) {
+  // Reference-таблиці перевіряємо ПЕРШИМИ — вони мають material_id/method_id що збиває нижчі перевірки
+  if (cols.includes('scale_type'))               return 'Reference Scales';
+  if (cols.includes('band_id'))                  return 'Reference Bands';
+  if (cols.includes('link_id'))                  return 'Reference Links';
   // result_parameter_id перевіряємо ДО chip_id (бо Result Parameters також має chip_id колонку)
   if (cols.includes('result_parameter_id'))      return 'Result Parameters';
   if (cols.includes('chip_id'))                  return 'Service Chips';
@@ -67,9 +71,6 @@ function detectSheet(cols) {
   if (cols.includes('method_id') && !cols.includes('service_type')) return 'Methods';
   if (cols.includes('service_id') || cols.includes('service_type')) return 'Services';
   if (cols.includes('material_id'))              return 'Materials';
-  if (cols.includes('scale_type'))               return 'Reference Scales';
-  if (cols.includes('band_id'))                  return 'Reference Bands';
-  if (cols.includes('link_id'))                  return 'Reference Links';
   return null; // README або невідомий
 }
 
