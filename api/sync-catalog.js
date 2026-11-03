@@ -373,7 +373,7 @@ async function syncCatalog(debug = false) {
       items_sheet:             { cols: itemRaw.cols,   rows: pkgItems.length,     filtered: itemRows.length },
       methods_sheet:           { cols: methRaw.cols,   rows: methods.length,      filtered: methRows.length },
       result_parameters_sheet: { cols: resParRaw.cols, rows: resultParams.length },
-      service_chips_sheet:     { cols: svcChipsRaw.cols, rows: serviceChips.length, filtered: svcChipRows.length },
+      service_chips_sheet:     { cols: svcChipsRaw.cols, rows: serviceChips.length },
     };
   }
 
