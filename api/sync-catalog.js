@@ -7,35 +7,72 @@ const https = require('https');
 
 const GS_ID = '1xn9CNpcReL0QyC8-bRxQEZ0JyVA2JsNJrx51DMjUL4g';
 
-// ─── gviz fetch ───────────────────────────────────────────────────────────────
+// ─── CSV parser (RFC 4180) ────────────────────────────────────────────────────
+function parseCsv(text) {
+  const rows = [];
+  let i = 0, n = text.length;
+  while (i < n) {
+    const row = [];
+    while (i < n) {
+      if (text[i] === '"') {
+        i++; let cell = '';
+        while (i < n) {
+          if (text[i] === '"' && text[i+1] === '"') { cell += '"'; i += 2; }
+          else if (text[i] === '"') { i++; break; }
+          else { cell += text[i++]; }
+        }
+        row.push(cell);
+      } else {
+        let cell = '';
+        while (i < n && text[i] !== ',' && text[i] !== '\n' && text[i] !== '\r') cell += text[i++];
+        row.push(cell);
+      }
+      if (i < n && text[i] === ',') i++;
+      else break;
+    }
+    if (i < n && text[i] === '\r') i++;
+    if (i < n && text[i] === '\n') i++;
+    if (row.length > 0) rows.push(row);
+  }
+  return rows;
+}
+
+// ─── gviz fetch (CSV — нормальне UTF-8 кодування) ────────────────────────────
 function gsFetch(sheetName) {
   return new Promise((resolve, reject) => {
-    const url = `https://docs.google.com/spreadsheets/d/${GS_ID}/gviz/tq?tqx=out:json&headers=1&sheet=${encodeURIComponent(sheetName)}`;
+    const url = `https://docs.google.com/spreadsheets/d/${GS_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
     https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
-      let data = '';
-      res.on('data', d => data += d);
+      const chunks = [];
+      res.on('data', d => chunks.push(d));
       res.on('end', () => {
         try {
-          const json = JSON.parse(data.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, ''));
-          const cols = json.table.cols.map(c => c.label || c.id);
-          const rows = (json.table.rows || []).slice(1); // рядок 0 = опис колонок укр.
+          const raw = Buffer.concat(chunks).toString('utf8');
+          // Якщо відповідь — HTML (редирект на логін) — падаємо з помилкою
+          if (raw.trimStart().startsWith('<')) {
+            reject(new Error(`gviz CSV for "${sheetName}" returned HTML (auth required?)`));
+            return;
+          }
           const cleanStr = v => {
             if (typeof v !== 'string') return v;
             return v
-              .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '') // control chars
-              .replace(/­/g, '')   // soft hyphen
-              .replace(/​/g, '')   // zero-width space
-              .replace(/‌/g, '')   // zero-width non-joiner
-              .replace(/‍/g, '')   // zero-width joiner
-              .replace(/﻿/g, '')   // BOM
+              .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
+              .replace(/­/g, '')
+              .replace(/​/g, '')
+              .replace(/‌/g, '')
+              .replace(/‍/g, '')
+              .replace(/﻿/g, '')
               .trim();
           };
-          const result = rows.map(row => {
+          const allRows = parseCsv(raw);
+          if (allRows.length < 2) { resolve({ cols: [], rows: [] }); return; }
+          // Рядок 0 = англ. назви колонок (для коду), рядок 1 = укр. описи (пропускаємо)
+          const cols = allRows[0].map(c => c.trim());
+          const dataRows = allRows.slice(2); // slice(2): пропускаємо рядок 1 (укр. описи)
+          const result = dataRows.map(row => {
             const obj = {};
             cols.forEach((col, i) => {
-              const cell = row.c && row.c[i];
-              const val = (cell && cell.v !== null && cell.v !== undefined) ? cell.v : null;
-              obj[col] = typeof val === 'string' ? cleanStr(val) : val;
+              const val = row[i] !== undefined ? cleanStr(row[i]) : null;
+              obj[col] = val === '' ? null : val;
             });
             return obj;
           }).filter(r => Object.values(r).some(v => v !== null));

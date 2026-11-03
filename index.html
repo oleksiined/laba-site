@@ -8502,7 +8502,7 @@ async function loadMethodsCatalog() {
         matId: svc.material_id || '',
         matName: mat.name || '',
         group: svc.group_name || '',
-        svcDesc: cleanFfd(svc.full_description || svc.short_description || ''),
+        svcDesc: svc.full_description || svc.short_description || '',
         svcSlug: svc.slug || '',
         svcId: svc.service_id || '',
       };
@@ -8743,7 +8743,7 @@ function mcatOpenDrawer(idx) {
   let body = '';
 
   // — Про дослідження —
-  const desc = cleanFfd(svc.full_description || svc.short_description || r.svcDesc || '');
+  const desc = svc.full_description || svc.short_description || r.svcDesc || '';
   if (desc) {
     const exampleVal = svc.example_result || m.example_result || '';
     body += `<div class="mcat-dr-section">
@@ -9012,10 +9012,6 @@ function ostFaqToggle(qEl) {
 
 function escHtml(str) {
   return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-function cleanFfd(str) {
-  if (typeof str !== 'string') return str;
-  return str.replace(/�+/g, '').trimEnd();
 }
 
 // ══ About page fullpage controller ══
@@ -10416,8 +10412,8 @@ async function loadCatalogFromSupabase() {
           return true;
         })(),
         groups:   pkg.package_group ? [pkg.package_group] : [],
-        desc:           cleanFfd(pkg.short_description || ''),
-        descRich:       cleanFfd(pkg.full_description || pkg.short_description || ''),
+        desc:           pkg.short_description || '',
+        descRich:       pkg.full_description || pkg.short_description || '',
         keywords:       [pkg.search_keywords||'', ...(pkgItemsFull[pkg.package_id]||[]).map(pi=>{ const s=svcById[pi.service_id]; return s ? (s.name||'') + ' ' + (s.search_keywords||'') : ''; }), ...(pkgItemsFull[pkg.package_id]||[]).flatMap(pi=>(svcChips[pi.service_id]||[]).map(c=>c.label||''))].join(' '),
         popular:        pkg.sort_order != null ? Math.max(0, 100 - pkg.sort_order) : 50,
         exampleUrl:     pkg.report_example_url || null,
@@ -10440,8 +10436,8 @@ async function loadCatalogFromSupabase() {
         price:    svc.price,
         material: _matKeyToLabel[mk] || mk,
         materialKey: mk,
-        desc:       cleanFfd(svc.short_description || ''),
-        descRich:   cleanFfd(svc.full_description || ''),
+        desc:       svc.short_description || '',
+        descRich:   svc.full_description || '',
         keywords:   svc.search_keywords || '',
         groups:     svc.group_name ? [svc.group_name] : [],
         methods:    svcMethods[svc.service_id] || [],
