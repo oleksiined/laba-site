@@ -8503,6 +8503,13 @@ async function loadMethodsCatalog() {
       methodsBySvc[sid].push(m);
     });
 
+    // Supplement materials with any from _mcatMatLabel not in DB
+    const _fetchedMatIds = new Set(materials.map(m=>m.material_id));
+    Object.keys(_mcatMatLabel).forEach(mid=>{
+      if(!_fetchedMatIds.has(mid)) materials.push({material_id:mid, name:_mcatMatLabel[mid], sort_order:99});
+    });
+    materials.sort((a,b)=>(a.sort_order??99)-(b.sort_order??99)||(a.material_id||'').localeCompare(b.material_id||''));
+
     // Build material pills
     const pillsEl = document.getElementById('mcatMatPills');
     let pillsHtml = '<button class="mcat-pill active" data-mat="" onclick="mcatSetMat(this,\'\')">Усі</button>';
