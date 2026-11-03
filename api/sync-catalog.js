@@ -48,7 +48,9 @@ function gsFetch(sheetName) {
         try {
           const raw = Buffer.concat(chunks).toString('utf8');
           // Якщо відповідь — HTML (редирект на логін) — падаємо з помилкою
-          if (raw.trimStart().startsWith('<')) {
+          // Знімаємо BOM (﻿) бо trimStart() його не видаляє
+          const rawTrimmed = raw.replace(/^﻿/, '').trimStart();
+          if (rawTrimmed.startsWith('<') || rawTrimmed.includes('<!DOCTYPE') || rawTrimmed.includes('<html')) {
             reject(new Error(`gviz CSV for "${sheetName}" returned HTML (auth required?)`));
             return;
           }
@@ -434,6 +436,12 @@ async function syncCatalog(debug = false) {
       sort_order:    r.sort_order != null ? Number(r.sort_order) : null,
       synced_at:     now,
     }));
+
+  // Захист від wipе: якщо всі основні sheets дали 0 рядків — не чіпаємо БД
+  const totalFetched = services.length + packages.length + methods.length + materials.length;
+  if (totalFetched === 0) {
+    throw new Error('Всі sheets повернули 0 рядків — синк скасовано для запобігання втраті даних. Перевірте доступ до Google Sheets (можливо, потрібна авторизація).');
+  }
 
   // DELETE всіх таблиць і вставляємо нові (повна заміна — дзеркало Sheet)
   await Promise.all([
