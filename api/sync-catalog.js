@@ -46,12 +46,23 @@ function gsFetch(sheetName) {
       res.on('data', d => chunks.push(d));
       res.on('end', () => {
         try {
+          // Перевіряємо HTTP статус
+          if (res.statusCode !== 200) {
+            reject(new Error(`gviz CSV for "${sheetName}" returned HTTP ${res.statusCode}`));
+            return;
+          }
           const raw = Buffer.concat(chunks).toString('utf8');
-          // Якщо відповідь — HTML (редирект на логін) — падаємо з помилкою
           // Знімаємо BOM (﻿) бо trimStart() його не видаляє
           const rawTrimmed = raw.replace(/^﻿/, '').trimStart();
+          // HTML (редирект на логін)
           if (rawTrimmed.startsWith('<') || rawTrimmed.includes('<!DOCTYPE') || rawTrimmed.includes('<html')) {
             reject(new Error(`gviz CSV for "${sheetName}" returned HTML (auth required?)`));
+            return;
+          }
+          // gviz error format: {"version":"0.6","status":"error",...} або google.visualization.Query.setResponse(...)
+          if (rawTrimmed.startsWith('google.visualization') || rawTrimmed.startsWith('{"version"') ||
+              (rawTrimmed.startsWith('{') && rawTrimmed.includes('"status"'))) {
+            reject(new Error(`gviz CSV for "${sheetName}" returned gviz error: ${rawTrimmed.substring(0, 120)}`));
             return;
           }
           const cleanStr = v => {
