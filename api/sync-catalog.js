@@ -7,45 +7,92 @@ const https = require('https');
 
 const GS_ID = '1xn9CNpcReL0QyC8-bRxQEZ0JyVA2JsNJrx51DMjUL4g';
 
-// ─── gviz fetch ───────────────────────────────────────────────────────────────
+// ─── CSV fetch (UTF-8, no gviz encoding issues) ───────────────────────────────
+function parseCsv(text) {
+  // Split into rows respecting quoted fields
+  const allRows = [];
+  let row = [], field = '', inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c === '"') {
+      if (inQ && text[i + 1] === '"') { field += '"'; i++; }
+      else inQ = !inQ;
+    } else if (c === ',' && !inQ) {
+      row.push(field); field = '';
+    } else if ((c === '\n' || (c === '\r' && text[i + 1] === '\n')) && !inQ) {
+      if (c === '\r') i++;
+      row.push(field); field = '';
+      allRows.push(row); row = [];
+    } else if (c !== '\r') {
+      field += c;
+    }
+  }
+  if (field || row.length) { row.push(field); allRows.push(row); }
+
+  if (allRows.length < 2) return { cols: [], rows: [] };
+
+  const cols = allRows[0]; // row 0 = eng column names
+  // row 1 = Ukrainian descriptions header — skip (same as previous gviz slice(1))
+  const dataRows = allRows.slice(2);
+
+  const cleanStr = v => {
+    if (typeof v !== 'string') return v;
+    return v
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '') // control chars
+      .replace(/­/g, '')   // soft hyphen
+      .replace(/​/g, '')   // zero-width space
+      .replace(/‌/g, '')   // zero-width non-joiner
+      .replace(/‍/g, '')   // zero-width joiner
+      .replace(/﻿/g, '')   // BOM
+      .trim();
+  };
+
+  const rows = dataRows
+    .map(r => {
+      const obj = {};
+      cols.forEach((col, i) => {
+        const raw = r[i] !== undefined ? r[i] : '';
+        obj[col] = raw === '' ? null : cleanStr(raw);
+      });
+      return obj;
+    })
+    .filter(r => Object.values(r).some(v => v !== null));
+
+  return { cols, rows };
+}
+
 function gsFetch(sheetName) {
   return new Promise((resolve, reject) => {
-    const url = `https://docs.google.com/spreadsheets/d/${GS_ID}/gviz/tq?tqx=out:json&headers=1&sheet=${encodeURIComponent(sheetName)}`;
-    https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
-      let data = '';
-      res.on('data', d => data += d);
-      res.on('end', () => {
-        try {
-          const json = JSON.parse(data.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, ''));
-          const cols = json.table.cols.map(c => c.label || c.id);
-          const rows = (json.table.rows || []).slice(1); // рядок 0 = опис колонок укр.
-          const cleanStr = v => {
-            if (typeof v !== 'string') return v;
-            return v
-              .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '') // control chars
-              .replace(/­/g, '')   // soft hyphen
-              .replace(/​/g, '')   // zero-width space
-              .replace(/‌/g, '')   // zero-width non-joiner
-              .replace(/‍/g, '')   // zero-width joiner
-              .replace(/﻿/g, '')   // BOM
-              .replace(/�/g, '')   // replacement character
-              .trim();
-          };
-          const result = rows.map(row => {
-            const obj = {};
-            cols.forEach((col, i) => {
-              const cell = row.c && row.c[i];
-              const val = (cell && cell.v !== null && cell.v !== undefined) ? cell.v : null;
-              obj[col] = typeof val === 'string' ? cleanStr(val) : val;
-            });
-            return obj;
-          }).filter(r => Object.values(r).some(v => v !== null));
-          resolve({ cols, rows: result });
-        } catch (e) {
-          reject(new Error(`Parse error for sheet "${sheetName}": ${e.message}`));
+    const csvUrl = `https://docs.google.com/spreadsheets/d/${GS_ID}/export?format=csv&sheet=${encodeURIComponent(sheetName)}`;
+
+    function doGet(urlStr) {
+      const u = new URL(urlStr);
+      const opts = {
+        hostname: u.hostname,
+        path:     u.pathname + u.search,
+        method:   'GET',
+        headers:  { 'User-Agent': 'Mozilla/5.0' },
+      };
+      https.get(opts, res => {
+        // Follow redirects (Google Drive returns 302 to download URL)
+        if ([301, 302, 307, 308].includes(res.statusCode) && res.headers.location) {
+          res.resume();
+          return doGet(res.headers.location);
         }
-      });
-    }).on('error', reject);
+        const chunks = [];
+        res.on('data', d => chunks.push(d));
+        res.on('end', () => {
+          try {
+            const text = Buffer.concat(chunks).toString('utf8');
+            resolve(parseCsv(text));
+          } catch (e) {
+            reject(new Error(`CSV parse error for "${sheetName}": ${e.message}`));
+          }
+        });
+      }).on('error', reject);
+    }
+
+    doGet(csvUrl);
   });
 }
 
