@@ -5035,19 +5035,7 @@ function crPanelTab(tab, btn) {
 }
 
 function crCreateOrder() {
-  const o = _crAll.find(x=>x.id===_crSelId);
-  if (!o) return;
-  // Переходимо в таб Замовлення і відкриваємо форму нового замовлення з даними клієнта
-  const navBtn = document.getElementById('adm-navbtn-orders');
-  if (navBtn) admSwitch('orders', navBtn);
-  // Даємо час на рендер і відкриваємо нове замовлення
-  setTimeout(() => {
-    if (typeof admNewOrder === 'function') {
-      admNewOrder({ name: o.name, phone: o.phone, crRef: o.id });
-    } else {
-      admSwitch('orders', document.getElementById('adm-navbtn-orders'));
-    }
-  }, 200);
+  window.open('https://laba.zemlerob.com.ua/#services', '_blank');
 }
 
 async function crSetStatus(newStatus) {
