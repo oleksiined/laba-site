@@ -39,8 +39,13 @@ async function nextCallRequestNum(host, key) {
     );
     if (r.status < 300) {
       const rows = JSON.parse(r.body);
-      if (rows && rows.length) {
-        const last = rows[0].order_num; // e.g. "CR260007"
+      // Фільтруємо тільки номери формату CR26XXXX (рівно 8 символів, 4 цифри після префіксу)
+      const validRows = rows.filter(row => {
+        const num = row.order_num || '';
+        return num.startsWith(prefix) && num.length === prefix.length + 4 && /^\d{4}$/.test(num.slice(prefix.length));
+      });
+      if (validRows.length) {
+        const last = validRows[0].order_num; // e.g. "CR260007"
         const seq = parseInt(last.slice(prefix.length), 10);
         if (!isNaN(seq)) return `${prefix}${String(seq + 1).padStart(4, '0')}`;
       }
