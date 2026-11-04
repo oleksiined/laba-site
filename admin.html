@@ -938,8 +938,11 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
                   <option value="Статус замовлення">Статус замовлення</option>
                   <option value="Питання/відповіді">Питання/відповіді</option>
                   <option value="Футер">Футер</option>
-                  <option value="Сайт LABA">Інші</option>
-                  <option value="button">Кнопка передзвонити</option>
+                  <option value="Каталог">Каталог</option>
+                  <option value="Каталог методів">Каталог методів</option>
+                  <option value="Відбір проб">Відбір проб</option>
+                  <option value="Про сервіс">Про сервіс</option>
+                  <option value="Сайт LABA">Сайт LABA</option>
                 </select>
                 <button class="adm-btn adm-btn-ghost" style="gap:5px;font-size:12px">
                   <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M3 5h14M6 10h8M9 15h2" stroke-linecap="round"/></svg>
@@ -2146,7 +2149,7 @@ async function admLoad() {
     const data = ordersResult.status === 'fulfilled' ? ordersResult.value : null;
     if (!data || !data.ok) throw new Error(data?.error || 'fetch failed');
     _admCatalogSvc = data.catalogServices || {};
-    _admOrders = (data.orders || []).map(_mapOrder);
+    _admOrders = (data.orders || []).filter(o => !(o.order_num||'').startsWith('CR')).map(_mapOrder);
   } catch (err) {
     console.warn('admLoad error:', err.message);
     _admOrders = [];
