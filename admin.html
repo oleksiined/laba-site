@@ -2134,10 +2134,11 @@ function _mapOrder(o) {
 
 // Fetch orders from backend and re-init
 async function admLoad() {
-  // Завантажуємо матеріали і замовлення паралельно
-  const [ordersResult, materialsResult] = await Promise.allSettled([
+  // Завантажуємо матеріали, замовлення і заявки паралельно
+  const [ordersResult, materialsResult, crResult] = await Promise.allSettled([
     fetch('https://laba.zemlerob.com.ua/api/orders-list').then(r => r.json()),
     fetch('https://laba.zemlerob.com.ua/api/materials').then(r => r.json()),
+    fetch('https://laba.zemlerob.com.ua/api/orders-list?prefix=CR').then(r => r.json()),
   ]);
 
   // Матеріали з Supabase → будуємо динамічну карту
@@ -2154,9 +2155,27 @@ async function admLoad() {
     console.warn('admLoad error:', err.message);
     _admOrders = [];
   }
+
+  // Оновлюємо бейдж Заявок без повного завантаження таба
+  try {
+    if (crResult.status === 'fulfilled' && crResult.value.ok) {
+      const crOrders = (crResult.value.orders || []).filter(o => (o.order_num||'').startsWith('CR'));
+      _crAll = crOrders.map(_crMapOrder);
+      _crLoaded = true;
+      crUpdateKpi();
+    }
+  } catch (_) {}
+
   _buildSamples();
   _buildClients();
   admInit();
+}
+
+// Автооновлення кожні 30 хвилин
+let _admAutoRefreshTimer = null;
+function _admStartAutoRefresh() {
+  if (_admAutoRefreshTimer) clearInterval(_admAutoRefreshTimer);
+  _admAutoRefreshTimer = setInterval(() => { admLoad(); }, 30 * 60 * 1000);
 }
 
 // Будуємо карту з catalog_materials: name → key та materialId → key
@@ -5133,6 +5152,7 @@ function admDoLogin() {
   sessionStorage.setItem('_admAuth', '1');
   document.getElementById('admLoginScreen').style.display = 'none';
   admLoad();
+  _admStartAutoRefresh();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -5142,6 +5162,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (sessionStorage.getItem('_admAuth') === '1') {
     document.getElementById('admLoginScreen').style.display = 'none';
     admLoad();
+    _admStartAutoRefresh();
   }
 });
 
