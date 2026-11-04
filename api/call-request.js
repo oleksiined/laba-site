@@ -70,7 +70,7 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid JSON' });
   }
 
-  const { name, phone, comment } = body || {};
+  const { name, phone, comment, source } = body || {};
   if (!name || !phone) return res.status(400).json({ error: 'name and phone required' });
 
   const url = process.env.SUPABASE_URL;
@@ -101,7 +101,7 @@ module.exports = async function handler(req, res) {
     promo:      null,
     discount:   0,
     total:      0,
-    notes:      comment ? `📞 Запит дзвінка\nКоментар: ${comment}` : '📞 Запит дзвінка',
+    notes:      `📞 Запит дзвінка\nДжерело: ${source||'Сайт LABA'}${comment ? '\nКоментар: '+comment : ''}`,
   };
 
   try {

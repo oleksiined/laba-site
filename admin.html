@@ -932,9 +932,13 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
                 </select>
                 <select class="adm-filter-sel" id="crFSource" onchange="crRender()">
                   <option value="">Джерело: Всі</option>
-                  <option value="site">Сайт LABA</option>
-                  <option value="form">Форма hero</option>
-                  <option value="services">Сторінка послуг</option>
+                  <option value="Хедер">Хедер</option>
+                  <option value="Меню">Меню</option>
+                  <option value="Обрати дослідження">Обрати дослідження</option>
+                  <option value="Статус замовлення">Статус замовлення</option>
+                  <option value="Питання/відповіді">Питання/відповіді</option>
+                  <option value="Футер">Футер</option>
+                  <option value="Сайт LABA">Інші</option>
                   <option value="button">Кнопка передзвонити</option>
                 </select>
                 <button class="adm-btn adm-btn-ghost" style="gap:5px;font-size:12px">
@@ -950,7 +954,6 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
                       <th>№ ЗАЯВКИ</th>
                       <th>КЛІЄНТ</th>
                       <th>ТЕЛЕФОН</th>
-                      <th>ТЕМА</th>
                       <th>ДЖЕРЕЛО</th>
                       <th>СТАТУС</th>
                       <th>ДАТА</th>
@@ -974,10 +977,9 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           <div class="adm-panel-head">
             <div>
               <div style="font-size:16px;font-weight:700;color:var(--navy)" id="crPanelNum">CB26000000</div>
-              <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+              <div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap">
                 <span class="adm-pill" id="crPanelStatusPill" style="color:var(--amber);background:#FFFBEB">● Нова</span>
-                <span style="font-size:12px;color:var(--text-soft)">|</span>
-                <a href="https://laba.zemlerob.com.ua" target="_blank" style="font-size:12px;color:var(--text-soft);text-decoration:none">Сайт LABA ↗</a>
+                <span id="crPanelQuickBadge" style="display:none;font-size:10.5px;font-weight:700;color:#7C3AED;background:#F5F3FF;border-radius:6px;padding:2px 7px;border:1px solid #DDD6FE">⚡ Швидке замовлення</span>
               </div>
             </div>
             <button class="adm-panel-x" onclick="crClosePanel()">✕</button>
@@ -994,19 +996,9 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
               <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 12px;line-height:1.6">
                 <span style="color:var(--text-soft)">Клієнт:</span><span id="crPIClient" style="font-weight:600;color:var(--navy)">—</span>
                 <span style="color:var(--text-soft)">Телефон:</span><span id="crPIPhone">—</span>
-                <span style="color:var(--text-soft)">Email:</span><span id="crPIEmail">—</span>
                 <span style="color:var(--text-soft)">Джерело:</span><span id="crPISource">—</span>
-                <span style="color:var(--text-soft)">Сторінка:</span><span id="crPIPage">—</span>
                 <span style="color:var(--text-soft)">Дата створення:</span><span id="crPIDate">—</span>
-                <span style="color:var(--text-soft)">Зручний час для дзвінка:</span><span id="crPITime" style="color:var(--navy);font-weight:500">—</span>
               </div>
-            </div>
-            <div class="adm-panel-sec">
-              <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" width="15" height="15"><path d="M4 4h12a1 1 0 011 1v8a1 1 0 01-1 1H7l-4 3V5a1 1 0 011-1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <div style="font-size:12px;font-weight:700;color:var(--navy)">Тема звернення</div>
-              </div>
-              <div id="crPITopic" style="font-size:12.5px;color:var(--text-mid)">—</div>
             </div>
             <div class="adm-panel-sec">
               <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px">
@@ -1047,10 +1039,10 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           <!-- Action buttons -->
           <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;flex-shrink:0">
             <div style="display:flex;gap:8px">
-              <a id="crBtnCall" href="#" class="adm-btn adm-btn-ghost" style="flex:1;justify-content:center;text-decoration:none" onclick="crCallAction(event)">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="14" height="14"><path d="M3 4a1 1 0 011-1h2.5l1.2 3-1.4 1.4a10.5 10.5 0 004.3 4.3l1.4-1.4 3 1.2V14a1 1 0 01-1 1A13 13 0 013 4z" stroke-linejoin="round"/></svg>
-                Зателефонувати
-              </a>
+              <button class="adm-btn adm-btn-primary" style="flex:1;justify-content:center" onclick="crCreateOrder()">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="14" height="14"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>
+                Створити замовлення
+              </button>
               <button class="adm-btn" style="flex:1;background:#EFF6FF;color:#1D4ED8;border:none" onclick="crSetStatus('work')">
                 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="14" height="14"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>
                 Позначити у роботі
@@ -4871,51 +4863,41 @@ const _crSStyle = {
   done:   'color:#16A34A;background:#F0FDF4',
 };
 
-// Розпізнаємо тему і джерело з notes
+// Розпізнаємо джерело і коментар з notes
 function _crParseTopic(notes) {
-  if (!notes) return { topic: '—', source: '—', comment: '' };
+  if (!notes) return { source: '—', comment: '' };
   const lines = notes.split('\n');
-  let topic = '📞 Запит дзвінка';
+  let topic = '';
   let comment = '';
   let source = 'Сайт LABA';
   for (const l of lines) {
-    if (l.startsWith('Тема:')) { topic = l.replace('Тема:', '').trim(); }
-    else if (l.startsWith('Коментар:')) { comment = l.replace('Коментар:', '').trim(); }
+    if (l.startsWith('Коментар:')) { comment = l.replace('Коментар:', '').trim(); }
     else if (l.startsWith('Джерело:')) { source = l.replace('Джерело:', '').trim(); }
-    else if (l.startsWith('Сторінка:')) { /* skip */ }
   }
-  if (topic === '📞 Запит дзвінка') topic = 'Хочу замовити аналіз ґрунту';
-  return { topic, source, comment };
+  return { source, comment };
 }
 
 function _crMapOrder(o) {
   const dt  = new Date(o.created_at || Date.now());
   const pad = n => String(n).padStart(2,'0');
   const date = `${pad(dt.getDate())}.${pad(dt.getMonth()+1)}.${dt.getFullYear()} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
-  const { topic, source, comment } = _crParseTopic(o.notes);
-  // manager and call_time from notes
-  let manager = '', callTime = '', pageRef = '/services/laboratory', attempts = 0, internalNote = '';
+  const { source, comment } = _crParseTopic(o.notes);
+  let manager = '', attempts = 0, internalNote = '';
   const lines = (o.notes||'').split('\n');
   for (const l of lines) {
-    if (l.startsWith('Менеджер:'))      manager  = l.replace('Менеджер:','').trim();
-    if (l.startsWith('Час дзвінка:'))   callTime = l.replace('Час дзвінка:','').trim();
-    if (l.startsWith('Сторінка:'))      pageRef  = l.replace('Сторінка:','').trim();
-    if (l.startsWith('Спроби:'))        attempts = parseInt(l.replace('Спроби:','').trim())||0;
-    if (l.startsWith('Примітка:'))      internalNote = l.replace('Примітка:','').trim();
+    if (l.startsWith('Менеджер:'))  manager      = l.replace('Менеджер:','').trim();
+    if (l.startsWith('Спроби:'))    attempts     = parseInt(l.replace('Спроби:','').trim())||0;
+    if (l.startsWith('Примітка:'))  internalNote = l.replace('Примітка:','').trim();
   }
   return {
     id: o.order_num,
     dbId: o.id,
     name: o.name || '—',
     phone: o.phone || '—',
-    email: o.email || '—',
     status: o.status || 'new',
-    topic,
     source,
     comment,
     manager,
-    callTime,
-    pageRef,
     attempts,
     internalNote,
     date,
@@ -4926,7 +4908,7 @@ function _crMapOrder(o) {
 
 async function crLoad() {
   const body = document.getElementById('crBody');
-  if (body) body.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:36px;color:var(--text-soft);font-size:13px">Завантаження...</td></tr>';
+  if (body) body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:36px;color:var(--text-soft);font-size:13px">Завантаження...</td></tr>';
   try {
     const r = await fetch('https://laba.zemlerob.com.ua/api/orders-list?prefix=CR');
     const data = await r.json();
@@ -4962,10 +4944,12 @@ function crUpdateKpi() {
 
 function _crFiltered() {
   let list = [..._crAll];
-  const q  = (document.getElementById('crSearch')?.value||'').trim().toLowerCase();
-  const fs = document.getElementById('crFStatus')?.value||'';
-  if (q)  list = list.filter(o => o.id.toLowerCase().includes(q) || o.name.toLowerCase().includes(q) || o.phone.includes(q));
-  if (fs) list = list.filter(o => o.status === fs);
+  const q   = (document.getElementById('crSearch')?.value||'').trim().toLowerCase();
+  const fs  = document.getElementById('crFStatus')?.value||'';
+  const fsr = document.getElementById('crFSource')?.value||'';
+  if (q)   list = list.filter(o => o.id.toLowerCase().includes(q) || o.name.toLowerCase().includes(q) || o.phone.includes(q));
+  if (fs)  list = list.filter(o => o.status === fs);
+  if (fsr) list = list.filter(o => o.source === fsr);
   if (_crFilter) list = list.filter(o => o.status === _crFilter);
   list.sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
   return list;
@@ -4976,7 +4960,7 @@ function crRender() {
   const body = document.getElementById('crBody');
   if (!body) return;
   if (!list.length) {
-    body.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:36px;color:var(--text-soft);font-size:13px">Заявок не знайдено</td></tr>';
+    body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:36px;color:var(--text-soft);font-size:13px">Заявок не знайдено</td></tr>';
   } else {
     body.innerHTML = list.map(o => {
       const ss = _crSStyle[o.status] || '';
@@ -4985,7 +4969,6 @@ function crRender() {
         <td><div class="adm-order-num">${o.id}</div><div class="adm-order-date-sm">${o.date.slice(0,10)}</div></td>
         <td><div class="adm-client-nm">${o.name}</div></td>
         <td style="color:var(--text-mid);font-weight:500;white-space:nowrap">${o.phone}</td>
-        <td style="color:var(--text-mid);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.topic}</td>
         <td style="color:var(--text-soft);font-size:12px">${o.source}</td>
         <td><span class="adm-pill" style="${ss}">${_crSL[o.status]||o.status}</span></td>
         <td style="color:var(--text-soft);font-size:11.5px;white-space:nowrap">${o.date}</td>
@@ -5011,20 +4994,16 @@ function crSelect(id) {
   if (sspill) { sspill.textContent = _crSL[o.status]||o.status; sspill.style.cssText = _crSStyle[o.status]||''; }
   set('crPIClient', o.name);
   set('crPIPhone', o.phone);
-  set('crPIEmail', o.email === '—' ? '—' : o.email);
   set('crPISource', o.source);
-  set('crPIPage', o.pageRef||'/services/laboratory');
   set('crPIDate', o.date);
-  set('crPITime', o.callTime||'—');
-  set('crPITopic', o.topic);
   set('crPIComment', o.comment||'—');
   setv('crPIManager', o.manager);
   setv('crPIStatus', o.status);
   setv('crPINote', o.internalNote);
   set('crPIAttempts', String(o.attempts));
-  // Phone link
-  const callBtn = document.getElementById('crBtnCall');
-  if (callBtn) callBtn.href = `tel:${o.phone.replace(/\s/g,'')}`;
+  // Швидке замовлення badge
+  const qBadge = document.getElementById('crPanelQuickBadge');
+  if (qBadge) qBadge.style.display = o.source === 'Обрати дослідження' ? 'inline-flex' : 'none';
   // History
   const hl = document.getElementById('crHistoryList');
   if (hl) hl.innerHTML = `<div style="color:var(--text-soft);font-size:12px;padding:16px 0">Заявка створена: ${o.date}</div>`;
@@ -5052,13 +5031,20 @@ function crPanelTab(tab, btn) {
   document.getElementById('crPanelHistory').style.display = tab==='history' ? 'block' : 'none';
 }
 
-function crCallAction(e) {
+function crCreateOrder() {
   const o = _crAll.find(x=>x.id===_crSelId);
   if (!o) return;
-  // Auto-increment attempts
-  o.attempts++;
-  document.getElementById('crPIAttempts').textContent = o.attempts;
-  if (o.status === 'new') crSetStatus('work');
+  // Переходимо в таб Замовлення і відкриваємо форму нового замовлення з даними клієнта
+  const navBtn = document.getElementById('adm-navbtn-orders');
+  if (navBtn) admSwitch('orders', navBtn);
+  // Даємо час на рендер і відкриваємо нове замовлення
+  setTimeout(() => {
+    if (typeof admNewOrder === 'function') {
+      admNewOrder({ name: o.name, phone: o.phone, crRef: o.id });
+    } else {
+      admSwitch('orders', document.getElementById('adm-navbtn-orders'));
+    }
+  }, 200);
 }
 
 async function crSetStatus(newStatus) {
