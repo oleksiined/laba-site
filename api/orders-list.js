@@ -50,9 +50,15 @@ module.exports = async function handler(req, res) {
   const host = new URL(url).hostname;
 
   try {
+    // Optional prefix filter: ?prefix=CR returns only call requests
+    const prefixFilter = req.query?.prefix || (typeof req.url === 'string' && new URL('https://x' + req.url).searchParams.get('prefix')) || '';
+    const ordersPath = prefixFilter
+      ? `/rest/v1/orders?order_num=like.${encodeURIComponent(prefixFilter + '%')}&order=created_at.desc&limit=500`
+      : '/rest/v1/orders?order=created_at.desc&limit=200';
+
     // Fetch orders, invoice documents, act documents, and catalog in parallel
     const [ordersResult, docsResult, actDocsResult, svcResult, pkgResult, pkgItemsResult] = await Promise.allSettled([
-      httpsReq(host, '/rest/v1/orders?order=created_at.desc&limit=200', key),
+      httpsReq(host, ordersPath, key),
       httpsReq(host, '/rest/v1/documents?document_type=eq.invoice&status=eq.published&select=order_id,storage_bucket,storage_path,file_name', key),
       httpsReq(host, '/rest/v1/documents?document_type=eq.act&status=eq.published&select=order_id,storage_bucket,storage_path,file_name', key),
       httpsReq(host, '/rest/v1/catalog_services?select=service_id,service_code,name,price', key),

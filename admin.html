@@ -4931,7 +4931,7 @@ async function crLoad() {
     const r = await fetch('https://laba.zemlerob.com.ua/api/orders-list?prefix=CR');
     const data = await r.json();
     if (!data.ok) throw new Error(data.error || 'fetch failed');
-    _crAll = (data.orders || []).map(_crMapOrder);
+    _crAll = (data.orders || []).filter(o => (o.order_num||'').startsWith('CR')).map(_crMapOrder);
     _crLoaded = true;
   } catch(e) {
     // Fallback: load all orders, filter CR prefix
