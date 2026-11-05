@@ -1115,7 +1115,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 
 
 /* ══ SERVICE ROW — матеріал-бейдж, терміни, лічильник ══ */
-.srv-material-badge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;color:#555;background:#f2f2f2;border:1.5px solid #d4d4d4;border-radius:6px;padding:4px 10px;margin-bottom:0;cursor:default}
+.srv-material-badge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;color:#555;background:#f2f2f2;border:1.5px solid #d4d4d4;border-radius:6px;padding:4px 10px;margin-bottom:0;cursor:default;white-space:nowrap;flex-shrink:0}
 .srv-material-badge svg{display:none}
 .srv-meta-row{display:flex;align-items:center;gap:14px;margin:8px 0 4px;flex-wrap:wrap}
 .srv-meta-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-mid)}
@@ -1922,9 +1922,10 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
   .navbar-inner{padding:0 12px;gap:4px}
   .nav-logo{margin-right:12px}
   .nav-logo svg,.nav-logo img{height:34px!important}
-  /* service card: price top-right (next to title), buttons bottom-right */
-  .srv-collapsed-row{grid-template-columns:1fr auto;align-items:start}
-  .srv-right-col{flex-direction:column-reverse;align-items:flex-end;justify-content:space-between;align-self:stretch;gap:6px;padding:2px 0}
+  /* service card: text full-width top, counter+price at bottom */
+  .srv-collapsed-row{display:flex;flex-direction:column;align-items:stretch;gap:0}
+  .srv-right-col{flex-direction:row;align-items:center;justify-content:space-between;align-self:stretch;gap:8px;padding:8px 0 2px;width:100%}
+  .srv-right-btns{flex-direction:row;align-items:center;gap:6px}
   .srv-right-price-main{font-size:18px}
 }
 
@@ -2632,13 +2633,15 @@ main{flex:1}
   .srv-mascot-block{display:none!important}
   .services-content{padding:0 16px}
 
-  /* Service cards — price top-right (next to title), buttons bottom-right, text wraps */
-  .srv-collapsed-row{grid-template-columns:1fr auto!important;align-items:start!important;gap:8px!important}
-  .srv-collapsed-left{overflow:visible!important}
+  /* Service cards mobile: text full-width top, counter+price row at bottom */
+  .srv-collapsed-row{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:0!important}
+  .srv-collapsed-left{width:100%!important;min-width:0!important;overflow:visible!important}
   .srv-collapsed-left .service-name{white-space:normal!important;overflow:visible!important;text-overflow:unset!important;font-size:15px!important}
   .srv-collapsed-left .service-short{white-space:normal!important;overflow:visible!important}
   .service-code{white-space:nowrap!important}
-  .srv-right-col{flex-direction:column-reverse!important;align-items:flex-end!important;justify-content:space-between!important;align-self:stretch!important;gap:6px!important;padding:2px 0!important}
+  .srv-right-col{flex-direction:row!important;align-items:center!important;justify-content:space-between!important;align-self:stretch!important;gap:8px!important;padding:8px 0 2px!important;width:100%!important}
+  .srv-right-btns{flex-direction:row!important;align-items:center!important;gap:6px!important}
+  .srv-right-price{text-align:right!important}
   .srv-right-price-main{font-size:16px!important}
 
   /* Order success modal — stack vertically */
@@ -2661,9 +2664,9 @@ main{flex:1}
 
   /* Cart page — mobile */
   .cart-grid{grid-template-columns:1fr!important;gap:16px}
-  .gc-inner{grid-template-columns:1fr!important}
-  .gc-left{border-right:none!important;border-bottom:1px solid var(--bd);padding:16px!important}
-  .gc-right{padding:16px!important}
+  .gc-inner{display:grid!important;grid-template-columns:1fr!important}
+  .gc-left{border-right:none!important;border-bottom:1px solid var(--bd)!important;padding:16px!important}
+  .gc-right{padding:16px!important;width:100%!important}
   .gc-name{font-size:15px}
 
   /* CTA banner image */
@@ -3569,7 +3572,7 @@ main{flex:1}
 
 
 <!-- FLOATING CART BUTTON -->
-<button id="floatingCartBtn" onclick="openCart()" title="Перейти до кошику" style="display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:1200;background:#fff;color:#1a2232;border:none;border-radius:50px;padding:12px 20px 12px 14px;font-size:15px;font-weight:700;cursor:pointer;align-items:center;gap:10px;box-shadow:0 4px 24px rgba(0,0,0,.22);font-family:'Manrope',sans-serif;white-space:nowrap;transition:opacity .2s">
+<button id="floatingCartBtn" onclick="navigate('checkout')" title="Перейти до кошику" style="display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:1200;background:#1a2232;color:#fff;border:none;border-radius:50px;padding:12px 20px 12px 14px;font-size:15px;font-weight:700;cursor:pointer;align-items:center;gap:10px;box-shadow:0 4px 24px rgba(0,0,0,.28);font-family:'Manrope',sans-serif;white-space:nowrap;transition:opacity .2s">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/><circle cx="10" cy="20.5" r="1.5"/><circle cx="18" cy="20.5" r="1.5"/></svg>
   Перейти до кошику
   <span id="floatingCartCount" style="background:#C4FF4D;color:#242729;border-radius:12px;padding:2px 8px;font-size:13px;font-weight:800;"></span>
@@ -6617,6 +6620,8 @@ function clickCartIcon(safeCode, event){
   if(delBtn) delBtn.style.display='';
   const cdelBtn=document.getElementById('cdel-'+safeCode); if(cdelBtn) cdelBtn.style.display='';
   syncCollapsedQty(safeCode);
+  // Переходимо одразу до кошику
+  navigate('checkout');
 }
 
 function syncCollapsedQty(safeCode){
@@ -7448,6 +7453,8 @@ function confirmAddInd(){
   const safeCode = ind.code.replace(/[^a-zA-Z0-9-]/g,'');
   const totalQty = selSamples.length + (addIndNewSample?1:0);
   if(totalQty>0) showIndCounter(safeCode, totalQty);
+  // Переходимо одразу до кошику
+  navigate('checkout');
 }
 
 // ═══════════════════════════════════════════════
