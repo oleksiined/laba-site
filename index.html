@@ -1918,9 +1918,12 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
   .about-hero-robots img.rob-sm{display:none}
   .about-hero-robots img.rob-md{height:90%}
   .about-hero-robots img.rob-lg{height:100%;margin:0}
-  /* service card: buttons top-right, price bottom-right */
+  /* navbar: reduce padding so cart icon is not clipped */
+  .navbar-inner{padding:0 12px;gap:4px}
+  .nav-logo{margin-right:12px}
+  /* service card: price top-right (next to title), buttons bottom-right */
   .srv-collapsed-row{grid-template-columns:1fr auto;align-items:start}
-  .srv-right-col{flex-direction:column;align-items:flex-end;justify-content:space-between;align-self:stretch;gap:6px;padding:2px 0}
+  .srv-right-col{flex-direction:column-reverse;align-items:flex-end;justify-content:space-between;align-self:stretch;gap:6px;padding:2px 0}
   .srv-right-price-main{font-size:18px}
 }
 
