@@ -2659,6 +2659,12 @@ main{flex:1}
   .checkout-page{padding:16px 12px 28px}
   .checkout-title{font-size:22px}
 
+  /* Cart page — mobile */
+  .cart-grid{grid-template-columns:1fr!important;gap:16px}
+  .gc-inner{grid-template-columns:1fr!important}
+  .gc-left{border-right:none!important;border-bottom:1px solid var(--bd);padding:16px!important}
+  .gc-right{padding:16px!important}
+  .gc-name{font-size:15px}
 
   /* CTA banner image */
   .cta-banner-img{height:auto!important;aspect-ratio:unset!important}
@@ -5990,10 +5996,11 @@ function navigate(page) {
     if (typeof NC_S !== 'undefined' && _ck !== NC_S._lastCartKey) { buildNCFromCart(); NC_S._lastCartKey = _ck; nc_maxStep = 1; }
     if (typeof nc_render === 'function') nc_render();
     if (typeof nc_setMaxStep === 'function') nc_setMaxStep(1);
-    try { history.pushState({page},'','#checkout'); } catch(e){} window.scrollTo(0,0); return;
+    try { history.pushState({page},'','#checkout'); } catch(e){} window.scrollTo(0,0); updateCartUI(); return;
   }
   try { history.pushState({page}, '', '#' + page); } catch(e){}
   window.scrollTo(0,0);
+  updateCartUI();
 }
 
 function goStep(step) {
@@ -6075,6 +6082,7 @@ function openCart(){
   document.getElementById('cartOverlay')?.classList.add('open');
   document.getElementById('cartDrawer')?.classList.add('open');
   document.body.style.overflow='hidden';
+  updateCartUI();
   // Render cart items in drawer
   const body=document.getElementById('cartBody');
   if(!body)return;
@@ -6112,6 +6120,7 @@ function closeCart(){
   document.getElementById('cartOverlay')?.classList.remove('open');
   document.getElementById('cartDrawer')?.classList.remove('open');
   document.body.style.overflow='';
+  updateCartUI();
 }
 
 function _cartDrawerRefreshItem(idx) {
@@ -6185,7 +6194,10 @@ function updateCartUI(){
   // floating go-to-cart button
   const fcb = document.getElementById('floatingCartBtn');
   if(fcb){
-    fcb.style.display = count > 0 ? 'flex' : 'none';
+    const checkoutPages = ['page-checkout','page-samples','page-checkout-ext','page-nc-confirm','page-payment','page-confirm'];
+    const onCheckout = checkoutPages.some(id => document.getElementById(id)?.classList.contains('active'));
+    const cartDrawerOpen = document.getElementById('cartDrawer')?.classList.contains('open');
+    fcb.style.display = (count > 0 && !onCheckout && !cartDrawerOpen) ? 'flex' : 'none';
     const fcbCount = document.getElementById('floatingCartCount');
     if(fcbCount) fcbCount.textContent = count;
   }
