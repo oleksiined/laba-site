@@ -1927,12 +1927,12 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
   .srv-right-col{flex-direction:row-reverse;align-items:center;justify-content:flex-start;align-self:stretch;gap:8px;padding:8px 0 2px;width:100%}
   .srv-right-btns{flex-direction:row;align-items:center;gap:6px}
   .srv-right-price-main{font-size:18px}
-  /* PKG 3-col mobile: [meta] [counter] [price+btns] */
+  /* PKG mobile: name/desc → meta row → price+btns row */
   .srv-collapsed-row--pkg{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;align-items:flex-start!important}
   .srv-collapsed-row--pkg .srv-collapsed-left{display:contents!important}
-  .srv-top-info{order:1!important;flex:0 0 100%!important;padding-bottom:4px}
-  .srv-collapsed-row--pkg .srv-meta-row{order:2!important;flex:0 0 auto!important;flex-direction:column!important;gap:3px!important;align-items:flex-start!important;margin:0!important;align-self:center!important}
-  .srv-collapsed-row--pkg .srv-right-col{order:2!important;flex:1!important;justify-content:flex-end!important;align-items:center!important;padding:0!important;width:auto!important}
+  .srv-top-info{order:1!important;flex:0 0 100%!important;padding-bottom:2px}
+  .srv-collapsed-row--pkg .srv-meta-row{order:2!important;flex:0 0 100%!important;flex-direction:row!important;gap:12px!important;align-items:center!important;margin:0 0 4px!important}
+  .srv-collapsed-row--pkg .srv-right-col{order:3!important;flex:0 0 100%!important;justify-content:flex-end!important;align-items:center!important;padding:0!important;width:auto!important}
 }
 
 </style>
@@ -2648,12 +2648,12 @@ main{flex:1}
   .srv-right-col{flex-direction:row-reverse!important;align-items:center!important;justify-content:flex-start!important;align-self:stretch!important;gap:8px!important;padding:8px 0 2px!important;width:100%!important}
   .srv-right-btns{flex-direction:row!important;align-items:center!important;gap:6px!important}
   .srv-right-price{text-align:right!important}
-  /* PKG 3-col mobile override */
+  /* PKG mobile: name/desc → meta row → price+btns row */
   .srv-collapsed-row--pkg{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;align-items:flex-start!important}
   .srv-collapsed-row--pkg .srv-collapsed-left{display:contents!important;width:auto!important}
-  .srv-top-info{order:1!important;flex:0 0 100%!important}
-  .srv-collapsed-row--pkg .srv-meta-row{order:2!important;flex:0 0 auto!important;flex-direction:column!important;gap:3px!important;align-items:flex-start!important;margin:0!important;align-self:center!important}
-  .srv-collapsed-row--pkg .srv-right-col{order:2!important;flex:1!important;justify-content:flex-end!important;align-items:center!important;padding:0!important;width:auto!important}
+  .srv-top-info{order:1!important;flex:0 0 100%!important;padding-bottom:2px}
+  .srv-collapsed-row--pkg .srv-meta-row{order:2!important;flex:0 0 100%!important;flex-direction:row!important;gap:12px!important;align-items:center!important;margin:0 0 4px!important}
+  .srv-collapsed-row--pkg .srv-right-col{order:3!important;flex:0 0 100%!important;justify-content:flex-end!important;align-items:center!important;padding:0!important;width:auto!important}
   .srv-right-price-main{font-size:16px!important}
 
   /* Order success modal — stack vertically */
