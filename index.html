@@ -1947,20 +1947,23 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
   --bd:#DDE1E4;--bd2:#c8cdd1;--red:#ef4444;--red-lt:#fef2f2;
   --green:#059669;--green-lt:#d1fae5;--r:12px;--r-sm:8px;--r-xs:6px;
 }
-.nc-stepbar{background:var(--bg);padding:16px 0;position:sticky;top:0;z-index:50}#page-nc-confirm .nc-stepbar{display:none!important}
-.nc-stepbar-in{max-width:1240px;margin:0 auto;padding:0 24px;display:flex;align-items:center}
-.nc-step{display:flex;align-items:center;gap:9px;flex-shrink:0;cursor:default;user-select:none}
-.nc-step-circ{width:30px;height:30px;border-radius:50%;border:2px solid var(--bd2);background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--t3);transition:all .2s;flex-shrink:0}
+.nc-stepbar{background:var(--bg);padding:12px 0;position:sticky;top:0;z-index:50;border-bottom:1px solid var(--bd)}#page-nc-confirm .nc-stepbar{display:none!important}
+.nc-stepbar-in{max-width:1240px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+.nc-step{display:flex;align-items:center;gap:10px;flex-shrink:0;cursor:default;user-select:none}
+.nc-step:not(.nc-active){display:none}
+.nc-step-circ{width:32px;height:32px;border-radius:50%;border:2px solid var(--bd2);background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--t3);transition:all .2s;flex-shrink:0}
 .nc-active .nc-step-circ{background:var(--neon);border-color:var(--neon);color:#242729}
 .nc-done .nc-step-circ{background:var(--neon);border-color:var(--neon);color:#242729}
-.nc-step-lbl{font-size:14px;font-weight:500;color:var(--t3)}
-.nc-active .nc-step-lbl{color:var(--t1);font-weight:600}
+.nc-step-lbl{font-size:15px;font-weight:500;color:var(--t3)}
+.nc-active .nc-step-lbl{color:var(--t1);font-weight:700;font-size:16px}
 .nc-step.nc-clickable{cursor:pointer}
 .nc-step.nc-clickable:hover .nc-step-lbl{color:var(--t1)}
 .nc-step.nc-clickable:hover .nc-step-circ{border-color:var(--t2)}
 .nc-step.nc-locked{opacity:.35;cursor:not-allowed}
-.nc-step-line{flex:1;height:1px;background:var(--bd);margin:0 12px;min-width:32px}
-.nc-done-line{background:var(--bd)}
+.nc-step-line{display:none}
+.nc-done-line{display:none}
+.nc-next-btn{background:var(--neon);color:#242729;border:none;border-radius:50px;padding:9px 20px 9px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:background .15s;white-space:nowrap}
+.nc-next-btn:hover{background:#b8ef3a}
 /* font override removed — use site-wide Manrope */
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -2165,7 +2168,7 @@ main{flex:1}
 .cart-empty{display:flex;align-items:center;justify-content:center;gap:48px;padding:60px 0 80px;min-height:420px;width:100%}
 .cart-empty-robot{flex:0 0 auto;width:300px;display:flex;align-items:center;justify-content:center}
 .cart-empty-text{flex:0 0 auto;max-width:380px}
-@media(max-width:700px){.cart-empty{flex-direction:column;gap:24px;padding:40px 20px 60px;min-height:auto;text-align:center}.cart-empty-robot{width:200px}.cart-empty-title{font-size:26px}.cart-empty-sub{font-size:15px}}
+@media(max-width:700px){.cart-empty{flex-direction:column;gap:16px;padding:24px 20px 40px;min-height:auto;text-align:center}.cart-empty-robot{width:150px}.cart-empty-title{font-size:24px}.cart-empty-sub{font-size:14px}}
 .cart-empty-title{font-size:36px;font-weight:800;color:var(--navy);line-height:1.15;margin-bottom:14px}
 .cart-empty-sub{font-size:16px;color:var(--t2);line-height:1.55;margin-bottom:28px}
 .cart-empty-btn{display:inline-flex;align-items:center;gap:8px;background:var(--neon);color:#242729;font-size:16px;font-weight:700;padding:16px 30px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;transition:background .15s;text-decoration:none;margin-bottom:18px}
@@ -2632,7 +2635,7 @@ main{flex:1}
   .srv-filter-title{font-size:13px!important;margin-bottom:6px!important}
   .mat-grid{display:grid!important;grid-template-columns:repeat(3,1fr)!important;overflow-x:unset!important;flex-wrap:unset!important;flex-direction:unset!important;gap:8px!important;padding-bottom:0!important}
   .mat-btn{flex-shrink:unset!important;width:100%!important;min-width:0!important;min-height:70px!important;font-size:11px!important;padding:8px 6px!important}
-  .mat-btn.other-material{grid-column:unset!important;flex-direction:column!important;width:100%!important}
+  .mat-btn.other-material{display:none!important}
   .mat-btn svg,.mat-btn i,.mat-btn img{width:28px!important;height:28px!important}
   /* Format pills */
   .srv-format-pills{flex-wrap:wrap;gap:6px}
@@ -2675,11 +2678,10 @@ main{flex:1}
   .checkout-page{padding:16px 12px 28px}
   .checkout-title{font-size:22px}
 
-  /* Stepbar — mobile: hide inactive labels, shrink lines */
-  .nc-stepbar-in{padding:0 12px!important}
-  .nc-step:not(.nc-active) .nc-step-lbl{display:none!important}
-  .nc-step-line{min-width:10px!important;margin:0 6px!important}
-  .nc-step-circ{width:26px!important;height:26px!important;font-size:12px!important}
+  /* Stepbar — mobile padding */
+  .nc-stepbar-in{padding:0 14px!important}
+  .nc-active .nc-step-lbl{font-size:14px!important}
+  .nc-next-btn{font-size:13px!important;padding:8px 14px 8px 12px!important}
 
   /* Container — less padding on mobile */
   .container{padding:16px 16px 32px!important}
@@ -3555,12 +3557,10 @@ main{flex:1}
   <div class="nc-stepbar">
     <div class="nc-stepbar-in">
       <div class="nc-step nc-active" onclick="nc_stepClick(1)"><div class="nc-step-circ">1</div><span class="nc-step-lbl">Кошик</span></div>
-      <div class="nc-step-line"></div>
       <div class="nc-step" onclick="nc_stepClick(2)"><div class="nc-step-circ">2</div><span class="nc-step-lbl">Налаштування зразків</span></div>
-      <div class="nc-step-line"></div>
       <div class="nc-step" onclick="nc_stepClick(3)"><div class="nc-step-circ">3</div><span class="nc-step-lbl">Оформлення</span></div>
-      <div class="nc-step-line"></div>
       <div class="nc-step" onclick="nc_stepClick(4)"><div class="nc-step-circ">4</div><span class="nc-step-lbl">Підтвердження</span></div>
+      <button class="nc-next-btn" onclick="nc_goToSamples()">Далі →</button>
     </div>
   </div>
 <main>
@@ -3790,12 +3790,10 @@ main{flex:1}
   <div class="nc-stepbar">
     <div class="nc-stepbar-in">
       <div class="nc-step nc-done" onclick="nc_stepClick(1)"><div class="nc-step-circ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#242729" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="nc-step-lbl">Кошик</span></div>
-      <div class="nc-step-line nc-done-line"></div>
       <div class="nc-step nc-active" onclick="nc_stepClick(2)"><div class="nc-step-circ">2</div><span class="nc-step-lbl">Налаштування зразків</span></div>
-      <div class="nc-step-line"></div>
       <div class="nc-step" onclick="nc_stepClick(3)"><div class="nc-step-circ">3</div><span class="nc-step-lbl">Оформлення</span></div>
-      <div class="nc-step-line"></div>
       <div class="nc-step" onclick="nc_stepClick(4)"><div class="nc-step-circ">4</div><span class="nc-step-lbl">Підтвердження</span></div>
+      <button class="nc-next-btn" onclick="nc_goToCheckoutExt()">Далі →</button>
     </div>
   </div>
 <main>
@@ -3840,12 +3838,10 @@ main{flex:1}
   <div class="nc-stepbar">
     <div class="nc-stepbar-in">
       <div class="nc-step nc-done" onclick="nc_stepClick(1)"><div class="nc-step-circ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#242729" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="nc-step-lbl">Кошик</span></div>
-      <div class="nc-step-line nc-done-line"></div>
       <div class="nc-step nc-done" onclick="nc_stepClick(2)"><div class="nc-step-circ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#242729" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="nc-step-lbl">Налаштування зразків</span></div>
-      <div class="nc-step-line nc-done-line"></div>
       <div class="nc-step nc-active" onclick="nc_stepClick(3)"><div class="nc-step-circ">3</div><span class="nc-step-lbl">Оформлення</span></div>
-      <div class="nc-step-line"></div>
       <div class="nc-step" onclick="nc_stepClick(4)"><div class="nc-step-circ">4</div><span class="nc-step-lbl">Підтвердження</span></div>
+      <button class="nc-next-btn" onclick="submitOrder()">Далі →</button>
     </div>
   </div>
 <main>
