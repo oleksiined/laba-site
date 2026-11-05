@@ -2721,6 +2721,10 @@ main{flex:1}
   .sample-card{min-width:0;max-width:100%;overflow:hidden;box-sizing:border-box!important}
   .form-card{min-width:0;max-width:100%;overflow:hidden;box-sizing:border-box!important;padding:16px!important}
   .field-grid-2,.field-grid-2-3{grid-template-columns:1fr!important}
+  /* Payment options — stack vertically on mobile */
+  .radio-card-row{grid-template-columns:1fr!important}
+  /* Hide "back to samples" link on mobile (stepbar back btn handles it) */
+  #nco-back-link{display:none!important}
 
   /* Sample card header — mobile grid redesign */
   /* Row 1: [Зразок N] [input поле_______________]  */
@@ -3904,7 +3908,7 @@ main{flex:1}
         <h1 class="page-title">Оформлення замовлення</h1>
         <div style="display:flex;justify-content:space-between;align-items:center">
           <p class="page-sub" style="margin:0">Заповніть контактні дані та реквізити для формування рахунку</p>
-          <button onclick="nco_goBack()" style="display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;font-size:13px;color:var(--t3);white-space:nowrap;flex-shrink:0;padding:0">
+          <button id="nco-back-link" onclick="nco_goBack()" style="display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;font-size:13px;color:var(--t3);white-space:nowrap;flex-shrink:0;padding:0">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             Повернутись до налаштування зразків
           </button>
@@ -11705,7 +11709,7 @@ function ncf_show() {
   document.getElementById('ncf-order-num').textContent = '№ ' + (o.num || 'LAB-000000-0000');
   document.getElementById('ncf-email').textContent = o.email || '—';
   document.getElementById('ncf-invoice-hint').textContent =
-    `Рахунок № від ${o.date || '—'} на суму ${nco_fmtPrice ? nco_fmtPrice(o.total||0) : (o.total||0) + ' грн'}`;
+    `Рахунок № ${o.num || '—'} від ${o.date || '—'} на суму ${nco_fmtPrice ? nco_fmtPrice(o.total||0) : (o.total||0) + ' грн'}`;
   ncf_renderSidebar();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-nc-confirm').classList.add('active');
