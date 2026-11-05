@@ -2258,8 +2258,14 @@ main{flex:1}
 /* ── SAMPLE ROW ── */
 .sample-card{background:#fff;border:1px solid var(--bd);border-radius:var(--r);margin-bottom:8px;overflow:hidden;transition:box-shadow .2s}
 .sample-card.is-open{box-shadow:0 4px 20px rgba(0,0,0,.08);border-color:var(--bd)}
-.sample-hd{display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;user-select:none;min-height:64px}
+.sample-hd{display:grid;grid-template-columns:auto 1fr auto auto;grid-template-rows:auto auto;column-gap:10px;row-gap:6px;padding:14px 16px;cursor:pointer;user-select:none;align-items:center}
 .sample-hd:hover{background:#fff}
+/* Desktop layout: label spans 2 rows left; row1: input+price+toggle; row2: mat-info */
+.sample-hd .sample-default-lbl{grid-column:1;grid-row:1/3;align-self:start;padding-top:7px}
+.sample-hd .name-input{grid-column:2;grid-row:1}
+.sample-hd .sample-price{grid-column:3;grid-row:1;white-space:nowrap}
+.sample-hd .toggle-btn{grid-column:4;grid-row:1}
+.sample-hd .mat-info{grid-column:2/5;grid-row:2;margin-top:0}
 .sample-hd-cb{flex-shrink:0}
 .sample-hd-cb input{width:16px;height:16px;accent-color:var(--neon);cursor:pointer}
 .num-badge{width:28px;height:28px;border-radius:50%;background:var(--bg);border:1.5px solid var(--bd2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--t3);flex-shrink:0;transition:all .2s}
@@ -2715,6 +2721,23 @@ main{flex:1}
   .sample-card{min-width:0;max-width:100%;overflow:hidden;box-sizing:border-box!important}
   .form-card{min-width:0;max-width:100%;overflow:hidden;box-sizing:border-box!important;padding:16px!important}
   .field-grid-2,.field-grid-2-3{grid-template-columns:1fr!important}
+
+  /* Sample card header — mobile grid redesign */
+  /* Row 1: [Зразок N] [Матеріал: ...] [ціна] [v]  */
+  /* Row 2:            [input поле_______________]  */
+  .sample-hd{grid-template-columns:auto 1fr auto auto!important;grid-template-rows:auto auto!important;padding:12px 14px!important;column-gap:8px!important;row-gap:5px!important}
+  .sample-hd .sample-default-lbl{grid-column:1!important;grid-row:1!important;align-self:center!important;padding-top:0!important;font-size:14px!important}
+  .sample-hd .mat-info{grid-column:2!important;grid-row:1!important;font-size:12px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sample-hd .sample-price{grid-column:3!important;grid-row:1!important;font-size:14px!important}
+  .sample-hd .toggle-btn{grid-column:4!important;grid-row:1!important}
+  .sample-hd .name-input{grid-column:2/5!important;grid-row:2!important;font-size:13px!important;padding:6px 10px!important}
+
+  /* Sample body — stack panels vertically */
+  .sample-body-grid{grid-template-columns:1fr!important;border-bottom:none}
+  .res-panel{border-right:none!important;border-bottom:1px solid var(--bd);padding:14px 16px!important}
+  .add-panel{padding:14px 16px!important}
+  .search-row{flex-wrap:wrap}
+  .cat-sel{max-width:100%!important;width:100%}
 
   /* Prevent page-level overflow */
   body{overflow-x:hidden}
@@ -10886,22 +10909,16 @@ function buildSampleCard(s, idx) {
 
   // ── header ──
   card.innerHTML = `
-<div class="sample-hd" onclick="toggleExpand('${s.id}')" style="align-items:flex-start;gap:10px">
-  <span class="sample-default-lbl" style="white-space:nowrap;flex-shrink:0;font-size:15px;font-weight:700;padding-top:7px;min-width:72px">${s.label}</span>
-  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
-    <div style="display:flex;align-items:center;gap:10px">
-      <input class="name-input" type="text" placeholder="Наприклад: Поле 12, ділянка А"
-             value="${s.name}" onclick="event.stopPropagation()"
-             oninput="updateName('${s.id}', this.value)" style="flex:1;min-width:0">
-      <span class="sample-price" style="font-size:15px;font-weight:700;white-space:nowrap;flex-shrink:0">${ns_fmtPrice(price)}</span>
-      <button class="toggle-btn" onclick="event.stopPropagation();toggleExpand('${s.id}')" style="flex-shrink:0">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-    </div>
-    <div class="mat-info" style="font-size:13px">
-      Матеріал: <strong style="font-weight:700">${m.name}</strong>${p ? `&nbsp;&nbsp;|&nbsp;&nbsp;Пакет: <strong style="font-weight:700">${p.name}</strong>` : ''}${s.additionalIndicatorIds && s.additionalIndicatorIds.length > 0 ? `&nbsp;&nbsp;<span style="color:var(--neon-dark);font-weight:600">+ ${ns_fmtDoslidzhen(s.additionalIndicatorIds.length)}</span>` : ''}
-    </div>
-  </div>
+<div class="sample-hd" onclick="toggleExpand('${s.id}')">
+  <span class="sample-default-lbl">${s.label}</span>
+  <div class="mat-info">Матеріал:&nbsp;<strong>${m.name}</strong>${p ? `&nbsp;&nbsp;|&nbsp;&nbsp;Пакет:&nbsp;<strong>${p.name}</strong>` : ''}${s.additionalIndicatorIds && s.additionalIndicatorIds.length > 0 ? `&nbsp;&nbsp;<span style="color:var(--neon-dark);font-weight:600">+&nbsp;${ns_fmtDoslidzhen(s.additionalIndicatorIds.length)}</span>` : ''}</div>
+  <input class="name-input" type="text" placeholder="Наприклад: Поле 12, ділянка А"
+         value="${s.name}" onclick="event.stopPropagation()"
+         oninput="updateName('${s.id}', this.value)">
+  <span class="sample-price">${ns_fmtPrice(price)}</span>
+  <button class="toggle-btn" onclick="event.stopPropagation();toggleExpand('${s.id}')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
 </div>
 <div class="sample-body">
   <div class="sample-body-grid">
