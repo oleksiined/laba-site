@@ -3562,6 +3562,13 @@ main{flex:1}
 
 
 
+<!-- FLOATING CART BUTTON -->
+<button id="floatingCartBtn" onclick="openCart()" title="Перейти до кошику" style="display:none;position:fixed;bottom:28px;right:28px;z-index:1200;background:#1a2232;color:#fff;border:none;border-radius:50px;padding:12px 20px 12px 14px;font-size:15px;font-weight:700;cursor:pointer;align-items:center;gap:10px;box-shadow:0 4px 24px rgba(0,0,0,.28);font-family:inherit;white-space:nowrap;transition:opacity .2s">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/><circle cx="10" cy="20.5" r="1.5"/><circle cx="18" cy="20.5" r="1.5"/></svg>
+  Перейти до кошику
+  <span id="floatingCartCount" style="background:#C4FF4D;color:#242729;border-radius:12px;padding:2px 8px;font-size:13px;font-weight:800;"></span>
+</button>
+
 <!-- CART OVERLAY -->
 <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
 <div class="cart-drawer" id="cartDrawer">
@@ -6175,6 +6182,13 @@ function updateCartUI(){
   // also update step-bar cart button if exists
   const cb = document.getElementById('cartCountBtn');
   if(cb) cb.textContent = count > 0 ? count : '';
+  // floating go-to-cart button
+  const fcb = document.getElementById('floatingCartBtn');
+  if(fcb){
+    fcb.style.display = count > 0 ? 'flex' : 'none';
+    const fcbCount = document.getElementById('floatingCartCount');
+    if(fcbCount) fcbCount.textContent = count;
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -6625,6 +6639,7 @@ function syncCollapsedQty(safeCode){
     if(subEl) subEl.textContent = '';
     if(icon) icon.style.display='';
     if(zone) zone.classList.remove('open');
+    const cdelBtnSCQ=document.getElementById('cdel-'+safeCode); if(cdelBtnSCQ) cdelBtnSCQ.style.display='none';
   }
 }
 
@@ -6641,6 +6656,7 @@ function changeCollapsedQty(safeCode, delta){
     const icon = document.getElementById('cicon-'+safeCode);
     if (zone) zone.classList.remove('open');
     if (icon) icon.style.display='';
+    const cdelBtnCCQ=document.getElementById('cdel-'+safeCode); if(cdelBtnCCQ) cdelBtnCCQ.style.display='none';
     syncCollapsedQty(safeCode);
     return;
   }
