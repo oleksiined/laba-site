@@ -1,9 +1,9 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="google-site-verification" content="WBz2Q61Mub0fIvunvzh5M9riqhetYaXx3Nj9Bnl3mZY" /><meta property="og:type" content="website" /><meta property="og:url" content="https://laba.zemlerob.com.ua/" /><meta property="og:title" content="LABA — сервіс лабораторних досліджень" /><meta property="og:description" content="Дослідження — складні. Сервіс — простий. Ми створили LABA, щоб лабораторні дослідження були доступними й зрозумілими для агробізнесу." /><meta property="og:image" content="https://laba.zemlerob.com.ua/og-image.png" /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:image" content="https://laba.zemlerob.com.ua/og-image.png" /><script async src="https://www.googletagmanager.com/gtm.js?id=GTM-MNNXS2VS"></script><script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","z7a05cjpkm");</script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());</script><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><meta name="google-site-verification" content="WBz2Q61Mub0fIvunvzh5M9riqhetYaXx3Nj9Bnl3mZY" /><meta property="og:type" content="website" /><meta property="og:url" content="https://laba.zemlerob.com.ua/" /><meta property="og:title" content="LABA — сервіс лабораторних досліджень" /><meta property="og:description" content="Дослідження — складні. Сервіс — простий. Ми створили LABA, щоб лабораторні дослідження були доступними й зрозумілими для агробізнесу." /><meta property="og:image" content="https://laba.zemlerob.com.ua/og-image.png" /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:image" content="https://laba.zemlerob.com.ua/og-image.png" /><script async src="https://www.googletagmanager.com/gtm.js?id=GTM-MNNXS2VS"></script><script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","z7a05cjpkm");</script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());</script><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!DOCTYPE html>
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LABA — Сервіс лабораторних досліджень для агробізнесу</title>
 <meta name="description" content="Зрозумілий вибір досліджень, онлайн-замовлення та підтримка, коли потрібна допомога. Ґрунт, добрива, вода, насіння, зерно.">
 <meta name="google-site-verification" content="WBz2Q61Mub0fIvunvzh5M9riqhetYaXx3Nj9Bnl3mZY" />
@@ -2594,6 +2594,9 @@ main{flex:1}
   /* Categories — 2 per row */
   .home-mat-tiles{grid-template-columns:repeat(2,1fr)!important;gap:8px}
 
+  /* How it works section */
+  .home-how{padding:0 16px 40px}
+
   /* CTA block */
   .home-cta-outer{padding:0 16px}
   .home-cta-inner{height:auto!important;min-height:unset!important;flex-direction:column!important;align-items:flex-start!important;padding:24px 20px 20px!important;gap:16px!important;overflow:visible!important}
@@ -2630,13 +2633,14 @@ main{flex:1}
   .srv-mascot-block{display:none!important}
   .services-content{padding:0 16px}
 
-  /* Service cards — fix 320px min-width that hides names on mobile */
-  .srv-collapsed-row{grid-template-columns:1fr!important;gap:4px!important}
+  /* Service cards — price top-right (next to title), buttons bottom-right, text wraps */
+  .srv-collapsed-row{grid-template-columns:1fr auto!important;align-items:start!important;gap:8px!important}
   .srv-collapsed-left{overflow:visible!important}
   .srv-collapsed-left .service-name{white-space:normal!important;overflow:visible!important;text-overflow:unset!important;font-size:15px!important}
   .srv-collapsed-left .service-short{white-space:normal!important;overflow:visible!important}
   .service-code{white-space:nowrap!important}
-  .srv-collapsed-row > div:last-child{justify-content:flex-start!important}
+  .srv-right-col{flex-direction:column-reverse!important;align-items:flex-end!important;justify-content:space-between!important;align-self:stretch!important;gap:6px!important;padding:2px 0!important}
+  .srv-right-price-main{font-size:16px!important}
 
   /* Order success modal — stack vertically */
   #order-success-modal .modal{max-width:100%!important;border-radius:16px!important}
