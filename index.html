@@ -2699,8 +2699,15 @@ main{flex:1}
   .stepper-wrap{margin:6px 0 2px!important}
   .cost-row,.per-row,.gtotal-row{min-width:0}
   .group-card{min-width:0;max-width:100%;overflow:hidden;box-sizing:border-box!important}
-  .gc-left,.gc-right,.gc-inner{min-width:0;max-width:100%;box-sizing:border-box!important}
-  #page-checkout aside,#page-samples aside,#page-checkout-ext aside{max-width:100%;box-sizing:border-box!important}
+  .gc-left,.gc-right,.gc-inner{min-width:0;max-width:100%;box-sizing:border-box!important;overflow:hidden}
+  .gc-right *{word-break:break-word}
+  .cost-row span,.per-row span,.gtotal-row span,.sb-row span,.sb-total span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  .cost-row,.per-row,.gtotal-row,.sb-row,.sb-total{gap:8px}
+  #page-checkout aside,#page-samples aside,#page-checkout-ext aside{max-width:100%;box-sizing:border-box!important;min-width:0}
+  .sidebar-card{max-width:100%!important;box-sizing:border-box!important;min-width:0;overflow:hidden}
+  .promo-row{flex-wrap:wrap!important}
+  .cart-grid > *{min-width:0;max-width:100%}
+  .container{width:100%!important;box-sizing:border-box!important}
 
   /* Prevent page-level overflow */
   body{overflow-x:hidden}
