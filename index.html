@@ -2675,12 +2675,26 @@ main{flex:1}
   .checkout-page{padding:16px 12px 28px}
   .checkout-title{font-size:22px}
 
+  /* Stepbar — mobile: hide inactive labels, shrink lines */
+  .nc-stepbar-in{padding:0 12px!important}
+  .nc-step:not(.nc-active) .nc-step-lbl{display:none!important}
+  .nc-step-line{min-width:10px!important;margin:0 6px!important}
+  .nc-step-circ{width:26px!important;height:26px!important;font-size:12px!important}
+
+  /* Container — less padding on mobile */
+  .container{padding:16px 16px 32px!important}
+
   /* Cart page — mobile */
   .cart-grid{grid-template-columns:1fr!important;gap:16px}
   .gc-inner{display:grid!important;grid-template-columns:1fr!important}
-  .gc-left{border-right:none!important;border-bottom:1px solid var(--bd)!important;padding:16px!important}
-  .gc-right{padding:16px!important;width:100%!important}
+  .gc-left{border-right:none!important;border-bottom:1px solid var(--bd)!important;padding:14px 16px!important}
+  .gc-right{padding:14px 16px!important;width:100%!important;box-sizing:border-box!important}
   .gc-name{font-size:15px}
+  .stepper-wrap{margin:6px 0 2px!important}
+  .cost-row,.per-row,.gtotal-row{min-width:0}
+
+  /* Prevent page-level overflow */
+  body{overflow-x:hidden}
 
   /* CTA banner image */
   .cta-banner-img{height:auto!important;aspect-ratio:unset!important}
