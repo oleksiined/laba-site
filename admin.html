@@ -1895,6 +1895,30 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           </table>
         </div>
 
+        <!-- Агрономічні дані -->
+        <div class="sp-sec">
+          <div class="sp-sec-hd">
+            <span class="sp-sec-title">Агрономічні дані</span>
+            <span id="smpAgroSaving" style="font-size:11px;color:var(--text-soft);display:none">Збереження…</span>
+          </div>
+          <div class="sp-row" style="align-items:flex-start;padding:4px 0">
+            <span class="sp-lbl" style="padding-top:7px">Дата відбору</span>
+            <input id="smpFldDate" type="date" onchange="smpSaveAgro()" style="flex:1;padding:5px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;color:var(--navy);background:var(--bg,#fff);outline:none">
+          </div>
+          <div class="sp-row" style="align-items:flex-start;padding:4px 0">
+            <span class="sp-lbl" style="padding-top:7px">Культура-попередник</span>
+            <input id="smpFldPredecessor" type="text" placeholder="—" onblur="smpSaveAgro()" style="flex:1;padding:5px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;color:var(--navy);background:var(--bg,#fff);outline:none">
+          </div>
+          <div class="sp-row" style="align-items:flex-start;padding:4px 0">
+            <span class="sp-lbl" style="padding-top:7px">Планова культура</span>
+            <input id="smpFldCrop" type="text" placeholder="—" onblur="smpSaveAgro()" style="flex:1;padding:5px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;color:var(--navy);background:var(--bg,#fff);outline:none">
+          </div>
+          <div class="sp-row" style="align-items:flex-start;padding:4px 0">
+            <span class="sp-lbl" style="padding-top:7px">Планова врожайність</span>
+            <input id="smpFldYield" type="text" placeholder="т/га" onblur="smpSaveAgro()" style="flex:1;padding:5px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;color:var(--navy);background:var(--bg,#fff);outline:none">
+          </div>
+        </div>
+
         <!-- Лабораторія та завдання -->
         <div class="sp-sec">
           <div class="sp-sec-hd">
@@ -4617,6 +4641,12 @@ function smpSelect(id) {
     });
     tbody.innerHTML = html || `<tr><td colspan="4" style="color:var(--text-soft);font-size:12px;padding:10px 6px;text-align:center">Дослідження не вказані</td></tr>`;
   }
+  // Агрономічні дані
+  const setInp = (eid, v) => { const e=document.getElementById(eid); if(e) e.value = v||''; };
+  setInp('smpFldDate', s.sampling_date||s.date||'');
+  setInp('smpFldPredecessor', s.predecessor||'');
+  setInp('smpFldCrop', s.planned_crop||'');
+  setInp('smpFldYield', s.planned_yield||'');
   // Лабораторія та завдання
   set('smpPanelLab', s.lab||'Лаб. №1');
   set('smpPanelTask', s.task||'Не створено');
@@ -4628,6 +4658,46 @@ function smpSelect(id) {
 }
 
 function smpAddNote() { alert('Функція у розробці'); }
+
+async function smpSaveAgro() {
+  if(!_smpSelId) return;
+  const s = _admSamples.find(x=>x.id===_smpSelId); if(!s) return;
+  const order = _admOrders.find(o=>o.id===s.orderId); if(!order) return;
+
+  const sampling_date = document.getElementById('smpFldDate')?.value || '';
+  const predecessor   = document.getElementById('smpFldPredecessor')?.value || '';
+  const planned_crop  = document.getElementById('smpFldCrop')?.value || '';
+  const planned_yield = document.getElementById('smpFldYield')?.value || '';
+
+  // Update local state
+  s.sampling_date = sampling_date; s.predecessor = predecessor;
+  s.planned_crop = planned_crop;   s.planned_yield = planned_yield;
+
+  const savingEl = document.getElementById('smpAgroSaving');
+  if(savingEl) savingEl.style.display='';
+
+  try {
+    const listRes = await fetch('https://laba.zemlerob.com.ua/api/orders-list');
+    const listData = await listRes.json();
+    const rawOrder = (listData.orders||[]).find(x=>x.id===order.dbId);
+    if(!rawOrder) throw new Error('Order not found');
+
+    const rawSamples = (rawOrder.samples||[]).map((rs, i) => {
+      if(i === s._idx) return { ...rs, sampling_date, predecessor, planned_crop, planned_yield };
+      return rs;
+    });
+
+    await _admUpdate(order.dbId, { samples: rawSamples }, {
+      event_type: 'sample_agro',
+      entity_type: 'sample',
+      description: `Агро-дані зразка ${s.sampleNum||s.id}: дата відбору=${sampling_date||'—'}, попередник=${predecessor||'—'}, культура=${planned_crop||'—'}, врожайність=${planned_yield||'—'}`,
+    });
+  } catch(err) {
+    console.error('smpSaveAgro:', err);
+  } finally {
+    if(savingEl) savingEl.style.display='none';
+  }
+}
 
 // Samples action buttons
 function smpFormTask() {
