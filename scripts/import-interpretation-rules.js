@@ -31,7 +31,8 @@ const supabase = createClient(
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID
   || '1cZrNUMYqTMdOMpcNNXilf0Yfkl9fwZjyaYf47sNIfJM';
 
-const DRY_RUN  = process.argv.includes('--dry-run');
+const DRY_RUN    = process.argv.includes('--dry-run');
+const DEBUG_COLS = process.argv.includes('--debug-cols');
 const ONLY_TABLE = (() => {
   const i = process.argv.indexOf('--table');
   return i !== -1 ? process.argv[i + 1] : null;
@@ -48,27 +49,22 @@ async function fetchSheet(sheetName) {
   // Google повертає /*O_o*/\ngoogle.visualization.Query.setResponse({...})
   const json = JSON.parse(text.replace(/^[^{]+/, '').replace(/\);?\s*$/, ''));
 
-  if (!json.table || !json.table.rows || json.table.rows.length === 0) {
-    console.log(`    ⚠ Лист "${sheetName}" порожній або не знайдений`);
-    // Debug: show available columns
-    if (json.table && json.table.cols) {
-      const labels = json.table.cols.map(c => `"${c.label}"`).filter(l => l !== '""');
-      if (labels.length) console.log(`    Колонки: ${labels.slice(0, 5).join(', ')}...`);
-    }
-    return [];
+  // Trim whitespace from column labels
+  const cols = json.table ? json.table.cols.map(c => (c.label || '').trim()) : [];
+
+  if (DEBUG_COLS) {
+    console.log(`    Колонки (${cols.length}): ${cols.map(c => `"${c}"`).join(', ')}`);
   }
 
-  // Trim whitespace from column labels
-  const cols = json.table.cols.map(c => (c.label || '').trim());
+  if (!json.table || !json.table.rows || json.table.rows.length === 0) {
+    console.log(`    ⚠ Лист "${sheetName}" порожній або не знайдений`);
+    if (cols.length) console.log(`    Колонки: ${cols.slice(0, 6).map(c => `"${c}"`).join(', ')}`);
+    return [];
+  }
 
   const rows = json.table.rows.map(r =>
     Object.fromEntries(cols.map((c, i) => [c, r.c[i]?.v ?? null]))
   );
-
-  // Debug: show first row keys for empty-looking results
-  if (rows.length > 0 && rows.length < 3) {
-    console.log(`    ℹ Лише ${rows.length} рядків. Ключі: ${Object.keys(rows[0]).slice(0,5).join(', ')}`);
-  }
 
   return rows;
 }
