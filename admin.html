@@ -2807,7 +2807,6 @@ function _admRenderSamplesTab(o) {
       <th>НАЗВА ЗРАЗКА</th>
       <th>СТАТУС</th>
       <th>ОНОВЛЕНО</th>
-      <th style="width:48px"></th>
     </tr></thead>
     <tbody>${sl.map((s,i)=>{
       const stCls = _admSSC[s.st]||'adm-ss-new';
@@ -2820,7 +2819,6 @@ function _admRenderSamplesTab(o) {
         <td><span class="adm-samp-mat">${mat}</span></td>
         <td><span class="adm-ss-pill ${stCls}">${stLbl}</span></td>
         <td><span class="adm-samp-dt">${dt}</span></td>
-        <td><button data-pdf-idx="${i}" onclick="generateProtocolAdmin(${i})" style="font:600 11px/1 Arial,sans-serif;padding:4px 8px;background:#132d33;color:#fff;border:none;border-radius:5px;cursor:pointer">PDF</button></td>
       </tr>`;
     }).join('')}</tbody>
   </table>`;
@@ -3226,10 +3224,13 @@ function _admRenderDocsTab(o) {
   ].join('');
 
   // ── Протокол ──
-  const proMenu = [
-    item('Завантажити', `admDocAct('protocol','download')`, !isDone),
-    item('Надіслати',   `admDocAct('protocol','send')`,     !isDone),
-  ].join('');
+  const sl = o.samplesList || [];
+  const proMenuItems = sl.length === 0
+    ? [item('Немає зразків', '', true)]
+    : sl.length === 1
+      ? [item('Сформувати PDF', `generateProtocolAdmin(0)`)]
+      : sl.map((s, i) => item(`PDF — ${s.num || ('Зразок ' + (i+1))}`, `generateProtocolAdmin(${i})`));
+  const proMenu = proMenuItems.join('');
 
   // ── ЕДО ──
   const edoMenu = [
