@@ -1947,25 +1947,24 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
   --bd:#DDE1E4;--bd2:#c8cdd1;--red:#ef4444;--red-lt:#fef2f2;
   --green:#059669;--green-lt:#d1fae5;--r:12px;--r-sm:8px;--r-xs:6px;
 }
-.nc-stepbar{background:var(--bg);padding:12px 0;position:sticky;top:0;z-index:50;border-bottom:1px solid var(--bd)}#page-nc-confirm .nc-stepbar{display:none!important}
-.nc-stepbar-in{max-width:1240px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
-.nc-step{display:flex;align-items:center;gap:10px;flex-shrink:0;cursor:default;user-select:none}
-.nc-step:not(.nc-active){display:none}
-.nc-step-circ{width:32px;height:32px;border-radius:50%;border:2px solid var(--bd2);background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--t3);transition:all .2s;flex-shrink:0}
+.nc-stepbar{background:var(--bg);padding:16px 0;position:sticky;top:0;z-index:50;border-bottom:1px solid var(--bd)}#page-nc-confirm .nc-stepbar{display:none!important}
+.nc-stepbar-in{max-width:1240px;margin:0 auto;padding:0 24px;display:flex;align-items:center}
+.nc-step{display:flex;align-items:center;gap:9px;flex-shrink:0;cursor:default;user-select:none}
+.nc-step-circ{width:30px;height:30px;border-radius:50%;border:2px solid var(--bd2);background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--t3);transition:all .2s;flex-shrink:0}
 .nc-active .nc-step-circ{background:var(--neon);border-color:var(--neon);color:#242729}
 .nc-done .nc-step-circ{background:var(--neon);border-color:var(--neon);color:#242729}
-.nc-step-lbl{font-size:15px;font-weight:500;color:var(--t3)}
-.nc-active .nc-step-lbl{color:var(--t1);font-weight:700;font-size:16px}
+.nc-step-lbl{font-size:14px;font-weight:500;color:var(--t3)}
+.nc-active .nc-step-lbl{color:var(--t1);font-weight:600}
 .nc-step.nc-clickable{cursor:pointer}
 .nc-step.nc-clickable:hover .nc-step-lbl{color:var(--t1)}
 .nc-step.nc-clickable:hover .nc-step-circ{border-color:var(--t2)}
 .nc-step.nc-locked{opacity:.35;cursor:not-allowed}
-.nc-step-line{display:none}
-.nc-done-line{display:none}
-.nc-next-btn{background:var(--neon);color:#242729;border:none;border-radius:50px;padding:9px 20px 9px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:background .15s;white-space:nowrap}
+.nc-step-line{flex:1;height:1px;background:var(--bd);margin:0 12px;min-width:32px}
+.nc-done-line{background:var(--bd)}
+.nc-next-btn{background:var(--neon);color:#242729;border:none;border-radius:50px;padding:9px 20px 9px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:background .15s;white-space:nowrap;margin-left:auto}
 .nc-next-btn:hover{background:#b8ef3a}
 .nc-back-btn{display:none}
-.nc-btn-group{display:flex;align-items:center;gap:8px}
+.nc-btn-group{display:flex;align-items:center;gap:8px;margin-left:auto}
 /* font override removed — use site-wide Manrope */
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -2692,6 +2691,8 @@ main{flex:1}
   .nc-next-btn{font-size:13px!important;padding:8px 14px 8px 12px!important}
   .nc-back-btn{display:flex!important;background:none;border:none;color:var(--t3);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;padding:4px 6px;border-radius:6px;white-space:nowrap;align-items:center}
   .nc-back-btn:hover{color:var(--t1)}
+  .nc-step:not(.nc-active) .nc-step-lbl{display:none!important}
+  .nc-step-line{min-width:10px!important;margin:0 4px!important}
 
   /* Container — less padding on mobile */
   .container{padding:16px 16px 32px!important}
@@ -3605,8 +3606,11 @@ main{flex:1}
   <div class="nc-stepbar">
     <div class="nc-stepbar-in">
       <div class="nc-step nc-active" onclick="nc_stepClick(1)"><div class="nc-step-circ">1</div><span class="nc-step-lbl">Кошик</span></div>
+      <div class="nc-step-line"></div>
       <div class="nc-step" onclick="nc_stepClick(2)"><div class="nc-step-circ">2</div><span class="nc-step-lbl">Налаштування зразків</span></div>
+      <div class="nc-step-line"></div>
       <div class="nc-step" onclick="nc_stepClick(3)"><div class="nc-step-circ">3</div><span class="nc-step-lbl">Оформлення</span></div>
+      <div class="nc-step-line"></div>
       <div class="nc-step" onclick="nc_stepClick(4)"><div class="nc-step-circ">4</div><span class="nc-step-lbl">Підтвердження</span></div>
       <div class="nc-btn-group">
         <button class="nc-back-btn" onclick="navigate('services')">← Назад</button>
@@ -3840,9 +3844,12 @@ main{flex:1}
 <div class="page" id="page-samples">
   <div class="nc-stepbar">
     <div class="nc-stepbar-in">
-      <div class="nc-step nc-done" onclick="nc_stepClick(1)"><div class="nc-step-circ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#242729" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="nc-step-lbl">Кошик</span></div>
+      <div class="nc-step nc-done nc-clickable" onclick="nc_stepClick(1)"><div class="nc-step-circ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#242729" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="nc-step-lbl">Кошик</span></div>
+      <div class="nc-step-line nc-done-line"></div>
       <div class="nc-step nc-active" onclick="nc_stepClick(2)"><div class="nc-step-circ">2</div><span class="nc-step-lbl">Налаштування зразків</span></div>
+      <div class="nc-step-line"></div>
       <div class="nc-step" onclick="nc_stepClick(3)"><div class="nc-step-circ">3</div><span class="nc-step-lbl">Оформлення</span></div>
+      <div class="nc-step-line"></div>
       <div class="nc-step" onclick="nc_stepClick(4)"><div class="nc-step-circ">4</div><span class="nc-step-lbl">Підтвердження</span></div>
       <div class="nc-btn-group">
         <button class="nc-back-btn" onclick="nc_stepClick(1)">← Назад</button>
@@ -3891,9 +3898,12 @@ main{flex:1}
 <div class="page" id="page-checkout-ext">
   <div class="nc-stepbar">
     <div class="nc-stepbar-in">
-      <div class="nc-step nc-done" onclick="nc_stepClick(1)"><div class="nc-step-circ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#242729" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="nc-step-lbl">Кошик</span></div>
-      <div class="nc-step nc-done" onclick="nc_stepClick(2)"><div class="nc-step-circ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#242729" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="nc-step-lbl">Налаштування зразків</span></div>
+      <div class="nc-step nc-done nc-clickable" onclick="nc_stepClick(1)"><div class="nc-step-circ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#242729" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="nc-step-lbl">Кошик</span></div>
+      <div class="nc-step-line nc-done-line"></div>
+      <div class="nc-step nc-done nc-clickable" onclick="nc_stepClick(2)"><div class="nc-step-circ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#242729" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="nc-step-lbl">Налаштування зразків</span></div>
+      <div class="nc-step-line nc-done-line"></div>
       <div class="nc-step nc-active" onclick="nc_stepClick(3)"><div class="nc-step-circ">3</div><span class="nc-step-lbl">Оформлення</span></div>
+      <div class="nc-step-line"></div>
       <div class="nc-step" onclick="nc_stepClick(4)"><div class="nc-step-circ">4</div><span class="nc-step-lbl">Підтвердження</span></div>
       <div class="nc-btn-group">
         <button class="nc-back-btn" onclick="nco_goBack()">← Назад</button>
