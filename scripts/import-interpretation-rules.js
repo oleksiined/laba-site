@@ -40,20 +40,39 @@ const ONLY_TABLE = (() => {
 
 // ─── Утиліти ─────────────────────────────────────────────────
 
-/** Завантажує лист як масив рядків (рядок 0 = заголовки) */
-async function fetchSheet(sheetName) {
-  const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+/**
+ * Нормалізує назву колонки:
+ * "rule_id ID формули" → "rule_id"   (ASCII field name — берем тільки перше слово)
+ * "Ключ результату"   → "Ключ результату"  (кирилиця — залишаємо повністю)
+ */
+function cleanLabel(raw) {
+  if (!raw) return '';
+  const s = raw.trim();
+  const first = s.split(' ')[0];
+  return /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(first) ? first : s;
+}
+
+/** Завантажує лист як масив рядків. При порожніх заголовках пробує headers=2 */
+async function fetchSheet(sheetName, headerRow = 1) {
+  const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&headers=${headerRow}`;
   const res  = await fetch(url);
   const text = await res.text();
 
   // Google повертає /*O_o*/\ngoogle.visualization.Query.setResponse({...})
   const json = JSON.parse(text.replace(/^[^{]+/, '').replace(/\);?\s*$/, ''));
 
-  // Trim whitespace from column labels
-  const cols = json.table ? json.table.cols.map(c => (c.label || '').trim()) : [];
+  const rawCols = json.table ? json.table.cols.map(c => (c.label || '').trim()) : [];
+  const allEmpty = rawCols.every(c => c === '');
+
+  // Якщо всі заголовки порожні — пробуємо рядок 2
+  if (allEmpty && headerRow === 1) {
+    return fetchSheet(sheetName, 2);
+  }
+
+  const cols = rawCols.map(cleanLabel);
 
   if (DEBUG_COLS) {
-    console.log(`    Колонки (${cols.length}): ${cols.map(c => `"${c}"`).join(', ')}`);
+    console.log(`    [headers=${headerRow}] Колонки (${cols.length}): ${cols.map(c => `"${c}"`).join(', ')}`);
   }
 
   if (!json.table || !json.table.rows || json.table.rows.length === 0) {
