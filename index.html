@@ -133,7 +133,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .mega-cta-btn:hover{background:var(--navy);color:var(--white)}
 /* Responsive */
 @media(max-width:900px){.mega-cards{grid-template-columns:repeat(3,1fr)}.mega-cols{grid-template-columns:1fr 1fr;gap:16px}.mega-col:not(:last-child){border-right:none}}
-@media(max-width:600px){.mega-cards{grid-template-columns:repeat(2,1fr)}.mega-cols{grid-template-columns:1fr}.nav-search-bar{display:none}.nav-status-label{display:none}.nav-status-btn{display:none!important}.mega-inner{padding:16px 16px 20px}.mega-menu{max-height:calc(100dvh - 68px);max-height:calc(100vh - 68px)}.mega-overlay{bottom:0}.mega-cta{flex-direction:column;align-items:flex-start;gap:12px}.mega-cta-btn{width:100%;justify-content:center;white-space:normal;text-align:center}}
+@media(max-width:600px){.mega-cards{grid-template-columns:repeat(2,1fr)}.mega-cols{grid-template-columns:1fr}.nav-search-bar{display:none}.nav-status-label{display:none}.nav-status-btn{display:none!important}.mega-inner{padding:16px 16px 20px}.mega-menu{max-height:calc(100dvh - 68px);max-height:calc(100vh - 68px)}.mega-overlay{bottom:0}.mega-cta{display:none!important}.mega-col:first-child{padding-left:0!important}.mega-col{padding:0!important}.mega-col:not(:last-child){border-right:none;border-bottom:1px solid var(--border-soft);padding-bottom:16px!important;margin-bottom:8px!important}}
 .nav-right-sep{width:1px;height:20px;background:var(--border);margin:0 6px}
 .btn-icon{width:36px;height:36px;border-radius:var(--radius-sm);border:none;background:none;display:flex;align-items:center;justify-content:center;color:var(--text-mid);cursor:pointer;transition:background .15s;position:relative}
 .btn-icon:hover{background:var(--bg)}
@@ -1920,8 +1920,9 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
   .about-hero-robots img.rob-lg{height:100%;margin:0}
   /* navbar: reduce padding so cart icon is not clipped */
   .navbar-inner{padding:0 12px;gap:4px}
-  .nav-logo{margin-right:12px}
+  .nav-logo{margin-right:0}
   .nav-logo svg,.nav-logo img{height:34px!important}
+  .mega-menu-btn{flex:1;margin:0 8px;justify-content:center}
   /* service card: text full-width top, counter+price at bottom */
   .srv-collapsed-row{display:flex;flex-direction:column;align-items:stretch;gap:0}
   .srv-right-col{flex-direction:row-reverse;align-items:center;justify-content:flex-start;align-self:stretch;gap:8px;padding:8px 0 2px;width:100%}
@@ -2603,7 +2604,8 @@ main{flex:1}
   .hero-text-content{max-width:100%!important}
   .hero-title{font-size:26px!important;letter-spacing:-1px;margin-bottom:10px}
   .hero-desc{font-size:14px;margin-bottom:20px;max-width:100%}
-  .hero-btns .btn-primary{font-size:14px!important;padding:12px 20px!important}
+  .hero-btns{flex-direction:column}
+  .hero-btns .btn-primary{font-size:14px!important;padding:12px 20px!important;width:100%;justify-content:center;text-align:center}
 
   /* Search card — stack */
   .home-search-section{padding:16px 16px 0}
@@ -2637,6 +2639,8 @@ main{flex:1}
   /* Quick nav buttons — vertical stack, centered */
   .srv-sidebar > div:first-child{display:flex!important;flex-direction:column!important;gap:8px!important;overflow-x:unset!important;padding:10px 12px!important;align-items:stretch!important}
   #seasonalBtn,#allResearchBtn{width:100%!important;flex-shrink:unset!important;min-width:0!important;justify-content:center!important}
+  .srv-mobile-search{display:block!important}
+  .search-row{display:none!important}
   /* Filter blocks — horizontal chip strip */
   .srv-filter-block{padding:8px 12px!important;border-bottom:none!important}
   .srv-filter-title{font-size:13px!important;margin-bottom:6px!important}
@@ -3381,12 +3385,20 @@ main{flex:1}
           </div>
           <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-soft);flex-shrink:0"><path d="M8 5l5 5-5 5" stroke-linecap="round"/></svg>
         </div>
-        <div id="allResearchBtn" onclick="goAllResearch()" style="background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:border-color .15s,background .15s">
+        <div id="allResearchBtn" onclick="goAllResearch()" style="background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:border-color .15s,background .15s" class="srv-all-btn">
           <div style="display:flex;align-items:center;gap:10px">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-mid);flex-shrink:0"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
             <div style="font-size:13px;font-weight:700;color:var(--navy)">Усі дослідження</div>
           </div>
           <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-soft);flex-shrink:0"><path d="M8 5l5 5-5 5" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+
+      <!-- Mobile-only search — shown between nav buttons and material filter -->
+      <div class="srv-mobile-search" style="display:none;padding:0 12px 8px">
+        <div style="position:relative">
+          <svg style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;color:#9CA3AF" width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#9CA3AF" stroke-width="2"/><path d="M20 20l-3-3" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/></svg>
+          <input id="searchInputMobile" type="text" placeholder="Шукати аналіз, дослідження або проблему..." autocomplete="off" oninput="searchQ=this.value.toLowerCase();var si=document.getElementById('searchInput');if(si)si.value=this.value;render()" style="width:100%;height:44px;border:1.5px solid var(--border);border-radius:var(--radius-pill);padding:0 16px 0 40px;font-size:14px;background:var(--white);color:var(--text);outline:none;box-sizing:border-box;font-family:inherit">
         </div>
       </div>
 
@@ -6074,7 +6086,7 @@ function navigate(page) {
   }
   const nsi2=document.getElementById('navSearchInp'); if(nsi2){nsi2.value='';} const nsd2=document.getElementById('navSearchDrop'); if(nsd2){nsd2.innerHTML='';nsd2.style.display='none';}
   if (page === 'services') { if(!srvMat) { srvMat=''; currentMaterial=''; srvFmtChosen=false; const ctx=document.getElementById('srvTaskContext'); if(ctx) ctx.style.display='none'; } buildTasksFromGroups(); renderTaskFilter(); render(); }
-  else { searchQ=''; const si=document.getElementById('searchInput'); if(si) si.value=''; }
+  else { searchQ=''; const si=document.getElementById('searchInput'); if(si) si.value=''; const sim=document.getElementById('searchInputMobile'); if(sim) sim.value=''; }
   if (page === 'methods') loadMethodsCatalog();
   if (page === 'status') ostPageInit();
   if (page === 'about') { window.scrollTo(0,0); setTimeout(function(){ if(typeof initAboutPin==='function') initAboutPin(); if(typeof initAboutFullpage==='function') initAboutFullpage(); },50); }
