@@ -11284,11 +11284,6 @@ function buildSampleCard(s, idx) {
   <input class="name-input" type="text" placeholder="Наприклад: Поле 12, ділянка А"
          value="${s.name}" onclick="event.stopPropagation()"
          oninput="updateName('${s.id}', this.value)">
-  <div class="sample-proto-fields" onclick="event.stopPropagation()" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
-    <input type="text" placeholder="Планова культура" value="${s.crop_planned||''}" style="flex:1;min-width:130px;border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-size:12px;font-family:inherit;color:var(--navy);background:#fafafa;outline:none" oninput="ns_updateField('${s.id}','crop_planned',this.value)">
-    <input type="text" placeholder="Культура-попередник" value="${s.crop_previous||''}" style="flex:1;min-width:130px;border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-size:12px;font-family:inherit;color:var(--navy);background:#fafafa;outline:none" oninput="ns_updateField('${s.id}','crop_previous',this.value)">
-    <input type="text" placeholder="Планова врожайність" value="${s.target_yield||''}" style="flex:1;min-width:120px;border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-size:12px;font-family:inherit;color:var(--navy);background:#fafafa;outline:none" oninput="ns_updateField('${s.id}','target_yield',this.value)">
-  </div>
   <span class="sample-price">${ns_fmtPrice(price)}</span>
   <button class="toggle-btn" onclick="event.stopPropagation();toggleExpand('${s.id}')">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
