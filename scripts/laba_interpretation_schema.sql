@@ -286,7 +286,7 @@ CREATE TABLE interpretation_test_cases (
   result_code           text        NOT NULL REFERENCES interpretation_methods(result_code),
   method_extraction     text,
   unit                  text,
-  test_value            numeric     NOT NULL,
+  test_value            numeric,
   operator              text        NOT NULL DEFAULT 'EQ',  -- EQ | GT | LT | GTE | LTE
   expected_category     text,
   expected_response     text,

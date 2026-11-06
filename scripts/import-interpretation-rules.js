@@ -47,10 +47,29 @@ async function fetchSheet(sheetName) {
 
   // Google повертає /*O_o*/\ngoogle.visualization.Query.setResponse({...})
   const json = JSON.parse(text.replace(/^[^{]+/, '').replace(/\);?\s*$/, ''));
-  const cols = json.table.cols.map(c => c.label);
+
+  if (!json.table || !json.table.rows || json.table.rows.length === 0) {
+    console.log(`    ⚠ Лист "${sheetName}" порожній або не знайдений`);
+    // Debug: show available columns
+    if (json.table && json.table.cols) {
+      const labels = json.table.cols.map(c => `"${c.label}"`).filter(l => l !== '""');
+      if (labels.length) console.log(`    Колонки: ${labels.slice(0, 5).join(', ')}...`);
+    }
+    return [];
+  }
+
+  // Trim whitespace from column labels
+  const cols = json.table.cols.map(c => (c.label || '').trim());
+
   const rows = json.table.rows.map(r =>
     Object.fromEntries(cols.map((c, i) => [c, r.c[i]?.v ?? null]))
   );
+
+  // Debug: show first row keys for empty-looking results
+  if (rows.length > 0 && rows.length < 3) {
+    console.log(`    ℹ Лише ${rows.length} рядків. Ключі: ${Object.keys(rows[0]).slice(0,5).join(', ')}`);
+  }
+
   return rows;
 }
 
@@ -99,6 +118,28 @@ async function upsert(table, rows, conflictColumn = null) {
     : { onConflict: Object.keys(rows[0])[0] };
 
   const { error } = await supabase.from(table).upsert(rows, opts);
+  if (error) {
+    console.error(`  ✗ ${table}: ${error.message}`);
+  } else {
+    console.log(`  ✓ ${table}: ${rows.length} рядків збережено`);
+  }
+}
+
+/** Truncate + insert (для таблиць без природного PK — scales) */
+async function truncateInsert(table, rows) {
+  if (!rows.length) { console.log(`  ⚠ ${table}: порожньо, пропущено`); return; }
+
+  if (DRY_RUN) {
+    console.log(`  🔍 ${table}: ${rows.length} рядків (dry-run, не записано)`);
+    console.log('    Приклад:', JSON.stringify(rows[0], null, 2).split('\n').slice(0,8).join('\n'));
+    return;
+  }
+
+  // Delete all existing rows first
+  const { error: delErr } = await supabase.from(table).delete().neq('id', 0);
+  if (delErr) console.warn(`  ⚠ ${table}: очистка: ${delErr.message}`);
+
+  const { error } = await supabase.from(table).insert(rows);
   if (error) {
     console.error(`  ✗ ${table}: ${error.message}`);
   } else {
@@ -166,7 +207,7 @@ async function importScales() {
       conditions_notes:  r['Умови й обмеження'],
       source_url:        r['Джерело'],
     }));
-  await upsert('interpretation_scales', data);
+  await truncateInsert('interpretation_scales', data);
 }
 
 async function importResponses() {
@@ -366,7 +407,7 @@ async function importTestCases() {
       result_code:       r['Ключ результату'],
       method_extraction: r['Метод / витяжка'],
       unit:              r['Одиниця'],
-      test_value:        num(r['Значення']),
+      test_value:        r['Значення'] !== null ? num(r['Значення']) : null,
       operator:          r['Оператор'] || 'EQ',
       expected_category: r['Очікувана категорія'],
       expected_response: r['Очікувана відповідь'],
