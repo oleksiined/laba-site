@@ -31,6 +31,10 @@ const supabase = createClient(
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID
   || '1cZrNUMYqTMdOMpcNNXilf0Yfkl9fwZjyaYf47sNIfJM';
 
+// Таблиця "Data source – backend test" (для protocol_sections та ін.)
+const DATASOURCE_SPREADSHEET_ID = process.env.DATASOURCE_SPREADSHEET_ID
+  || '1xn9CNpcReL0QyC8-bRxQEZ0JyVA2JsNJrx51DMjUL4g';
+
 const DRY_RUN    = process.argv.includes('--dry-run');
 const DEBUG_COLS = process.argv.includes('--debug-cols');
 const ONLY_TABLE = (() => {
@@ -53,8 +57,8 @@ function cleanLabel(raw) {
 }
 
 /** Завантажує лист як масив рядків. При порожніх заголовках пробує headers=2 */
-async function fetchSheet(sheetName, headerRow = 1) {
-  const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&headers=${headerRow}`;
+async function fetchSheet(sheetName, headerRow = 1, spreadsheetId = SPREADSHEET_ID) {
+  const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&headers=${headerRow}`;
   const res  = await fetch(url);
   const text = await res.text();
 
@@ -66,7 +70,7 @@ async function fetchSheet(sheetName, headerRow = 1) {
 
   // Якщо всі заголовки порожні — пробуємо рядок 2
   if (allEmpty && headerRow === 1) {
-    return fetchSheet(sheetName, 2);
+    return fetchSheet(sheetName, 2, spreadsheetId);
   }
 
   const cols = rawCols.map(cleanLabel);
@@ -166,11 +170,15 @@ async function truncateInsert(table, rows) {
 // ─── Імпортери ────────────────────────────────────────────────
 
 async function importProtocolSections() {
-  console.log('\n📋 protocol_sections (лист: "Data source – backend test")');
-  const rows = await fetchSheet('Data source – backend test');
-  // Пропускаємо рядок-підказку (рядок 1 з описами колонок)
+  console.log('\n📋 protocol_sections (таблиця: Data source, лист: "Protocol Sections")');
+  // Рядок 1 = технічні назви колонок, рядок 2 = опис, дані з рядка 3
+  const rows = await fetchSheet('Protocol Sections', 1, DATASOURCE_SPREADSHEET_ID);
   const data = rows
-    .filter(r => r['protocol_section_id'] && !r['protocol_section_id'].includes('Стабільний'))
+    // Пропускаємо рядок з описами (рядок 2 у Sheets — перший після заголовка)
+    // і порожні рядки
+    .filter(r => r['protocol_section_id']
+      && !r['protocol_section_id'].includes('Стабільний')
+      && r['protocol_section_id'].startsWith('SOIL-'))
     .map(r => ({
       protocol_section_id:   r['protocol_section_id'],
       material_id:           r['material_id'] || 'MAT-01',
