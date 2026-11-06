@@ -6287,10 +6287,9 @@ function updateCartUI(){
   // floating go-to-cart button
   const fcb = document.getElementById('floatingCartBtn');
   if(fcb){
-    const checkoutPages = ['page-checkout','page-samples','page-checkout-ext','page-nc-confirm','page-payment','page-confirm'];
-    const onCheckout = checkoutPages.some(id => document.getElementById(id)?.classList.contains('active'));
+    const onServices = document.getElementById('page-services')?.classList.contains('active');
     const cartDrawerOpen = document.getElementById('cartDrawer')?.classList.contains('open');
-    fcb.style.display = (count > 0 && !onCheckout && !cartDrawerOpen) ? 'flex' : 'none';
+    fcb.style.display = (count > 0 && onServices && !cartDrawerOpen) ? 'flex' : 'none';
     const fcbCount = document.getElementById('floatingCartCount');
     if(fcbCount) fcbCount.textContent = count;
   }
