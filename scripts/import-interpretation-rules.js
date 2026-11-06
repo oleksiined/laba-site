@@ -166,6 +166,26 @@ async function truncateInsert(table, rows) {
   }
 }
 
+/** Завантажує всі result_code з interpretation_methods */
+async function loadKnownResultCodes() {
+  const { data, error } = await supabase
+    .from('interpretation_methods')
+    .select('result_code');
+  if (error) { console.warn('  ⚠ Не вдалось завантажити result_codes:', error.message); return null; }
+  return new Set(data.map(r => r.result_code));
+}
+
+/** Дедуплікує масив за ключовою колонкою (залишає перший запис) */
+function deduplicateBy(rows, key) {
+  const seen = new Set();
+  const result = [];
+  for (const row of rows) {
+    const k = row[key];
+    if (k && !seen.has(k)) { seen.add(k); result.push(row); }
+  }
+  return result;
+}
+
 
 // ─── Імпортери ────────────────────────────────────────────────
 
@@ -212,9 +232,11 @@ async function importMethods() {
 
 async function importScales() {
   console.log('\n📊 interpretation_scales (лист: "Шкали")');
+  const knownCodes = DRY_RUN ? null : await loadKnownResultCodes();
   const rows = await fetchSheet('Шкали');
   const data = rows
-    .filter(r => r['Ключ результату'] && r['Код категорії'])
+    .filter(r => r['Ключ результату'] && r['Код категорії']
+      && (!knownCodes || knownCodes.has(r['Ключ результату'])))
     .map(r => ({
       result_code:       r['Ключ результату'],
       method_extraction: r['Метод / витяжка'],
@@ -235,9 +257,11 @@ async function importScales() {
 
 async function importResponses() {
   console.log('\n💬 interpretation_responses (лист: "Відповіді")');
+  const knownCodes = DRY_RUN ? null : await loadKnownResultCodes();
   const rows = await fetchSheet('Відповіді');
   const data = rows
-    .filter(r => r['Код відповіді'])
+    .filter(r => r['Код відповіді']
+      && (!knownCodes || knownCodes.has(r['Ключ результату'])))
     .map(r => ({
       response_code:     r['Код відповіді'],
       result_code:       r['Ключ результату'],
@@ -282,7 +306,7 @@ async function importCalculations() {
 async function importOptimalRanges() {
   console.log('\n🎯 protocol_optimal_ranges (лист: "Оптимальні діапазони протоколу")');
   const rows = await fetchSheet('Оптимальні діапазони протоколу');
-  const data = rows
+  const allData = rows
     .filter(r => r['result_code'] && !r['result_code'].includes('Ключ'))
     .map(r => ({
       result_code:         r['result_code'],
@@ -299,6 +323,10 @@ async function importOptimalRanges() {
       cec_input:           r['cec_input'],
       lookup_field:        r['lookup_field'],
     }));
+  // Дедуплікуємо за result_code (можуть бути дублікати в таблиці)
+  const data = deduplicateBy(allData, 'result_code');
+  if (allData.length !== data.length)
+    console.log(`    ℹ Видалено ${allData.length - data.length} дублікатів result_code`);
   await upsert('protocol_optimal_ranges', data, 'result_code');
 }
 
