@@ -1522,6 +1522,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .lbl-client-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid #eee;border-bottom:1px solid #eee;margin-bottom:8px;flex-wrap:wrap;gap:3px}
 .lbl-cfield{font-size:10px;color:#333}
 .lbl-cfield strong{font-weight:700}
+.lbl-date-line{display:inline-block;width:90px;border-bottom:1px solid #333;vertical-align:bottom;margin-left:2px}
 .lbl-qr{margin-bottom:4px}
 .lbl-qr canvas,.lbl-qr img{width:72px!important;height:72px!important;display:block}
 .lbl-attach{font-size:9px;color:#aaa;text-align:right;font-style:italic}
@@ -12568,10 +12569,13 @@ function ncf_printLabels() {
     const mat = getMat(s.materialId);
     const pkg = getPkgName(s.packageId);
     const add = getAddNames(s.additionalIndicatorIds);
-    return { idx, sampleCode, sampleLabel, mat, pkg, add };
+    const cropPlanned  = s.crop_planned  || '';
+    const cropPrevious = s.crop_previous || '';
+    const targetYield  = s.target_yield  || '';
+    return { idx, sampleCode, sampleLabel, mat, pkg, add, cropPlanned, cropPrevious, targetYield };
   });
 
-  const labelHTML = sampleData.map(({ idx, sampleCode, sampleLabel, mat, pkg, add }) => `
+  const labelHTML = sampleData.map(({ idx, sampleCode, sampleLabel, mat, pkg, add, cropPlanned, cropPrevious, targetYield }) => `
     <div class="lbl-card">
       <div class="lbl-header">
         <div class="lbl-logo">
@@ -12592,10 +12596,13 @@ function ncf_printLabels() {
         <tr><td class="lbl-tl">Матеріал</td><td class="lbl-tv">${mat}</td></tr>
         <tr><td class="lbl-tl">Пакет</td><td class="lbl-tv">${pkg}</td></tr>
         ${add !== '—' ? `<tr><td class="lbl-tl">Додатково</td><td class="lbl-tv">${add}</td></tr>` : ''}
+        ${cropPrevious ? `<tr><td class="lbl-tl">Попередник</td><td class="lbl-tv">${cropPrevious}</td></tr>` : ''}
+        ${cropPlanned  ? `<tr><td class="lbl-tl">Планова культура</td><td class="lbl-tv">${cropPlanned}</td></tr>` : ''}
+        ${targetYield  ? `<tr><td class="lbl-tl">Врожайність</td><td class="lbl-tv">${targetYield}</td></tr>` : ''}
       </table>
       <div class="lbl-client-row">
         <span class="lbl-cfield">Клієнт <strong>${clientName}</strong></span>
-        <span class="lbl-cfield">Дата відбору: ___ / ___ / _______</span>
+        <span class="lbl-cfield lbl-date-field">Дата відбору:&nbsp;<span class="lbl-date-line"></span></span>
       </div>
       <div class="lbl-qr" id="lbl-qr-${idx}" data-code="${sampleCode.replace(/"/g,'&quot;')}"></div>
       <div class="lbl-attach">Прикріпіть до пакування зразка</div>
