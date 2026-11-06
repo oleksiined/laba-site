@@ -2883,7 +2883,8 @@ async function generateProtocolAdmin(sIdx) {
     const orderNum = o.id||'—';
     const materialName = s.material||'—';
     const pkgCode = s.packageId||s.pkg||'';
-    const pageTitle = s.name||s.packageName||'Зразок';
+    const pkgNameRaw = s.packageName || '';
+    const pageTitle = (pkgNameRaw && !/^зразок\s*\d+$/i.test(pkgNameRaw.trim())) ? pkgNameRaw : (pkgCode || 'Пакет');
     const labId = sampleRow.lab_sample_id||'—';
     const sampleNum = sampleRow.sample_number||s.num||'—';
     const cropPrevious = sampleRow.crop_previous||'—';
@@ -2939,7 +2940,7 @@ tbody td{border-bottom:.38pt solid #e0e2e4;padding:3.3pt 4pt}.group th{backgroun
 <article class="sheet print-page-1"><div class="frame">
 <header class="head">
 <img alt="LABA" class="brand-lockup" src="${LOGO_SRC}"/>
-<div class="lab"><strong>LABA / ЗЕМЛЕРОБ</strong><span>Аграрна лабораторія</span><small>вул. Поштова 1, Київ · lab@zemlerob.com.ua</small><small>+38 (067) 000-00-00</small></div>
+<div class="lab"><strong>Центр лабораторних досліджень</strong><span>ТОВ «КОМПАНІЯ ЗЕМЛЕРОБ»</span><small>laba.zemlerob.com.ua</small></div>
 </header>
 <div class="content">
 <div class="hero">
@@ -2970,7 +2971,7 @@ tbody td{border-bottom:.38pt solid #e0e2e4;padding:3.3pt 4pt}.group th{backgroun
 </table>
 </section>
 </div>
-<footer class="foot"><strong>LABA / ЗЕМЛЕРОБ</strong><span>Лаб. ID ${labId}</span><span>${sampleNum}</span></footer>
+<footer class="foot"><strong>ТОВ «КОМПАНІЯ ЗЕМЛЕРОБ»</strong><span>Лаб. ID ${labId}</span><span>${sampleNum}</span></footer>
 </div></article>
 </main>
 </body></html>`;
@@ -2978,7 +2979,6 @@ tbody td{border-bottom:.38pt solid #e0e2e4;padding:3.3pt 4pt}.group th{backgroun
     if (!win) { alert('Дозвольте спливаючі вікна'); return; }
     win.document.write(html);
     win.document.close();
-    setTimeout(() => win.print(), 600);
   } catch(err) {
     console.error('generateProtocolAdmin:', err);
     alert('Помилка формування протоколу');

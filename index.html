@@ -8707,7 +8707,8 @@ async function generateProtocol(sampleId) {
     const labId = s.lab_sample_id || '—';
     const customerName = o.client_farm || o.client_name || '—';
     const orderNum = o.order_number || '';
-    const pageTitle = s.base_package_name || pkgCode || 'Пакет';
+    const pkgNameRaw = s.base_package_name || '';
+    const pageTitle = (pkgNameRaw && !/^зразок\s*\d+$/i.test(pkgNameRaw.trim())) ? pkgNameRaw : (pkgCode || 'Пакет');
 
     let rowNum = 0;
     let tableRows = '';
@@ -8774,7 +8775,7 @@ tbody td{border-bottom:.38pt solid #e0e2e4;padding:3.3pt 4pt}.group th{backgroun
 <article class="sheet print-page-1"><div class="frame">
 <header class="head">
 <img alt="LABA" class="brand-lockup" src="${LOGO_SRC}"/>
-<div class="lab"><strong>LABA / ЗЕМЛЕРОБ</strong><span>Аграрна лабораторія</span><small>вул. Поштова 1, Київ · lab@zemlerob.com.ua</small><small>+38 (067) 000-00-00</small></div>
+<div class="lab"><strong>Центр лабораторних досліджень</strong><span>ТОВ «КОМПАНІЯ ЗЕМЛЕРОБ»</span><small>laba.zemlerob.com.ua</small></div>
 </header>
 <div class="content">
 <div class="hero">
@@ -8804,7 +8805,7 @@ tbody td{border-bottom:.38pt solid #e0e2e4;padding:3.3pt 4pt}.group th{backgroun
 </table>
 </section>
 </div>
-<footer class="foot"><strong>LABA / ЗЕМЛЕРОБ</strong><span>Лаб. ID ${labId}</span><span>${s.sample_number || orderNum}</span></footer>
+<footer class="foot"><strong>ТОВ «КОМПАНІЯ ЗЕМЛЕРОБ»</strong><span>Лаб. ID ${labId}</span><span>${s.sample_number || orderNum}</span></footer>
 </div></article>
 </main>
 </body></html>`;
@@ -8813,7 +8814,6 @@ tbody td{border-bottom:.38pt solid #e0e2e4;padding:3.3pt 4pt}.group th{backgroun
     if (!win) { showToast('Дозвольте спливаючі вікна'); return; }
     win.document.write(html);
     win.document.close();
-    setTimeout(() => win.print(), 600);
   } catch(err) {
     console.error('generateProtocol:', err);
     showToast('Помилка формування протоколу');
