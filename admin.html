@@ -2939,6 +2939,7 @@ async function generateProtocolAdmin(sIdx) {
         : Promise.resolve(null),
     ]);
     const sampleRow = Array.isArray(samplesData) ? (samplesData[sIdx]||{}) : {};
+    console.log('[protocol] sIdx=',sIdx,'s.num=',s.num,'sampleRow=',sampleRow,'samplesData.length=',Array.isArray(samplesData)?samplesData.length:samplesData,'o.dbId=',o.dbId);
     const pkgItems = s.packageItems || pkgItemsRaw || [];
     const methodIds = [...new Set(pkgItems.map(x=>x.method_id).filter(Boolean))];
     const serviceIds = [...new Set(pkgItems.map(x=>x.service_id).filter(Boolean))];
@@ -2966,6 +2967,7 @@ async function generateProtocolAdmin(sIdx) {
     const resultsRows = Array.isArray(labResultsArr) ? labResultsArr : [];
     const resultsMap = {};
     resultsRows.forEach(r=>{ if(r.param_code) resultsMap[r.param_code]=r.value; });
+    console.log('[protocol] queried sample_id=',sampleRow.sample_number||s.num||'','labResultsArr=',labResultsArr,'resultsMap keys=',Object.keys(resultsMap),'uniqueParams codes=',uniqueParams.map(p=>p.code));
     const groups={};
     uniqueParams.forEach(p=>{
       const grpName = p.service_id&&serviceMap[p.service_id] ? (serviceMap[p.service_id].group_name||'Аналізи') : 'Аналізи';
