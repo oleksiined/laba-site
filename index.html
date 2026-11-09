@@ -8688,6 +8688,12 @@ async function generateProtocol(sampleId) {
     const resultCodes = (params||[]).map(p=>p.code).filter(Boolean);
     const { data: ranges } = await db.from('protocol_optimal_ranges')
       .select('result_code, range_text').in('result_code', resultCodes.length ? resultCodes : ['__none__']);
+    // Fetch actual lab results for this sample
+    const sampleNum = s.sample_number || sampleId;
+    const { data: labResults } = await db.from('sample_results')
+      .select('results, lab_sample_id').eq('sample_id', sampleNum).maybeSingle();
+    const resultsMap = labResults ? (labResults.results || {}) : {};
+    const labId = labResults ? (labResults.lab_sample_id || '—') : '—';
     const methodMap = {};
     (methods||[]).forEach(m=>{ methodMap[m.id] = m; });
     const serviceMap = {};
@@ -8704,7 +8710,6 @@ async function generateProtocol(sampleId) {
     const matMap = { soil:'Ґрунт', water:'Вода', fertilizer:'Добрива', seeds:'Насіння', grain:'Зерно', plants:'Рослини' };
     const materialName = matMap[s.material] || s.material || 'Ґрунт';
     const today = new Date().toLocaleDateString('uk-UA', {day:'numeric', month:'long', year:'numeric'});
-    const labId = s.lab_sample_id || '—';
     const customerName = o.client_farm || o.client_name || '—';
     const orderNum = o.order_number || '';
     const pkgNameRaw = s.base_package_name || '';
@@ -8720,8 +8725,17 @@ async function generateProtocol(sampleId) {
         const unit = p.unit || '—';
         const optRange = p.code && rangeMap[p.code] ? rangeMap[p.code] : '—';
         const dispName = p.protocol_name || p.name || '—';
-        tableRows += `<tr><td class="num">${rowNum}</td><td>${dispName}</td><td class="num">—</td><td class="num">${unit}</td><td class="optimal-range num">${optRange}</td><td>${stdCode}</td></tr>`;
+        const resVal = p.code && resultsMap[p.code] != null ? resultsMap[p.code] : '—';
+        tableRows += `<tr><td class="num">${rowNum}</td><td>${dispName}</td><td class="num">${resVal}</td><td class="num">${unit}</td><td class="optimal-range num">${optRange}</td><td>${stdCode}</td></tr>`;
       });
+    }
+    // Fallback: if no catalog params but we have sample_results, render raw results
+    if (!tableRows && Object.keys(resultsMap).length > 0) {
+      let rn = 0;
+      for (const [key, val] of Object.entries(resultsMap)) {
+        rn++;
+        tableRows += `<tr><td class="num">${rn}</td><td>${key}</td><td class="num">${val}</td><td class="num">—</td><td class="optimal-range num">—</td><td>—</td></tr>`;
+      }
     }
     if (!tableRows) {
       tableRows = `<tr><td colspan="6" style="text-align:center;color:#888;padding:12pt">Дані аналізу будуть доступні після завантаження результатів лабораторії</td></tr>`;

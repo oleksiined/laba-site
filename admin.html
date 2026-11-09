@@ -5504,7 +5504,8 @@ function resRenderPreview() {
     <td style="padding:6px 10px;font-size:11px;color:var(--text-soft)">${s.lab_sample_id||'—'}</td>
     ${previewHeaders.map(h=>{
       const v = s.results[h.key];
-      return `<td style="padding:6px 8px;text-align:right;font-size:12px">${v!=null?v+'<span style=\"font-size:10px;color:var(--text-soft);margin-left:2px\">${h.unit}</span>':'<span style=\"color:var(--text-soft)\">—</span>'}</td>`;
+      const unitSpan = h.unit ? `<span style="font-size:10px;color:var(--text-soft);margin-left:2px">${h.unit}</span>` : '';
+      return `<td style="padding:6px 8px;text-align:right;font-size:12px">${v!=null ? v+unitSpan : '<span style="color:var(--text-soft)">—</span>'}</td>`;
     }).join('')}
     ${_resHeaders.length > 8 ? '<td></td>' : ''}
   </tr>`).join('');
