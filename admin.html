@@ -2947,9 +2947,17 @@ async function generateProtocolAdmin(sIdx) {
       methodIds.length ? sbGet('catalog_methods', `id=in.(${methodIds.join(',')})&select=id,standard_code`) : Promise.resolve([]),
       serviceIds.length ? sbGet('catalog_services', `service_id=in.(${serviceIds.join(',')})&select=service_id,group_name`) : Promise.resolve([]),
     ]);
-    const resultCodes = (params||[]).map(p=>p.code).filter(Boolean);
+    // Deduplicate params by code (same indicator may appear for multiple methods)
+    const seenCodes = new Set();
+    const uniqueParams = (params||[]).filter(p => {
+      if (!p.code) return true;
+      if (seenCodes.has(p.code)) return false;
+      seenCodes.add(p.code); return true;
+    });
+    const resultCodes = uniqueParams.map(p=>p.code).filter(Boolean);
+    const quotedCodes = resultCodes.map(c => c.includes(' ') || c.includes(',') ? `"${c}"` : c);
     const [ranges, labResultsArr] = await Promise.all([
-      resultCodes.length ? sbGet('protocol_optimal_ranges', `result_code=in.(${resultCodes.join(',')})&select=result_code,range_text`) : Promise.resolve([]),
+      resultCodes.length ? sbGet('protocol_optimal_ranges', `result_code=in.(${quotedCodes.join(',')})&select=result_code,range_text`) : Promise.resolve([]),
       sbGet('sample_results', `sample_id=eq.${encodeURIComponent(o.id)}&select=results,lab_sample_id&limit=1`),
     ]);
     const methodMap={};  (methods||[]).forEach(m=>{ methodMap[m.id]=m; });
@@ -2958,7 +2966,7 @@ async function generateProtocolAdmin(sIdx) {
     const labResults = Array.isArray(labResultsArr)&&labResultsArr.length ? labResultsArr[0] : null;
     const resultsMap = labResults ? (labResults.results||{}) : {};
     const groups={};
-    (params||[]).forEach(p=>{
+    uniqueParams.forEach(p=>{
       const grpName = p.service_id&&serviceMap[p.service_id] ? (serviceMap[p.service_id].group_name||'Аналізи') : 'Аналізи';
       if(!groups[grpName]) groups[grpName]=[];
       groups[grpName].push(p);

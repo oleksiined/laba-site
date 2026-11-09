@@ -8686,9 +8686,17 @@ async function generateProtocol(sampleId) {
     const services = serviceIds.length
       ? await _sbFetch('catalog_services', `service_id=in.(${serviceIds.join(',')})&select=service_id,group_name`).catch(()=>[])
       : [];
-    const resultCodes = (params||[]).map(p=>p.code).filter(Boolean);
+    // Deduplicate params by code (same indicator may appear for multiple methods)
+    const seenCodes = new Set();
+    const uniqueParams = (params||[]).filter(p => {
+      if (!p.code) return true;
+      if (seenCodes.has(p.code)) return false;
+      seenCodes.add(p.code); return true;
+    });
+    const resultCodes = uniqueParams.map(p=>p.code).filter(Boolean);
+    const quotedCodes = resultCodes.map(c => c.includes(' ') || c.includes(',') ? `"${c}"` : c);
     const ranges = resultCodes.length
-      ? await _sbFetch('protocol_optimal_ranges', `result_code=in.(${resultCodes.join(',')})&select=result_code,range_text`).catch(()=>[])
+      ? await _sbFetch('protocol_optimal_ranges', `result_code=in.(${quotedCodes.join(',')})&select=result_code,range_text`).catch(()=>[])
       : [];
 
     // Fetch actual lab results for this sample.
@@ -8710,7 +8718,7 @@ async function generateProtocol(sampleId) {
     const rangeMap = {};
     (ranges||[]).forEach(r=>{ rangeMap[r.result_code] = r.range_text; });
     const groups = {};
-    (params||[]).forEach(p => {
+    uniqueParams.forEach(p => {
       const svcId = p.service_id;
       const grpName = svcId && serviceMap[svcId] ? serviceMap[svcId].group_name : (s.base_package_name || 'Результати');
       if (!groups[grpName]) groups[grpName] = [];
