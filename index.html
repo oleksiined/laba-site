@@ -8530,10 +8530,8 @@ function cabOrderTab(filter, btn) {
 }
 
 async function cabLoadOrdersFromSupabase() {
-  if (!db) return [];
   try {
-    const { data, error } = await db.from('orders').select('*').order('created_at', {ascending:false}).limit(100);
-    if (error) return [];
+    const data = await _sbFetch('orders', 'select=*&order=created_at.desc&limit=100');
     return (data || []).map(o => ({
       id: o.id,
       order_number: o.order_number,
@@ -8548,8 +8546,7 @@ async function cabLoadOrdersFromSupabase() {
 }
 
 async function cabShowSamplesModal(orderId, orderNum) {
-  if (!db) { showToast('Немає зʼєднання'); return; }
-  const { data: samps } = await db.from('samples').select('id, sample_number, name, base_package_name').eq('order_id', orderId).order('sample_number');
+  const samps = await _sbFetch('samples', `order_id=eq.${encodeURIComponent(orderId)}&select=id,sample_number,name,base_package_name&order=sample_number`).catch(()=>[]);
   if (!samps || !samps.length) { showToast('Зразки не знайдено'); return; }
   let items = samps.map(s => `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee">
     <div><div style="font-weight:600;color:#0d2b3e;font-size:14px">${s.sample_number || s.id}</div>
@@ -8664,34 +8661,40 @@ function cabUpdateStats() {
 
 // ── Protocol PDF Generator ──
 async function generateProtocol(sampleId) {
-  if (!db) { showToast('Немає зʼєднання з базою даних'); return; }
   showToast('Формуємо протокол...');
   try {
-    const { data: sampleData, error: sErr } = await db.from('samples')
-      .select('*, orders(client_name, client_farm, order_number)')
-      .eq('id', sampleId).single();
-    if (sErr || !sampleData) { showToast('Зразок не знайдено'); return; }
-    const s = sampleData;
-    const o = s.orders || {};
+    // Fetch sample with order info (embedded resource join)
+    const sampRows = await _sbFetch('samples', `id=eq.${encodeURIComponent(sampleId)}&select=*,orders(client_name,client_farm,order_number)&limit=1`).catch(()=>[]);
+    if (!sampRows || !sampRows.length) { showToast('Зразок не знайдено'); return; }
+    const s = sampRows[0];
+    const o = (s.orders) || {};
     const pkgCode = s.base_package_code;
-    const { data: pkgItems } = await db.from('catalog_package_items')
-      .select('method_id, service_id').eq('package_code', pkgCode);
+
+    // Fetch catalog data (errors handled gracefully)
+    const pkgItems = pkgCode
+      ? await _sbFetch('catalog_package_items', `package_code=eq.${encodeURIComponent(pkgCode)}&select=method_id,service_id`).catch(()=>[])
+      : [];
     const methodIds = [...new Set((pkgItems||[]).map(x=>x.method_id).filter(Boolean))];
     const serviceIds = [...new Set((pkgItems||[]).map(x=>x.service_id).filter(Boolean))];
-    const { data: params } = await db.from('catalog_result_parameters')
-      .select('id, name, protocol_name, unit, code, method_id, service_id')
-      .in('method_id', methodIds.length ? methodIds : ['__none__']);
-    const { data: methods } = await db.from('catalog_methods')
-      .select('id, standard_code').in('id', methodIds.length ? methodIds : ['__none__']);
-    const { data: services } = await db.from('catalog_services')
-      .select('id, group_name').in('id', serviceIds.length ? serviceIds : ['__none__']);
+
+    const params = methodIds.length
+      ? await _sbFetch('catalog_result_parameters', `method_id=in.(${methodIds.join(',')})&select=id,name,protocol_name,unit,code,method_id,service_id`).catch(()=>[])
+      : [];
+    const methods = methodIds.length
+      ? await _sbFetch('catalog_methods', `id=in.(${methodIds.join(',')})&select=id,standard_code`).catch(()=>[])
+      : [];
+    const services = serviceIds.length
+      ? await _sbFetch('catalog_services', `id=in.(${serviceIds.join(',')})&select=id,group_name`).catch(()=>[])
+      : [];
     const resultCodes = (params||[]).map(p=>p.code).filter(Boolean);
-    const { data: ranges } = await db.from('protocol_optimal_ranges')
-      .select('result_code, range_text').in('result_code', resultCodes.length ? resultCodes : ['__none__']);
+    const ranges = resultCodes.length
+      ? await _sbFetch('protocol_optimal_ranges', `result_code=in.(${resultCodes.join(',')})&select=result_code,range_text`).catch(()=>[])
+      : [];
+
     // Fetch actual lab results for this sample
     const sampleNum = s.sample_number || sampleId;
-    const { data: labResults } = await db.from('sample_results')
-      .select('results, lab_sample_id').eq('sample_id', sampleNum).maybeSingle();
+    const labResultsArr = await _sbFetch('sample_results', `sample_id=eq.${encodeURIComponent(sampleNum)}&select=results,lab_sample_id&limit=1`).catch(()=>[]);
+    const labResults = (labResultsArr && labResultsArr.length) ? labResultsArr[0] : null;
     const resultsMap = labResults ? (labResults.results || {}) : {};
     const labId = labResults ? (labResults.lab_sample_id || '—') : '—';
     const methodMap = {};
