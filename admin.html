@@ -2941,13 +2941,15 @@ async function generateProtocolAdmin(sIdx) {
     const sampleRow = Array.isArray(samplesData) ? (samplesData[sIdx]||{}) : {};
     const pkgItems = s.packageItems || pkgItemsRaw || [];
     const serviceIds = [...new Set(pkgItems.map(x=>x.service_id).filter(Boolean))];
-    const [params, services] = await Promise.all([
-      serviceIds.length ? sbGet('catalog_result_parameters', `service_id=in.(${serviceIds.join(',')})&order=protocol_sort_order.asc.nullslast,display_order.asc&select=result_parameter_id,name,unit,code,method_id,service_id,protocol_sort_order`) : Promise.resolve([]),
-      serviceIds.length ? sbGet('catalog_services', `service_id=in.(${serviceIds.join(',')})&select=service_id,group_name`) : Promise.resolve([]),
+    const [params, protocolSections] = await Promise.all([
+      serviceIds.length ? sbGet('catalog_result_parameters', `service_id=in.(${serviceIds.join(',')})&order=protocol_sort_order.asc.nullslast,display_order.asc&select=result_parameter_id,name,unit,code,method_id,service_id,protocol_sort_order,protocol_section_id`) : Promise.resolve([]),
+      sbGet('protocol_sections', `order=sort_order.asc&select=protocol_section_id,protocol_section_name,sort_order,client_visible&limit=200`),
     ]);
     // Build method ids from actual params (not pkgItems) to cover all methods
     const methodIds = [...new Set((params||[]).map(p=>p.method_id).filter(Boolean))];
     const methods = methodIds.length ? await sbGet('catalog_methods', `method_id=in.(${methodIds.join(',')})&select=method_id,standard_code`) : [];
+    const sectionMap = {}; // protocol_section_id → {name, sort_order}
+    (protocolSections||[]).forEach(s=>{ sectionMap[s.protocol_section_id]=s; });
     // Deduplicate params by code (same indicator may appear for multiple methods)
     const seenCodes = new Set();
     const uniqueParams = (params||[]).filter(p => {
@@ -2962,7 +2964,6 @@ async function generateProtocolAdmin(sIdx) {
       sbGet('sample_results', `sample_id=eq.${encodeURIComponent(sampleRow.sample_number||s.num||'')}&select=param_code,value,lab_sample_id`),
     ]);
     const methodMap={};  (methods||[]).forEach(m=>{ methodMap[m.method_id]=m; });
-    const serviceMap={}; (services||[]).forEach(sv=>{ serviceMap[sv.service_id||sv.id]=sv; });
     const rangeMap={};   (ranges||[]).forEach(r=>{
       if(r.optimal_min!=null||r.optimal_max!=null){
         const mn=r.optimal_min!=null?r.optimal_min:'';
@@ -2981,16 +2982,25 @@ async function generateProtocolAdmin(sIdx) {
       const code = paramIdToCode[r.param_code] || r.param_code;
       resultsMap[code] = r.value;
     });
+    // Group params by protocol_section_id, sorted by section sort_order
     const groups={};
     uniqueParams.forEach(p=>{
-      const grpName = p.service_id&&serviceMap[p.service_id] ? (serviceMap[p.service_id].group_name||'Аналізи') : 'Аналізи';
-      if(!groups[grpName]) groups[grpName]=[];
-      groups[grpName].push(p);
+      const secId = p.protocol_section_id || '__other__';
+      if(!groups[secId]) groups[secId]=[];
+      groups[secId].push(p);
+    });
+    // Sort sections by sort_order from protocol_sections table
+    const sortedSectionIds = Object.keys(groups).sort((a,b)=>{
+      const sa = sectionMap[a]?.sort_order ?? 999;
+      const sb = sectionMap[b]?.sort_order ?? 999;
+      return sa - sb;
     });
     // Build rows array for pagination
     let rowNum=0;
     const allRows=[];
-    for(const [grpName,grpParams] of Object.entries(groups)){
+    for(const secId of sortedSectionIds){
+      const grpParams = groups[secId];
+      const grpName = sectionMap[secId]?.protocol_section_name || secId;
       allRows.push({type:'group',html:`<tr class="group"><th colspan="6" scope="rowgroup">${grpName}</th></tr>`});
       grpParams.forEach(p=>{
         rowNum++;
