@@ -8684,7 +8684,7 @@ async function generateProtocol(sampleId) {
       ? await _sbFetch('catalog_methods', `id=in.(${methodIds.join(',')})&select=id,standard_code`).catch(()=>[])
       : [];
     const services = serviceIds.length
-      ? await _sbFetch('catalog_services', `id=in.(${serviceIds.join(',')})&select=id,group_name`).catch(()=>[])
+      ? await _sbFetch('catalog_services', `service_id=in.(${serviceIds.join(',')})&select=service_id,group_name`).catch(()=>[])
       : [];
     const resultCodes = (params||[]).map(p=>p.code).filter(Boolean);
     const ranges = resultCodes.length
@@ -8706,7 +8706,7 @@ async function generateProtocol(sampleId) {
     const methodMap = {};
     (methods||[]).forEach(m=>{ methodMap[m.id] = m; });
     const serviceMap = {};
-    (services||[]).forEach(sv=>{ serviceMap[sv.id] = sv; });
+    (services||[]).forEach(sv=>{ serviceMap[sv.service_id || sv.id] = sv; });
     const rangeMap = {};
     (ranges||[]).forEach(r=>{ rangeMap[r.result_code] = r.range_text; });
     const groups = {};
