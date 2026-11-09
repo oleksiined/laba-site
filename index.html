@@ -8672,13 +8672,13 @@ async function generateProtocol(sampleId) {
 
     // Fetch catalog data (errors handled gracefully)
     const pkgItems = pkgCode
-      ? await _sbFetch('catalog_package_items', `package_code=eq.${encodeURIComponent(pkgCode)}&select=method_id,service_id`).catch(()=>[])
+      ? await _sbFetch('catalog_package_items', `package_id=eq.${encodeURIComponent(pkgCode)}&select=method_id,service_id`).catch(()=>[])
       : [];
     const methodIds = [...new Set((pkgItems||[]).map(x=>x.method_id).filter(Boolean))];
     const serviceIds = [...new Set((pkgItems||[]).map(x=>x.service_id).filter(Boolean))];
 
-    const params = methodIds.length
-      ? await _sbFetch('catalog_result_parameters', `method_id=in.(${methodIds.join(',')})&select=id,name,protocol_name,unit,code,method_id,service_id`).catch(()=>[])
+    const params = serviceIds.length
+      ? await _sbFetch('catalog_result_parameters', `service_id=in.(${serviceIds.join(',')})&client_visible=eq.true&order=display_order&select=id,name,protocol_name,unit,code,method_id,service_id`).catch(()=>[])
       : [];
     const methods = methodIds.length
       ? await _sbFetch('catalog_methods', `id=in.(${methodIds.join(',')})&select=id,standard_code`).catch(()=>[])
