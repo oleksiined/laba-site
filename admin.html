@@ -1811,6 +1811,8 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
             <div class="adm-oi-row"><span class="adm-oi-lbl">Статус</span><span class="adm-oi-val" id="admPayStatFull">—</span></div>
             <div class="adm-oi-row"><span class="adm-oi-lbl">Сума</span><span class="adm-oi-val" id="admPayAmount2">—</span></div>
             <div class="adm-oi-row"><span class="adm-oi-lbl">Дата рахунку</span><span class="adm-oi-val" id="admPayDate">—</span></div>
+            <div class="adm-oi-row" id="admPayLiqRow" style="display:none"><span class="adm-oi-lbl">LiqPay ID</span><span class="adm-oi-val" id="admPayLiqId">—</span></div>
+            <div class="adm-oi-row" id="admPayLiqStatusRow" style="display:none"><span class="adm-oi-lbl">LiqPay статус</span><span class="adm-oi-val" id="admPayLiqStatus">—</span></div>
           </div>
           <button class="adm-pbtn adm-pbtn-sec" onclick="alert('Надсилання рахунку — підключити до Supabase')">
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="13" height="13"><path d="M2 6l8 5 8-5"/><rect x="2" y="4" width="16" height="12" rx="2"/></svg>
@@ -2139,6 +2141,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
 <script>
 // Orders loaded from API (replaces static mock data)
 let _admOrders = [];
+let _admOrdersRaw = [];
 let _admCatalogSvc = {}; // service_id/code → {name, price}
 
 // Map Supabase order row → admin panel format
@@ -2161,7 +2164,8 @@ function _mapOrder(o) {
   if (o.delivery?.city)    delivery += ', ' + o.delivery.city;
 
   const payMap  = { invoice:'unpaid', online:'pending', cod:'pending', cash:'pending' };
-  const payment = payMap[o.payment] || 'unpaid';
+  // Use actual payment_status from DB (set by LiqPay callback) if available
+  const payment = o.payment_status || payMap[o.payment] || 'unpaid';
 
   const samplesArr = Array.isArray(o.samples) ? o.samples : [];
   const pkgMap = { basic:'basic', standard:'standard', extended:'extended', 'Базовий':'basic', 'Стандартний':'standard', 'Розширений':'extended' };
@@ -2240,7 +2244,9 @@ async function admLoad() {
     const data = ordersResult.status === 'fulfilled' ? ordersResult.value : null;
     if (!data || !data.ok) throw new Error(data?.error || 'fetch failed');
     _admCatalogSvc = data.catalogServices || {};
-    _admOrders = (data.orders || []).filter(o => !(o.order_num||'').startsWith('CR')).map(_mapOrder);
+    const _rawOrders = (data.orders || []).filter(o => !(o.order_num||'').startsWith('CR'));
+    _admOrdersRaw = _rawOrders; // keep raw for liqpay fields etc.
+    _admOrders = _rawOrders.map(_mapOrder);
   } catch (err) {
     console.warn('admLoad error:', err.message);
     _admOrders = [];
@@ -2720,10 +2726,16 @@ function admSelect(id) {
   _admRenderDocsTab(o);
 
   // ── Оплата tab ──
-  const payStatMap = {paid:'Оплачено',pending:'Очікує оплати',partial:'Частково',unpaid:'Не оплачено'};
   setH('admPayStatFull', `<span class="adm-pill ${_admPC[o.payment]}">${_admPL[o.payment]}</span>`);
   setT('admPayAmount2', o.amount);
   setT('admPayDate', o.payment==='paid'?o.date:'—');
+  // LiqPay transaction details (from callback)
+  const rawO = ((_admOrdersRaw||[]).find(r=>r.order_num===o.id)) || {};
+  const liqId = rawO.liqpay_payment_id; const liqSt = rawO.liqpay_status;
+  const rowLiq = document.getElementById('admPayLiqRow'); const rowLiqSt = document.getElementById('admPayLiqStatusRow');
+  if (rowLiq) rowLiq.style.display = liqId ? '' : 'none';
+  if (rowLiqSt) rowLiqSt.style.display = liqSt ? '' : 'none';
+  setT('admPayLiqId', liqId||'—'); setT('admPayLiqStatus', liqSt||'—');
 
     // Reset to first tab
   admPanelTab('general');

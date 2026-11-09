@@ -8958,6 +8958,18 @@ function showToast(msg,ms=2500){
     if(e.state && e.state.page) navigate(e.state.page);
     else _navigateFromHash(location.hash);
   });
+  // Handle ?paid=ORDER_NUM redirect from LiqPay
+  (function(){
+    const _p = new URLSearchParams(window.location.search).get('paid');
+    if (_p) {
+      history.replaceState(null,'',window.location.pathname + window.location.hash);
+      navigate('status');
+      setTimeout(function(){
+        const inp = document.getElementById('ostat-input');
+        if (inp) { inp.value = _p; ostCheck(); }
+      }, 400);
+    }
+  })();
   // Скидаємо матеріал — показуємо всі послуги
   srvMat = ''; currentMaterial = '';
   updateCartUI();
@@ -12060,7 +12072,7 @@ async function submitOrder() {
         body: JSON.stringify({
           orderNum:    orderNum,
           amount:      grand,
-          description: `Лабораторні дослідження, замовлення ${orderNum}`,
+          description: `Оплата за рахунок № ${orderNum} від ${new Date().toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'})}`,
         }),
       });
       const lp = await lpRes.json();
