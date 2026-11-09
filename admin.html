@@ -2995,8 +2995,8 @@ async function generateProtocolAdmin(sIdx) {
       }
     }
     if(!allRows.length) allRows.push({type:'data',html:`<tr><td colspan="6" style="text-align:center;color:#888;padding:12pt">Дані аналізу будуть доступні після завантаження результатів лабораторії</td></tr>`});
-    // Paginate: ~23 data rows on first page, ~28 on continuation pages
-    const ROWS_PER_FIRST=23,ROWS_PER_REST=28;
+    // Paginate: ~18 data rows on first page, ~23 on continuation pages
+    const ROWS_PER_FIRST=18,ROWS_PER_REST=23;
     const pages=[];
     let curPage=[],dataCount=0,pgLimit=ROWS_PER_FIRST;
     for(const row of allRows){
@@ -4824,6 +4824,31 @@ async function smpSaveAgro() {
       entity_type: 'sample',
       description: `Агро-дані зразка ${s.sampleNum||s.id}: дата відбору=${sampling_date||'—'}, попередник=${predecessor||'—'}, культура=${planned_crop||'—'}, врожайність=${planned_yield||'—'}`,
     });
+
+    // Also PATCH Supabase samples table so the protocol can read these fields
+    const SUPA_URL_A = 'https://lczccbminjzefmmehntq.supabase.co';
+    const SUPA_KEY_A = 'sb_publishable_Axo6-4xZHWuXXlUY2zU5lA_lPbz2eFn';
+    const agroPayload = {
+      crop_previous: predecessor  || null,
+      crop_planned:  planned_crop || null,
+      target_yield:  planned_yield|| null,
+    };
+    if (sampling_date) agroPayload.sampling_date = sampling_date;
+    const patchRes = await fetch(
+      `${SUPA_URL_A}/rest/v1/samples?sample_number=eq.${encodeURIComponent(s.sampleNum)}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPA_KEY_A,
+          'Authorization': 'Bearer ' + SUPA_KEY_A,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify(agroPayload),
+      }
+    );
+    if (!patchRes.ok) console.warn('smpSaveAgro Supabase PATCH:', patchRes.status, await patchRes.text().catch(()=>''));
+
   } catch(err) {
     console.error('smpSaveAgro:', err);
   } finally {
