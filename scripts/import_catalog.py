@@ -211,11 +211,42 @@ def run():
         })
     api("package_items", items)
 
+    # ── 5. Result Parameters ─────────────────────────────────
+    print("\n→ Result Parameters")
+    rp_rows = load_sheet(wb, "Result Parameters")
+    result_params = []
+    for r in rp_rows:
+        rpid = safe(r.get("result_parameter_id"))
+        if not rpid:
+            continue
+        result_params.append({
+            "result_parameter_id": rpid,
+            "method_id":           safe(r.get("method_id")),
+            "service_id":          safe(r.get("service_id")),
+            "name":                safe(r.get("name")) or rpid,
+            "code":                safe(r.get("code")),
+            "symbol":              safe(r.get("symbol")),
+            "result_type":         safe(r.get("result_type")),
+            "unit":                safe(r.get("unit")),
+            "display_order":       to_int(r.get("display_order")),
+            "client_visible":      r.get("client_visible") is not False,
+            "required":            bool(r.get("required") is not False),
+            "calculation_no":      safe(r.get("calculation_no")),
+            "chip_id":             safe(r.get("chip_id")),
+            "data_type":           safe(r.get("data_type")),
+            "protocol_name":       safe(r.get("protocol_name")),
+            "protocol_section_id": safe(r.get("protocol_section_id")),
+            "protocol_sort_order": to_int(r.get("protocol_sort_order")),
+            "decimal_places":      to_int(r.get("decimal_places")),
+        })
+    api("catalog_result_parameters", result_params)
+
     print("\n✅ Імпорт завершено!")
-    print(f"   Матеріалів: {len(materials)}")
-    print(f"   Послуг:     {len(services)}")
-    print(f"   Пакетів:    {len(packages)}")
-    print(f"   Позицій:    {len(items)}")
+    print(f"   Матеріалів:          {len(materials)}")
+    print(f"   Послуг:              {len(services)}")
+    print(f"   Пакетів:             {len(packages)}")
+    print(f"   Позицій пакетів:     {len(items)}")
+    print(f"   Параметрів рез-тів:  {len(result_params)}")
 
 
 if __name__ == "__main__":
