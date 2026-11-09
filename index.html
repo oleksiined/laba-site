@@ -8953,34 +8953,24 @@ function showToast(msg,ms=2500){
       navigate('home');
     }
   }
-  _navigateFromHash(location.hash);
+  // Handle ?paid=ORDER_NUM redirect from LiqPay — must check BEFORE navigate so we don't show home
+  const _liqpayPaid = new URLSearchParams(window.location.search).get('paid');
+  if (_liqpayPaid) {
+    history.replaceState(null, '', window.location.pathname);
+    try {
+      const saved = JSON.parse(localStorage.getItem('laba_liqpay_order') || '{}');
+      window._ncfOrder = (saved && saved.num) ? saved : { num: _liqpayPaid };
+      localStorage.removeItem('laba_liqpay_order');
+    } catch(_){ window._ncfOrder = { num: _liqpayPaid }; }
+    window._ncfPaidViaLiqpay = true;
+    window.addEventListener('load', function(){ if (typeof ncf_show === 'function') ncf_show(); });
+  } else {
+    _navigateFromHash(location.hash);
+  }
   window.addEventListener('popstate', function(e){
     if(e.state && e.state.page) navigate(e.state.page);
     else _navigateFromHash(location.hash);
   });
-  // Handle ?paid=ORDER_NUM redirect from LiqPay — deferred until DOM is ready
-  (function(){
-    const _p = new URLSearchParams(window.location.search).get('paid');
-    if (_p) {
-      history.replaceState(null,'',window.location.pathname + window.location.hash);
-      // Restore saved order snapshot immediately (before localStorage might be cleared)
-      try {
-        const saved = JSON.parse(localStorage.getItem('laba_liqpay_order') || '{}');
-        if (saved && saved.num) window._ncfOrder = saved;
-        else window._ncfOrder = { num: _p };
-        localStorage.removeItem('laba_liqpay_order');
-      } catch(_){ window._ncfOrder = { num: _p }; }
-      window._ncfPaidViaLiqpay = true;
-      // Show confirm page after full DOM is loaded (guard: if load already fired, use setTimeout)
-      if (document.readyState === 'complete') {
-        setTimeout(function(){ if (typeof ncf_show === 'function') ncf_show(); }, 0);
-      } else {
-        window.addEventListener('load', function(){
-          if (typeof ncf_show === 'function') ncf_show();
-        });
-      }
-    }
-  })();
   // Скидаємо матеріал — показуємо всі послуги
   srvMat = ''; currentMaterial = '';
   updateCartUI();
