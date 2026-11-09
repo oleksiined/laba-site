@@ -2943,7 +2943,7 @@ async function generateProtocolAdmin(sIdx) {
     const methodIds = [...new Set(pkgItems.map(x=>x.method_id).filter(Boolean))];
     const serviceIds = [...new Set(pkgItems.map(x=>x.service_id).filter(Boolean))];
     const [params, methods, services] = await Promise.all([
-      serviceIds.length ? sbGet('catalog_result_parameters', `service_id=in.(${serviceIds.join(',')})&order=display_order&select=name,unit,code,method_id,service_id`) : Promise.resolve([]),
+      serviceIds.length ? sbGet('catalog_result_parameters', `service_id=in.(${serviceIds.join(',')})&order=display_order&select=result_parameter_id,name,unit,code,method_id,service_id`) : Promise.resolve([]),
       methodIds.length ? sbGet('catalog_methods', `id=in.(${methodIds.join(',')})&select=id,standard_code`) : Promise.resolve([]),
       serviceIds.length ? sbGet('catalog_services', `service_id=in.(${serviceIds.join(',')})&select=service_id,group_name`) : Promise.resolve([]),
     ]);
@@ -2969,9 +2969,17 @@ async function generateProtocolAdmin(sIdx) {
         rangeMap[r.result_code]= mn!==''&&mx!=='' ? `${mn}–${mx}` : mn!=='' ? `>${mn}` : `<${mx}`;
       }
     });
+    // Build result_parameter_id → code mapping from catalog
+    const paramIdToCode = {};
+    (params||[]).forEach(p=>{ if(p.result_parameter_id && p.code) paramIdToCode[p.result_parameter_id]=p.code; });
     const resultsRows = Array.isArray(labResultsArr) ? labResultsArr : [];
     const resultsMap = {};
-    resultsRows.forEach(r=>{ if(r.param_code) resultsMap[r.param_code]=r.value; });
+    resultsRows.forEach(r=>{
+      if(!r.param_code) return;
+      // Map result_parameter_id → short code (e.g. '01-1-047-01-R01' → 'SOC')
+      const code = paramIdToCode[r.param_code] || r.param_code;
+      resultsMap[code] = r.value;
+    });
     const groups={};
     uniqueParams.forEach(p=>{
       const grpName = p.service_id&&serviceMap[p.service_id] ? (serviceMap[p.service_id].group_name||'Аналізи') : 'Аналізи';
@@ -5631,7 +5639,7 @@ function resParseFile(input) {
         const results = {};
         _resHeaders.forEach(h => {
           const v = (row[h.col]||'').toString().trim();
-          if(v !== '') results[h.service_code || h.key] = v;
+          if(v !== '') results[h.key] = v;
         });
         _resParsed.push({ sample_id, lab_sample_id: (row[1]||'').toString().trim(), results });
       }
@@ -5673,7 +5681,7 @@ function resRenderPreview() {
     <td style="padding:6px 10px;font-family:monospace;font-size:11px;color:var(--navy);white-space:nowrap">${s.sample_id}</td>
     <td style="padding:6px 10px;font-size:11px;color:var(--text-soft)">${s.lab_sample_id||'—'}</td>
     ${previewHeaders.map(h=>{
-      const v = s.results[h.service_code || h.key];
+      const v = s.results[h.key];
       const unitSpan = h.unit ? `<span style="font-size:10px;color:var(--text-soft);margin-left:2px">${h.unit}</span>` : '';
       return `<td style="padding:6px 8px;text-align:right;font-size:12px">${v!=null ? v+unitSpan : '<span style="color:var(--text-soft)">—</span>'}</td>`;
     }).join('')}
