@@ -10544,34 +10544,48 @@ function closeAddModal() { document.getElementById('add-modal').classList.add('h
 
 // ══════════════════════════════════════════
 // PROMO
-// Поки — локальний список. Згодом замінити
-// nc_findPromo() на запит до Supabase.
+// Валідація через /api/validate-promo (Supabase promocodes).
+// nc_findPromo() повертає кешовані дані після успішної перевірки.
 // ══════════════════════════════════════════
-const PROMO_CODES = {
-  // 'КОД': { discount: число, type: 'percent' | 'fixed' }
-  'LABA10':    { discount: 10,   type: 'percent' },
-  'LABA500':   { discount: 500,  type: 'fixed'   },
-  'ZEMLEROB':  { discount: 15,   type: 'percent' },
-};
+
+// Кеш останнього валідованого промокоду
+// { code: 'LABA10', discount: 10, type: 'percent' }
+let _promoCache = null;
 
 function nc_findPromo(code) {
-  // TODO: замінити на fetch до Supabase
-  return PROMO_CODES[code] || null;
+  if (_promoCache && _promoCache.code === (code||'').toUpperCase()) {
+    return { discount: _promoCache.discount, type: 'percent' };
+  }
+  return null;
 }
 
-function nc_applyPromo() {
-  const code = (document.getElementById('nc-promo-inp').value||'').trim().toUpperCase();
+async function nc_applyPromo() {
+  const inp = document.getElementById('nc-promo-inp');
+  const code = (inp ? inp.value : '').trim().toUpperCase();
   if (!code) { toast('Введіть промокод'); return; }
-  const promo = nc_findPromo(code);
-  if (!promo) { toast('Промокод не знайдено'); return; }
-  const gs = nc_groups(), tt = nc_totals(gs);
-  NC_S.promo = code;
-  NC_S.promoDiscount = promo.type === 'percent'
-    ? Math.round(tt.sub * promo.discount / 100)
-    : Math.min(promo.discount, tt.sub);
-  const label = promo.type === 'percent' ? `−${promo.discount}%` : `−${nc_fmt(promo.discount)}`;
-  toast(`Промокод застосовано: ${label}`);
-  nc_render();
+
+  const btn = inp ? inp.nextElementSibling : null;
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+
+  try {
+    const res = await fetch('/api/validate-promo?code=' + encodeURIComponent(code));
+    const data = await res.json();
+    if (!data.ok) {
+      toast(data.error || 'Промокод не знайдено');
+      return;
+    }
+    _promoCache = { code, discount: data.discount_percent, type: 'percent' };
+    const gs = nc_groups(), tt = nc_totals(gs);
+    NC_S.promo = code;
+    NC_S.promoDiscount = Math.round(tt.sub * data.discount_percent / 100);
+    toast(`Промокод застосовано: −${data.discount_percent}%`);
+    nc_render();
+  } catch(err) {
+    toast('Помилка перевірки промокоду');
+    console.error('nc_applyPromo:', err);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Застосувати'; }
+  }
 }
 function nc_cancelPromo() {
   NC_S.promo = '';
@@ -12647,18 +12661,40 @@ function _ncfShowLabelOverlay(labelHTML, total, src) {
 // ══════════════════════════════════════════
 // PROMO
 // ══════════════════════════════════════════
-function nco_applyPromo() {
-  const code = (document.getElementById('nco-promo-inp')?.value || NCO.promo || '').trim().toUpperCase();
+async function nco_applyPromo() {
+  const inp = document.getElementById('nco-promo-inp');
+  const code = (inp?.value || NCO.promo || '').trim().toUpperCase();
   if (!code) { toast('Введіть промокод'); return; }
-  const promo = nc_findPromo(code);
-  if (promo) {
+
+  const btn = inp ? inp.nextElementSibling : null;
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+
+  try {
+    // If same code already cached, use cache directly
+    const cached = nc_findPromo(code);
+    let discountPct;
+    if (cached) {
+      discountPct = cached.discount;
+    } else {
+      const res = await fetch('/api/validate-promo?code=' + encodeURIComponent(code));
+      const data = await res.json();
+      if (!data.ok) {
+        toast(data.error || 'Промокод не знайдено');
+        return;
+      }
+      _promoCache = { code, discount: data.discount_percent, type: 'percent' };
+      discountPct = data.discount_percent;
+    }
     const sub = NCO.pkgSum + NCO.addSum;
-    NCO.promoDiscount = promo.type === 'percent' ? Math.round(sub * promo.discount / 100) : Math.min(promo.discount, sub);
+    NCO.promoDiscount = Math.round(sub * discountPct / 100);
     NCO.promo = code;
-    toast('Промокод застосовано');
+    toast(`Промокод застосовано: −${discountPct}%`);
     nco_renderSidebar();
-  } else {
-    toast('Промокод не знайдено');
+  } catch(err) {
+    toast('Помилка перевірки промокоду');
+    console.error('nco_applyPromo:', err);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Застосувати'; }
   }
 }
 function nco_cancelPromo() {
