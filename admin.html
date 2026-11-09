@@ -2943,15 +2943,21 @@ async function generateProtocolAdmin(sIdx) {
     const methodIds = [...new Set(pkgItems.map(x=>x.method_id).filter(Boolean))];
     const serviceIds = [...new Set(pkgItems.map(x=>x.service_id).filter(Boolean))];
     const [params, methods, services] = await Promise.all([
-      methodIds.length ? sbGet('catalog_result_parameters', `method_id=in.(${methodIds.join(',')})&select=id,name,protocol_name,unit,code,method_id,service_id`) : Promise.resolve([]),
+      serviceIds.length ? sbGet('catalog_result_parameters', `service_id=in.(${serviceIds.join(',')})&client_visible=eq.true&order=display_order&select=id,name,protocol_name,unit,code,method_id,service_id`) : Promise.resolve([]),
       methodIds.length ? sbGet('catalog_methods', `id=in.(${methodIds.join(',')})&select=id,standard_code`) : Promise.resolve([]),
-      serviceIds.length ? sbGet('catalog_services', `id=in.(${serviceIds.join(',')})&select=id,group_name`) : Promise.resolve([]),
+      serviceIds.length ? sbGet('catalog_services', `service_id=in.(${serviceIds.join(',')})&select=service_id,group_name`) : Promise.resolve([]),
     ]);
     const resultCodes = (params||[]).map(p=>p.code).filter(Boolean);
-    const ranges = resultCodes.length ? await sbGet('protocol_optimal_ranges', `result_code=in.(${resultCodes.join(',')})&select=result_code,range_text`) : [];
+    const [ranges, labResultsArr] = await Promise.all([
+      resultCodes.length ? sbGet('protocol_optimal_ranges', `result_code=in.(${resultCodes.join(',')})&select=result_code,range_text`) : Promise.resolve([]),
+      sbGet('sample_results', `sample_id=eq.${encodeURIComponent(o.id)}&select=results,lab_sample_id&limit=1`),
+    ]);
     const methodMap={};  (methods||[]).forEach(m=>{ methodMap[m.id]=m; });
-    const serviceMap={}; (services||[]).forEach(sv=>{ serviceMap[sv.id]=sv; });
+    const serviceMap={}; (services||[]).forEach(sv=>{ serviceMap[sv.service_id||sv.id]=sv; });
     const rangeMap={};   (ranges||[]).forEach(r=>{ rangeMap[r.result_code]=r.range_text; });
+    const labResults = Array.isArray(labResultsArr)&&labResultsArr.length ? labResultsArr[0] : null;
+    const resultsMap = labResults ? (labResults.results||{}) : {};
+    const labId = labResults ? (labResults.lab_sample_id||'—') : '—';
     const groups={};
     (params||[]).forEach(p=>{
       const grpName = p.service_id&&serviceMap[p.service_id] ? (serviceMap[p.service_id].group_name||'Аналізи') : 'Аналізи';
@@ -2967,8 +2973,17 @@ async function generateProtocolAdmin(sIdx) {
         const unit = p.unit||'—';
         const optRange = p.code&&rangeMap[p.code] ? rangeMap[p.code] : '—';
         const dispName = p.protocol_name||p.name||'—';
-        tableRows+=`<tr><td class="num">${rowNum}</td><td>${dispName}</td><td class="num">—</td><td class="num">${unit}</td><td class="optimal-range num">${optRange}</td><td>${stdCode}</td></tr>`;
+        const val = p.code&&resultsMap[p.code]!==undefined ? resultsMap[p.code] : '—';
+        tableRows+=`<tr><td class="num">${rowNum}</td><td>${dispName}</td><td class="num">${val}</td><td class="num">${unit}</td><td class="optimal-range num">${optRange}</td><td>${stdCode}</td></tr>`;
       });
+    }
+    // Fallback: show raw results if params empty but results exist
+    if(!tableRows && Object.keys(resultsMap).length>0){
+      let rn=0;
+      for(const [key,val] of Object.entries(resultsMap)){
+        rn++;
+        tableRows+=`<tr><td class="num">${rn}</td><td>${key}</td><td class="num">${val}</td><td class="num">—</td><td class="optimal-range num">—</td><td>—</td></tr>`;
+      }
     }
     if(!tableRows) tableRows=`<tr><td colspan="6" style="text-align:center;color:#888;padding:12pt">Дані аналізу будуть доступні після завантаження результатів лабораторії</td></tr>`;
     const customerName = o.client||o.companyFull||'—';
@@ -2977,7 +2992,7 @@ async function generateProtocolAdmin(sIdx) {
     const pkgCode = s.packageId||s.pkg||'';
     const pkgNameRaw = s.packageName || '';
     const pageTitle = (pkgNameRaw && !/^зразок\s*\d+$/i.test(pkgNameRaw.trim())) ? pkgNameRaw : (pkgCode || 'Пакет');
-    const labId = sampleRow.lab_sample_id||'—';
+    const labId = sampleRow.lab_sample_id || (labResults ? (labResults.lab_sample_id||'—') : '—');
     const sampleNum = sampleRow.sample_number||s.num||'—';
     const cropPrevious = sampleRow.crop_previous||'—';
     const cropPlanned = sampleRow.crop_planned||'—';
