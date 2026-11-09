@@ -8959,7 +8959,8 @@ function showToast(msg,ms=2500){
     history.replaceState(null, '', window.location.pathname);
     try {
       const saved = JSON.parse(localStorage.getItem('laba_liqpay_order') || '{}');
-      window._ncfOrder = (saved && saved.num) ? saved : { num: _liqpayPaid };
+      // Only use saved data if it matches the paid order number — avoid stale localStorage
+      window._ncfOrder = (saved && saved.num === _liqpayPaid) ? saved : { num: _liqpayPaid };
       localStorage.removeItem('laba_liqpay_order');
     } catch(_){ window._ncfOrder = { num: _liqpayPaid }; }
     window._ncfPaidViaLiqpay = true;
