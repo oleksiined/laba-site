@@ -5148,6 +5148,7 @@ admSwitch = function(tab, btn) {
   else                   { if(typeof _ordUpdateSidebar==='function') _ordUpdateSidebar(); }
   if (tab==='clients')   { cliInit(); }
   if (tab==='docs')      { docInit(); }
+  if (tab==='results')   { resLoadFromDb(); }
 };
 
 // ─── UPDATE admClosePanel TO RESTORE ORDER PANEL ─
@@ -5408,6 +5409,43 @@ let _resParsed = [];
 let _resHeaders = [];
 // Filtered rows for preview search
 let _resFiltered = [];
+let _resDbLoaded = false;
+
+async function resLoadFromDb() {
+  const st = document.getElementById('resSaveStatus');
+  if(st) st.textContent = 'Завантаження з бази…';
+  try {
+    const SUPA_URL2 = 'https://lczccbminjzefmmehntq.supabase.co';
+    const SUPA_KEY2 = 'sb_publishable_Axo6-4xZHWuXXlUY2zU5lA_lPbz2eFn';
+    const data = await fetch(`${SUPA_URL2}/rest/v1/sample_results?select=sample_id,lab_sample_id,results,imported_at&order=imported_at.desc&limit=500`, {
+      headers:{ apikey: SUPA_KEY2, Authorization: 'Bearer '+SUPA_KEY2, Accept:'application/json' }
+    }).then(r=>r.ok?r.json():[]).catch(()=>[]);
+
+    if(!data.length) {
+      if(st) st.textContent = '';
+      return;
+    }
+
+    // Build unified _resHeaders from all keys across all rows
+    const allKeys = new Set();
+    data.forEach(row => { if(row.results) Object.keys(row.results).forEach(k=>allKeys.add(k)); });
+    _resHeaders = [...allKeys].map((key,i) => ({ col: i+2, key, service_code:'', name:key, unit:'', type:'' }));
+
+    _resParsed = data.map(row => ({
+      sample_id: row.sample_id,
+      lab_sample_id: row.lab_sample_id || '',
+      results: row.results || {},
+      _importedAt: row.imported_at,
+    }));
+    _resFiltered = [..._resParsed];
+    _resDbLoaded = true;
+    resRenderPreview();
+    if(st) st.textContent = `Завантажено ${data.length} зразків з бази`;
+  } catch(err) {
+    console.error('resLoadFromDb:', err);
+    if(st) st.textContent = '';
+  }
+}
 
 function resOpenUpload() {
   const area = document.getElementById('resUploadArea');
@@ -5534,6 +5572,10 @@ async function resSave() {
       st.textContent = `✓ Збережено ${data.saved} зразків`;
       btn.textContent = 'Зберегти результати';
       btn.disabled = false;
+      // Hide upload panel and reload from DB to show persisted data
+      const area = document.getElementById('resUploadArea');
+      if(area) area.style.display = 'none';
+      resLoadFromDb();
     } else {
       throw new Error(data.error||'Server error');
     }
