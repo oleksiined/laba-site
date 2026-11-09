@@ -8971,10 +8971,14 @@ function showToast(msg,ms=2500){
         localStorage.removeItem('laba_liqpay_order');
       } catch(_){ window._ncfOrder = { num: _p }; }
       window._ncfPaidViaLiqpay = true;
-      // Show confirm page after full DOM is loaded
-      window.addEventListener('load', function(){
-        if (typeof ncf_show === 'function') ncf_show();
-      });
+      // Show confirm page after full DOM is loaded (guard: if load already fired, use setTimeout)
+      if (document.readyState === 'complete') {
+        setTimeout(function(){ if (typeof ncf_show === 'function') ncf_show(); }, 0);
+      } else {
+        window.addEventListener('load', function(){
+          if (typeof ncf_show === 'function') ncf_show();
+        });
+      }
     }
   })();
   // Скидаємо матеріал — показуємо всі послуги
