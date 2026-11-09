@@ -246,6 +246,7 @@ html{scroll-behavior:smooth}
 .hist-wrap{padding:16px 18px}
 .hist-empty{padding:40px 16px;text-align:center;color:var(--text-soft);font-size:13px}
 .hist-loading{padding:32px 16px;text-align:center;color:var(--text-soft);font-size:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
 .hist-timeline{display:flex;flex-direction:column;gap:0;position:relative}
 .hist-timeline::before{content:'';position:absolute;left:17px;top:6px;bottom:6px;width:1.5px;background:var(--border);z-index:0}
 .hist-item{display:flex;gap:12px;align-items:flex-start;padding:8px 0;position:relative;z-index:1}
@@ -1481,9 +1482,15 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           </div>
           <!-- Empty state -->
           <div id="resEmptyState" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;color:var(--text-soft)">
-            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48" style="margin-bottom:16px;opacity:.4"><path d="M8 8h22l10 10v22H8V8z"/><path d="M30 8v10h10"/><path d="M16 28l4-5 4 5 6-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <div style="font-size:14px;font-weight:500">Натисніть «Імпорт результатів» та оберіть Excel файл</div>
-            <div style="font-size:12px;margin-top:4px">Формат: перші 5 рядків — заголовки, далі дані зразків</div>
+            <div id="resLoadingIndicator" style="display:flex;flex-direction:column;align-items:center;gap:10px">
+              <div style="width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin 0.8s linear infinite"></div>
+              <div style="font-size:13px">Завантаження результатів…</div>
+            </div>
+            <div id="resNoDataMsg" style="display:none;flex-direction:column;align-items:center">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48" style="margin-bottom:16px;opacity:.4"><path d="M8 8h22l10 10v22H8V8z"/><path d="M30 8v10h10"/><path d="M16 28l4-5 4 5 6-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div style="font-size:14px;font-weight:500">Натисніть «Імпорт результатів» та оберіть Excel файл</div>
+              <div style="font-size:12px;margin-top:4px">Формат: перші 5 рядків — заголовки, далі дані зразків</div>
+            </div>
           </div>
         </div>
       </div>
@@ -5407,6 +5414,7 @@ function crSelectAll(cb) {}
 
 // Parsed data: array of objects { sample_id, lab_sample_id, results: { key: value } }
 let _resParsed = [];
+let _resDbLoading = false;
 // Header metadata: [ { key, service_code, name, unit, type } ]
 let _resHeaders = [];
 // Filtered rows for preview search
@@ -5414,6 +5422,13 @@ let _resFiltered = [];
 let _resDbLoaded = false;
 
 async function resLoadFromDb() {
+  _resDbLoading = true;
+  // Show spinner, hide no-data message
+  const loadInd = document.getElementById('resLoadingIndicator');
+  const noDataMsg = document.getElementById('resNoDataMsg');
+  if(loadInd) loadInd.style.display = 'flex';
+  if(noDataMsg) noDataMsg.style.display = 'none';
+
   const st = document.getElementById('resSaveStatus');
   if(st) st.textContent = 'Завантаження з бази…';
   try {
@@ -5423,8 +5438,13 @@ async function resLoadFromDb() {
       headers:{ apikey: SUPA_KEY2, Authorization: 'Bearer '+SUPA_KEY2, Accept:'application/json' }
     }).then(r=>r.ok?r.json():[]).catch(()=>[]);
 
+    _resDbLoading = false;
+
     if(!data.length) {
       if(st) st.textContent = '';
+      // No data in DB — show import prompt
+      if(loadInd) loadInd.style.display = 'none';
+      if(noDataMsg) noDataMsg.style.display = 'flex';
       return;
     }
 
@@ -5444,8 +5464,11 @@ async function resLoadFromDb() {
     resRenderPreview();
     if(st) st.textContent = `Завантажено ${data.length} зразків з бази`;
   } catch(err) {
+    _resDbLoading = false;
     console.error('resLoadFromDb:', err);
     if(st) st.textContent = '';
+    if(loadInd) loadInd.style.display = 'none';
+    if(noDataMsg) noDataMsg.style.display = 'flex';
   }
 }
 

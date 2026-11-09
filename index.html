@@ -8691,9 +8691,12 @@ async function generateProtocol(sampleId) {
       ? await _sbFetch('protocol_optimal_ranges', `result_code=in.(${resultCodes.join(',')})&select=result_code,range_text`).catch(()=>[])
       : [];
 
-    // Fetch actual lab results for this sample
-    const sampleNum = s.sample_number || sampleId;
-    const labResultsArr = await _sbFetch('sample_results', `sample_id=eq.${encodeURIComponent(sampleNum)}&select=results,lab_sample_id&limit=1`).catch(()=>[]);
+    // Fetch actual lab results for this sample.
+    // sample_results.sample_id stores the ORDER number (e.g. S260000119).
+    // s.sample_number stores order+suffix (e.g. S260000119-01).
+    // o.order_number from the join is the most reliable key; fallback strips -NN suffix.
+    const orderNumForResults = o.order_number || (s.sample_number||'').replace(/-\d{2}$/, '') || sampleId;
+    const labResultsArr = await _sbFetch('sample_results', `sample_id=eq.${encodeURIComponent(orderNumForResults)}&select=results,lab_sample_id&limit=1`).catch(()=>[]);
     const labResults = (labResultsArr && labResultsArr.length) ? labResultsArr[0] : null;
     const resultsMap = labResults ? (labResults.results || {}) : {};
     const labId = labResults ? (labResults.lab_sample_id || '—') : '—';
