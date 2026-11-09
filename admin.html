@@ -2958,7 +2958,7 @@ async function generateProtocolAdmin(sIdx) {
     const resultCodes = uniqueParams.map(p=>p.code).filter(Boolean);
     const quotedCodes = resultCodes.map(c => c.includes(' ') || c.includes(',') ? `"${c}"` : c);
     const [ranges, labResultsArr] = await Promise.all([
-      resultCodes.length ? sbGet('protocol_optimal_ranges', `result_code=in.(${quotedCodes.join(',')})&select=result_code,optimal_min,optimal_max,unit`) : Promise.resolve([]),
+      resultCodes.length ? sbGet('protocol_optimal_ranges', `result_code=in.(${quotedCodes.join(',')})&select=result_code,optimal_min,optimal_max,unit&limit=1000`) : Promise.resolve([]),
       sbGet('sample_results', `sample_id=eq.${encodeURIComponent(sampleRow.sample_number||s.num||'')}&select=param_code,value,lab_sample_id`),
     ]);
     const methodMap={};  (methods||[]).forEach(m=>{ methodMap[m.method_id]=m; });
