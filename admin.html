@@ -2957,7 +2957,6 @@ async function generateProtocolAdmin(sIdx) {
     const rangeMap={};   (ranges||[]).forEach(r=>{ rangeMap[r.result_code]=r.range_text; });
     const labResults = Array.isArray(labResultsArr)&&labResultsArr.length ? labResultsArr[0] : null;
     const resultsMap = labResults ? (labResults.results||{}) : {};
-    const labId = labResults ? (labResults.lab_sample_id||'—') : '—';
     const groups={};
     (params||[]).forEach(p=>{
       const grpName = p.service_id&&serviceMap[p.service_id] ? (serviceMap[p.service_id].group_name||'Аналізи') : 'Аналізи';
