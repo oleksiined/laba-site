@@ -77,7 +77,7 @@ module.exports = async function handler(req, res) {
   try {
     const result = await supabaseRequest(
       host,
-      '/rest/v1/sample_results',
+      '/rest/v1/sample_results?on_conflict=sample_id',
       key,
       'POST',
       upsertRows
