@@ -2944,7 +2944,7 @@ async function generateProtocolAdmin(sIdx) {
     const serviceIds = [...new Set(pkgItems.map(x=>x.service_id).filter(Boolean))];
     const [params, methods, services] = await Promise.all([
       serviceIds.length ? sbGet('catalog_result_parameters', `service_id=in.(${serviceIds.join(',')})&order=protocol_sort_order.asc.nullslast,display_order.asc&select=result_parameter_id,name,unit,code,method_id,service_id,protocol_sort_order`) : Promise.resolve([]),
-      methodIds.length ? sbGet('catalog_methods', `id=in.(${methodIds.join(',')})&select=id,standart_code`) : Promise.resolve([]),
+      methodIds.length ? sbGet('catalog_methods', `method_id=in.(${methodIds.join(',')})&select=method_id,standart_code`) : Promise.resolve([]),
       serviceIds.length ? sbGet('catalog_services', `service_id=in.(${serviceIds.join(',')})&select=service_id,group_name`) : Promise.resolve([]),
     ]);
     // Deduplicate params by code (same indicator may appear for multiple methods)
@@ -2960,7 +2960,7 @@ async function generateProtocolAdmin(sIdx) {
       resultCodes.length ? sbGet('protocol_optimal_ranges', `result_code=in.(${quotedCodes.join(',')})&select=result_code,optimal_min,optimal_max,unit`) : Promise.resolve([]),
       sbGet('sample_results', `sample_id=eq.${encodeURIComponent(sampleRow.sample_number||s.num||'')}&select=param_code,value,lab_sample_id`),
     ]);
-    const methodMap={};  (methods||[]).forEach(m=>{ methodMap[m.id]=m; });
+    const methodMap={};  (methods||[]).forEach(m=>{ methodMap[m.method_id]=m; });
     const serviceMap={}; (services||[]).forEach(sv=>{ serviceMap[sv.service_id||sv.id]=sv; });
     const rangeMap={};   (ranges||[]).forEach(r=>{
       if(r.optimal_min!=null||r.optimal_max!=null){
