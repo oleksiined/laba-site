@@ -2958,13 +2958,14 @@ async function generateProtocolAdmin(sIdx) {
     const quotedCodes = resultCodes.map(c => c.includes(' ') || c.includes(',') ? `"${c}"` : c);
     const [ranges, labResultsArr] = await Promise.all([
       resultCodes.length ? sbGet('protocol_optimal_ranges', `result_code=in.(${quotedCodes.join(',')})&select=result_code,range_text`) : Promise.resolve([]),
-      sbGet('sample_results', `sample_id=eq.${encodeURIComponent(o.id)}&select=results,lab_sample_id&limit=1`),
+      sbGet('sample_results', `sample_id=eq.${encodeURIComponent(o.id)}&select=param_code,value,lab_sample_id`),
     ]);
     const methodMap={};  (methods||[]).forEach(m=>{ methodMap[m.id]=m; });
     const serviceMap={}; (services||[]).forEach(sv=>{ serviceMap[sv.service_id||sv.id]=sv; });
     const rangeMap={};   (ranges||[]).forEach(r=>{ rangeMap[r.result_code]=r.range_text; });
-    const labResults = Array.isArray(labResultsArr)&&labResultsArr.length ? labResultsArr[0] : null;
-    const resultsMap = labResults ? (labResults.results||{}) : {};
+    const resultsRows = Array.isArray(labResultsArr) ? labResultsArr : [];
+    const resultsMap = {};
+    resultsRows.forEach(r=>{ if(r.param_code) resultsMap[r.param_code]=r.value; });
     const groups={};
     uniqueParams.forEach(p=>{
       const grpName = p.service_id&&serviceMap[p.service_id] ? (serviceMap[p.service_id].group_name||'Аналізи') : 'Аналізи';
@@ -3016,7 +3017,7 @@ async function generateProtocolAdmin(sIdx) {
     const pkgCode = s.packageId||s.pkg||'';
     const pkgNameRaw = s.packageName || '';
     const pageTitle = (pkgNameRaw && !/^зразок\s*\d+$/i.test(pkgNameRaw.trim())) ? pkgNameRaw : (pkgCode || 'Пакет');
-    const labId = sampleRow.lab_sample_id || (labResults ? (labResults.lab_sample_id||'—') : '—');
+    const labId = sampleRow.lab_sample_id || (resultsRows.length ? (resultsRows[0].lab_sample_id||'—') : '—');
     const sampleNum = sampleRow.sample_number||s.num||'—';
     const cropPrevious = sampleRow.crop_previous||'—';
     const cropPlanned = sampleRow.crop_planned||'—';
@@ -5523,7 +5524,8 @@ async function resLoadFromDb() {
   try {
     const SUPA_URL2 = 'https://lczccbminjzefmmehntq.supabase.co';
     const SUPA_KEY2 = 'sb_publishable_Axo6-4xZHWuXXlUY2zU5lA_lPbz2eFn';
-    const data = await fetch(`${SUPA_URL2}/rest/v1/sample_results?select=sample_id,lab_sample_id,results,imported_at&order=imported_at.desc&limit=500`, {
+    // EAV: one row per param — load all, then aggregate by sample_id
+    const data = await fetch(`${SUPA_URL2}/rest/v1/sample_results?select=sample_id,lab_sample_id,param_code,value,imported_at&order=sample_id.asc,imported_at.desc&limit=5000`, {
       headers:{ apikey: SUPA_KEY2, Authorization: 'Bearer '+SUPA_KEY2, Accept:'application/json' }
     }).then(r=>r.ok?r.json():[]).catch(()=>[]);
 
@@ -5531,27 +5533,37 @@ async function resLoadFromDb() {
 
     if(!data.length) {
       if(st) st.textContent = '';
-      // No data in DB — show import prompt
       if(loadInd) loadInd.style.display = 'none';
       if(noDataMsg) noDataMsg.style.display = 'flex';
       return;
     }
 
-    // Build unified _resHeaders from all keys across all rows
+    // Aggregate EAV rows into per-sample objects
+    const bySample = {};
+    data.forEach(row => {
+      if(!row.sample_id) return;
+      if(!bySample[row.sample_id]) {
+        bySample[row.sample_id] = {
+          sample_id: row.sample_id,
+          lab_sample_id: row.lab_sample_id || '',
+          results: {},
+          _importedAt: row.imported_at,
+        };
+      }
+      if(row.param_code) bySample[row.sample_id].results[row.param_code] = row.value;
+    });
+
+    _resParsed = Object.values(bySample);
+
+    // Build unified headers from all param_code keys
     const allKeys = new Set();
-    data.forEach(row => { if(row.results) Object.keys(row.results).forEach(k=>allKeys.add(k)); });
+    _resParsed.forEach(s => Object.keys(s.results).forEach(k=>allKeys.add(k)));
     _resHeaders = [...allKeys].map((key,i) => ({ col: i+2, key, service_code:'', name:key, unit:'', type:'' }));
 
-    _resParsed = data.map(row => ({
-      sample_id: row.sample_id,
-      lab_sample_id: row.lab_sample_id || '',
-      results: row.results || {},
-      _importedAt: row.imported_at,
-    }));
     _resFiltered = [..._resParsed];
     _resDbLoaded = true;
     resRenderPreview();
-    if(st) st.textContent = `Завантажено ${data.length} зразків з бази`;
+    if(st) st.textContent = `Завантажено ${_resParsed.length} зразків з бази`;
   } catch(err) {
     _resDbLoading = false;
     console.error('resLoadFromDb:', err);

@@ -1,7 +1,7 @@
 // Vercel Serverless Function — POST /api/import-results
 // Receives parsed Excel rows and upserts into sample_results table.
-// Each row: { sample_id, lab_sample_id, results: { "key": "value", ... } }
-// Stores as one row per sample in sample_results (upsert on sample_id).
+// Each row: { sample_id, lab_sample_id, results: { "param_code": "value", ... } }
+// Stores as one row per param (EAV), upsert on (sample_id, param_code).
 
 const https = require('https');
 
@@ -64,20 +64,32 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ ok: false, error: 'No rows provided' });
   }
 
-  // Build upsert payload
-  const upsertRows = rows.map(r => ({
-    sample_id: (r.sample_id || '').toString().trim(),
-    lab_sample_id: (r.lab_sample_id || '').toString().trim() || null,
-    results: r.results || {},
-    imported_at: new Date().toISOString(),
-  })).filter(r => r.sample_id);
+  // Expand each sample's results into one row per param (EAV)
+  const now = new Date().toISOString();
+  const upsertRows = [];
+  rows.forEach(r => {
+    const sampleId = (r.sample_id || '').toString().trim();
+    const labSampleId = (r.lab_sample_id || '').toString().trim() || null;
+    if(!sampleId) return;
+    const results = r.results || {};
+    Object.entries(results).forEach(([code, value]) => {
+      if(!code) return;
+      upsertRows.push({
+        sample_id: sampleId,
+        lab_sample_id: labSampleId,
+        param_code: code,
+        value: value !== undefined && value !== null ? String(value) : null,
+        imported_at: now,
+      });
+    });
+  });
 
   if(!upsertRows.length) return res.status(400).json({ ok: false, error: 'No valid rows' });
 
   try {
     const result = await supabaseRequest(
       host,
-      '/rest/v1/sample_results?on_conflict=sample_id',
+      '/rest/v1/sample_results?on_conflict=sample_id,param_code',
       key,
       'POST',
       upsertRows
@@ -88,7 +100,9 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ ok: false, error: `Supabase ${result.status}: ${result.body}` });
     }
 
-    return res.status(200).json({ ok: true, saved: upsertRows.length });
+    // Count distinct samples saved
+    const distinctSamples = new Set(upsertRows.map(r => r.sample_id)).size;
+    return res.status(200).json({ ok: true, saved: distinctSamples, rows: upsertRows.length });
   } catch(err) {
     console.error('[import-results] exception:', err.message);
     return res.status(500).json({ ok: false, error: err.message });
