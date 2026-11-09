@@ -645,6 +645,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -708,6 +709,10 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
         <button class="adm-nav-item" onclick="admSwitch('clients',this)" id="adm-navbtn-clients">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="7" r="3"/><path d="M2 17c0-3.3 2.7-6 6-6" stroke-linecap="round"/><circle cx="15" cy="11" r="2"/><path d="M11.5 17c0-1.9 1.6-3.5 3.5-3.5s3.5 1.6 3.5 3.5" stroke-linecap="round"/></svg>
           <span>Клієнти</span>
+        </button>
+        <button class="adm-nav-item" onclick="admSwitch('results',this)" id="adm-navbtn-results">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 17l4-4 3 3 4-5 3 3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 3h14v14" stroke-linecap="round"/></svg>
+          <span>Результати</span>
         </button>
         <div class="adm-nav-divider"></div>
         <div class="adm-nav-section">Документи</div>
@@ -1425,6 +1430,60 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
               <span class="adm-pag-info" id="docPagInfo"></span>
               <div class="adm-pag" id="docPagination"></div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── RESULTS TAB ── -->
+      <div class="adm-subtab" id="admtab-results">
+        <div class="adm-topbar">
+          <div>
+            <div class="adm-page-title">Результати</div>
+            <div class="adm-page-sub">Завантаження результатів аналізів від лабораторії</div>
+          </div>
+          <div class="adm-topbar-actions">
+            <button class="adm-btn adm-btn-primary" onclick="resOpenUpload()">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M10 13V4M6 7l4-4 4 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16h12" stroke-linecap="round"/></svg>
+              Імпорт результатів
+            </button>
+          </div>
+        </div>
+
+        <!-- Upload area (hidden by default) -->
+        <div id="resUploadArea" style="display:none;padding:20px 24px;border-bottom:1px solid var(--border);background:#f8fafc">
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:8px;padding:9px 16px;background:#fff;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--navy)">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="15" height="15"><path d="M4 4h7l5 5v7H4V4z"/><path d="M11 4v5h5" stroke-linecap="round"/></svg>
+              Обрати Excel файл
+              <input type="file" id="resFileInput" accept=".xlsx,.xls" style="display:none" onchange="resParseFile(this)">
+            </label>
+            <span id="resFileName" style="font-size:13px;color:var(--text-soft)">Файл не обрано</span>
+            <button id="resSaveBtn" onclick="resSave()" style="display:none;padding:9px 20px;background:#10B981;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">
+              Зберегти результати
+            </button>
+            <span id="resSaveStatus" style="font-size:12px;color:var(--text-soft)"></span>
+          </div>
+        </div>
+
+        <!-- Preview table -->
+        <div style="flex:1;overflow:auto;padding:20px 24px">
+          <div id="resPreviewWrap" style="display:none">
+            <div style="margin-bottom:12px;display:flex;align-items:center;gap:12px">
+              <span style="font-size:13px;font-weight:600;color:var(--navy)" id="resPreviewCount"></span>
+              <input type="text" id="resPreviewSearch" placeholder="Пошук зразка…" oninput="resFilterPreview()" style="padding:5px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;width:200px">
+            </div>
+            <div style="overflow-x:auto">
+              <table id="resPreviewTable" style="width:100%;border-collapse:collapse;font-size:12px">
+                <thead id="resPreviewHead" style="background:#f1f5f9;position:sticky;top:0"></thead>
+                <tbody id="resPreviewBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Empty state -->
+          <div id="resEmptyState" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;color:var(--text-soft)">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48" style="margin-bottom:16px;opacity:.4"><path d="M8 8h22l10 10v22H8V8z"/><path d="M30 8v10h10"/><path d="M16 28l4-5 4 5 6-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div style="font-size:14px;font-weight:500">Натисніть «Імпорт результатів» та оберіть Excel файл</div>
+            <div style="font-size:12px;margin-top:4px">Формат: перші 5 рядків — заголовки, далі дані зразків</div>
           </div>
         </div>
       </div>
@@ -5338,6 +5397,152 @@ function crOpenClient() {
 }
 
 function crSelectAll(cb) {}
+
+// ═══════════════════════════════════════════════════════
+// RESULTS TAB — Excel import
+// ═══════════════════════════════════════════════════════
+
+// Parsed data: array of objects { sample_id, lab_sample_id, results: { key: value } }
+let _resParsed = [];
+// Header metadata: [ { key, service_code, name, unit, type } ]
+let _resHeaders = [];
+// Filtered rows for preview search
+let _resFiltered = [];
+
+function resOpenUpload() {
+  const area = document.getElementById('resUploadArea');
+  if(area) area.style.display = area.style.display === 'none' ? '' : 'none';
+}
+
+function resParseFile(input) {
+  const file = input.files[0]; if(!file) return;
+  document.getElementById('resFileName').textContent = file.name;
+  document.getElementById('resSaveBtn').style.display = 'none';
+  document.getElementById('resSaveStatus').textContent = 'Читаємо файл…';
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'array', cellText: false, cellDates: true });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      // Convert to array-of-arrays, raw values (no formula text)
+      const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
+
+      if(raw.length < 6) { document.getElementById('resSaveStatus').textContent = 'Файл має бути мінімум 6 рядків (5 заголовків + дані)'; return; }
+
+      // Row indices: 0=service_code, 1=result_key, 2=type, 3=unit, 4=name, 5+=data
+      const rowCode = raw[0]; // service codes
+      const rowKey  = raw[1]; // result keys  (e.g. 01-1-047-01-R01)
+      const rowType = raw[2]; // measured/calculated/interpreted
+      const rowUnit = raw[3]; // units
+      const rowName = raw[4]; // Ukrainian names
+
+      // Build header list (skip first 2 cols: sample_id, lab_sample_id)
+      _resHeaders = [];
+      for(let c = 2; c < rowKey.length; c++) {
+        const key = (rowKey[c]||'').toString().trim();
+        if(!key) continue;
+        _resHeaders.push({
+          col: c,
+          key,
+          service_code: (rowCode[c]||'').toString().trim(),
+          name: (rowName[c]||key).toString().trim(),
+          unit: (rowUnit[c]||'').toString().trim(),
+          type: (rowType[c]||'').toString().trim(),
+        });
+      }
+
+      // Parse data rows
+      _resParsed = [];
+      for(let r = 5; r < raw.length; r++) {
+        const row = raw[r];
+        const sample_id = (row[0]||'').toString().trim();
+        if(!sample_id) continue;
+        const results = {};
+        _resHeaders.forEach(h => {
+          const v = (row[h.col]||'').toString().trim();
+          if(v !== '') results[h.key] = v;
+        });
+        _resParsed.push({ sample_id, lab_sample_id: (row[1]||'').toString().trim(), results });
+      }
+
+      _resFiltered = [..._resParsed];
+      resRenderPreview();
+      document.getElementById('resSaveBtn').style.display = '';
+      document.getElementById('resSaveStatus').textContent = `Знайдено ${_resParsed.length} зразків, ${_resHeaders.length} показників`;
+    } catch(err) {
+      console.error('resParseFile:', err);
+      document.getElementById('resSaveStatus').textContent = 'Помилка читання файлу: ' + err.message;
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function resRenderPreview() {
+  const wrap = document.getElementById('resPreviewWrap');
+  const empty = document.getElementById('resEmptyState');
+  if(!_resFiltered.length) { if(wrap) wrap.style.display='none'; if(empty) empty.style.display='flex'; return; }
+  if(wrap) wrap.style.display=''; if(empty) empty.style.display='none';
+
+  document.getElementById('resPreviewCount').textContent = `${_resFiltered.length} зразків`;
+
+  // Show up to first 8 indicator columns in preview
+  const previewHeaders = _resHeaders.slice(0, 8);
+
+  const thead = document.getElementById('resPreviewHead');
+  const tbody = document.getElementById('resPreviewBody');
+
+  thead.innerHTML = `<tr>
+    <th style="padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:600;color:var(--navy)">№ зразка</th>
+    <th style="padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:600;color:var(--navy)">Лаб. ID</th>
+    ${previewHeaders.map(h=>`<th style="padding:7px 8px;text-align:right;border-bottom:1px solid var(--border);font-weight:500;color:var(--text-soft);max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${h.name}">${h.name.length>14?h.name.slice(0,13)+'…':h.name}</th>`).join('')}
+    ${_resHeaders.length > 8 ? `<th style="padding:7px 8px;color:var(--text-soft);font-size:11px">+${_resHeaders.length-8} ще</th>` : ''}
+  </tr>`;
+
+  tbody.innerHTML = _resFiltered.map(s => `<tr style="border-bottom:1px solid #f1f5f9">
+    <td style="padding:6px 10px;font-family:monospace;font-size:11px;color:var(--navy);white-space:nowrap">${s.sample_id}</td>
+    <td style="padding:6px 10px;font-size:11px;color:var(--text-soft)">${s.lab_sample_id||'—'}</td>
+    ${previewHeaders.map(h=>{
+      const v = s.results[h.key];
+      return `<td style="padding:6px 8px;text-align:right;font-size:12px">${v!=null?v+'<span style=\"font-size:10px;color:var(--text-soft);margin-left:2px\">${h.unit}</span>':'<span style=\"color:var(--text-soft)\">—</span>'}</td>`;
+    }).join('')}
+    ${_resHeaders.length > 8 ? '<td></td>' : ''}
+  </tr>`).join('');
+}
+
+function resFilterPreview() {
+  const q = (document.getElementById('resPreviewSearch')?.value||'').toLowerCase().trim();
+  _resFiltered = q ? _resParsed.filter(s => s.sample_id.toLowerCase().includes(q) || s.lab_sample_id.toLowerCase().includes(q)) : [..._resParsed];
+  resRenderPreview();
+}
+
+async function resSave() {
+  if(!_resParsed.length) return;
+  const btn = document.getElementById('resSaveBtn');
+  const st  = document.getElementById('resSaveStatus');
+  btn.disabled = true; btn.textContent = 'Збереження…';
+
+  try {
+    const res = await fetch('https://laba.zemlerob.com.ua/api/import-results', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rows: _resParsed }),
+    });
+    const data = await res.json();
+    if(data.ok) {
+      st.textContent = `✓ Збережено ${data.saved} зразків`;
+      btn.textContent = 'Зберегти результати';
+      btn.disabled = false;
+    } else {
+      throw new Error(data.error||'Server error');
+    }
+  } catch(err) {
+    console.error('resSave:', err);
+    st.textContent = 'Помилка збереження: ' + err.message;
+    btn.textContent = 'Зберегти результати';
+    btn.disabled = false;
+  }
+}
 
 </script>
 
