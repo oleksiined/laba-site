@@ -2944,7 +2944,7 @@ async function generateProtocolAdmin(sIdx) {
     const serviceIds = [...new Set(pkgItems.map(x=>x.service_id).filter(Boolean))];
     const [params, methods, services] = await Promise.all([
       serviceIds.length ? sbGet('catalog_result_parameters', `service_id=in.(${serviceIds.join(',')})&order=display_order&select=result_parameter_id,name,unit,code,method_id,service_id`) : Promise.resolve([]),
-      methodIds.length ? sbGet('catalog_methods', `id=in.(${methodIds.join(',')})&select=id,standard_code`) : Promise.resolve([]),
+      methodIds.length ? sbGet('catalog_methods', `id=in.(${methodIds.join(',')})&select=id,standart_code`) : Promise.resolve([]),
       serviceIds.length ? sbGet('catalog_services', `service_id=in.(${serviceIds.join(',')})&select=service_id,group_name`) : Promise.resolve([]),
     ]);
     // Deduplicate params by code (same indicator may appear for multiple methods)
@@ -2993,7 +2993,7 @@ async function generateProtocolAdmin(sIdx) {
       allRows.push({type:'group',html:`<tr class="group"><th colspan="6" scope="rowgroup">${grpName}</th></tr>`});
       grpParams.forEach(p=>{
         rowNum++;
-        const stdCode=p.method_id&&methodMap[p.method_id]?(methodMap[p.method_id].standard_code||'—'):'—';
+        const stdCode=p.method_id&&methodMap[p.method_id]?(methodMap[p.method_id].standart_code||'—'):'—';
         const unit=p.unit||'—';
         const optRange=p.code&&rangeMap[p.code]?rangeMap[p.code]:'—';
         const dispName=p.name||'—';
