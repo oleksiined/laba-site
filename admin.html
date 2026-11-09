@@ -2995,8 +2995,8 @@ async function generateProtocolAdmin(sIdx) {
       }
     }
     if(!allRows.length) allRows.push({type:'data',html:`<tr><td colspan="6" style="text-align:center;color:#888;padding:12pt">Дані аналізу будуть доступні після завантаження результатів лабораторії</td></tr>`});
-    // Paginate: ~15 data rows on first page, ~18 on continuation pages
-    const ROWS_PER_FIRST=15,ROWS_PER_REST=18;
+    // Paginate: ~23 data rows on first page, ~28 on continuation pages
+    const ROWS_PER_FIRST=23,ROWS_PER_REST=28;
     const pages=[];
     let curPage=[],dataCount=0,pgLimit=ROWS_PER_FIRST;
     for(const row of allRows){
@@ -3067,10 +3067,19 @@ ${footer}
       } else {
         return `<article class="sheet"><div class="frame">
 <header class="head">
-<img alt="LABA" class="brand-lockup" src="${LOGO_SRC}" style="width:60pt"/>
-<div style="flex:1;padding-left:8pt"><p class="kicker" style="font-size:7.2pt;margin-bottom:2pt">Продовження результатів</p><strong style="font-size:8.5pt">Лаб. ID ${labId} · ${customerName}</strong></div>
+<img alt="LABA" class="brand-lockup" src="${LOGO_SRC}"/>
+<div class="lab"><strong>Центр лабораторних досліджень</strong><span>ТОВ «КОМПАНІЯ ЗЕМЛЕРОБ»</span><small>laba.zemlerob.com.ua</small></div>
 </header>
 <div class="content">
+<div class="hero" style="margin:0 0 5pt">
+<p class="kicker">Лабораторні дослідження · ${customerName}</p>
+<h1 style="font-size:16pt;padding-right:0">ПРОТОКОЛ АНАЛІЗУ ҐРУНТУ</h1>
+<p style="font-size:7.5pt;color:var(--green);margin-top:3pt;font-weight:600">Продовження результатів · Лаб. ID ${labId}</p>
+</div>
+<dl class="meta" style="grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:5pt">
+<div class="card"><dt>Замовник</dt><dd>${customerName}</dd></div>
+<div class="card"><dt>Номер зразка LABA</dt><dd>${sampleNum}</dd></div>
+</dl>
 ${tableSection}
 </div>
 ${footer}
