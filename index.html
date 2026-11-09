@@ -8696,7 +8696,10 @@ async function generateProtocol(sampleId) {
     // s.sample_number stores order+suffix (e.g. S260000119-01).
     // o.order_number from the join is the most reliable key; fallback strips -NN suffix.
     const orderNumForResults = o.order_number || (s.sample_number||'').replace(/-\d{2}$/, '') || sampleId;
+    console.log('[proto] pkgCode=', pkgCode, 'pkgItems=', pkgItems, 'serviceIds=', serviceIds, 'params=', params);
+    console.log('[proto] orderNumForResults=', orderNumForResults, 'o.order_number=', o.order_number, 's.sample_number=', s.sample_number);
     const labResultsArr = await _sbFetch('sample_results', `sample_id=eq.${encodeURIComponent(orderNumForResults)}&select=results,lab_sample_id&limit=1`).catch(()=>[]);
+    console.log('[proto] labResultsArr=', labResultsArr);
     const labResults = (labResultsArr && labResultsArr.length) ? labResultsArr[0] : null;
     const resultsMap = labResults ? (labResults.results || {}) : {};
     const labId = labResults ? (labResults.lab_sample_id || '—') : '—';
