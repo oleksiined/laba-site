@@ -4065,7 +4065,7 @@ main{flex:1}
               <p style="font-size:13.5px;color:var(--t3);margin-bottom:10px">Ми надіслали підтвердження та рахунок на <span id="ncf-email" style="color:var(--t2);font-weight:500">—</span></p>
               <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
                 <span style="font-size:15px;font-weight:700;color:var(--t1)" id="ncf-order-num">№ LAB-000000-0000</span>
-                <span style="background:#fff8e6;color:#c07000;border:1px solid #f5d97a;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600">Очікує оплату</span>
+                <span id="ncf-pay-badge" style="background:#fff8e6;color:#c07000;border:1px solid #f5d97a;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600">Очікує оплату</span>
               </div>
             </div>
           </div>
@@ -4085,29 +4085,29 @@ main{flex:1}
         <div style="background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:24px;margin-bottom:20px">
           <h3 style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:18px">Що далі?</h3>
           <div style="display:flex;flex-direction:column;gap:16px">
-            <div style="display:flex;gap:14px;align-items:flex-start">
-              <div style="width:28px;height:28px;border-radius:50%;background:var(--neon);color:#242729;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+            <div id="ncf-next-step-pay" style="display:flex;gap:14px;align-items:flex-start">
+              <div class="ncf-step-num" style="width:28px;height:28px;border-radius:50%;background:var(--neon);color:#242729;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
               <div>
                 <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:2px">Оплатіть рахунок</div>
                 <div style="font-size:13px;color:var(--t3)" id="ncf-invoice-hint">Рахунок сформовано на суму замовлення</div>
               </div>
             </div>
             <div style="display:flex;gap:14px;align-items:flex-start">
-              <div style="width:28px;height:28px;border-radius:50%;background:var(--neon);color:#242729;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+              <div class="ncf-step-num" style="width:28px;height:28px;border-radius:50%;background:var(--neon);color:#242729;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
               <div>
                 <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:2px">Відберіть і підпишіть зразки</div>
                 <div style="font-size:13px;color:var(--t3)">Використовуйте назви зразків або системні коди з замовлення</div>
               </div>
             </div>
             <div style="display:flex;gap:14px;align-items:flex-start">
-              <div style="width:28px;height:28px;border-radius:50%;background:var(--neon);color:#242729;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+              <div class="ncf-step-num" style="width:28px;height:28px;border-radius:50%;background:var(--neon);color:#242729;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
               <div>
                 <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:2px">Передайте зразки до лабораторії</div>
                 <div style="font-size:13px;color:var(--t3)">Нова пошта або самостійна доставка</div>
               </div>
             </div>
             <div style="display:flex;gap:14px;align-items:flex-start">
-              <div style="width:28px;height:28px;border-radius:50%;background:var(--neon);color:#242729;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div>
+              <div class="ncf-step-num" style="width:28px;height:28px;border-radius:50%;background:var(--neon);color:#242729;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div>
               <div>
                 <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:2px">Слідкуйте за статусом</div>
                 <div style="font-size:13px;color:var(--t3)">Ми повідомимо про приймання зразків і готовність результатів</div>
@@ -8963,11 +8963,15 @@ function showToast(msg,ms=2500){
     const _p = new URLSearchParams(window.location.search).get('paid');
     if (_p) {
       history.replaceState(null,'',window.location.pathname + window.location.hash);
-      navigate('status');
-      setTimeout(function(){
-        const inp = document.getElementById('ostat-input');
-        if (inp) { inp.value = _p; ostCheck(); }
-      }, 400);
+      // Restore saved order snapshot
+      try {
+        const saved = JSON.parse(localStorage.getItem('laba_liqpay_order') || '{}');
+        if (saved && saved.num) window._ncfOrder = saved;
+        else window._ncfOrder = { num: _p };
+        localStorage.removeItem('laba_liqpay_order');
+      } catch(_){ window._ncfOrder = { num: _p }; }
+      window._ncfPaidViaLiqpay = true;
+      ncf_show();
     }
   })();
   // Скидаємо матеріал — показуємо всі послуги
@@ -12091,6 +12095,8 @@ async function submitOrder() {
           form.appendChild(inp);
         });
         document.body.appendChild(form);
+        // Save order snapshot so we can restore it after LiqPay redirect
+        try { localStorage.setItem('laba_liqpay_order', JSON.stringify(window._ncfOrder || {})); } catch(_){}
         form.submit();
         return; // Don't show confirm page — LiqPay handles redirect
       } else {
@@ -12132,6 +12138,26 @@ function ncf_show() {
   document.getElementById('ncf-email').textContent = o.email || '—';
   document.getElementById('ncf-invoice-hint').textContent =
     `Рахунок № ${o.num || '—'} від ${o.date || '—'} на суму ${nco_fmtPrice ? nco_fmtPrice(o.total||0) : (o.total||0) + ' грн'}`;
+  // Adapt UI for LiqPay-paid orders
+  const _liqPaid = !!window._ncfPaidViaLiqpay;
+  const badge = document.getElementById('ncf-pay-badge');
+  if (badge) {
+    if (_liqPaid) { badge.textContent = 'Оплачено'; badge.style.background='#d1fae5'; badge.style.color='#065f46'; badge.style.borderColor='#6ee7b7'; }
+    else { badge.textContent = 'Очікує оплату'; badge.style.background='#fff8e6'; badge.style.color='#c07000'; badge.style.borderColor='#f5d97a'; }
+  }
+  const payStep = document.getElementById('ncf-next-step-pay');
+  if (payStep) payStep.style.display = _liqPaid ? 'none' : 'flex';
+  // Renumber remaining steps when payment step is hidden
+  if (_liqPaid) {
+    let n = 1;
+    document.querySelectorAll('#page-nc-confirm .ncf-step-num').forEach(el => {
+      if (el.closest('#ncf-next-step-pay')) return;
+      el.textContent = n++;
+    });
+  } else {
+    let n = 1;
+    document.querySelectorAll('#page-nc-confirm .ncf-step-num').forEach(el => { el.textContent = n++; });
+  }
   ncf_renderSidebar();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-nc-confirm').classList.add('active');
