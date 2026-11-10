@@ -5,6 +5,7 @@
 
 const https = require('https');
 const nodemailer = require('nodemailer');
+const { sendConfirmationEmail } = require('./send-confirmation-email');
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -664,65 +665,38 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // 2c. Email to client
+  // 2c. Confirmation email to client via SendPulse SMTP
   const clientEmail = order.client?.email;
-  if (clientEmail && process.env.SMTP_HOST) {
-    const transporter = nodemailer.createTransport({
-      host:   process.env.SMTP_HOST,
-      port:   Number(process.env.SMTP_PORT || 587),
-      secure: process.env.SMTP_SECURE === 'true',
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-    });
-
-    // Confirmation email
+  if (clientEmail && process.env.SENDPULSE_SMTP_HOST) {
     try {
-      await transporter.sendMail({
-        from:    `"LABA Agro" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
-        to:      clientEmail,
-        subject: `Замовлення ${order.orderNum} прийнято — LABA`,
-        html:    buildClientEmailHtml(order),
-      });
+      await sendConfirmationEmail(order);
+      console.log('[order] confirmation email sent to', clientEmail);
     } catch (err) {
-      console.warn('Confirmation email error (non-fatal):', err.message);
+      console.warn('[order] confirmation email error (non-fatal):', err.message);
       notifErrors.push({ channel: 'email', message: err.message });
-    }
-
-    // Invoice email
-    const invoiceNum = order.orderNum
-      ? 'LABA-' + order.orderNum.replace(/^LAB-/, '')
-      : 'LABA-рахунок';
-    try {
-      await transporter.sendMail({
-        from:    `"LABA Agro" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
-        to:      clientEmail,
-        subject: `Рахунок ${invoiceNum} — LABA`,
-        html:    buildInvoiceHtml(order),
-      });
-    } catch (err) {
-      console.warn('Invoice email error (non-fatal):', err.message);
-      notifErrors.push({ channel: 'invoice_email', message: err.message });
     }
   }
 
-  // 2d. Team email
+  // 2d. Team email (plain-text summary via SendPulse SMTP)
   const teamEmail = process.env.TEAM_EMAIL;
-  if (teamEmail && process.env.SMTP_HOST) {
+  if (teamEmail && process.env.SENDPULSE_SMTP_HOST) {
     try {
-      const transporter = nodemailer.createTransport({
-        host:   process.env.SMTP_HOST,
-        port:   Number(process.env.SMTP_PORT || 587),
-        secure: process.env.SMTP_SECURE === 'true',
-        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+      const smtpFrom = process.env.FROM_EMAIL || process.env.SENDPULSE_SMTP_USER;
+      const teamTransporter = nodemailer.createTransport({
+        host:   process.env.SENDPULSE_SMTP_HOST,
+        port:   465,
+        secure: true,
+        auth:   { user: process.env.SENDPULSE_SMTP_USER, pass: process.env.SENDPULSE_SMTP_PASS },
       });
       const textBody = buildTelegramText(order).replace(/[*_`]/g, '');
-      await transporter.sendMail({
-        from:    `"LABA Site" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+      await teamTransporter.sendMail({
+        from:    `"LABA Site" <${smtpFrom}>`,
         to:      teamEmail,
         subject: `Нове замовлення ${order.orderNum} — LABA`,
         text:    textBody,
       });
     } catch (err) {
-      console.warn('Team email error (non-fatal):', err.message);
+      console.warn('[order] team email error (non-fatal):', err.message);
       notifErrors.push({ channel: 'team_email', message: err.message });
     }
   }

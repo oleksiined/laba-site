@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <title>LABA — замовлення № {{order_number}}</title>
+  <style>
+    /* Email-safe table layout. All essential styling is also inline. */
+    body{margin:0!important;padding:0!important;background-color:#f3f5f7!important;color:#17191e!important;font-family:Arial,Helvetica,sans-serif!important}
+    table{border-spacing:0;border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt}
+    img{border:0;outline:none;text-decoration:none;display:block}
+    a{text-decoration:none}
+    .paper{width:640px;max-width:640px}
+    .mobile-only{display:none;max-height:0;overflow:hidden}
+    @media only screen and (max-width:680px){
+      .outer{padding:14px 8px!important}
+      .paper{width:100%!important;max-width:100%!important}
+      .pad{padding-left:22px!important;padding-right:22px!important}
+      .top-pad{padding-top:24px!important}
+      .hero-copy{font-size:29px!important;line-height:35px!important}
+      .hero-col{display:block!important;width:100%!important}
+      .hero-picture{width:100%!important;max-width:320px!important;margin:0 auto!important}
+      .hero-picture-cell{padding-top:12px!important}
+      .action-col{display:block!important;width:100%!important;padding:0 0 9px 0!important}
+      .action-link{display:block!important;width:auto!important;text-align:center!important}
+      .summary-col{display:block!important;width:100%!important;text-align:left!important}
+      .summary-price{padding-top:12px!important;border-left:0!important;border-top:1px solid #e6e9ed!important}
+      .two-col{display:block!important;width:100%!important;padding:0!important}
+      .support-sep{border-left:0!important;border-top:1px solid #e6e9ed!important;padding-top:16px!important;margin-top:16px!important}
+      .desktop-only{display:none!important}
+      .mobile-only{display:block!important;max-height:none!important;overflow:visible!important}
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background:#f3f5f7;font-family:Arial,Helvetica,sans-serif;color:#17191e;">
+  <div style="display:none;font-size:1px;color:#f3f5f7;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;">Ваше замовлення № {{order_number}} оформлено. Рахунок та етикетки у вкладеннях, інструкція — за посиланням.</div>
+  <table role="presentation" width="100%" style="width:100%;background:#f3f5f7" cellpadding="0" cellspacing="0" border="0">
+   <tr><td align="center" class="outer" style="padding:30px 14px 44px;">
+    <!--[if mso]><table role="presentation" width="640" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+    <table role="presentation" class="paper" width="640" style="width:640px;max-width:640px;background:#fff;border:1px solid #e7ebef;border-radius:22px;overflow:hidden" cellpadding="0" cellspacing="0" border="0">
+     <tr><td class="pad top-pad" style="padding:26px 30px 0;">
+       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+         <td valign="middle" style="width:50%;"><img src="cid:laba-logo" width="185" height="66" alt="LABA — сервіс лабораторних досліджень" style="display:block;width:185px;max-width:100%;height:auto;"></td>
+         <td valign="middle" align="right" style="font-size:12px;line-height:18px;color:#78818d;letter-spacing:.1px;">Підтвердження<br class="mobile-only"> замовлення</td>
+        </tr>
+       </table>
+       <div style="height:1px;background:#edf0f3;margin-top:20px;line-height:1px;font-size:1px;">&nbsp;</div>
+      </td></tr>
+     <tr><td class="pad" style="padding:28px 30px 14px;">
+       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+         <td class="hero-col" valign="middle" style="width:57%;vertical-align:middle;">
+          <div class="hero-copy" style="font-size:31px;font-weight:800;line-height:37px;letter-spacing:-.8px;color:#17191e;">Все готово —<br>ваше замовлення<br><span style="background:#b6ff21;color:#101214;padding:0 5px;border-radius:9px;">оформлено</span></div>
+          <div style="margin-top:13px;font-size:14px;line-height:22px;color:#67717c;">Рахунок та етикетки вже у вкладеннях.<br>Далі — кілька простих кроків.</div>
+          <div style="margin-top:19px;font-size:16px;font-weight:800;color:#17191e;">№ {{order_number}}</div>
+          <div style="margin-top:8px;"><span style="display:inline-block;background:#fff7e8;border:1px solid #f2be55;border-radius:18px;padding:6px 11px;font-size:12px;line-height:15px;font-weight:bold;color:#a35f00;">Очікує оплату</span></div>
+         </td>
+         <td class="hero-col hero-picture-cell" valign="bottom" align="right" style="width:43%;padding-top:0;vertical-align:bottom;">
+          <img class="hero-picture" src="cid:laba-mascot" width="260" height="195" alt="Робот LABA підготував ваше замовлення" style="display:block;max-width:100%;width:260px;height:auto;">
+         </td>
+        </tr>
+       </table>
+      </td></tr>
+     <tr><td class="pad" style="padding:0 30px 21px;">
+       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+         <td class="action-col" width="34%" style="padding:0 7px 0 0;"><a class="action-link" href="{{invoice_url}}" style="display:block;background:#b6ff21;color:#17191e;border:1px solid #b6ff21;border-radius:10px;padding:12px 6px;font-size:12px;font-weight:bold;line-height:17px;text-align:center;white-space:nowrap;">↓ &nbsp; Рахунок</a></td>
+         <td class="action-col" width="33%" style="padding:0 7px 0 0;"><a class="action-link" href="{{labels_url}}" style="display:block;background:#fff;color:#292e35;border:1px solid #d7dde4;border-radius:10px;padding:12px 6px;font-size:12px;font-weight:bold;line-height:17px;text-align:center;white-space:nowrap;">↓ &nbsp; Етикетки</a></td>
+         <td class="action-col" width="33%" style="padding:0;"><a class="action-link" href="{{sampling_guide_url}}" style="display:block;background:#fff;color:#292e35;border:1px solid #d7dde4;border-radius:10px;padding:12px 6px;font-size:12px;font-weight:bold;line-height:17px;text-align:center;white-space:nowrap;">↗ &nbsp; Як відібрати проби</a></td>
+        </tr>
+       </table>
+      </td></tr>
+     <tr><td class="pad" style="padding:0 30px 26px;">
+       <table role="presentation" width="100%" style="border:1px solid #dfe4e9;border-radius:12px;overflow:hidden;" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+         <td class="summary-col" width="65%" valign="middle" style="padding:18px 18px 17px;vertical-align:middle;">
+          <div style="font-size:18px;line-height:23px;font-weight:800;color:#17191e;">{{service_name}}</div>
+          <div style="margin-top:6px;font-size:13px;line-height:20px;color:#737d88;">{{samples_count}} зразок · {{packages_count}} пакет</div>
+         </td>
+         <td class="summary-col summary-price" width="35%" valign="middle" style="padding:18px;vertical-align:middle;border-left:1px solid #e6e9ed;">
+          <div style="font-size:12px;line-height:16px;color:#68717c;">Разом до сплати</div>
+          <div style="font-size:25px;font-weight:800;line-height:32px;color:#17191e;white-space:nowrap;">{{total_amount}} грн</div>
+         </td>
+        </tr>
+       </table>
+      </td></tr>
+     <tr><td class="pad" style="padding:0 30px 8px;">
+       <div style="font-size:21px;line-height:27px;font-weight:800;letter-spacing:-.3px;">Що далі?</div>
+      </td></tr>
+     <!-- Four next steps -->
+     <tr><td class="pad" style="padding:11px 30px 0;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+       <td width="40" valign="top" style="width:40px;"><div style="background:#b6ff21;width:30px;height:30px;border-radius:50%;font-size:14px;font-weight:800;text-align:center;line-height:30px;">1</div></td>
+       <td valign="top" style="padding-bottom:12px;"><div style="font-size:15px;line-height:20px;font-weight:700;">Оплатіть рахунок</div><div style="font-size:13px;line-height:20px;color:#77818d;margin-top:3px;">Рахунок № {{order_number}} від {{invoice_date}} на {{total_amount}} грн.</div></td>
+      </tr></table>
+     </td></tr>
+     <tr><td class="pad" style="padding:4px 30px 0;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+       <td width="40" valign="top" style="width:40px;"><div style="background:#b6ff21;width:30px;height:30px;border-radius:50%;font-size:14px;font-weight:800;text-align:center;line-height:30px;">2</div></td>
+       <td valign="top" style="padding-bottom:12px;"><div style="font-size:15px;line-height:20px;font-weight:700;">Підпишіть зразки</div><div style="font-size:13px;line-height:20px;color:#77818d;margin-top:3px;">Роздрукуйте етикетки із вкладення та наклейте на зразки.</div></td>
+      </tr></table>
+     </td></tr>
+     <tr><td class="pad" style="padding:4px 30px 0;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+       <td width="40" valign="top" style="width:40px;"><div style="background:#b6ff21;width:30px;height:30px;border-radius:50%;font-size:14px;font-weight:800;text-align:center;line-height:30px;">3</div></td>
+       <td valign="top" style="padding-bottom:12px;"><div style="font-size:15px;line-height:20px;font-weight:700;">Передайте зразки до лабораторії</div><div style="font-size:13px;line-height:20px;color:#77818d;margin-top:3px;">Новою поштою або самостійно — як вам зручніше.</div></td>
+      </tr></table>
+     </td></tr>
+     <tr><td class="pad" style="padding:4px 30px 22px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+       <td width="40" valign="top" style="width:40px;"><div style="background:#b6ff21;width:30px;height:30px;border-radius:50%;font-size:14px;font-weight:800;text-align:center;line-height:30px;">4</div></td>
+       <td valign="top"><div style="font-size:15px;line-height:20px;font-weight:700;">Стежте за статусом</div><div style="font-size:13px;line-height:20px;color:#77818d;margin-top:3px;">Повідомимо, коли отримаємо зразки та підготуємо результати. <a href="{{tracking_url}}" style="color:#333a42;text-decoration:underline;font-weight:bold;">Перевірити статус</a></div></td>
+      </tr></table>
+     </td></tr>
+     <tr><td class="pad" style="padding:0 30px 24px;">
+       <table role="presentation" width="100%" style="border:1px solid #e1e6eb;border-radius:12px;" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+         <td class="two-col" width="55%" style="padding:17px 18px;vertical-align:top;">
+          <div style="font-size:12px;line-height:18px;color:#7b8491;">Передавання зразків</div>
+          <div style="font-size:15px;line-height:23px;color:#15191d;font-weight:800;">{{delivery_method}}</div>
+          <div style="font-size:12px;line-height:19px;color:#77818d;">{{delivery_details}}</div>
+         </td>
+         <td class="two-col" width="45%" style="padding:17px 18px;vertical-align:top;">
+          <div class="support-sep" style="border-left:1px solid #e6e9ed;padding-left:16px;">
+           <div style="font-size:12px;line-height:18px;color:#7b8491;">Потрібна допомога?</div>
+           <div style="font-size:15px;line-height:23px;font-weight:800;"><a href="tel:{{support_phone_tel}}" style="color:#17191e;">{{support_phone_display}}</a></div>
+           <div style="font-size:12px;line-height:19px;color:#77818d;">{{support_hours}}</div>
+          </div>
+         </td>
+        </tr>
+       </table>
+      </td></tr>
+     <tr><td class="pad" style="padding:0 30px 26px;">
+      <div style="height:1px;background:#edf0f3;margin-bottom:21px;line-height:1px;font-size:1px;">&nbsp;</div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+       <td width="37" valign="top" style="width:37px;font-size:28px;line-height:30px;color:#99ea00;">♡</td>
+       <td valign="top"><div style="font-size:14px;line-height:21px;font-weight:800;color:#17191e;">Дякуємо, що обираєте LABA!</div><div style="font-size:12px;line-height:20px;color:#7b8491;">З аналізами легше приймати точні рішення.</div></td>
+      </tr></table>
+      <div style="margin-top:20px;font-size:10px;line-height:15px;color:#9aa3ac;">Це автоматичне повідомлення щодо вашого замовлення. Якщо ви його не оформлювали, зв’яжіться з нами.</div>
+     </td></tr>
+    </table>
+    <!--[if mso]></td></tr></table><![endif]-->
+   </td></tr>
+  </table>
+</body>
+</html>
