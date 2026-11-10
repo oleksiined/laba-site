@@ -58,7 +58,7 @@ module.exports = async function handler(req, res) {
     is_active: 'eq.true',
     valid_from: `lte.${today}`,
     valid_to:   `gte.${today}`,
-    select: 'code,discount_percent,valid_from,valid_to',
+    select: 'code,discount_percent,valid_from,valid_to,max_uses,used_count',
     limit: '1',
   });
 
@@ -78,6 +78,15 @@ module.exports = async function handler(req, res) {
     }
 
     const promo = rows[0];
+
+    // Check usage limit
+    if (promo.max_uses !== null && promo.max_uses !== undefined) {
+      const used = Number(promo.used_count) || 0;
+      if (used >= Number(promo.max_uses)) {
+        return res.status(200).json({ ok: false, error: 'Промокод вичерпано' });
+      }
+    }
+
     return res.status(200).json({
       ok: true,
       discount_percent: Number(promo.discount_percent),

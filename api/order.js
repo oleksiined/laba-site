@@ -589,7 +589,36 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ ok: false, orderNum: order.orderNum, error: 'Supabase: ' + err.message });
   }
 
-  // 1a. Log order_created event (non-critical)
+  // 1a. Increment promo used_count via RPC (non-critical)
+  if (order.promo) {
+    try {
+      const _spUrl  = process.env.SUPABASE_URL;
+      const _spKey  = process.env.SUPABASE_SERVICE_KEY;
+      const _spHost = new URL(_spUrl).hostname;
+      await new Promise((resolve, reject) => {
+        const body = JSON.stringify({ promo_code: order.promo.toUpperCase() });
+        const req = require('https').request({
+          hostname: _spHost,
+          path: '/rest/v1/rpc/increment_promo_used_count',
+          method: 'POST',
+          headers: {
+            'apikey': _spKey,
+            'Authorization': `Bearer ${_spKey}`,
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(body),
+          },
+        }, r => { r.resume(); resolve(); });
+        req.on('error', reject);
+        req.write(body);
+        req.end();
+      });
+      console.log('[order] promo used_count incremented for', order.promo);
+    } catch (err) {
+      console.warn('[order] promo increment failed (non-fatal):', err.message);
+    }
+  }
+
+  // 1b. Log order_created event (non-critical)
   await logOrderEvent(
     order.orderNum,
     'order_created',
