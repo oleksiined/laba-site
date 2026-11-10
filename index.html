@@ -12159,6 +12159,26 @@ function ncf_show() {
   document.getElementById('page-nc-confirm').classList.add('active');
   nc_setMaxStep(4);
   window.scrollTo(0, 0);
+
+  // ── Auto-save invoice PDF to Supabase (background, silent) ────────────────
+  // Runs for all payment types (invoice + liqpay), regardless of user clicking download
+  setTimeout(function() {
+    if (window._ncfInvoiceAutoSaved) return; // run only once per order
+    window._ncfInvoiceAutoSaved = true;
+    ncf_saveInvoiceBackground();
+  }, 800); // slight delay to let pdfMake load
+}
+
+function ncf_saveInvoiceBackground() {
+  if (typeof pdfMake === 'undefined') {
+    // pdfMake not ready yet — retry once after 2s
+    setTimeout(function() {
+      if (typeof pdfMake !== 'undefined') ncf_downloadInvoice(true);
+      else console.warn('[LABA] pdfMake not available for auto-save');
+    }, 2000);
+    return;
+  }
+  ncf_downloadInvoice(true);
 }
 
 function ncf_renderSidebar() {
@@ -12235,9 +12255,9 @@ function ncf_renderSidebar() {
   </div>`;
 }
 
-function ncf_downloadInvoice() {
+function ncf_downloadInvoice(saveOnly) {
   if (typeof pdfMake === 'undefined') {
-    toast('PDF-бібліотека завантажується, спробуйте ще раз');
+    if (!saveOnly) toast('PDF-бібліотека завантажується, спробуйте ще раз');
     return;
   }
 
@@ -12563,15 +12583,17 @@ function ncf_downloadInvoice() {
   // ── Generate PDF once → same blob used for download AND Supabase save ────
   pdfMake.createPdf(docDef).getBase64(function(_b64) {
 
-    // ① Download to user (identical to what gets saved)
-    try {
-      const _link = document.createElement('a');
-      _link.href = 'data:application/pdf;base64,' + _b64;
-      _link.download = _invFileName;
-      document.body.appendChild(_link);
-      _link.click();
-      document.body.removeChild(_link);
-    } catch(e) { console.warn('[LABA] Invoice download error:', e.message); }
+    // ① Download to user (skip when called in background save-only mode)
+    if (!saveOnly) {
+      try {
+        const _link = document.createElement('a');
+        _link.href = 'data:application/pdf;base64,' + _b64;
+        _link.download = _invFileName;
+        document.body.appendChild(_link);
+        _link.click();
+        document.body.removeChild(_link);
+      } catch(e) { console.warn('[LABA] Invoice download error:', e.message); }
+    }
 
     // ② Save the same PDF to Supabase Storage (background, silent)
     fetch('https://laba.zemlerob.com.ua/api/save-invoice', {
