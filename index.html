@@ -6136,6 +6136,7 @@ function navigateToArticle(slug) {
   document.title = art.seoTitle;
   var metaDesc = document.querySelector('meta[name="description"]');
   if (metaDesc) metaDesc.setAttribute('content', art.metaDesc);
+  try { history.pushState({page:'article', slug: slug}, '', '#article=' + slug); } catch(e){}
   navigate('article');
   window.scrollTo(0, 0);
 }
@@ -8963,6 +8964,9 @@ function showToast(msg,ms=2500){
   function _navigateFromHash(hash) {
     if(hash.startsWith('#card-')){
       navigate('services');
+    } else if(hash.startsWith('#article=')){
+      const _slug = hash.slice('#article='.length);
+      if(_slug && BLOG_ARTICLES[_slug]) navigateToArticle(_slug); else navigate('blog');
     } else if(hash && hash !== '#'){
       const _pg = hash.slice(1);
       if(_ALL_PAGES.includes(_pg)) navigate(_pg); else navigate('home');
@@ -8986,7 +8990,8 @@ function showToast(msg,ms=2500){
     _navigateFromHash(location.hash);
   }
   window.addEventListener('popstate', function(e){
-    if(e.state && e.state.page) navigate(e.state.page);
+    if(e.state && e.state.page === 'article' && e.state.slug) navigateToArticle(e.state.slug);
+    else if(e.state && e.state.page) navigate(e.state.page);
     else _navigateFromHash(location.hash);
   });
   // Скидаємо матеріал — показуємо всі послуги
