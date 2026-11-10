@@ -4549,7 +4549,7 @@ main{flex:1}
       <!-- 1: Ґрунт -->
       <div class="blog-card" data-cat="grunt" onclick="navigateToArticle('analizy-gruntu-pered-posivom-kukurudzy')">
         <div class="blog-card-media">
-          <div class="blog-card-photo" style="background:linear-gradient(160deg,#c8e6c9 0%,#558b2f 55%,#e65100 100%);height:210px"></div>
+          <img class="blog-card-photo" src="/blog/analiz-gruntu-kukurudza.png" alt="Аналізи ґрунту перед посівом кукурудзи" loading="lazy" style="height:210px;object-fit:cover">
           <span class="blog-card-cat">Ґрунт</span>
           <span class="blog-card-time">6 хв читання</span>
         </div>
@@ -4573,7 +4573,7 @@ main{flex:1}
       <!-- 2: Добрива -->
       <div class="blog-card" data-cat="dobryva" onclick="navigateToArticle('yak-pereviryty-yakist-dobryv')">
         <div class="blog-card-media">
-          <div class="blog-card-photo" style="background:linear-gradient(160deg,#f5f5dc 0%,#c8b86a 50%,#8d6e37 100%);height:210px"></div>
+          <img class="blog-card-photo" src="/blog/yakist-dobryv.png" alt="Якість добрив" loading="lazy" style="height:210px;object-fit:cover">
           <span class="blog-card-cat" style="background:#6d4c41">Добрива</span>
           <span class="blog-card-time">5 хв читання</span>
         </div>
@@ -4597,7 +4597,7 @@ main{flex:1}
       <!-- 3: Рослини -->
       <div class="blog-card" data-cat="roslyny" onclick="navigateToArticle('diagnostyka-defitsytu-elementiv-lystkovyi-analiz')">
         <div class="blog-card-media">
-          <div class="blog-card-photo" style="background:linear-gradient(160deg,#a5d6a7 0%,#1b5e20 55%,#0a3d0a 100%);height:210px"></div>
+          <img class="blog-card-photo" src="/blog/diagnostyka-defitsytu.png" alt="Діагностика дефіциту елементів" loading="lazy" style="height:210px;object-fit:cover">
           <span class="blog-card-cat" style="background:#1565c0">Рослини</span>
           <span class="blog-card-time">7 хв читання</span>
         </div>
@@ -4621,7 +4621,7 @@ main{flex:1}
       <!-- 4: Ґрунт -->
       <div class="blog-card" data-cat="grunt" onclick="navigateToArticle('nyzkyi-vmist-organichnoi-rechovyny-v-grunti')">
         <div class="blog-card-media">
-          <div class="blog-card-photo" style="background:linear-gradient(160deg,#bcaaa4 0%,#5d4037 55%,#3e2723 100%);height:210px"></div>
+          <img class="blog-card-photo" src="/blog/organichna-rechovyna.png" alt="Органічна речовина ґрунту" loading="lazy" style="height:210px;object-fit:cover">
           <span class="blog-card-cat">Ґрунт</span>
           <span class="blog-card-time">6 хв читання</span>
         </div>
@@ -4645,7 +4645,7 @@ main{flex:1}
       <!-- 5: Насіння -->
       <div class="blog-card" data-cat="nasinnya" onclick="navigateToArticle('navishcho-pereviryaty-yakist-nasinnia')">
         <div class="blog-card-media">
-          <div class="blog-card-photo" style="background:linear-gradient(160deg,#ffe0b2 0%,#bf8040 55%,#6d4c24 100%);height:210px"></div>
+          <img class="blog-card-photo" src="/blog/navishcho-perevirjaty-nasinnya.png" alt="Якість насіння" loading="lazy" style="height:210px;object-fit:cover">
           <span class="blog-card-cat" style="background:#7b5e2a">Насіння</span>
           <span class="blog-card-time">4 хв читання</span>
         </div>
@@ -4669,7 +4669,7 @@ main{flex:1}
       <!-- 6: Сезонне -->
       <div class="blog-card" data-cat="sezonni" onclick="navigateToArticle('5-agronomichnykh-priorytetiv-pered-vesnoyu')">
         <div class="blog-card-media">
-          <div class="blog-card-photo" style="background:linear-gradient(160deg,#fff9c4 0%,#f9a825 50%,#e65100 100%);height:210px"></div>
+          <img class="blog-card-photo" src="/blog/agro-priorytety-vesna.png" alt="Агрономічні пріоритети весни" loading="lazy" style="height:210px;object-fit:cover">
           <span class="blog-card-cat" style="background:#e65100">Сезонне</span>
           <span class="blog-card-time">5 хв читання</span>
         </div>
@@ -5964,6 +5964,7 @@ var BLOG_ARTICLES = {
     category: 'Ґрунт', catColor: '#2e7d32', catFilter: 'grunt',
     readTime: '6 хв читання', date: '12 березня 2024',
     gradient: 'linear-gradient(160deg,#c8e6c9 0%,#558b2f 55%,#e65100 100%)',
+    cover: '/blog/analiz-gruntu-kukurudza.png',
     seoTitle: 'Які аналізи ґрунту потрібні перед посівом кукурудзи | Лаб. дослідження',
     metaDesc: 'Які аналізи ґрунту потрібні перед посівом кукурудзи: азот, фосфор, калій, pH, органічна речовина. Як обрати показники та використати результати.',
     related: ['yak-pereviryty-yakist-dobryv','diagnostyka-defitsytu-elementiv-lystkovyi-analiz','5-agronomichnykh-priorytetiv-pered-vesnoyu'],
@@ -5986,6 +5987,7 @@ var BLOG_ARTICLES = {
     category: 'Добрива', catColor: '#6d4c41', catFilter: 'dobryva',
     readTime: '5 хв читання', date: '3 березня 2024',
     gradient: 'linear-gradient(160deg,#f5f5dc 0%,#c8b86a 50%,#8d6e37 100%)',
+    cover: '/blog/yakist-dobryv.png',
     seoTitle: 'Як перевірити якість добрив перед використанням | Лаб. дослідження',
     metaDesc: 'Як перевірити мінеральні, рідкі та органічні добрива в лабораторії. Основні показники NPK, правила відбору проб і читання протоколу.',
     related: ['analizy-gruntu-pered-posivom-kukurudzy','nyzkyi-vmist-organichnoi-rechovyny-v-grunti','5-agronomichnykh-priorytetiv-pered-vesnoyu'],
@@ -6008,6 +6010,7 @@ var BLOG_ARTICLES = {
     category: 'Рослини', catColor: '#1565c0', catFilter: 'roslyny',
     readTime: '7 хв читання', date: '26 лютого 2024',
     gradient: 'linear-gradient(160deg,#a5d6a7 0%,#1b5e20 55%,#0a3d0a 100%)',
+    cover: '/blog/diagnostyka-defitsytu.png',
     seoTitle: 'Діагностика дефіциту елементів живлення за листковим аналізом | LABA',
     metaDesc: 'Листковий аналіз рослин: як виявити дефіцит азоту, калію, магнію, цинку та інших елементів. Коли відбирати листя і як читати результати.',
     related: ['analizy-gruntu-pered-posivom-kukurudzy','nyzkyi-vmist-organichnoi-rechovyny-v-grunti','5-agronomichnykh-priorytetiv-pered-vesnoyu'],
@@ -6029,6 +6032,7 @@ var BLOG_ARTICLES = {
     category: 'Ґрунт', catColor: '#2e7d32', catFilter: 'grunt',
     readTime: '6 хв читання', date: '19 лютого 2024',
     gradient: 'linear-gradient(160deg,#bcaaa4 0%,#5d4037 55%,#3e2723 100%)',
+    cover: '/blog/organichna-rechovyna.png',
     seoTitle: 'Що означає низький вміст органічної речовини в ґрунті | LABA',
     metaDesc: 'Що означає низька органічна речовина та гумус у ґрунті: вплив на структуру, вологу й живлення культур, причини та методи контролю.',
     related: ['analizy-gruntu-pered-posivom-kukurudzy','yak-pereviryty-yakist-dobryv','5-agronomichnykh-priorytetiv-pered-vesnoyu'],
@@ -6049,6 +6053,7 @@ var BLOG_ARTICLES = {
     category: 'Насіння', catColor: '#795548', catFilter: 'nasinnya',
     readTime: '4 хв читання', date: '10 лютого 2024',
     gradient: 'linear-gradient(160deg,#f1f8e9 0%,#558b2f 55%,#1b5e20 100%)',
+    cover: '/blog/navishcho-perevirjaty-nasinnya.png',
     seoTitle: 'Навіщо перевіряти якість насіння у лабораторії | LABA',
     metaDesc: 'Навіщо робити лабораторний аналіз насіння: схожість, чистота, сила росту. Як відібрати пробу та оцінити якість партії перед посівом.',
     related: ['analizy-gruntu-pered-posivom-kukurudzy','5-agronomichnykh-priorytetiv-pered-vesnoyu','diagnostyka-defitsytu-elementiv-lystkovyi-analiz'],
@@ -6067,6 +6072,7 @@ var BLOG_ARTICLES = {
     category: 'Сезонне', catColor: '#e65100', catFilter: 'sezonni',
     readTime: '5 хв читання', date: '5 лютого 2024',
     gradient: 'linear-gradient(160deg,#fff9c4 0%,#f9a825 60%,#e65100 100%)',
+    cover: '/blog/agro-priorytety-vesna.png',
     seoTitle: '5 агрономічних пріоритетів перед весною | Лаб. дослідження LABA',
     metaDesc: 'Як підготувати господарство до весняної посівної: аналіз ґрунту, перевірка добрив і насіння, відбір проб та план живлення культур.',
     related: ['analizy-gruntu-pered-posivom-kukurudzy','yak-pereviryty-yakist-dobryv','navishcho-pereviryaty-yakist-nasinnia'],
@@ -6088,8 +6094,11 @@ var BLOG_ARTICLES = {
 function _buildRelatedCard(slug) {
   var art = BLOG_ARTICLES[slug];
   if (!art) return '';
+  var relImgHtml = art.cover
+    ? '<img class="article-rel-img" src="' + art.cover + '" alt="' + art.title + '" loading="lazy">'
+    : '<div class="article-rel-img" style="background:' + art.gradient + '"></div>';
   return '<div class="article-rel-card" onclick="navigateToArticle(\'' + slug + '\')">' +
-    '<div class="article-rel-img" style="background:' + art.gradient + '"></div>' +
+    relImgHtml +
     '<div class="article-rel-body">' +
     '<span class="blog-tag">' + art.category + '</span>' +
     '<div class="blog-card-title" style="font-size:14px;margin-top:6px">' + art.title + '</div>' +
@@ -6109,7 +6118,17 @@ function navigateToArticle(slug) {
   var h1El = document.getElementById('art-h1');
   if (h1El) h1El.textContent = art.title;
   var heroEl = document.getElementById('art-hero');
-  if (heroEl) heroEl.style.background = art.gradient;
+  if (heroEl) {
+    if (art.cover) {
+      heroEl.style.background = '';
+      heroEl.style.backgroundImage = 'url(' + art.cover + ')';
+      heroEl.style.backgroundSize = 'cover';
+      heroEl.style.backgroundPosition = 'center';
+    } else {
+      heroEl.style.backgroundImage = '';
+      heroEl.style.background = art.gradient;
+    }
+  }
   var contentEl = document.getElementById('art-content');
   if (contentEl) contentEl.innerHTML = art.content;
   var relGrid = document.getElementById('art-related-grid');
