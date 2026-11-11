@@ -25,6 +25,7 @@ const GS_GIDS = {
   spec:    process.env.INTERP_GID_SPEC    || null,  // Специфікація протоколу
   bands:   process.env.INTERP_GID_BANDS   || null,  // Шкали рівнів
   texture: process.env.INTERP_GID_TEXTURE || null,  // Текстура за CEC
+  cation:  process.env.INTERP_GID_CATION  || null,  // Баланс катіонів (Ca/Mg за CEC) — опційно
 };
 
 // ─── CSV parser (RFC 4180) ────────────────────────────────────────────────────
@@ -188,18 +189,21 @@ async function syncInterpretations() {
     throw new Error('GS_PUB_ID не задано. Опублікуй таблицю Google Sheets і встанови INTERP_GS_PUB_ID в Vercel env або задай GID-и через env vars.');
   }
 
-  const missingGids = Object.entries(GS_GIDS).filter(([,v]) => !v).map(([k]) => k);
+  // cation — optional sheet; skip if GID not set
+  const requiredGids = ['spec', 'bands', 'texture'];
+  const missingGids = requiredGids.filter(k => !GS_GIDS[k]);
   if (missingGids.length) {
     throw new Error(`GID-и не задані для аркушів: ${missingGids.join(', ')}. Встанови env vars INTERP_GID_SPEC, INTERP_GID_BANDS, INTERP_GID_TEXTURE.`);
   }
 
   const now = new Date().toISOString();
 
-  // Завантажуємо всі три аркуші паралельно
-  const [specRows, bandRows, textureRows] = await Promise.all([
+  // Завантажуємо аркуші паралельно (cation — опційно)
+  const [specRows, bandRows, textureRows, cationRowsRaw] = await Promise.all([
     fetchSheet(GS_GIDS.spec),
     fetchSheet(GS_GIDS.bands),
     fetchSheet(GS_GIDS.texture),
+    GS_GIDS.cation ? fetchSheet(GS_GIDS.cation).catch(() => []) : Promise.resolve(null),
   ]);
 
   // ── Специфікація протоколу ──────────────────────────────────────────────────
@@ -271,6 +275,28 @@ async function syncInterpretations() {
       synced_at:      now,
     }));
 
+  // ── Баланс катіонів за CEC ───────────────────────────────────────────────────
+  // Колонки: cec_val, Ca від, Ca до, Mg від, Mg до (рядок "Правило" — пропускаємо)
+  const cation = cationRowsRaw
+    ? cationRowsRaw
+        .filter(r => {
+          const v = r['cec_val'] || r['CEC'] || r['ЄКО'] || Object.values(r)[0];
+          return v != null && !isNaN(Number(String(v).trim()));
+        })
+        .map(r => {
+          // Намагаємось знайти колонки за різними можливими назвами
+          const cecVal = Number(String(r['cec_val'] || r['CEC'] || r['ЄКО'] || Object.values(r)[0]).trim());
+          const vals = Object.values(r).map(v => toNum(v)).filter(v => v !== null);
+          // Порядок колонок: cec_val, ca_from, ca_to, mg_from, mg_to
+          const caFrom = toNum(r['Ca від'] || r['ca_from'] || r['Ca_від'] || r['ca від']);
+          const caTo   = toNum(r['Ca до']  || r['ca_to']  || r['Ca_до']  || r['ca до']);
+          const mgFrom = toNum(r['Mg від'] || r['mg_from'] || r['Mg_від'] || r['mg від']);
+          const mgTo   = toNum(r['Mg до']  || r['mg_to']  || r['Mg_до']  || r['mg до']);
+          return { cec_val: cecVal, ca_from: caFrom, ca_to: caTo, mg_from: mgFrom, mg_to: mgTo, synced_at: now };
+        })
+        .filter(r => !isNaN(r.cec_val) && r.ca_from != null && r.ca_to != null && r.mg_from != null && r.mg_to != null)
+    : [];
+
   // Захист від wipe
   if (spec.length === 0 && bands.length === 0 && texture.length === 0) {
     throw new Error('Синк скасовано: усі три аркуші порожні. Перевір публікацію таблиці і GID-и.');
@@ -281,18 +307,21 @@ async function syncInterpretations() {
     spec.length    ? sbRequest('DELETE', 'protocol_spec?result_parameter_id=neq.__none__',          null).catch(() => {}) : Promise.resolve(),
     bands.length   ? sbRequest('DELETE', 'protocol_level_bands?band_id=neq.__none__',               null).catch(() => {}) : Promise.resolve(),
     texture.length ? sbRequest('DELETE', 'protocol_texture_cec?class_id=neq.__none__',              null).catch(() => {}) : Promise.resolve(),
+    cation.length  ? sbRequest('DELETE', 'protocol_cation_balance?cec_val=gte.0',                   null).catch(() => {}) : Promise.resolve(),
   ]);
 
   await Promise.all([
-    spec.length    ? upsert('protocol_spec',          'result_parameter_id', spec)    : Promise.resolve(),
-    bands.length   ? upsert('protocol_level_bands',   'band_id',             bands)   : Promise.resolve(),
-    texture.length ? upsert('protocol_texture_cec',   'class_id',            texture) : Promise.resolve(),
+    spec.length    ? upsert('protocol_spec',              'result_parameter_id', spec)    : Promise.resolve(),
+    bands.length   ? upsert('protocol_level_bands',       'band_id',             bands)   : Promise.resolve(),
+    texture.length ? upsert('protocol_texture_cec',       'class_id',            texture) : Promise.resolve(),
+    cation.length  ? upsert('protocol_cation_balance',    'cec_val',             cation)  : Promise.resolve(),
   ]);
 
   return {
     spec:    spec.length,
     bands:   bands.length,
     texture: texture.length,
+    cation:  cation.length,
     syncedAt: now,
   };
 }

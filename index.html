@@ -8961,11 +8961,12 @@ async function generateProtocol(sampleId) {
     const serviceIds = [...new Set((pkgItems||[]).map(x=>x.service_id).filter(Boolean))];
 
     // 3. protocol_spec is the single source: query by service_id, ordered
-    const [specRows, textureCec] = await Promise.all([
+    const [specRows, textureCec, cationBalance] = await Promise.all([
       serviceIds.length
         ? _sbFetch('protocol_spec', `service_id=in.(${serviceIds.join(',')})&status=neq.disabled&order=section_order,item_order&select=*`).catch(()=>[])
         : Promise.resolve([]),
       _sbFetch('protocol_texture_cec', `status=neq.disabled&order=from_val&select=*`).catch(()=>[]),
+      _sbFetch('protocol_cation_balance', `order=cec_val&select=cec_val,ca_from,ca_to,mg_from,mg_to`).catch(()=>[]),
     ]);
     const mergedParams = (specRows||[]).filter(p => p.result_parameter_id);
 
@@ -9018,14 +9019,25 @@ async function generateProtocol(sampleId) {
       return null;
     })();
 
-    // Texture → EC apply_if group (default: T2 "Супісок; Суглинок" if unknown)
+    // Texture → EC apply_if group (data-driven from bandsMap apply_if values)
     const texEcApplyIf = (() => {
-      const t = texClass || '';
-      if (!t) return 'Текстура: Супісок; Суглинок; текстура невідома';
-      if (/^пісок$|^зв.язний\s*пісок$/i.test(t.trim())) return 'Текстура: Пісок';
-      if (/глина|органіч/i.test(t)) return 'Текстура: Глина; Органічний ґрунт';
-      if (/пилуват|silt.{0,5}loam|clay.{0,5}loam/i.test(t)) return 'Текстура: Пилуватий або глинистий суглинок';
-      return 'Текстура: Супісок; Суглинок; текстура невідома';
+      const ecId = '01-1-007-01-R01';
+      const ecBands = bandsMap[ecId];
+      if (!ecBands || !ecBands.length) return null;
+      const groups = [...new Set(ecBands.map(b => b.apply_if).filter(Boolean))];
+      if (!groups.length) return null;
+      const t = (texClass || '').trim().toLowerCase();
+      if (t) {
+        for (const group of groups) {
+          const prefix = 'текстура: ';
+          const lower = group.toLowerCase();
+          if (!lower.startsWith(prefix)) continue;
+          const names = lower.slice(prefix.length).split(';').map(s => s.trim());
+          if (names.some(name => t === name || t.includes(name) || name.includes(t))) return group;
+        }
+      }
+      // Fallback: group that contains "невідома" (unknown texture)
+      return groups.find(g => g.toLowerCase().includes('невідома')) || groups[0];
     })();
 
     // 10. selection_group: show only the method whose lab param has a value
@@ -9063,33 +9075,7 @@ async function generateProtocol(sampleId) {
       return null;
     }
 
-    // Ca/Mg optimum lookup table by CEC (Midwest Laboratories, Agronomy Handbook)
-    const CEC_BAL = {4:{cf:520,ct:600,mf:75,mt:112},5:{cf:650,ct:750,mf:90,mt:135},
-      6:{cf:708,ct:817,mf:106,mt:159},7:{cf:910,ct:1050,mf:121,mt:182},
-      8:{cf:1040,ct:1200,mf:135,mt:202},9:{cf:1170,ct:1350,mf:148,mt:222},
-      10:{cf:1300,ct:1500,mf:160,mt:240},11:{cf:1430,ct:1650,mf:172,mt:258},
-      12:{cf:1560,ct:1800,mf:183,mt:274},13:{cf:1690,ct:1950,mf:193,mt:290},
-      14:{cf:1820,ct:2100,mf:202,mt:303},15:{cf:1950,ct:2250,mf:210,mt:315},
-      16:{cf:2080,ct:2400,mf:218,mt:327},17:{cf:2210,ct:2550,mf:225,mt:338},
-      18:{cf:2340,ct:2700,mf:230,mt:345},19:{cf:2470,ct:2850,mf:236,mt:354},
-      20:{cf:2600,ct:3000,mf:240,mt:360},21:{cf:2730,ct:3150,mf:252,mt:378},
-      22:{cf:2860,ct:3300,mf:263,mt:394},23:{cf:2990,ct:3450,mf:275,mt:412},
-      24:{cf:3120,ct:3600,mf:288,mt:432},25:{cf:3250,ct:3750,mf:300,mt:450},
-      26:{cf:3380,ct:3900,mf:312,mt:468},27:{cf:3510,ct:4050,mf:324,mt:486},
-      28:{cf:3640,ct:4200,mf:336,mt:504},29:{cf:3770,ct:4350,mf:348,mt:522},
-      30:{cf:3900,ct:4500,mf:360,mt:540},31:{cf:4030,ct:4650,mf:372,mt:558},
-      32:{cf:4160,ct:4800,mf:384,mt:576},33:{cf:4290,ct:4950,mf:396,mt:594},
-      34:{cf:4420,ct:5100,mf:408,mt:612},35:{cf:4550,ct:5250,mf:420,mt:630},
-      36:{cf:4680,ct:5400,mf:432,mt:648},37:{cf:4810,ct:5550,mf:444,mt:666},
-      38:{cf:4940,ct:5700,mf:456,mt:684},39:{cf:5070,ct:5850,mf:468,mt:702},
-      40:{cf:5200,ct:6000,mf:480,mt:720},41:{cf:5330,ct:6150,mf:492,mt:738},
-      42:{cf:5460,ct:6300,mf:504,mt:756},43:{cf:5590,ct:6450,mf:516,mt:774},
-      44:{cf:5720,ct:6600,mf:528,mt:792},45:{cf:5850,ct:6750,mf:540,mt:810},
-      46:{cf:5980,ct:6900,mf:552,mt:828},47:{cf:6110,ct:7050,mf:564,mt:846},
-      48:{cf:6240,ct:7200,mf:576,mt:864},49:{cf:6370,ct:7350,mf:588,mt:882},
-      50:{cf:6500,ct:7500,mf:600,mt:900}};
-
-    // Returns Ca or Mg optimum string based on CEC; '—' if CEC not in results
+    // Returns Ca or Mg optimum string based on CEC; uses protocol_cation_balance from Supabase
     function getCaMgOptimum(isCa) {
       const cecRaw = resultsMap['01-1-031-01-R01'];
       if (cecRaw == null || cecRaw === '') return '—';
@@ -9101,19 +9087,19 @@ async function generateProtocol(sampleId) {
         t = Math.round(cec * (isCa ? 150 : 18));
       } else {
         const key = Math.max(4, Math.round(cec));
-        const row = CEC_BAL[key];
+        const row = (cationBalance||[]).find(r => r.cec_val === key);
         if (!row) return '—';
-        f = isCa ? row.cf : row.mf;
-        t = isCa ? row.ct : row.mt;
+        f = isCa ? row.ca_from : row.mg_from;
+        t = isCa ? row.ca_to   : row.mg_to;
       }
       return `${f}–${t}`;
     }
 
     // 12. Format optimum range (per spec: lower = not inclusive unless Q=0; upper = per upper_inclusive flag)
     function fmtOptimum(p) {
-      // Ca/Mg: dynamic optimum from CEC balance table
-      if (p.result_parameter_id === '01-1-031-01-R08') return getCaMgOptimum(true);
-      if (p.result_parameter_id === '01-1-031-01-R09') return getCaMgOptimum(false);
+      // Ca/Mg: dynamic optimum from CEC balance table (identified by formula column)
+      if (p.formula === 'cec_balance_ca') return getCaMgOptimum(true);
+      if (p.formula === 'cec_balance_mg') return getCaMgOptimum(false);
       const from = p.optimum_from, to = p.optimum_to;
       if (from == null && to == null) return '—';
       const dp = p.decimal_places ?? 2;
