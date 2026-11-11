@@ -8962,14 +8962,24 @@ async function generateProtocol(sampleId) {
       ? await _sbFetch('catalog_result_parameters', `service_id=in.(${serviceIds.join(',')})&order=display_order&select=code,name,unit,method_id,service_id`).catch(()=>[])
       : [];
 
-    // 4. Enrich: get protocol_spec rows by result_parameter_id
+    // 4. Enrich: get protocol_spec rows, level bands, and texture CEC
     const paramCodes = (catalogParams||[]).map(p => p.code).filter(Boolean);
-    const [specRows, textureCec] = await Promise.all([
+    const [specRows, levelBands, textureCec] = await Promise.all([
       paramCodes.length
         ? _sbFetch('protocol_spec', `result_parameter_id=in.(${paramCodes.join(',')})&status=neq.disabled&select=*`).catch(()=>[])
         : Promise.resolve([]),
+      paramCodes.length
+        ? _sbFetch('protocol_level_bands', `result_parameter_id=in.(${paramCodes.join(',')})&status=neq.disabled&order=result_parameter_id,band_order&select=*`).catch(()=>[])
+        : Promise.resolve([]),
       _sbFetch('protocol_texture_cec', `status=neq.disabled&order=from_val&select=*`).catch(()=>[]),
     ]);
+    // Build bandsMap: result_parameter_id → sorted array of band rows
+    const bandsMap = {};
+    (levelBands||[]).forEach(b => {
+      if (!b.result_parameter_id) return;
+      if (!bandsMap[b.result_parameter_id]) bandsMap[b.result_parameter_id] = [];
+      bandsMap[b.result_parameter_id].push(b);
+    });
     // Build specMap: result_parameter_id → protocol_spec row
     const specMap = {};
     (specRows||[]).forEach(r => { if (r.result_parameter_id) specMap[r.result_parameter_id] = r; });
@@ -9080,7 +9090,39 @@ async function generateProtocol(sampleId) {
       return `≤ ${fmtN(to)}`;
     }
 
-    // 13. Format result value with decimal_places
+    // 13. Level band lookup
+    function getBandLevel(paramId, rawVal) {
+      const bands = bandsMap[paramId];
+      if (!bands || !bands.length) return null;
+      const n = parseFloat(rawVal);
+      if (isNaN(n)) return null;
+      for (const b of bands) {
+        const fromOk = b.from_val == null || (b.from_inclusive ? n >= b.from_val : n > b.from_val);
+        const toOk   = b.to_val   == null || (b.to_inclusive   ? n <= b.to_val   : n < b.to_val);
+        if (fromOk && toOk) return b;
+      }
+      return null;
+    }
+    // level_code → badge colors (bg, text)
+    const LEVEL_COLORS = {
+      'дуже низький':['#fee2e2','#991b1b'], 'very_low':['#fee2e2','#991b1b'], 'dn':['#fee2e2','#991b1b'],
+      'низький':     ['#fed7aa','#9a3412'], 'low':     ['#fed7aa','#9a3412'], 'n': ['#fed7aa','#9a3412'],
+      'середній':    ['#fef9c3','#854d0e'], 'medium':  ['#fef9c3','#854d0e'], 's': ['#fef9c3','#854d0e'],
+      'підвищений':  ['#dcfce7','#166534'], 'elevated':['#dcfce7','#166534'], 'p': ['#dcfce7','#166534'],
+      'оптимальний': ['#bbf7d0','#14532d'], 'optimal': ['#bbf7d0','#14532d'], 'o': ['#bbf7d0','#14532d'],
+      'достатній':   ['#bbf7d0','#14532d'], 'sufficient':['#bbf7d0','#14532d'], 'd':['#bbf7d0','#14532d'],
+      'високий':     ['#bfdbfe','#1e3a8a'], 'high':    ['#bfdbfe','#1e3a8a'], 'v': ['#bfdbfe','#1e3a8a'],
+      'дуже високий':['#ddd6fe','#4c1d95'], 'very_high':['#ddd6fe','#4c1d95'],'dv':['#ddd6fe','#4c1d95'],
+    };
+    function levelBadge(band) {
+      if (!band) return '—';
+      const name = band.level_name || band.level_code || '?';
+      const key = (band.level_code || band.level_name || '').toLowerCase().trim();
+      const [bg, fg] = LEVEL_COLORS[key] || ['#f3f4f6','#374151'];
+      return `<span style="display:inline-block;padding:1pt 4pt;border-radius:3pt;font-size:7pt;font-weight:600;background:${bg};color:${fg};white-space:nowrap">${name}</span>`;
+    }
+
+    // 14. Format result value with decimal_places
     function fmtVal(val, dp) {
       if (val == null || val === '') return '—';
       const n = parseFloat(val);
@@ -9117,24 +9159,27 @@ async function generateProtocol(sampleId) {
     let rowNum = 0;
     let tableRows = '';
     for (const [secName, secData] of sortedSections) {
-      tableRows += `<tr class="group"><th colspan="6" scope="rowgroup">${secName}</th></tr>`;
+      tableRows += `<tr class="group"><th colspan="7" scope="rowgroup">${secName}</th></tr>`;
       for (const p of secData.items) {
         rowNum++;
         const stdCode = p.method_id && methodMap[p.method_id] ? methodMap[p.method_id].standard_code || '—' : '—';
         const unit = p.unit || '—';
         const optRange = fmtOptimum(p);
         const dispName = p.display_name || '—';
-        let resVal;
+        let rawResVal;
         if (p.value_source === 'LABA (розрахунок)') {
-          resVal = fmtVal(getCalcValue(p), p.decimal_places);
+          rawResVal = getCalcValue(p);
         } else {
-          resVal = fmtVal(resultsMap[p.result_parameter_id], p.decimal_places);
+          rawResVal = resultsMap[p.result_parameter_id];
         }
-        tableRows += `<tr><td class="num">${rowNum}</td><td>${dispName}</td><td class="num">${resVal}</td><td class="num">${unit}</td><td class="optimal-range num">${optRange}</td><td>${stdCode}</td></tr>`;
+        const resVal = fmtVal(rawResVal, p.decimal_places);
+        const band = getBandLevel(p.result_parameter_id, rawResVal);
+        const badgeHtml = levelBadge(band);
+        tableRows += `<tr><td class="num">${rowNum}</td><td>${dispName}</td><td class="num">${resVal}</td><td class="num">${unit}</td><td class="optimal-range num">${optRange}</td><td class="num">${badgeHtml}</td><td>${stdCode}</td></tr>`;
       }
     }
     if (!tableRows) {
-      tableRows = `<tr><td colspan="6" style="text-align:center;color:#888;padding:12pt">Дані аналізу будуть доступні після завантаження результатів лабораторії</td></tr>`;
+      tableRows = `<tr><td colspan="7" style="text-align:center;color:#888;padding:12pt">Дані аналізу будуть доступні після завантаження результатів лабораторії</td></tr>`;
     }
 
     const html = `<!DOCTYPE html>
@@ -9208,8 +9253,8 @@ tbody td{border-bottom:.38pt solid #e0e2e4;padding:3.3pt 4pt}.group th{backgroun
 </dl>
 <section class="panel results">
 <h2>Результати досліджень</h2>
-<table><colgroup><col style="width:5%"/><col style="width:32%"/><col style="width:13%"/><col style="width:11%"/><col style="width:13%"/><col style="width:26%"/></colgroup>
-<thead><tr><th class="num">№</th><th>Дослідження</th><th class="num">Результат</th><th class="num">Од. вим.</th><th class="num">Оптимальний<br/>діапазон</th><th>Код стандарту / методики</th></tr></thead>
+<table><colgroup><col style="width:4%"/><col style="width:28%"/><col style="width:11%"/><col style="width:9%"/><col style="width:11%"/><col style="width:14%"/><col style="width:23%"/></colgroup>
+<thead><tr><th class="num">№</th><th>Дослідження</th><th class="num">Результат</th><th class="num">Од. вим.</th><th class="num">Оптимальний<br/>діапазон</th><th class="num">Оцінка</th><th>Код стандарту / методики</th></tr></thead>
 <tbody>${tableRows}</tbody>
 </table>
 </section>
