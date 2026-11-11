@@ -2954,22 +2954,41 @@ main{flex:1}
 .contract-req-row span:last-child{color:#333;font-weight:500}
 @media(max-width:600px){.contract-layout{padding:32px 16px 80px}.contract-req-row{flex-direction:column;gap:4px}.contract-req-row span:first-child{min-width:unset}}
 /* ── CONTACTS PAGE ── */
-.contacts-layout{max-width:860px;margin:0 auto;padding:48px 24px 80px}
-.contacts-title{font-size:clamp(28px,4vw,40px);font-weight:900;color:var(--navy);margin-bottom:32px}
-.contacts-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.contacts-card{background:var(--bg);border-radius:var(--radius);padding:24px}
-.contacts-card--wide{grid-column:1/-1}
-.contacts-card-label{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-soft);margin-bottom:16px}
-.contacts-rows{display:flex;flex-direction:column;gap:0}
-.contacts-row{display:flex;flex-direction:column;gap:2px;padding:10px 0;border-bottom:1px solid var(--border-soft)}
-.contacts-row:last-child{border-bottom:none}
-.contacts-key{font-size:12px;color:var(--text-soft)}
-.contacts-val{font-size:14px;font-weight:500;color:var(--navy)}
+.contacts-layout{max-width:1100px;margin:0 auto;padding:64px 24px 100px}
+.contacts-hero{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+.contacts-title{font-size:clamp(32px,5vw,52px);font-weight:900;color:var(--navy);line-height:1.1;margin-bottom:16px}
+.contacts-subtitle{font-size:15px;color:var(--text-mid);line-height:1.6;margin-bottom:40px;max-width:400px}
+.contacts-info-list{display:flex;flex-direction:column;gap:0}
+.contacts-info-item{display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid var(--border-soft)}
+.contacts-info-item:last-child{border-bottom:none}
+.contacts-info-icon{width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
+.contacts-info-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-soft);margin-bottom:2px}
+.contacts-info-value{font-size:15px;font-weight:600;color:var(--navy)}
+.contacts-info-value a{color:var(--navy);text-decoration:none}
+.contacts-info-value a:hover{color:var(--accent)}
+.contacts-form-card{background:var(--bg);border-radius:20px;padding:36px}
+.contacts-form-title{font-size:20px;font-weight:800;color:var(--navy);margin-bottom:24px}
+.contacts-form-fields{display:flex;flex-direction:column;gap:14px}
+.contacts-field label{display:block;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--text-soft);margin-bottom:6px}
+.contacts-field input,.contacts-field textarea{width:100%;padding:12px 14px;border:1.5px solid var(--border-soft);border-radius:10px;font-size:14px;color:var(--navy);background:#fff;outline:none;transition:border .18s;box-sizing:border-box;font-family:inherit}
+.contacts-field input:focus,.contacts-field textarea:focus{border-color:var(--navy)}
+.contacts-field textarea{resize:vertical;min-height:110px}
+.contacts-form-btn{margin-top:8px;width:100%;padding:14px;background:var(--accent);color:var(--navy);font-size:15px;font-weight:800;border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .18s}
+.contacts-form-btn:hover{opacity:.85}
+.contacts-form-success{display:none;background:#f0fff4;border:1.5px solid #bbf7d0;border-radius:10px;padding:16px;text-align:center;font-size:14px;font-weight:600;color:#166534;margin-top:12px}
+.contacts-legal{background:var(--bg);border-radius:20px;padding:28px 36px;margin-top:24px}
+.contacts-legal-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-soft);margin-bottom:12px}
+.contacts-legal-row{display:flex;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid var(--border-soft);font-size:13px}
+.contacts-legal-row:last-child{border-bottom:none}
+.contacts-legal-row span:first-child{color:var(--text-soft);flex-shrink:0}
+.contacts-legal-row span:last-child{color:var(--navy);font-weight:500;text-align:right}
+.contacts-return{background:var(--bg);border-radius:20px;padding:28px 36px;margin-top:24px}
+.contacts-return-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-soft);margin-bottom:10px}
+.contacts-return-text{font-size:14px;line-height:1.75;color:var(--text-mid)}
 .contacts-link{color:var(--neon-dark);text-decoration:none}
 .contacts-link:hover{text-decoration:underline}
-.contacts-cta{margin-top:20px;width:100%}
-.contacts-return-text{font-size:14px;line-height:1.7;color:var(--text-mid)}
-@media(max-width:600px){.contacts-grid{grid-template-columns:1fr}.contacts-card--wide{grid-column:auto}}
+@media(max-width:768px){.contacts-hero{grid-template-columns:1fr;gap:40px}}
+@media(max-width:600px){.contacts-form-card,.contacts-legal,.contacts-return{padding:24px 20px}}
 
 /* Hero — light two-column */
 .ostat-hero{background:#eef2f7;padding:64px 0 56px;overflow:hidden}
@@ -4549,62 +4568,86 @@ main{flex:1}
 <!-- ══ PAGE: CONTACTS ══ -->
 <div class="page" id="page-contacts">
   <div class="contacts-layout">
-    <h1 class="contacts-title">Контакти</h1>
 
-    <div class="contacts-grid">
-      <!-- Зв'язок -->
-      <div class="contacts-card">
-        <div class="contacts-card-label">Зв'язок</div>
-        <div class="contacts-rows">
-          <div class="contacts-row">
-            <span class="contacts-key">Телефон</span>
-            <a href="tel:+380671819967" class="contacts-val contacts-link">+38 067 181 99 67</a>
-          </div>
-          <div class="contacts-row">
-            <span class="contacts-key">Email</span>
-            <a href="mailto:laba@zemlerob.com.ua" class="contacts-val contacts-link">laba@zemlerob.com.ua</a>
-          </div>
-          <div class="contacts-row">
-            <span class="contacts-key">Сайт</span>
-            <a href="https://laba.zemlerob.com.ua" class="contacts-val contacts-link">laba.zemlerob.com.ua</a>
-          </div>
-        </div>
-        <button class="btn-primary contacts-cta" onclick="openCallModal('Контакти')">Зв'язатися з нами</button>
-      </div>
+    <div class="contacts-hero">
+      <!-- Ліва колонка -->
+      <div class="contacts-left">
+        <h1 class="contacts-title">Зв'яжіться<br>з командою LABA</h1>
+        <p class="contacts-subtitle">Допоможемо з вибором досліджень, замовленням або результатами.</p>
 
-      <!-- Юридичні дані -->
-      <div class="contacts-card">
-        <div class="contacts-card-label">Юридична інформація</div>
-        <div class="contacts-rows">
-          <div class="contacts-row">
-            <span class="contacts-key">Компанія</span>
-            <span class="contacts-val">ТОВ «ЗЕМЛЕРОБ ХАБ»</span>
+        <div class="contacts-info-list">
+          <div class="contacts-info-item">
+            <div class="contacts-info-icon">📞</div>
+            <div>
+              <div class="contacts-info-label">Гаряча лінія</div>
+              <div class="contacts-info-value"><a href="tel:+380671819967">+380 67 181 99 67</a></div>
+            </div>
           </div>
-          <div class="contacts-row">
-            <span class="contacts-key">Код ЄДРПОУ</span>
-            <span class="contacts-val">45801119</span>
+          <div class="contacts-info-item">
+            <div class="contacts-info-icon">✉️</div>
+            <div>
+              <div class="contacts-info-label">Електронна пошта</div>
+              <div class="contacts-info-value"><a href="mailto:laba@zemlerob.com.ua">laba@zemlerob.com.ua</a></div>
+            </div>
           </div>
-          <div class="contacts-row">
-            <span class="contacts-key">Адреса</span>
-            <span class="contacts-val">Україна, 18000, м. Черкаси, вул. Байди Вишневецького, буд. 36/1</span>
-          </div>
-          <div class="contacts-row">
-            <span class="contacts-key">IBAN</span>
-            <span class="contacts-val">UA63 305299 00000 26001031616283</span>
-          </div>
-          <div class="contacts-row">
-            <span class="contacts-key">Банк</span>
-            <span class="contacts-val">АТ КБ «ПриватБанк», МФО 305299</span>
+          <div class="contacts-info-item">
+            <div class="contacts-info-icon">📍</div>
+            <div>
+              <div class="contacts-info-label">Центральний офіс</div>
+              <div class="contacts-info-value">м. Черкаси, вул. Байди Вишневецького, 36/1</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Повернення коштів -->
-      <div class="contacts-card contacts-card--wide">
-        <div class="contacts-card-label">Умови повернення коштів</div>
-        <p class="contacts-return-text">Замовник має право відмовитися від замовлення та отримати повернення коштів до початку проведення досліджень. Якщо зразки вже прийнято до аналізу — повернення здійснюється пропорційно до невиконаної частини послуги. Звернення щодо повернення надсилайте на <a href="mailto:laba@zemlerob.com.ua" class="contacts-link">laba@zemlerob.com.ua</a> із зазначенням номера замовлення. Детальніше — у <a href="#" onclick="navigate('contract');return false;" class="contacts-link">Публічному договорі</a>.</p>
+      <!-- Права колонка — форма -->
+      <div class="contacts-right">
+        <div class="contacts-form-card">
+          <div class="contacts-form-title">Напишіть нам</div>
+          <div class="contacts-form-fields">
+            <div class="contacts-field">
+              <label>Ваше ім'я</label>
+              <input type="text" id="cf-name" placeholder="Як до вас звертатися?">
+            </div>
+            <div class="contacts-field">
+              <label>Електронна пошта</label>
+              <input type="email" id="cf-email" placeholder="name@example.com">
+            </div>
+            <div class="contacts-field">
+              <label>Телефон (необов'язково)</label>
+              <input type="tel" id="cf-phone" placeholder="+380">
+            </div>
+            <div class="contacts-field">
+              <label>Повідомлення</label>
+              <textarea id="cf-message" placeholder="Опишіть запитання. Якщо воно про замовлення, додайте його номер."></textarea>
+            </div>
+          </div>
+          <button class="contacts-form-btn" onclick="submitContactForm()">
+            Надіслати повідомлення →
+          </button>
+          <div class="contacts-form-success" id="cf-success">
+            ✅ Повідомлення надіслано! Відповімо найближчим часом.
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Юридична інформація -->
+    <div class="contacts-legal">
+      <div class="contacts-legal-title">Юридична інформація</div>
+      <div class="contacts-legal-row"><span>Компанія</span><span>ТОВ «ЗЕМЛЕРОБ ХАБ»</span></div>
+      <div class="contacts-legal-row"><span>Код ЄДРПОУ</span><span>45801119</span></div>
+      <div class="contacts-legal-row"><span>Адреса</span><span>Україна, 18000, м. Черкаси, вул. Байди Вишневецького, буд. 36/1</span></div>
+      <div class="contacts-legal-row"><span>IBAN</span><span>UA63 305299 00000 26001031616283</span></div>
+      <div class="contacts-legal-row"><span>Банк</span><span>АТ КБ «ПриватБанк», МФО 305299</span></div>
+    </div>
+
+    <!-- Повернення -->
+    <div class="contacts-return">
+      <div class="contacts-return-label">Умови повернення коштів</div>
+      <p class="contacts-return-text">Замовник має право відмовитися від замовлення та отримати повернення коштів до початку проведення досліджень. Якщо зразки вже прийнято до аналізу — повернення здійснюється пропорційно до невиконаної частини послуги. Звернення щодо повернення надсилайте на <a href="mailto:laba@zemlerob.com.ua" class="contacts-link">laba@zemlerob.com.ua</a> із зазначенням номера замовлення. Детальніше — у <a href="#" onclick="navigate('contract');return false;" class="contacts-link">Публічному договорі</a>.</p>
+    </div>
+
   </div>
 </div>
 
@@ -8504,6 +8547,18 @@ function startOver(){
 // CALL MODAL
 // ═══════════════════════════════════════════════
 let _callSource='Сайт LABA';
+function submitContactForm(){
+  const name=document.getElementById('cf-name').value.trim();
+  const email=document.getElementById('cf-email').value.trim();
+  const message=document.getElementById('cf-message').value.trim();
+  if(!name||!email||!message){alert('Будь ласка, заповніть ім\'я, пошту та повідомлення.');return;}
+  const btn=document.querySelector('.contacts-form-btn');
+  btn.disabled=true;btn.textContent='Надсилаємо…';
+  setTimeout(()=>{
+    btn.style.display='none';
+    document.getElementById('cf-success').style.display='block';
+  },800);
+}
 function openCallModal(src){
   _callSource=src||'Сайт LABA';
   const bd=document.getElementById('callModalBackdrop');
