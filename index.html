@@ -8954,62 +8954,32 @@ async function generateProtocol(sampleId) {
     const o = (s.orders) || {};
     const pkgCode = s.base_package_code;
 
-    // 2. package → serviceIds + methodIds
+    // 2. package → serviceIds
     const pkgItems = pkgCode
-      ? await _sbFetch('catalog_package_items', `package_id=eq.${encodeURIComponent(pkgCode)}&select=method_id,service_id`).catch(()=>[])
+      ? await _sbFetch('catalog_package_items', `package_id=eq.${encodeURIComponent(pkgCode)}&select=service_id`).catch(()=>[])
       : [];
     const serviceIds = [...new Set((pkgItems||[]).map(x=>x.service_id).filter(Boolean))];
-    const methodIdsFromPkg = [...new Set((pkgItems||[]).map(x=>x.method_id).filter(Boolean))];
 
-    // 3. ALL params from catalog_result_parameters by serviceIds (full list, was used in old protocol)
-    const catalogParams = serviceIds.length
-      ? await _sbFetch('catalog_result_parameters', `service_id=in.(${serviceIds.join(',')})&order=display_order&select=code,name,unit,method_id,service_id`).catch(()=>[])
-      : [];
-
-    // 4. Enrich: get protocol_spec rows, level bands, and texture CEC
-    const paramCodes = (catalogParams||[]).map(p => p.code).filter(Boolean);
-    const [specRows, levelBands, textureCec] = await Promise.all([
-      paramCodes.length
-        ? _sbFetch('protocol_spec', `result_parameter_id=in.(${paramCodes.join(',')})&status=neq.disabled&select=*`).catch(()=>[])
-        : Promise.resolve([]),
-      paramCodes.length
-        ? _sbFetch('protocol_level_bands', `result_parameter_id=in.(${paramCodes.join(',')})&status=neq.disabled&order=result_parameter_id,band_order&select=*`).catch(()=>[])
+    // 3. protocol_spec is the single source: query by service_id, ordered
+    const [specRows, textureCec] = await Promise.all([
+      serviceIds.length
+        ? _sbFetch('protocol_spec', `service_id=in.(${serviceIds.join(',')})&status=neq.disabled&order=section_order,item_order&select=*`).catch(()=>[])
         : Promise.resolve([]),
       _sbFetch('protocol_texture_cec', `status=neq.disabled&order=from_val&select=*`).catch(()=>[]),
     ]);
-    // Build bandsMap: result_parameter_id → sorted array of band rows
+    const mergedParams = (specRows||[]).filter(p => p.result_parameter_id);
+
+    // 4. level bands for these params
+    const paramCodes = mergedParams.map(p => p.result_parameter_id);
+    const levelBands = paramCodes.length
+      ? await _sbFetch('protocol_level_bands', `result_parameter_id=in.(${paramCodes.join(',')})&status=neq.disabled&order=result_parameter_id,band_order&select=*`).catch(()=>[])
+      : [];
     const bandsMap = {};
     (levelBands||[]).forEach(b => {
       if (!b.result_parameter_id) return;
       if (!bandsMap[b.result_parameter_id]) bandsMap[b.result_parameter_id] = [];
       bandsMap[b.result_parameter_id].push(b);
     });
-    // Build specMap: result_parameter_id → protocol_spec row
-    const specMap = {};
-    (specRows||[]).forEach(r => { if (r.result_parameter_id) specMap[r.result_parameter_id] = r; });
-
-    // 5. Merge catalog params with specMap to build unified param list
-    // For each catalog param, use protocol_spec data where available, else fall back to catalog data
-    const mergedParams = (catalogParams||[]).map(p => {
-      const sp = specMap[p.code] || {};
-      return {
-        result_parameter_id: p.code,
-        display_name:   sp.display_name   || p.name,
-        unit:           sp.unit           || p.unit,
-        method_id:      sp.method_id      || p.method_id,
-        service_id:     p.service_id,
-        section_name:   sp.section_name   || null,
-        section_order:  sp.section_order  ?? 999,
-        item_order:     sp.item_order     ?? 999,
-        decimal_places: sp.decimal_places ?? null,
-        optimum_from:   sp.optimum_from   ?? null,
-        optimum_to:     sp.optimum_to     ?? null,
-        value_source:   sp.value_source   || 'лабораторія',
-        selection_group:sp.selection_group|| null,
-        formula:        sp.formula        || null,
-        status:         sp.status         || 'active',
-      };
-    }).filter(p => p.status !== 'disabled');
 
     // 6. catalog_methods for standard codes (PK = method_id)
     const allMethodIds = [...new Set(mergedParams.map(p => p.method_id).filter(Boolean))];
@@ -9019,7 +8989,7 @@ async function generateProtocol(sampleId) {
 
     // 7. EAV sample_results — all rows, NO limit
     const orderNumForResults = o.order_number || (s.sample_number||'').replace(/-\d{2}$/, '') || sampleId;
-    console.log('[proto] pkgCode=', pkgCode, 'serviceIds=', serviceIds, 'orderNumForResults=', orderNumForResults, 'catalogParams=', (catalogParams||[]).length, 'specRows=', (specRows||[]).length);
+    console.log('[proto] pkgCode=', pkgCode, 'serviceIds=', serviceIds, 'mergedParams=', mergedParams.length, 'orderNumForResults=', orderNumForResults);
     const labResultsArr = await _sbFetch('sample_results', `sample_id=eq.${encodeURIComponent(orderNumForResults)}&select=param_code,value,lab_sample_id`).catch(()=>[]);
     console.log('[proto] labResultsArr.length=', (labResultsArr||[]).length);
     const resultsMap = {}; // param_code → value
