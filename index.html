@@ -2938,6 +2938,23 @@ main{flex:1}
    СТАТУС ЗАМОВЛЕННЯ PAGE
 ════════════════════════════════════════ */
 .ostat-page{min-height:100vh;background:#fff;padding-bottom:80px}
+/* ── CONTACTS PAGE ── */
+.contacts-layout{max-width:860px;margin:0 auto;padding:48px 24px 80px}
+.contacts-title{font-size:clamp(28px,4vw,40px);font-weight:900;color:var(--navy);margin-bottom:32px}
+.contacts-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.contacts-card{background:var(--bg);border-radius:var(--radius);padding:24px}
+.contacts-card--wide{grid-column:1/-1}
+.contacts-card-label{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-soft);margin-bottom:16px}
+.contacts-rows{display:flex;flex-direction:column;gap:0}
+.contacts-row{display:flex;flex-direction:column;gap:2px;padding:10px 0;border-bottom:1px solid var(--border-soft)}
+.contacts-row:last-child{border-bottom:none}
+.contacts-key{font-size:12px;color:var(--text-soft)}
+.contacts-val{font-size:14px;font-weight:500;color:var(--navy)}
+.contacts-link{color:var(--neon-dark);text-decoration:none}
+.contacts-link:hover{text-decoration:underline}
+.contacts-cta{margin-top:20px;width:100%}
+.contacts-return-text{font-size:14px;line-height:1.7;color:var(--text-mid)}
+@media(max-width:600px){.contacts-grid{grid-template-columns:1fr}.contacts-card--wide{grid-column:auto}}
 
 /* Hero — light two-column */
 .ostat-hero{background:#eef2f7;padding:64px 0 56px;overflow:hidden}
@@ -3171,7 +3188,7 @@ main{flex:1}
         <button class="mega-col-link" onclick="closeMegaMenu();navigate('blog')">Агрохімічний гід <span class="mega-col-arrow">›</span></button>
         <button class="mega-col-link" onclick="closeMegaMenu();navigate('about')">Про сервіс <span class="mega-col-arrow">›</span></button>
         <button class="mega-col-link" onclick="closeMegaMenu()">Як ми працюємо <span class="mega-col-arrow">›</span></button>
-        <button class="mega-col-link" onclick="closeMegaMenu()">Контакти <span class="mega-col-arrow">›</span></button>
+        <button class="mega-col-link" onclick="closeMegaMenu();navigate('contacts')">Контакти <span class="mega-col-arrow">›</span></button>
         <a class="mega-col-link" href="/public-contract.pdf" target="_blank" onclick="closeMegaMenu()">Публічний договір <span class="mega-col-arrow">›</span></a>
       </div>
     </div>
@@ -3348,7 +3365,7 @@ main{flex:1}
         <div class="laba-footer-col-title">Про LABA</div>
         <a href="#" onclick="navigate('blog');return false;">Агрохімічний гід</a>
         <a href="#" onclick="navigate('about');return false;">Про сервіс</a>
-        <a href="#">Контакти</a>
+        <a href="#" onclick="navigate('contacts');return false;">Контакти</a>
         <button class="laba-footer-contact-btn" onclick="openCallModal('Футер')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
           Зв'язатися з нами
@@ -3597,7 +3614,7 @@ main{flex:1}
         <div class="laba-footer-col-title">Про LABA</div>
         <a href="#" onclick="navigate('blog');return false;">Агрохімічний гід</a>
         <a href="#" onclick="navigate('about');return false;">Про сервіс</a>
-        <a href="#">Контакти</a>
+        <a href="#" onclick="navigate('contacts');return false;">Контакти</a>
         <button class="laba-footer-contact-btn" onclick="openCallModal('Футер')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
           Зв'язатися з нами
@@ -4172,9 +4189,9 @@ main{flex:1}
     </div>
     <div class="payment-panel" id="pay-panel-bank">
       <div class="bank-table">
-        <div class="bank-tr"><span class="bank-td-key">Отримувач</span><span class="bank-td-val">ТОВ КОМПАНІЯ ЗЕМЛЕРОБ</span></div>
-        <div class="bank-tr"><span class="bank-td-key">ЄДРПОУ</span><span class="bank-td-val" id="bankEdrpou">— (додати)</span></div>
-        <div class="bank-tr"><span class="bank-td-key">IBAN</span><span class="bank-td-val" id="bankIban">— (додати)</span></div>
+        <div class="bank-tr"><span class="bank-td-key">Отримувач</span><span class="bank-td-val">ТОВ «ЗЕМЛЕРОБ ХАБ»</span></div>
+        <div class="bank-tr"><span class="bank-td-key">ЄДРПОУ</span><span class="bank-td-val" id="bankEdrpou">45801119</span></div>
+        <div class="bank-tr"><span class="bank-td-key">IBAN</span><span class="bank-td-val" id="bankIban">UA63 305299 00000 26001031616283</span></div>
         <div class="bank-tr"><span class="bank-td-key">Призначення</span><span class="bank-td-val" id="bankPurpose">—</span></div>
         <div class="bank-tr"><span class="bank-td-key">Сума</span><span class="bank-td-val" id="bankSum">—</span></div>
       </div>
@@ -4514,6 +4531,68 @@ main{flex:1}
 </div>
 </div>
 
+<!-- ══ PAGE: CONTACTS ══ -->
+<div class="page" id="page-contacts">
+  <div class="contacts-layout">
+    <h1 class="contacts-title">Контакти</h1>
+
+    <div class="contacts-grid">
+      <!-- Зв'язок -->
+      <div class="contacts-card">
+        <div class="contacts-card-label">Зв'язок</div>
+        <div class="contacts-rows">
+          <div class="contacts-row">
+            <span class="contacts-key">Телефон</span>
+            <a href="tel:+380671819967" class="contacts-val contacts-link">+38 067 181 99 67</a>
+          </div>
+          <div class="contacts-row">
+            <span class="contacts-key">Email</span>
+            <a href="mailto:laba@zemlerob.com.ua" class="contacts-val contacts-link">laba@zemlerob.com.ua</a>
+          </div>
+          <div class="contacts-row">
+            <span class="contacts-key">Сайт</span>
+            <a href="https://laba.zemlerob.com.ua" class="contacts-val contacts-link">laba.zemlerob.com.ua</a>
+          </div>
+        </div>
+        <button class="btn-primary contacts-cta" onclick="openCallModal('Контакти')">Зв'язатися з нами</button>
+      </div>
+
+      <!-- Юридичні дані -->
+      <div class="contacts-card">
+        <div class="contacts-card-label">Юридична інформація</div>
+        <div class="contacts-rows">
+          <div class="contacts-row">
+            <span class="contacts-key">Компанія</span>
+            <span class="contacts-val">ТОВ «ЗЕМЛЕРОБ ХАБ»</span>
+          </div>
+          <div class="contacts-row">
+            <span class="contacts-key">Код ЄДРПОУ</span>
+            <span class="contacts-val">45801119</span>
+          </div>
+          <div class="contacts-row">
+            <span class="contacts-key">Адреса</span>
+            <span class="contacts-val">Україна, 18000, м. Черкаси, вул. Байди Вишневецького, буд. 36/1</span>
+          </div>
+          <div class="contacts-row">
+            <span class="contacts-key">IBAN</span>
+            <span class="contacts-val">UA63 305299 00000 26001031616283</span>
+          </div>
+          <div class="contacts-row">
+            <span class="contacts-key">Банк</span>
+            <span class="contacts-val">АТ КБ «ПриватБанк», МФО 305299</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Повернення коштів -->
+      <div class="contacts-card contacts-card--wide">
+        <div class="contacts-card-label">Умови повернення коштів</div>
+        <p class="contacts-return-text">Замовник має право відмовитися від замовлення та отримати повернення коштів до початку проведення досліджень. Якщо зразки вже прийнято до аналізу — повернення здійснюється пропорційно до невиконаної частини послуги. Звернення щодо повернення надсилайте на <a href="mailto:laba@zemlerob.com.ua" class="contacts-link">laba@zemlerob.com.ua</a> із зазначенням номера замовлення. Детальніше — у <a href="/public-contract.pdf" target="_blank" class="contacts-link">Публічному договорі</a>.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ══ PAGE: BLOG LISTING ══ -->
 <div class="page blog-page" id="page-blog">
   <!-- Hero header -->
@@ -4725,7 +4804,7 @@ main{flex:1}
         <div class="laba-footer-col-title">Про LABA</div>
         <a href="#" onclick="navigate('blog');return false;">Агрохімічний гід</a>
         <a href="#" onclick="navigate('about');return false;">Про сервіс</a>
-        <a href="#">Контакти</a>
+        <a href="#" onclick="navigate('contacts');return false;">Контакти</a>
         <button class="laba-footer-contact-btn" onclick="openCallModal('Футер')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
           Зв'язатися з нами
@@ -4869,7 +4948,7 @@ main{flex:1}
         <div class="laba-footer-col-title">Про LABA</div>
         <a href="#" onclick="navigate('blog');return false;">Агрохімічний гід</a>
         <a href="#" onclick="navigate('about');return false;">Про сервіс</a>
-        <a href="#">Контакти</a>
+        <a href="#" onclick="navigate('contacts');return false;">Контакти</a>
         <button class="laba-footer-contact-btn" onclick="openCallModal('Футер')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
           Зв'язатися з нами
@@ -5030,7 +5109,7 @@ main{flex:1}
         <div class="laba-footer-col-title">Про LABA</div>
         <a href="#" onclick="navigate('blog');return false;">Агрохімічний гід</a>
         <a href="#" onclick="navigate('about');return false;">Про сервіс</a>
-        <a href="#">Контакти</a>
+        <a href="#" onclick="navigate('contacts');return false;">Контакти</a>
         <button class="laba-footer-contact-btn" onclick="openCallModal('Футер')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
           Зв'язатися з нами
@@ -5476,7 +5555,7 @@ main{flex:1}
         <div class="laba-footer-col-title">Про LABA</div>
         <a href="#" onclick="navigate('blog');return false;">Агрохімічний гід</a>
         <a href="#" onclick="navigate('about');return false;">Про сервіс</a>
-        <a href="#">Контакти</a>
+        <a href="#" onclick="navigate('contacts');return false;">Контакти</a>
         <button class="laba-footer-contact-btn" onclick="openCallModal('Футер')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
           Зв'язатися з нами
