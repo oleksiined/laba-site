@@ -1,12 +1,10 @@
 // Vercel Serverless Function — POST /api/send-confirmation-email
-// Sends a branded order-confirmation email to the client via SendPulse SMTP.
+// Sends a branded order-confirmation email to the client via Resend API.
 //
 // Required env vars:
-//   SENDPULSE_SMTP_HOST   — usually smtp.sendpulse.com
-//   SENDPULSE_SMTP_USER   — SendPulse SMTP username (from SMTP panel)
-//   SENDPULSE_SMTP_PASS   — SendPulse SMTP password
-//   FROM_EMAIL            — sender address, e.g. order@laba.zemlerob.com.ua
-//   SITE_URL              — base URL, e.g. https://laba.zemlerob.com.ua
+//   RESEND_API_KEY  — API key from resend.com
+//   FROM_EMAIL      — sender address, e.g. laba@zemlerob.com.ua
+//   SITE_URL        — base URL, e.g. https://laba.zemlerob.com.ua
 //
 // Optional env vars:
 //   SUPPORT_PHONE_TEL     — tel: href value, e.g. +380671819967
@@ -15,12 +13,11 @@
 //   SAMPLING_GUIDE_URL    — link to sampling instructions page
 
 'use strict';
-const fs           = require('fs');
-const path         = require('path');
-const nodemailer   = require('nodemailer');
+const fs   = require('fs');
+const path = require('path');
 
 // ─── Static assets (bundled with this function) ───────────────────────────────
-const ASSETS_DIR  = path.join(__dirname, 'assets');
+const ASSETS_DIR    = path.join(__dirname, 'assets');
 const TEMPLATE_PATH = path.join(ASSETS_DIR, 'email-confirmation.html');
 
 let _templateHtml = null;
@@ -40,27 +37,21 @@ function renderTemplate(html, vars) {
 function buildVars(order) {
   const site = (process.env.SITE_URL || 'https://laba.zemlerob.com.ua').replace(/\/$/, '');
 
-  // Service name: join all ordered item names
   const serviceName = (order.items || []).map(i => i.name).filter(Boolean).join(', ')
     || 'Лабораторний аналіз';
 
-  // Count samples (sum of samples array or items quantities)
   const samplesCount = Array.isArray(order.samples) && order.samples.length > 0
     ? order.samples.length
     : (order.items || []).reduce((s, i) => s + (Number(i.samples) || Number(i.qty) || 1), 0);
 
-  // Count packages (number of items lines)
   const packagesCount = (order.items || []).length || 1;
 
-  // Formatted total
-  const totalAmount = Number(order.total || 0).toLocaleString('uk-UA') + ' грн';
+  const totalAmount = Number(order.total || 0).toLocaleString('uk-UA') + ' грн';
 
-  // Invoice date (today, Ukraine locale)
   const invoiceDate = new Date().toLocaleDateString('uk-UA', {
     day: '2-digit', month: '2-digit', year: 'numeric',
   });
 
-  // Delivery
   const del = order.delivery || {};
   const deliveryMethod = del.type === 'nova_poshta' ? 'Нова Пошта'
     : del.type === 'ukr_poshta'  ? 'Укрпошта'
@@ -71,31 +62,29 @@ function buildVars(order) {
     || [del.city, del.street].filter(Boolean).join(', ')
     || '';
 
-  // Support contacts
   const phoneTel     = process.env.SUPPORT_PHONE_TEL     || '+380671819967';
   const phoneDisplay = process.env.SUPPORT_PHONE_DISPLAY || '+380 67 181 99 67';
   const hours        = process.env.SUPPORT_HOURS         || 'Пн–Пт 9:00–18:00';
 
-  // Links
-  const orderPage         = `${site}/#order=${encodeURIComponent(order.orderNum || '')}`;
-  const samplingGuideUrl  = process.env.SAMPLING_GUIDE_URL || `${site}/#guide`;
+  const orderPage        = `${site}/#order=${encodeURIComponent(order.orderNum || '')}`;
+  const samplingGuideUrl = process.env.SAMPLING_GUIDE_URL || `${site}/#guide`;
 
   return {
-    order_number:         order.orderNum  || '',
-    service_name:         serviceName,
-    samples_count:        samplesCount,
-    packages_count:       packagesCount,
-    total_amount:         totalAmount,
-    invoice_date:         invoiceDate,
-    invoice_url:          orderPage,
-    labels_url:           orderPage,
-    sampling_guide_url:   samplingGuideUrl,
-    tracking_url:         orderPage,
-    delivery_method:      deliveryMethod,
-    delivery_details:     deliveryDetails,
-    support_phone_tel:    phoneTel,
+    order_number:          order.orderNum  || '',
+    service_name:          serviceName,
+    samples_count:         samplesCount,
+    packages_count:        packagesCount,
+    total_amount:          totalAmount,
+    invoice_date:          invoiceDate,
+    invoice_url:           orderPage,
+    labels_url:            orderPage,
+    sampling_guide_url:    samplingGuideUrl,
+    tracking_url:          orderPage,
+    delivery_method:       deliveryMethod,
+    delivery_details:      deliveryDetails,
+    support_phone_tel:     phoneTel,
     support_phone_display: phoneDisplay,
-    support_hours:        hours,
+    support_hours:         hours,
   };
 }
 
@@ -123,53 +112,44 @@ function buildPlainText(order, vars) {
   ].join('\n');
 }
 
-// ─── Main send function (exported for use in order.js) ───────────────────────
+// ─── Main send function ───────────────────────────────────────────────────────
 async function sendConfirmationEmail(order) {
-  const smtpHost = process.env.SENDPULSE_SMTP_HOST;
-  const smtpUser = process.env.SENDPULSE_SMTP_USER;
-  const smtpPass = process.env.SENDPULSE_SMTP_PASS;
-  const fromEmail = process.env.FROM_EMAIL || smtpUser;
+  const apiKey    = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.FROM_EMAIL || 'laba@zemlerob.com.ua';
   const toEmail   = order.client?.email;
 
-  if (!smtpHost || !smtpUser || !smtpPass) throw new Error('SendPulse SMTP not configured');
-  if (!toEmail)                             throw new Error('No client email in order');
+  if (!apiKey)   throw new Error('RESEND_API_KEY not configured');
+  if (!toEmail)  throw new Error('No client email in order');
 
   const vars    = buildVars(order);
   const html    = renderTemplate(getTemplate(), vars);
   const text    = buildPlainText(order, vars);
   const subject = `LABA: замовлення № ${vars.order_number} оформлено`;
 
-  const transporter = nodemailer.createTransport({
-    host:   smtpHost,
-    port:   465,
-    secure: true,
-    auth:   { user: smtpUser, pass: smtpPass },
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type':  'application/json',
+    },
+    body: JSON.stringify({
+      from:    `LABA Агро <${fromEmail}>`,
+      to:      [toEmail],
+      subject,
+      text,
+      html,
+    }),
   });
 
-  await transporter.sendMail({
-    from:    `"LABA Агро" <${fromEmail}>`,
-    to:      toEmail,
-    subject,
-    text,
-    html,
-    attachments: [
-      {
-        filename:    'laba-logo.png',
-        path:        path.join(ASSETS_DIR, 'laba-logo.png'),
-        cid:         'laba-logo',
-        contentType: 'image/png',
-      },
-      {
-        filename:    'laba-mascot.png',
-        path:        path.join(ASSETS_DIR, 'laba-mascot.png'),
-        cid:         'laba-mascot',
-        contentType: 'image/png',
-      },
-    ],
-  });
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`Resend API error ${response.status}: ${err}`);
+  }
+
+  return await response.json();
 }
 
-// ─── Vercel HTTP handler (optional — can be called directly too) ──────────────
+// ─── Vercel HTTP handler ──────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
   const allowedOrigins = [
     'https://laba.zemlerob.com.ua',
