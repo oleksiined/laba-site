@@ -8950,35 +8950,62 @@ async function generateProtocol(sampleId) {
     const o = (s.orders) || {};
     const pkgCode = s.base_package_code;
 
-    // 2. package → methodIds (use method_id to match protocol_spec, not service_id)
+    // 2. package → serviceIds + methodIds
     const pkgItems = pkgCode
       ? await _sbFetch('catalog_package_items', `package_id=eq.${encodeURIComponent(pkgCode)}&select=method_id,service_id`).catch(()=>[])
       : [];
+    const serviceIds = [...new Set((pkgItems||[]).map(x=>x.service_id).filter(Boolean))];
     const methodIdsFromPkg = [...new Set((pkgItems||[]).map(x=>x.method_id).filter(Boolean))];
 
-    // 3. protocol_spec for these methods (ordered)
-    const spec = methodIdsFromPkg.length
-      ? await _sbFetch('protocol_spec', `method_id=in.(${methodIdsFromPkg.join(',')})&status=neq.disabled&order=section_order,item_order&select=*`).catch(()=>[])
+    // 3. ALL params from catalog_result_parameters by serviceIds (full list, was used in old protocol)
+    const catalogParams = serviceIds.length
+      ? await _sbFetch('catalog_result_parameters', `service_id=in.(${serviceIds.join(',')})&order=display_order&select=code,name,unit,method_id,service_id`).catch(()=>[])
       : [];
 
-    // 4. level bands (for future use) and texture CEC table
-    const specIds = (spec||[]).map(p => p.result_parameter_id).filter(Boolean);
-    const [bands, textureCec] = await Promise.all([
-      specIds.length
-        ? _sbFetch('protocol_level_bands', `result_parameter_id=in.(${specIds.join(',')})&status=neq.disabled&order=band_order&select=*`).catch(()=>[])
+    // 4. Enrich: get protocol_spec rows by result_parameter_id
+    const paramCodes = (catalogParams||[]).map(p => p.code).filter(Boolean);
+    const [specRows, textureCec] = await Promise.all([
+      paramCodes.length
+        ? _sbFetch('protocol_spec', `result_parameter_id=in.(${paramCodes.join(',')})&status=neq.disabled&select=*`).catch(()=>[])
         : Promise.resolve([]),
       _sbFetch('protocol_texture_cec', `status=neq.disabled&order=from_val&select=*`).catch(()=>[]),
     ]);
+    // Build specMap: result_parameter_id → protocol_spec row
+    const specMap = {};
+    (specRows||[]).forEach(r => { if (r.result_parameter_id) specMap[r.result_parameter_id] = r; });
 
-    // 5. catalog_methods for standard codes (PK = method_id)
-    const methodIds = [...new Set((spec||[]).map(p => p.method_id).filter(Boolean))];
-    const methods = methodIds.length
-      ? await _sbFetch('catalog_methods', `method_id=in.(${methodIds.join(',')})&select=method_id,standard_code`).catch(()=>[])
+    // 5. Merge catalog params with specMap to build unified param list
+    // For each catalog param, use protocol_spec data where available, else fall back to catalog data
+    const mergedParams = (catalogParams||[]).map(p => {
+      const sp = specMap[p.code] || {};
+      return {
+        result_parameter_id: p.code,
+        display_name:   sp.display_name   || p.name,
+        unit:           sp.unit           || p.unit,
+        method_id:      sp.method_id      || p.method_id,
+        service_id:     p.service_id,
+        section_name:   sp.section_name   || null,
+        section_order:  sp.section_order  ?? 999,
+        item_order:     sp.item_order     ?? 999,
+        decimal_places: sp.decimal_places ?? null,
+        optimum_from:   sp.optimum_from   ?? null,
+        optimum_to:     sp.optimum_to     ?? null,
+        value_source:   sp.value_source   || 'лабораторія',
+        selection_group:sp.selection_group|| null,
+        formula:        sp.formula        || null,
+        status:         sp.status         || 'active',
+      };
+    }).filter(p => p.status !== 'disabled');
+
+    // 6. catalog_methods for standard codes (PK = method_id)
+    const allMethodIds = [...new Set(mergedParams.map(p => p.method_id).filter(Boolean))];
+    const methods = allMethodIds.length
+      ? await _sbFetch('catalog_methods', `method_id=in.(${allMethodIds.join(',')})&select=method_id,standard_code`).catch(()=>[])
       : [];
 
-    // 6. EAV sample_results — all rows, NO limit
+    // 7. EAV sample_results — all rows, NO limit
     const orderNumForResults = o.order_number || (s.sample_number||'').replace(/-\d{2}$/, '') || sampleId;
-    console.log('[proto] pkgCode=', pkgCode, 'serviceIds=', serviceIds, 'orderNumForResults=', orderNumForResults);
+    console.log('[proto] pkgCode=', pkgCode, 'serviceIds=', serviceIds, 'orderNumForResults=', orderNumForResults, 'catalogParams=', (catalogParams||[]).length, 'specRows=', (specRows||[]).length);
     const labResultsArr = await _sbFetch('sample_results', `sample_id=eq.${encodeURIComponent(orderNumForResults)}&select=param_code,value,lab_sample_id`).catch(()=>[]);
     console.log('[proto] labResultsArr.length=', (labResultsArr||[]).length);
     const resultsMap = {}; // param_code → value
@@ -8988,11 +9015,11 @@ async function generateProtocol(sampleId) {
       if (r.lab_sample_id && labId === '—') labId = r.lab_sample_id;
     });
 
-    // 7. Build lookup maps
+    // 8. Build lookup maps
     const methodMap = {};
     (methods||[]).forEach(m => { methodMap[m.method_id] = m; });
 
-    // 8. Determine texture class (R04 direct; fallback: CEC-based lookup from protocol_texture_cec)
+    // 9. Determine texture class (R04 direct; fallback: CEC-based lookup from protocol_texture_cec)
     const texClass = (() => {
       const direct = resultsMap['01-1-001-01-R04'];
       if (direct) return String(direct).trim();
@@ -9007,9 +9034,9 @@ async function generateProtocol(sampleId) {
       return null;
     })();
 
-    // 9. Phosphorus / selection_group: show only the method whose lab param has a value
-    const selGroupParams = {}; // group → [spec rows]
-    (spec||[]).forEach(p => {
+    // 10. selection_group: show only the method whose lab param has a value
+    const selGroupParams = {}; // group → [merged param rows]
+    mergedParams.forEach(p => {
       if (!p.selection_group) return;
       if (!selGroupParams[p.selection_group]) selGroupParams[p.selection_group] = [];
       selGroupParams[p.selection_group].push(p);
@@ -9026,10 +9053,9 @@ async function generateProtocol(sampleId) {
       selGroupMethodChosen[grp] = rows[0] && rows[0].method_id;
     });
 
-    // 10. LABA calculations
+    // 11. LABA calculations
     function getCalcValue(p) {
       if (p.formula === 'P2O5_to_P') {
-        // Find the R01 param of same group (strips trailing -Rxx and re-appends -R01)
         const prefix = p.result_parameter_id.replace(/-R\d+$/, '');
         const r01key = Object.keys(resultsMap).find(k => k.startsWith(prefix + '-R') && /R0*1$/.test(k));
         const p2o5val = r01key ? parseFloat(resultsMap[r01key]) : NaN;
@@ -9043,7 +9069,7 @@ async function generateProtocol(sampleId) {
       return null;
     }
 
-    // 11. Format optimum range from numeric fields
+    // 12. Format optimum range from numeric fields
     function fmtOptimum(p) {
       const from = p.optimum_from, to = p.optimum_to;
       if (from == null && to == null) return '—';
@@ -9054,7 +9080,7 @@ async function generateProtocol(sampleId) {
       return `≤ ${fmtN(to)}`;
     }
 
-    // 12. Format result value with decimal_places
+    // 13. Format result value with decimal_places
     function fmtVal(val, dp) {
       if (val == null || val === '') return '—';
       const n = parseFloat(val);
@@ -9063,7 +9089,7 @@ async function generateProtocol(sampleId) {
       return n.toFixed(dp).replace(/\.?0+$/, '') || n.toFixed(dp);
     }
 
-    // 13. Build grouped table rows
+    // 14. Build grouped table rows
     const matMap = { soil:'Ґрунт', water:'Вода', fertilizer:'Добрива', seeds:'Насіння', grain:'Зерно', plants:'Рослини' };
     const materialName = matMap[s.material] || s.material || 'Ґрунт';
     const today = new Date().toLocaleDateString('uk-UA', {day:'numeric', month:'long', year:'numeric'});
@@ -9072,9 +9098,15 @@ async function generateProtocol(sampleId) {
     const pkgNameRaw = s.base_package_name || '';
     const pageTitle = (pkgNameRaw && !/^зразок\s*\d+$/i.test(pkgNameRaw.trim())) ? pkgNameRaw : (pkgCode || 'Пакет');
 
-    // Group by section_name, preserving section_order
+    // Sort mergedParams: by section_order, then item_order
+    mergedParams.sort((a, b) => {
+      if (a.section_order !== b.section_order) return a.section_order - b.section_order;
+      return a.item_order - b.item_order;
+    });
+
+    // Group by section_name
     const sections = {}; // section_name → { order, items }
-    (spec||[]).forEach(p => {
+    mergedParams.forEach(p => {
       if (p.selection_group && selGroupMethodChosen[p.selection_group] !== p.method_id) return;
       const sec = p.section_name || 'Результати';
       if (!sections[sec]) sections[sec] = { order: p.section_order ?? 999, items: [] };
