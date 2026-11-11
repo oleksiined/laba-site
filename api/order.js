@@ -4,7 +4,6 @@
 // 2. Sends confirmation email to client
 
 const https = require('https');
-const nodemailer = require('nodemailer');
 const { sendConfirmationEmail } = require('./send-confirmation-email');
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -665,39 +664,15 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // 2c. Confirmation email to client via SendPulse SMTP
+  // 2c. Confirmation email to client via Resend
   const clientEmail = order.client?.email;
-  if (clientEmail && process.env.SENDPULSE_SMTP_HOST) {
+  if (clientEmail && process.env.RESEND_API_KEY) {
     try {
       await sendConfirmationEmail(order);
       console.log('[order] confirmation email sent to', clientEmail);
     } catch (err) {
       console.warn('[order] confirmation email error (non-fatal):', err.message);
       notifErrors.push({ channel: 'email', message: err.message });
-    }
-  }
-
-  // 2d. Team email (plain-text summary via SendPulse SMTP)
-  const teamEmail = process.env.TEAM_EMAIL;
-  if (teamEmail && process.env.SENDPULSE_SMTP_HOST) {
-    try {
-      const smtpFrom = process.env.FROM_EMAIL || process.env.SENDPULSE_SMTP_USER;
-      const teamTransporter = nodemailer.createTransport({
-        host:   process.env.SENDPULSE_SMTP_HOST,
-        port:   465,
-        secure: true,
-        auth:   { user: process.env.SENDPULSE_SMTP_USER, pass: process.env.SENDPULSE_SMTP_PASS },
-      });
-      const textBody = buildTelegramText(order).replace(/[*_`]/g, '');
-      await teamTransporter.sendMail({
-        from:    `"LABA Site" <${smtpFrom}>`,
-        to:      teamEmail,
-        subject: `Нове замовлення ${order.orderNum} — LABA`,
-        text:    textBody,
-      });
-    } catch (err) {
-      console.warn('[order] team email error (non-fatal):', err.message);
-      notifErrors.push({ channel: 'team_email', message: err.message });
     }
   }
 
