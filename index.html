@@ -8950,15 +8950,15 @@ async function generateProtocol(sampleId) {
     const o = (s.orders) || {};
     const pkgCode = s.base_package_code;
 
-    // 2. package → serviceIds
+    // 2. package → methodIds (use method_id to match protocol_spec, not service_id)
     const pkgItems = pkgCode
       ? await _sbFetch('catalog_package_items', `package_id=eq.${encodeURIComponent(pkgCode)}&select=method_id,service_id`).catch(()=>[])
       : [];
-    const serviceIds = [...new Set((pkgItems||[]).map(x=>x.service_id).filter(Boolean))];
+    const methodIdsFromPkg = [...new Set((pkgItems||[]).map(x=>x.method_id).filter(Boolean))];
 
-    // 3. protocol_spec for these services (ordered)
-    const spec = serviceIds.length
-      ? await _sbFetch('protocol_spec', `service_id=in.(${serviceIds.join(',')})&status=neq.disabled&order=section_order,item_order&select=*`).catch(()=>[])
+    // 3. protocol_spec for these methods (ordered)
+    const spec = methodIdsFromPkg.length
+      ? await _sbFetch('protocol_spec', `method_id=in.(${methodIdsFromPkg.join(',')})&status=neq.disabled&order=section_order,item_order&select=*`).catch(()=>[])
       : [];
 
     // 4. level bands (for future use) and texture CEC table
