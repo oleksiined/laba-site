@@ -9079,18 +9079,22 @@ async function generateProtocol(sampleId) {
       return null;
     }
 
-    // 12. Format optimum range from numeric fields
+    // 12. Format optimum range (per spec: lower = not inclusive unless Q=0; upper = per upper_inclusive flag)
     function fmtOptimum(p) {
       const from = p.optimum_from, to = p.optimum_to;
       if (from == null && to == null) return '—';
       const dp = p.decimal_places ?? 2;
       const fmtN = n => { const s = Number(n).toFixed(dp); return s.replace(/\.?0+$/, '') || s; };
+      // upper_inclusive: true → "≤ X", false → "< X", null → default "≤"
+      const upperSymbol = p.upper_inclusive === false ? '<' : '≤';
+      // lower: not inclusive (>) unless Q=0 (then ≥ 0)
+      const lowerSymbol = (from != null && Number(from) === 0) ? '≥' : '>';
       if (from != null && to != null) return `${fmtN(from)}–${fmtN(to)}`;
-      if (from != null) return `> ${fmtN(from)}`;
-      return `≤ ${fmtN(to)}`;
+      if (from != null) return `${lowerSymbol} ${fmtN(from)}`;
+      return `${upperSymbol} ${fmtN(to)}`;
     }
 
-    // 13. Level band lookup
+    // 13. Level band lookup (per spec: from_inclusive/to_inclusive from band rows)
     function getBandLevel(paramId, rawVal) {
       const bands = bandsMap[paramId];
       if (!bands || !bands.length) return null;
@@ -9102,6 +9106,19 @@ async function generateProtocol(sampleId) {
         if (fromOk && toOk) return b;
       }
       return null;
+    }
+    // Level of P (formula=P2O5_to_P) = level of corresponding P₂O₅ result_parameter_id (same method prefix, R01)
+    function getBandLevelForParam(p, rawResVal) {
+      if (p.formula === 'P2O5_to_P') {
+        const prefix = p.result_parameter_id.replace(/-R\d+$/, '');
+        const p2o5id = Object.keys(bandsMap).find(k => k.startsWith(prefix + '-R') && /R0*1$/.test(k));
+        if (p2o5id) {
+          const p2o5raw = resultsMap[p2o5id];
+          return getBandLevel(p2o5id, p2o5raw);
+        }
+        return null;
+      }
+      return getBandLevel(p.result_parameter_id, rawResVal);
     }
     // level_code → badge colors (bg, text)
     const LEVEL_COLORS = {
@@ -9167,13 +9184,20 @@ async function generateProtocol(sampleId) {
         const optRange = fmtOptimum(p);
         const dispName = p.display_name || '—';
         let rawResVal;
-        if (p.value_source === 'LABA (розрахунок)') {
+        const isCalc = p.value_source === 'LABA (розрахунок)';
+        if (isCalc) {
           rawResVal = getCalcValue(p);
         } else {
           rawResVal = resultsMap[p.result_parameter_id];
         }
-        const resVal = fmtVal(rawResVal, p.decimal_places);
-        const band = getBandLevel(p.result_parameter_id, rawResVal);
+        // Ordered but no value yet → "Очікує результату" (lab params only)
+        let resVal;
+        if (!isCalc && (rawResVal == null || rawResVal === '')) {
+          resVal = `<span style="color:#9ca3af;font-style:italic">Очікує результату</span>`;
+        } else {
+          resVal = fmtVal(rawResVal, p.decimal_places);
+        }
+        const band = getBandLevelForParam(p, rawResVal);
         const badgeHtml = levelBadge(band);
         tableRows += `<tr><td class="num">${rowNum}</td><td>${dispName}</td><td class="num">${resVal}</td><td class="num">${unit}</td><td class="optimal-range num">${optRange}</td><td class="num">${badgeHtml}</td><td>${stdCode}</td></tr>`;
       }
