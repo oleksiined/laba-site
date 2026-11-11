@@ -8941,6 +8941,10 @@ function cabUpdateStats() {
 
 // ── Protocol PDF Generator ──
 async function generateProtocol(sampleId) {
+  // Open window immediately (must be synchronous — browsers block window.open after await)
+  const win = window.open('', '_blank');
+  if (!win) { showToast('Дозвольте спливаючі вікна у браузері'); return; }
+  win.document.write('<html><head><meta charset="utf-8"><title>Завантаження…</title></head><body style="font:14px Arial,sans-serif;padding:32px;color:#555">Формуємо протокол…</body></html>');
   showToast('Формуємо протокол...');
   try {
     // 1. Sample + order
@@ -9356,12 +9360,11 @@ tbody td{border-bottom:.38pt solid #e0e2e4;padding:3.3pt 4pt}.group th{backgroun
 </main>
 </body></html>`;
 
-    const win = window.open('', '_blank');
-    if (!win) { showToast('Дозвольте спливаючі вікна'); return; }
     win.document.write(html);
     win.document.close();
   } catch(err) {
     console.error('generateProtocol:', err);
+    win && win.close();
     showToast('Помилка формування протоколу');
   }
 }
