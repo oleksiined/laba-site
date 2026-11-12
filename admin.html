@@ -4900,12 +4900,31 @@ function smpSelect(id) {
     });
     tbody.innerHTML = html || `<tr><td colspan="4" style="color:var(--text-soft);font-size:12px;padding:10px 6px;text-align:center">Дослідження не вказані</td></tr>`;
   }
-  // Агрономічні дані
+  // Агрономічні дані — спочатку заповнюємо з кешу (якщо вже підтягували),
+  // потім lazy-load актуальних даних із Supabase samples
   const setInp = (eid, v) => { const e=document.getElementById(eid); if(e) e.value = v||''; };
-  setInp('smpFldDate', s.sampling_date||s.date||'');
-  setInp('smpFldPredecessor', s.predecessor||'');
-  setInp('smpFldCrop', s.planned_crop||'');
-  setInp('smpFldYield', s.planned_yield||'');
+  setInp('smpFldDate', s.sampling_date||'');
+  setInp('smpFldPredecessor', s.crop_previous||s.predecessor||'');
+  setInp('smpFldCrop', s.crop_planned||s.planned_crop||'');
+  setInp('smpFldYield', s.target_yield||s.planned_yield||'');
+  // Lazy-load актуальних агро-полів з Supabase
+  if(s.sampleNum) {
+    sbGet('samples', `sample_number=eq.${encodeURIComponent(s.sampleNum)}&select=crop_previous,crop_planned,target_yield,sampling_date&limit=1`)
+      .then(rows => {
+        if(!rows||!rows.length) return;
+        const r = rows[0];
+        // Кешуємо в об'єкт зразка
+        s.crop_previous = r.crop_previous||''; s.crop_planned = r.crop_planned||'';
+        s.target_yield  = r.target_yield||'';  s.sampling_date = r.sampling_date||'';
+        // Заповнюємо інпути тільки якщо цей зразок ще відкритий
+        if(_smpSelId === id) {
+          setInp('smpFldDate', r.sampling_date||'');
+          setInp('smpFldPredecessor', r.crop_previous||'');
+          setInp('smpFldCrop', r.crop_planned||'');
+          setInp('smpFldYield', r.target_yield||'');
+        }
+      }).catch(()=>{});
+  }
   // Лабораторія та завдання
   set('smpPanelLab', s.lab||'Лаб. №1');
   set('smpPanelTask', s.task||'Не створено');
@@ -4928,9 +4947,11 @@ async function smpSaveAgro() {
   const planned_crop  = document.getElementById('smpFldCrop')?.value || '';
   const planned_yield = document.getElementById('smpFldYield')?.value || '';
 
-  // Update local state
+  // Update local cache (both old and new field names)
   s.sampling_date = sampling_date; s.predecessor = predecessor;
   s.planned_crop = planned_crop;   s.planned_yield = planned_yield;
+  s.crop_previous = predecessor;   s.crop_planned = planned_crop;
+  s.target_yield  = planned_yield;
 
   const savingEl = document.getElementById('smpAgroSaving');
   if(savingEl) savingEl.style.display='';
