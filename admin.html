@@ -1566,6 +1566,20 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
               <span class="adm-pill adm-p-done" style="font-size:11px">Активно</span>
             </div>
           </div>
+
+          <div class="adm-sett-card">
+            <div class="adm-sett-card-title">Синхронізація протоколу</div>
+            <div style="font-size:12.5px;color:var(--text-soft);margin-bottom:14px">
+              Оновлює таблицю <code style="background:var(--bg);padding:1px 5px;border-radius:4px;font-size:11.5px">protocol_spec</code> даними з Google Sheets «Специфікація протоколу».
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <button class="adm-btn-primary" id="syncProtocolBtn" onclick="syncProtocolSpec()">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14" style="vertical-align:-2px;margin-right:5px"><path d="M4 10a6 6 0 1 1 1.5 4" stroke-linecap="round"/><path d="M4 14v-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Синхронізувати
+              </button>
+              <span id="syncProtocolStatus" style="font-size:12px;color:var(--text-soft)"></span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2224,6 +2238,31 @@ function _mapOrder(o) {
     actName:     o.act_name     || '',
     notes:       o.notes        || '',
   };
+}
+
+// Sync protocol_spec from Google Sheets
+async function syncProtocolSpec() {
+  const btn = document.getElementById('syncProtocolBtn');
+  const status = document.getElementById('syncProtocolStatus');
+  btn.disabled = true;
+  status.style.color = 'var(--text-soft)';
+  status.textContent = 'Синхронізація…';
+  try {
+    const res = await fetch('/api/sync-interpretations', { method: 'POST' });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) {
+      status.style.color = 'var(--green,#22a35a)';
+      const upserted = data.upserted ?? data.spec_rows ?? '?';
+      status.textContent = `✓ Оновлено ${upserted} рядків`;
+    } else {
+      status.style.color = '#d9534f';
+      status.textContent = `✗ Помилка: ${data.error || res.status}`;
+    }
+  } catch (e) {
+    status.style.color = '#d9534f';
+    status.textContent = `✗ ${e.message}`;
+  }
+  btn.disabled = false;
 }
 
 // Fetch orders from backend and re-init
