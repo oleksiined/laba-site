@@ -11305,6 +11305,7 @@ async function _sbFetch(table, params = '') {
 
 // ─── Завантаження каталогу з Supabase ─────────────────────────────────────
 async function loadCatalogFromSupabase() {
+  console.log('[catalog] loadCatalogFromSupabase called from:', new Error().stack.split('\n').slice(1,4).join(' | '));
   try {
     const [services, packages, pkgItems, methods, materials, serviceChips] = await Promise.all([
       _sbFetch('catalog_services',      'select=*&or=(status.in.(active,draft),status.is.null)&order=sort_order.asc.nullslast,service_id'),
