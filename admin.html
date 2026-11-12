@@ -2257,7 +2257,10 @@ async function _runSync(endpoint, btnId, statusId) {
     const data = await res.json().catch(() => ({}));
     if (res.ok) {
       status.style.color = 'var(--green,#22a35a)';
-      const count = data.upserted ?? data.spec_rows ?? data.rows ?? '?';
+      const count = data.upserted ?? data.spec_rows ?? data.rows
+        ?? (typeof data === 'object' && data
+            ? Object.values(data).filter(v => typeof v === 'number').reduce((a,b)=>a+b, 0)
+            : '?');
       status.textContent = `✓ ${count} рядків`;
     } else {
       status.style.color = '#d9534f';
