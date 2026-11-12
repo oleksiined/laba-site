@@ -2973,9 +2973,9 @@ async function generateProtocolAdmin(sIdx) {
       ? await sbGet('protocol_spec', `${specFilter}&status=neq.disabled&order=section_order,item_order&select=${specSelect}`)
       : [];
     const params = (specRows||[]).filter(p=>p.result_parameter_id);
-    // Build method ids
-    const methodIds = [...new Set(params.map(p=>p.method_id).filter(Boolean))];
-    const methods = methodIds.length ? await sbGet('catalog_methods', `method_id=in.(${methodIds.join(',')})&select=method_id,standard_code`) : [];
+    // Build method ids for catalog_methods lookup
+    const specMethodIds = [...new Set(params.map(p=>p.method_id).filter(Boolean))];
+    const methods = specMethodIds.length ? await sbGet('catalog_methods', `method_id=in.(${specMethodIds.join(',')})&select=method_id,standard_code`) : [];
     const methodMap={};  (methods||[]).forEach(m=>{ methodMap[m.method_id]=m; });
     const resultsRows = Array.isArray(labResultsArr) ? labResultsArr : [];
     const resultsMap = {};
