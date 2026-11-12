@@ -11419,9 +11419,22 @@ async function loadCatalogFromSupabase() {
       return result;
     };
 
+    // ── Helper: resolve material_id for a package (пакет може не мати material_id — беремо з першого сервісу) ──
+    const _svcById = {};
+    for (const svc of services) if (svc.service_id) _svcById[svc.service_id] = svc;
+    function _pkgMatId(pkg) {
+      if (pkg.material_id) return pkg.material_id;
+      const items = pkgItemsFull[pkg.package_id] || [];
+      for (const pi of items) {
+        const s = _svcById[pi.service_id];
+        if (s && s.material_id) return s.material_id;
+      }
+      return null;
+    }
+
     // ── Оновлюємо NC_CATALOG.packages ──
     for (const pkg of packages) {
-      const matKey = _matIdToKey[pkg.material_id] || 'soil';
+      const matKey = _matIdToKey[_pkgMatId(pkg)] || 'soil';
       const key = pkg.slug || pkg.package_id;
       if (!key) continue;
       const existing = NC_CATALOG.packages[key] || {};
@@ -11437,7 +11450,7 @@ async function loadCatalogFromSupabase() {
 
     // ── Оновлюємо NS_CAT.packages ──
     for (const pkg of packages) {
-      const matKey = _matIdToKey[pkg.material_id] || 'soil';
+      const matKey = _matIdToKey[_pkgMatId(pkg)] || 'soil';
       const key = pkg.slug || pkg.package_id;
       if (!key) continue;
       const existing = NS_CAT.packages[key] || {};
@@ -11489,12 +11502,11 @@ async function loadCatalogFromSupabase() {
     const _matKeyToSvcKey  = { soil:'soil', water:'water', fertilizer:'fertilizer', seeds:'seeds', grain:'grain', plant:'plants' };
     const _matKeyToLabel   = { soil:'Ґрунт', water:'Вода', fertilizer:'Добрива', seeds:'Насіння', grain:'Зерно', plant:'Рослини', plants:'Рослини' };
     Object.values(SERVICES).forEach(s => { s.packages = []; s.individual = []; });
-    // Build service lookup for package keyword enrichment
-    const svcById = {};
-    for (const svc of services) { if (svc.service_id) svcById[svc.service_id] = svc; }
+    // Build service lookup for package keyword enrichment (reuse _svcById built above)
+    const svcById = _svcById;
     for (const pkg of packages) {
       if (pkg.status !== 'active') continue;
-      const mk = _matIdToKey[pkg.material_id] || 'soil';
+      const mk = _matIdToKey[_pkgMatId(pkg)] || 'soil';
       const sk = _matKeyToSvcKey[mk] || mk;
       if (!SERVICES[sk]) continue;
       SERVICES[sk].packages.push({
