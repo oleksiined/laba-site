@@ -5,8 +5,8 @@
 'use strict';
 const https = require('https');
 
-const GS_ID = '1xn9CNpcReL0QyC8-bRxQEZ0JyVA2JsNJrx51DMjUL4g';
-const GS_PUB_ID = '2PACX-1vRbHG3iOUp6zr4eRsePrcvkEvxKMynoS3zTpocb3_8RE8PM1IED2gT9LUmsojORbelT6ixv3gttqY2W';
+// Spreadsheet ID (незмінний — з URL таблиці; env var дозволяє перевизначити)
+const GS_ID = process.env.CATALOG_GS_ID || '1xn9CNpcReL0QyC8-bRxQEZ0JyVA2JsNJrx51DMjUL4g';
 
 // GID-и листів (отримати: Файл → Поширити → Опублікувати у Вебі → окремий лист → URL)
 // Визначити gid: відкрити лист у таблиці, в URL буде #gid=XXXXXXXX
@@ -77,7 +77,7 @@ function detectSheet(cols) {
 function gsFetch(gid) {
   return new Promise((resolve, reject) => {
     // published CSV з gid=NUMBER — не потребує auth
-    const url = `https://docs.google.com/spreadsheets/d/e/${GS_PUB_ID}/pub?output=csv&gid=${gid}`;
+    const url = `https://docs.google.com/spreadsheets/d/${GS_ID}/export?format=csv&gid=${gid}`;
     Promise.resolve(httpGet(url)).then(res => {
       const chunks = [];
       res.on('data', d => chunks.push(d));

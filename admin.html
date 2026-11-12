@@ -1084,10 +1084,15 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
         <div class="adm-topbar">
           <div><div class="adm-page-title">Dashboard</div><div class="adm-page-sub">Загальна аналітика та статистика</div></div>
           <div class="adm-topbar-actions">
+            <button class="adm-btn-sec" id="syncCatalogBtn" onclick="syncCatalog()" title="Синхронізувати каталог з Google Sheets">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13" style="vertical-align:-2px;margin-right:4px"><path d="M4 10a6 6 0 1 1 1.5 4" stroke-linecap="round"/><path d="M4 14v-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Синхр. каталог
+            </button>
             <button class="adm-btn-sec" id="syncProtocolBtn" onclick="syncProtocolSpec()" title="Синхронізувати protocol_spec з Google Sheets">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13" style="vertical-align:-2px;margin-right:4px"><path d="M4 10a6 6 0 1 1 1.5 4" stroke-linecap="round"/><path d="M4 14v-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
               Синхр. протокол
             </button>
+            <span id="syncCatalogStatus" style="font-size:11.5px;color:var(--text-soft)"></span>
             <span id="syncProtocolStatus" style="font-size:11.5px;color:var(--text-soft)"></span>
           </div>
         </div>
@@ -2240,29 +2245,38 @@ function _mapOrder(o) {
   };
 }
 
-// Sync protocol_spec from Google Sheets
-async function syncProtocolSpec() {
-  const btn = document.getElementById('syncProtocolBtn');
-  const status = document.getElementById('syncProtocolStatus');
+// Generic sync helper
+async function _runSync(endpoint, btnId, statusId) {
+  const btn = document.getElementById(btnId);
+  const status = document.getElementById(statusId);
   btn.disabled = true;
   status.style.color = 'var(--text-soft)';
   status.textContent = 'Синхронізація…';
   try {
-    const res = await fetch('/api/sync-interpretations', { method: 'POST' });
+    const res = await fetch(endpoint, { method: 'POST' });
     const data = await res.json().catch(() => ({}));
     if (res.ok) {
       status.style.color = 'var(--green,#22a35a)';
-      const upserted = data.upserted ?? data.spec_rows ?? '?';
-      status.textContent = `✓ Оновлено ${upserted} рядків`;
+      const count = data.upserted ?? data.spec_rows ?? data.rows ?? '?';
+      status.textContent = `✓ ${count} рядків`;
     } else {
       status.style.color = '#d9534f';
-      status.textContent = `✗ Помилка: ${data.error || res.status}`;
+      status.textContent = `✗ ${data.error || res.status}`;
     }
   } catch (e) {
     status.style.color = '#d9534f';
     status.textContent = `✗ ${e.message}`;
   }
   btn.disabled = false;
+}
+
+async function syncCatalog() {
+  await _runSync('/api/sync-catalog', 'syncCatalogBtn', 'syncCatalogStatus');
+}
+
+// Sync protocol_spec from Google Sheets
+async function syncProtocolSpec() {
+  await _runSync('/api/sync-interpretations', 'syncProtocolBtn', 'syncProtocolStatus');
 }
 
 // Fetch orders from backend and re-init
