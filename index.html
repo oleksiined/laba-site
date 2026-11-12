@@ -12121,18 +12121,6 @@ function renderPayerFields() {
            maxlength="8" inputmode="numeric" onblur="validateEdrpou(this)" oninput="this.value=this.value.replace(/\D/g,'');NCO.legal.edrpou=this.value">
   </div>
 </div>
-<div class="field-grid-2" style="margin-bottom:0">
-  <div class="field">
-    <label class="field-label">ІПН</label>
-    <input class="field-input" type="text" id="f-ipn" value="${NCO.legal.ipn}" placeholder="123456789012"
-           maxlength="12" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'');NCO.legal.ipn=this.value">
-  </div>
-  <div class="field">
-    <label class="field-label">Юридична адреса<span class="req">*</span></label>
-    <input class="field-input" type="text" id="f-addr" value="${NCO.legal.address}" placeholder="м. Київ, вул. …"
-           onblur="validateReq(this)" oninput="NCO.legal.address=this.value">
-  </div>
-</div>
 
 <div id="recipient-extra"></div>`;
   } else if (t === 'fop') {
@@ -12148,11 +12136,6 @@ function renderPayerFields() {
     <input class="field-input" type="text" id="f-rnokpp" value="${NCO.fop.rnokpp}" placeholder="1234567890"
            maxlength="10" inputmode="numeric" onblur="validateReq(this)" oninput="this.value=this.value.replace(/\D/g,'');NCO.fop.rnokpp=this.value">
   </div>
-</div>
-<div class="field" style="margin-bottom:0">
-  <label class="field-label">Адреса реєстрації<span class="req">*</span></label>
-  <input class="field-input" type="text" id="f-fop-addr" value="${NCO.fop.address}" placeholder="м. Київ, вул. …"
-         onblur="validateReq(this)" oninput="NCO.fop.address=this.value">
 </div>
 
 </label>
