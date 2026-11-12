@@ -1083,6 +1083,13 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
       <div class="adm-subtab" id="admtab-dashboard">
         <div class="adm-topbar">
           <div><div class="adm-page-title">Dashboard</div><div class="adm-page-sub">Загальна аналітика та статистика</div></div>
+          <div class="adm-topbar-actions">
+            <button class="adm-btn-sec" id="syncProtocolBtn" onclick="syncProtocolSpec()" title="Синхронізувати protocol_spec з Google Sheets">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13" style="vertical-align:-2px;margin-right:4px"><path d="M4 10a6 6 0 1 1 1.5 4" stroke-linecap="round"/><path d="M4 14v-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Синхр. протокол
+            </button>
+            <span id="syncProtocolStatus" style="font-size:11.5px;color:var(--text-soft)"></span>
+          </div>
         </div>
         <div class="adm-stats" style="padding:0 20px 16px">
           <div class="adm-stat"><div class="adm-stat-val" id="dashN">8</div><div class="adm-stat-lbl">Нові замовлення</div></div>
@@ -1569,15 +1576,8 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
 
           <div class="adm-sett-card">
             <div class="adm-sett-card-title">Синхронізація протоколу</div>
-            <div style="font-size:12.5px;color:var(--text-soft);margin-bottom:14px">
-              Оновлює таблицю <code style="background:var(--bg);padding:1px 5px;border-radius:4px;font-size:11.5px">protocol_spec</code> даними з Google Sheets «Специфікація протоколу».
-            </div>
-            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-              <button class="adm-btn-primary" id="syncProtocolBtn" onclick="syncProtocolSpec()">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14" style="vertical-align:-2px;margin-right:5px"><path d="M4 10a6 6 0 1 1 1.5 4" stroke-linecap="round"/><path d="M4 14v-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Синхронізувати
-              </button>
-              <span id="syncProtocolStatus" style="font-size:12px;color:var(--text-soft)"></span>
+            <div style="font-size:12.5px;color:var(--text-soft)">
+              Кнопка «Синхр. протокол» доступна на Dashboard (верхній правий кут).
             </div>
           </div>
         </div>
