@@ -11323,17 +11323,32 @@ async function loadCatalogFromSupabase() {
     // ── Build dynamic material_id → SERVICES-key mapping from catalog_materials ──
     // Це надійніше ніж захардкоджені MAT-коди, бо прив'язується до назви матеріалу
     const _nameToSvcKey = {
-      'Ґрунт':'soil', 'Добрива':'fertilizer', 'Вода':'water',
-      'Насіння':'seeds', 'Зерно':'grain', 'Рослини':'plants', 'Рослина':'plants',
+      // Ґрунт
+      'ґрунт':'soil','грунт':'soil','soil':'soil',
+      // Добрива — різні форми
+      'добрива':'fertilizer','добриво':'fertilizer','добрива':'fertilizer','мінеральні добрива':'fertilizer','fertilizer':'fertilizer',
+      // Вода
+      'вода':'water','water':'water',
+      // Насіння
+      'насіння':'seeds','насіння':'seeds','seeds':'seeds',
+      // Зерно
+      'зерно':'grain','grain':'grain',
+      // Рослини
+      'рослини':'plants','рослина':'plants','plant':'plants','plants':'plants',
     };
+    // Статичний fallback по MAT-коду (якщо назва не розпізнана)
+    const _matCodeFallback = { 'mat-01':'soil','mat-02':'fertilizer','mat-03':'seeds','mat-04':'grain','mat-05':'water','mat-06':'plants' };
     const _matIdToKey = {}; // shadows outer const — built from live catalog_materials
     for (const mat of materials) {
-      const k = _nameToSvcKey[mat.name];
+      const norm = (mat.name || '').trim().toLowerCase();
+      const k = _nameToSvcKey[norm]
+             || _matCodeFallback[(mat.material_id || '').toLowerCase()]
+             || null;
       if (mat.material_id && k) _matIdToKey[mat.material_id] = k;
     }
-    // Fallback якщо catalog_materials порожній
+    // Fallback якщо catalog_materials повністю порожній
     if (!Object.keys(_matIdToKey).length) {
-      Object.assign(_matIdToKey, {'MAT-01':'soil','MAT-02':'fertilizer','MAT-03':'seeds','MAT-04':'grain','MAT-05':'water','MAT-06':'plant'});
+      Object.assign(_matIdToKey, {'MAT-01':'soil','MAT-02':'fertilizer','MAT-03':'seeds','MAT-04':'grain','MAT-05':'water','MAT-06':'plants'});
     }
     console.log('[catalog] matIdToKey:', _matIdToKey, '| services total:', services.length);
     console.log('[catalog] services sample (first 5):', services.slice(0,5).map(s=>({id:s.service_id,mat:s.material_id,status:s.status,standalone:s.orderable_standalone})));
@@ -11539,7 +11554,8 @@ async function loadCatalogFromSupabase() {
     for (const svc of services) {
       if (svc.status !== 'active' && svc.status !== 'draft') { _dbgSkipStatus++; continue; }
       if (svc.orderable_standalone === false) { _dbgSkipStandalone++; continue; }
-      const mk = _matIdToKey[svc.material_id] || 'soil';
+      const mk = _matIdToKey[svc.material_id];
+      if (!mk) { _dbgSkipNoSvc++; continue; } // немає матеріалу — пропускаємо, щоб не забруднювати 'soil'
       const sk = _matKeyToSvcKey[mk] || mk;
       if (!SERVICES[sk]) { _dbgSkipNoSvc++; continue; }
       _dbgAdded++;
