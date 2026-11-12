@@ -1517,49 +1517,49 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           <div class="adm-sett-card">
             <div class="adm-sett-card-title">Профіль менеджера</div>
             <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
-              <div style="width:56px;height:56px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0">ІП</div>
+              <div id="settAvatar" style="width:56px;height:56px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0">ІП</div>
               <div>
-                <div style="font-size:14px;font-weight:600;color:var(--text-dark)">Іріна Петренко</div>
-                <div style="font-size:12px;color:var(--text-soft)">Менеджер лабораторії</div>
+                <div id="settAvatarName" style="font-size:14px;font-weight:600;color:var(--text-dark)">Іріна Петренко</div>
+                <div id="settAvatarRole" style="font-size:12px;color:var(--text-soft)">Менеджер лабораторії</div>
               </div>
             </div>
             <div class="adm-sett-grid">
-              <div class="adm-sett-field"><label class="adm-sett-lbl">Ім'я та прізвище</label><input class="adm-sett-inp" value="Іріна Петренко"></div>
-              <div class="adm-sett-field"><label class="adm-sett-lbl">Посада</label><input class="adm-sett-inp" value="Менеджер лабораторії"></div>
-              <div class="adm-sett-field"><label class="adm-sett-lbl">Email</label><input class="adm-sett-inp" type="email" value="petrenko@laba.ua"></div>
-              <div class="adm-sett-field"><label class="adm-sett-lbl">Телефон</label><input class="adm-sett-inp" type="tel" value="+380 67 181 99 67"></div>
+              <div class="adm-sett-field"><label class="adm-sett-lbl">Ім'я та прізвище</label><input id="settName" class="adm-sett-inp" value="Іріна Петренко"></div>
+              <div class="adm-sett-field"><label class="adm-sett-lbl">Посада</label><input id="settRole" class="adm-sett-inp" value="Менеджер лабораторії"></div>
+              <div class="adm-sett-field"><label class="adm-sett-lbl">Email</label><input id="settEmail" class="adm-sett-inp" type="email" value="petrenko@laba.ua"></div>
+              <div class="adm-sett-field"><label class="adm-sett-lbl">Телефон</label><input id="settPhone" class="adm-sett-inp" type="tel" value="+380 67 181 99 67"></div>
             </div>
-            <div class="adm-sett-save"><button class="adm-btn-primary" onclick="alert('Збережено')">Зберегти зміни</button><button class="adm-btn-sec">Скасувати</button></div>
+            <div class="adm-sett-save"><button class="adm-btn-primary" onclick="settSaveProfile()">Зберегти зміни</button><button class="adm-btn-sec" onclick="settLoad()">Скасувати</button><span id="settProfileStatus" style="font-size:12px;opacity:0;transition:opacity .4s"></span></div>
           </div>
           <!-- Lab -->
           <div class="adm-sett-card">
             <div class="adm-sett-card-title">Лабораторія</div>
             <div class="adm-sett-grid">
-              <div class="adm-sett-field"><label class="adm-sett-lbl">Назва лабораторії</label><input class="adm-sett-inp" value="LABA — лабораторія Землероб"></div>
-              <div class="adm-sett-field"><label class="adm-sett-lbl">Номер акредитації</label><input class="adm-sett-inp" value="UA-2023-LA-0158"></div>
-              <div class="adm-sett-field"><label class="adm-sett-lbl">Адреса</label><input class="adm-sett-inp" value="м. Черкаси, вул. Лабораторна 1"></div>
-              <div class="adm-sett-field"><label class="adm-sett-lbl">Телефон лабораторії</label><input class="adm-sett-inp" value="+380 472 00 00 00"></div>
+              <div class="adm-sett-field"><label class="adm-sett-lbl">Назва лабораторії</label><input id="settLabName" class="adm-sett-inp" value="LABA — лабораторія Землероб"></div>
+              <div class="adm-sett-field"><label class="adm-sett-lbl">Номер акредитації</label><input id="settLabAcc" class="adm-sett-inp" value="UA-2023-LA-0158"></div>
+              <div class="adm-sett-field"><label class="adm-sett-lbl">Адреса</label><input id="settLabAddr" class="adm-sett-inp" value="м. Черкаси, вул. Лабораторна 1"></div>
+              <div class="adm-sett-field"><label class="adm-sett-lbl">Телефон лабораторії</label><input id="settLabPhone" class="adm-sett-inp" value="+380 472 00 00 00"></div>
             </div>
-            <div class="adm-sett-save"><button class="adm-btn-primary" onclick="alert('Збережено')">Зберегти зміни</button><button class="adm-btn-sec">Скасувати</button></div>
+            <div class="adm-sett-save"><button class="adm-btn-primary" onclick="settSaveLab()">Зберегти зміни</button><button class="adm-btn-sec" onclick="settLoad()">Скасувати</button><span id="settLabStatus" style="font-size:12px;opacity:0;transition:opacity .4s"></span></div>
           </div>
           <!-- Notifications -->
           <div class="adm-sett-card">
             <div class="adm-sett-card-title">Сповіщення</div>
             <div class="adm-sett-toggle-row">
-              <div><div class="adm-sett-toggle-lbl">Email при новому замовленні</div><div class="adm-sett-toggle-sub">Надсилати на petrenko@laba.ua</div></div>
-              <input type="checkbox" checked style="width:16px;height:16px;cursor:pointer">
+              <div><div class="adm-sett-toggle-lbl">Email при новому замовленні</div><div class="adm-sett-toggle-sub" id="settNotifEmailSub">Надсилати на petrenko@laba.ua</div></div>
+              <input type="checkbox" id="settNotifNewOrder" checked style="width:16px;height:16px;cursor:pointer" onchange="settSaveNotif()">
             </div>
             <div class="adm-sett-toggle-row">
               <div><div class="adm-sett-toggle-lbl">Email при отриманні зразків</div><div class="adm-sett-toggle-sub">Підтвердження від клієнта</div></div>
-              <input type="checkbox" checked style="width:16px;height:16px;cursor:pointer">
+              <input type="checkbox" id="settNotifSamples" checked style="width:16px;height:16px;cursor:pointer" onchange="settSaveNotif()">
             </div>
             <div class="adm-sett-toggle-row">
               <div><div class="adm-sett-toggle-lbl">Нагадування про прострочені зразки</div><div class="adm-sett-toggle-sub">Якщо зразки не отримано 3+ дні</div></div>
-              <input type="checkbox" style="width:16px;height:16px;cursor:pointer">
+              <input type="checkbox" id="settNotifOverdue" style="width:16px;height:16px;cursor:pointer" onchange="settSaveNotif()">
             </div>
             <div class="adm-sett-toggle-row">
               <div><div class="adm-sett-toggle-lbl">SMS клієнту при готовності</div><div class="adm-sett-toggle-sub">Автоматично при статусі «Готово»</div></div>
-              <input type="checkbox" style="width:16px;height:16px;cursor:pointer">
+              <input type="checkbox" id="settNotifSms" style="width:16px;height:16px;cursor:pointer" onchange="settSaveNotif()">
             </div>
           </div>
           <!-- Integrations -->
@@ -5396,6 +5396,7 @@ admSwitch = function(tab, btn) {
   if (tab==='clients')   { cliInit(); }
   if (tab==='docs')      { docInit(); }
   if (tab==='results')   { resLoadFromDb(); }
+  if (tab==='settings')  { settLoad(); }
 };
 
 // ─── UPDATE admClosePanel TO RESTORE ORDER PANEL ─
@@ -6024,6 +6025,100 @@ async function admDetachContract(orderId) {
 // Залишаємо для сумісності зі старими викликами
 function admShowContractSearch(o) { /* no-op — replaced by inline search */ }
 function admCloseContractSearch() { /* no-op */ }
+
+// ════════════════════════════════════════════
+//  SETTINGS — localStorage persistence
+// ════════════════════════════════════════════
+const _SETT_KEY = 'adm_laba_settings';
+
+function settLoad() {
+  let d = {};
+  try { const r = localStorage.getItem(_SETT_KEY); if(r) d = JSON.parse(r); } catch(_) {}
+  // Profile
+  const name  = d.name  || 'Іріна Петренко';
+  const role  = d.role  || 'Менеджер лабораторії';
+  const email = d.email || 'petrenko@laba.ua';
+  const phone = d.phone || '+380 67 181 99 67';
+  _sv('settName',  name);
+  _sv('settRole',  role);
+  _sv('settEmail', email);
+  _sv('settPhone', phone);
+  _settUpdateAvatar(name, role);
+  // Lab
+  _sv('settLabName',  d.labName  || 'LABA — лабораторія Землероб');
+  _sv('settLabAcc',   d.labAcc   || 'UA-2023-LA-0158');
+  _sv('settLabAddr',  d.labAddr  || 'м. Черкаси, вул. Лабораторна 1');
+  _sv('settLabPhone', d.labPhone || '+380 472 00 00 00');
+  // Notifications
+  _sc('settNotifNewOrder', d.notifNewOrder !== false);
+  _sc('settNotifSamples',  d.notifSamples  !== false);
+  _sc('settNotifOverdue',  d.notifOverdue  === true);
+  _sc('settNotifSms',      d.notifSms      === true);
+  // Update email sub-label
+  const sub = document.getElementById('settNotifEmailSub');
+  if(sub) sub.textContent = `Надсилати на ${email}`;
+}
+
+function _sv(id, val) { const el=document.getElementById(id); if(el) el.value=val; }
+function _sc(id, checked) { const el=document.getElementById(id); if(el) el.checked=checked; }
+
+function _settUpdateAvatar(name, role) {
+  const parts = (name||'').trim().split(/\s+/);
+  const initials = parts.length >= 2
+    ? (parts[0][0]+(parts[1][0]||'')).toUpperCase()
+    : (name||'ІП').slice(0,2).toUpperCase();
+  const av = document.getElementById('settAvatar');
+  if(av) av.textContent = initials;
+  const an = document.getElementById('settAvatarName');
+  if(an) an.textContent = name || '';
+  const ar = document.getElementById('settAvatarRole');
+  if(ar) ar.textContent = role || '';
+}
+
+function _settGet() {
+  try { const r = localStorage.getItem(_SETT_KEY); return r ? JSON.parse(r) : {}; } catch(_) { return {}; }
+}
+
+function settSaveProfile() {
+  const d = _settGet();
+  d.name  = (document.getElementById('settName')?.value  || '').trim();
+  d.role  = (document.getElementById('settRole')?.value  || '').trim();
+  d.email = (document.getElementById('settEmail')?.value || '').trim();
+  d.phone = (document.getElementById('settPhone')?.value || '').trim();
+  try { localStorage.setItem(_SETT_KEY, JSON.stringify(d)); } catch(_) {}
+  _settUpdateAvatar(d.name, d.role);
+  const sub = document.getElementById('settNotifEmailSub');
+  if(sub) sub.textContent = `Надсилати на ${d.email}`;
+  _settShowSaved('settProfileStatus');
+}
+
+function settSaveLab() {
+  const d = _settGet();
+  d.labName  = (document.getElementById('settLabName')?.value  || '').trim();
+  d.labAcc   = (document.getElementById('settLabAcc')?.value   || '').trim();
+  d.labAddr  = (document.getElementById('settLabAddr')?.value  || '').trim();
+  d.labPhone = (document.getElementById('settLabPhone')?.value || '').trim();
+  try { localStorage.setItem(_SETT_KEY, JSON.stringify(d)); } catch(_) {}
+  _settShowSaved('settLabStatus');
+}
+
+function settSaveNotif() {
+  const d = _settGet();
+  d.notifNewOrder = document.getElementById('settNotifNewOrder')?.checked ?? true;
+  d.notifSamples  = document.getElementById('settNotifSamples')?.checked  ?? true;
+  d.notifOverdue  = document.getElementById('settNotifOverdue')?.checked  ?? false;
+  d.notifSms      = document.getElementById('settNotifSms')?.checked      ?? false;
+  try { localStorage.setItem(_SETT_KEY, JSON.stringify(d)); } catch(_) {}
+}
+
+function _settShowSaved(id) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.textContent = '✓ Збережено';
+  el.style.color = 'var(--green,#22a35a)';
+  el.style.opacity = '1';
+  setTimeout(() => { el.style.opacity = '0'; }, 2500);
+}
 </script>
 
 </body>
