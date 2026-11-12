@@ -2953,11 +2953,25 @@ async function generateProtocolAdmin(sIdx) {
     const sampleRow = Array.isArray(samplesData) ? (samplesData[sIdx]||{}) : {};
     const pkgItems = s.packageItems || pkgItemsRaw || [];
     const serviceIds = [...new Set(pkgItems.map(x=>x.service_id).filter(Boolean))];
-    const [specRows, labResultsArr, cationBalance] = await Promise.all([
-      serviceIds.length ? sbGet('protocol_spec', `service_id=in.(${serviceIds.join(',')})&status=neq.disabled&order=section_order,item_order&select=result_parameter_id,display_name,unit,method_id,section_name,section_order,item_order,decimal_places,optimum_from,optimum_to,upper_inclusive,value_source,formula`) : Promise.resolve([]),
+    const methodIds  = [...new Set(pkgItems.map(x=>x.method_id).filter(Boolean))];
+    const specSelect = `result_parameter_id,display_name,unit,method_id,section_name,section_order,item_order,decimal_places,optimum_from,optimum_to,upper_inclusive,value_source,formula`;
+    // Fetch results + cation balance in parallel
+    const [labResultsArr, cationBalance] = await Promise.all([
       sbGet('sample_results', `sample_id=eq.${encodeURIComponent(sampleRow.sample_number||s.num||'')}&select=param_code,value,lab_sample_id`),
       sbGet('protocol_cation_balance', `order=cec_val&select=cec_val,ca_from,ca_to,mg_from,mg_to`).catch(()=>[]),
     ]);
+    // Build protocol_spec filter: service_id → method_id → result_parameter_id from results
+    const paramCodes = (labResultsArr||[]).map(r=>r.param_code).filter(Boolean);
+    const specFilter = serviceIds.length
+      ? `service_id=in.(${serviceIds.join(',')})`
+      : methodIds.length
+        ? `method_id=in.(${methodIds.join(',')})`
+        : paramCodes.length
+          ? `result_parameter_id=in.(${paramCodes.join(',')})`
+          : null;
+    const specRows = specFilter
+      ? await sbGet('protocol_spec', `${specFilter}&status=neq.disabled&order=section_order,item_order&select=${specSelect}`)
+      : [];
     const params = (specRows||[]).filter(p=>p.result_parameter_id);
     // Build method ids
     const methodIds = [...new Set(params.map(p=>p.method_id).filter(Boolean))];
