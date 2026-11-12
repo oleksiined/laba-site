@@ -11305,7 +11305,6 @@ async function _sbFetch(table, params = '') {
 
 // ─── Завантаження каталогу з Supabase ─────────────────────────────────────
 async function loadCatalogFromSupabase() {
-  console.log('[catalog] loadCatalogFromSupabase called from:', new Error().stack.split('\n').slice(1,4).join(' | '));
   try {
     const [services, packages, pkgItems, methods, materials, serviceChips] = await Promise.all([
       _sbFetch('catalog_services',      'select=*&or=(status.in.(active,draft),status.is.null)&order=sort_order.asc.nullslast,service_id'),
@@ -11357,8 +11356,6 @@ async function loadCatalogFromSupabase() {
     if (!Object.keys(_matIdToKey).length) {
       Object.assign(_matIdToKey, {'MAT-01':'soil','MAT-02':'fertilizer','MAT-03':'seeds','MAT-04':'grain','MAT-05':'water','MAT-06':'plants'});
     }
-    console.log('[catalog] matIdToKey:', _matIdToKey, '| services total:', services.length);
-    console.log('[catalog] services sample (first 5):', services.slice(0,5).map(s=>({id:s.service_id,mat:s.material_id,status:s.status,standalone:s.orderable_standalone})));
 
     // ── Build pkg → [{service_id, method_id}] map (зберігаємо method_id з Package Items) ──
     const pkgIncluded = {};     // package_id → [service_id, ...] (для NC_CATALOG сумісності)
@@ -11528,14 +11525,6 @@ async function loadCatalogFromSupabase() {
     Object.values(SERVICES).forEach(s => { s.packages = []; s.individual = []; });
     // Build service lookup for package keyword enrichment (reuse _svcById built above)
     const svcById = _svcById;
-    // Debug: log packages per material (all fetched packages)
-    const _pkgMatCounts = {}; const _pkgMatSkip = {};
-    for (const pkg of packages) {
-      const _dbgMk = _matIdToKey[_pkgMatId(pkg)] || '(fallback:soil)';
-      if (pkg.status !== 'active') { _pkgMatSkip[_dbgMk] = (_pkgMatSkip[_dbgMk]||0)+1; }
-      else _pkgMatCounts[_dbgMk] = (_pkgMatCounts[_dbgMk]||0)+1;
-    }
-    console.log('[catalog] packages per matKey (active):', _pkgMatCounts, '| skipped (non-active):', _pkgMatSkip);
     for (const pkg of packages) {
       if (pkg.status !== 'active' && pkg.status !== 'draft') continue;
       const mk = _matIdToKey[_pkgMatId(pkg)] || 'soil';
@@ -11567,26 +11556,13 @@ async function loadCatalogFromSupabase() {
         deliverables:   pkg.result_deliverables ? pkg.result_deliverables.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean) : null,
       });
     }
-    let _dbgSkipStatus=0, _dbgSkipStandalone=0, _dbgSkipNoSvc=0, _dbgAdded=0;
-    // Debug: log per-material standalone/status breakdown
-    const _svcDbg = {}; // matKey → {total,skipStatus,skipStandalone,added}
     for (const svc of services) {
-      const _dbgMkRaw = _matIdToKey[_normMatId(svc.material_id)] || '(noMat:'+svc.material_id+')';
-      if (!_svcDbg[_dbgMkRaw]) _svcDbg[_dbgMkRaw] = {total:0,skipStatus:0,skipStandalone:0,added:0};
-      _svcDbg[_dbgMkRaw].total++;
-      if (svc.status !== 'active' && svc.status !== 'draft') _svcDbg[_dbgMkRaw].skipStatus++;
-      else if (svc.orderable_standalone === false) _svcDbg[_dbgMkRaw].skipStandalone++;
-      else _svcDbg[_dbgMkRaw].added++;
-    }
-    console.log('[catalog] per-material svc breakdown:', _svcDbg);
-    for (const svc of services) {
-      if (svc.status !== 'active' && svc.status !== 'draft') { _dbgSkipStatus++; continue; }
-      if (svc.orderable_standalone === false) { _dbgSkipStandalone++; continue; }
+      if (svc.status !== 'active' && svc.status !== 'draft') continue;
+      if (svc.orderable_standalone === false) continue;
       const mk = _matIdToKey[_normMatId(svc.material_id)];
-      if (!mk) { _dbgSkipNoSvc++; continue; } // немає матеріалу — пропускаємо, щоб не забруднювати 'soil'
+      if (!mk) continue; // немає матеріалу — пропускаємо, щоб не забруднювати 'soil'
       const sk = _matKeyToSvcKey[mk] || mk;
-      if (!SERVICES[sk]) { _dbgSkipNoSvc++; continue; }
-      _dbgAdded++;
+      if (!SERVICES[sk]) continue;
       SERVICES[sk].individual.push({
         code:        svc.service_id,
         slug:        svc.slug || svc.service_id,
@@ -11603,8 +11579,6 @@ async function loadCatalogFromSupabase() {
         exampleUrl: svc.report_example_url || null,
       });
     }
-    const _indivCounts = {}; for (const k of Object.keys(SERVICES)) _indivCounts[k]=SERVICES[k].individual.length;
-    console.log('[catalog] SERVICES.individual counts:', _indivCounts, '| added:', _dbgAdded, 'skip-status:', _dbgSkipStatus, 'skip-standalone:', _dbgSkipStandalone, 'skip-noSvc:', _dbgSkipNoSvc);
     // ── Показуємо тільки матеріали з Supabase ──
     if (materials.length) {
       const _matKeyNorm = { plant: 'plants' };
