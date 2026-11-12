@@ -11527,8 +11527,16 @@ async function loadCatalogFromSupabase() {
     Object.values(SERVICES).forEach(s => { s.packages = []; s.individual = []; });
     // Build service lookup for package keyword enrichment (reuse _svcById built above)
     const svcById = _svcById;
+    // Debug: log packages per material (all fetched packages)
+    const _pkgMatCounts = {}; const _pkgMatSkip = {};
     for (const pkg of packages) {
-      if (pkg.status !== 'active') continue;
+      const _dbgMk = _matIdToKey[_pkgMatId(pkg)] || '(fallback:soil)';
+      if (pkg.status !== 'active') { _pkgMatSkip[_dbgMk] = (_pkgMatSkip[_dbgMk]||0)+1; }
+      else _pkgMatCounts[_dbgMk] = (_pkgMatCounts[_dbgMk]||0)+1;
+    }
+    console.log('[catalog] packages per matKey (active):', _pkgMatCounts, '| skipped (non-active):', _pkgMatSkip);
+    for (const pkg of packages) {
+      if (pkg.status !== 'active' && pkg.status !== 'draft') continue;
       const mk = _matIdToKey[_pkgMatId(pkg)] || 'soil';
       const sk = _matKeyToSvcKey[mk] || mk;
       if (!SERVICES[sk]) continue;
@@ -11559,6 +11567,17 @@ async function loadCatalogFromSupabase() {
       });
     }
     let _dbgSkipStatus=0, _dbgSkipStandalone=0, _dbgSkipNoSvc=0, _dbgAdded=0;
+    // Debug: log per-material standalone/status breakdown
+    const _svcDbg = {}; // matKey → {total,skipStatus,skipStandalone,added}
+    for (const svc of services) {
+      const _dbgMkRaw = _matIdToKey[_normMatId(svc.material_id)] || '(noMat:'+svc.material_id+')';
+      if (!_svcDbg[_dbgMkRaw]) _svcDbg[_dbgMkRaw] = {total:0,skipStatus:0,skipStandalone:0,added:0};
+      _svcDbg[_dbgMkRaw].total++;
+      if (svc.status !== 'active' && svc.status !== 'draft') _svcDbg[_dbgMkRaw].skipStatus++;
+      else if (svc.orderable_standalone === false) _svcDbg[_dbgMkRaw].skipStandalone++;
+      else _svcDbg[_dbgMkRaw].added++;
+    }
+    console.log('[catalog] per-material svc breakdown:', _svcDbg);
     for (const svc of services) {
       if (svc.status !== 'active' && svc.status !== 'draft') { _dbgSkipStatus++; continue; }
       if (svc.orderable_standalone === false) { _dbgSkipStandalone++; continue; }
