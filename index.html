@@ -1235,6 +1235,10 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .srv-right-price{text-align:right}
 .srv-right-price-main{font-size:20px;font-weight:800;color:var(--navy);white-space:nowrap;line-height:1.15}
 .srv-right-price-sub{font-size:11px;color:var(--text-soft);line-height:1.4;margin-top:2px}
+.srv-qty-wrap{display:flex;flex-direction:column;align-items:center;gap:2px}
+.srv-action-btns{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.srv-ind-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.srv-ind-price{text-align:right}
 
 
 
@@ -1926,17 +1930,25 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
   .nav-logo{margin-right:0}
   .nav-logo svg,.nav-logo img{height:34px!important}
   .mega-menu-btn{flex:1;margin:0 8px;justify-content:center}
-  /* service card: text full-width top, counter+price at bottom */
+  /* service card: text full-width top, [ціна | лічильник | кнопки] внизу */
   .srv-collapsed-row{display:flex;flex-direction:column;align-items:stretch;gap:0}
-  .srv-right-col{flex-direction:row-reverse;align-items:center;justify-content:flex-start;align-self:stretch;gap:8px;padding:8px 0 2px;width:100%}
-  .srv-right-btns{flex-direction:row;align-items:center;gap:6px}
+  .srv-right-col{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;align-self:stretch!important;gap:0!important;padding:8px 0 4px!important;width:100%!important}
+  .srv-right-price{flex:1;text-align:left!important;order:1}
   .srv-right-price-main{font-size:18px}
+  .srv-right-btns{display:contents}
+  .srv-qty-wrap{order:2;display:flex;flex-direction:column;align-items:center;gap:2px;padding:0 8px}
+  .srv-action-btns{order:3;display:flex;gap:6px;align-items:center;flex-shrink:0;margin-left:auto}
+  /* IND mobile: same layout */
+  .srv-ind-right{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;align-self:stretch!important;padding:8px 0 4px!important;width:100%!important;gap:0!important}
+  .srv-ind-price{flex:1;text-align:left!important;order:1}
+  .srv-ind-right .srv-qty-wrap{order:2;padding:0 8px}
+  .srv-ind-right .srv-action-btns{order:3;margin-left:auto}
   /* PKG mobile: name/desc → meta row → price+btns row */
   .srv-collapsed-row--pkg{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;align-items:flex-start!important}
   .srv-collapsed-row--pkg .srv-collapsed-left{display:contents!important}
   .srv-top-info{order:1!important;flex:0 0 100%!important;padding-bottom:2px}
   .srv-collapsed-row--pkg .srv-meta-row{order:2!important;flex:0 0 100%!important;flex-direction:row!important;gap:12px!important;align-items:center!important;margin:0 0 4px!important}
-  .srv-collapsed-row--pkg .srv-right-col{order:3!important;flex:0 0 100%!important;justify-content:center!important;align-items:center!important;padding:0!important;width:auto!important}
+  .srv-collapsed-row--pkg .srv-right-col{order:3!important;flex:0 0 100%!important;padding:8px 0 4px!important;width:100%!important}
   #floatingCartBtn{right:auto!important;left:50%!important;transform:translateX(-50%)!important}
 }
 
@@ -2658,22 +2670,29 @@ main{flex:1}
   .services-content{padding:0 16px}
   .srv-results-bar{padding-left:16px;padding-right:16px}
 
-  /* Service cards mobile: text full-width top, counter+price row at bottom */
+  /* Service cards mobile: text top, [ціна | лічильник | кнопки] внизу */
   .srv-collapsed-row{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:0!important}
   .srv-collapsed-left{width:100%!important;min-width:0!important;overflow:visible!important}
   .srv-collapsed-left .service-name{white-space:normal!important;overflow:visible!important;text-overflow:unset!important;font-size:15px!important}
   .srv-collapsed-left .service-short{white-space:normal!important;overflow:visible!important}
   .service-code{white-space:nowrap!important}
-  .srv-right-col{flex-direction:row-reverse!important;align-items:center!important;justify-content:flex-start!important;align-self:stretch!important;gap:8px!important;padding:8px 0 2px!important;width:100%!important}
-  .srv-right-btns{flex-direction:row!important;align-items:center!important;gap:6px!important}
-  .srv-right-price{text-align:right!important}
+  .srv-right-col{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;align-self:stretch!important;gap:0!important;padding:8px 0 4px!important;width:100%!important}
+  .srv-right-price{flex:1!important;text-align:left!important;order:1}
+  .srv-right-price-main{font-size:18px!important}
+  .srv-right-btns{display:contents!important}
+  .srv-qty-wrap{order:2;display:flex;flex-direction:column;align-items:center;gap:2px;padding:0 8px}
+  .srv-action-btns{order:3;display:flex;gap:6px;align-items:center;flex-shrink:0;margin-left:auto}
+  /* IND mobile */
+  .srv-ind-right{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;align-self:stretch!important;padding:8px 0 4px!important;width:100%!important;gap:0!important}
+  .srv-ind-price{flex:1!important;text-align:left!important;order:1}
+  .srv-ind-right .srv-qty-wrap{order:2;padding:0 8px}
+  .srv-ind-right .srv-action-btns{order:3;margin-left:auto}
   /* PKG mobile: name/desc → meta row → price+btns row */
   .srv-collapsed-row--pkg{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;align-items:flex-start!important}
   .srv-collapsed-row--pkg .srv-collapsed-left{display:contents!important;width:auto!important}
   .srv-top-info{order:1!important;flex:0 0 100%!important;padding-bottom:2px}
   .srv-collapsed-row--pkg .srv-meta-row{order:2!important;flex:0 0 100%!important;flex-direction:row!important;gap:12px!important;align-items:center!important;margin:0 0 4px!important}
-  .srv-collapsed-row--pkg .srv-right-col{order:3!important;flex:0 0 100%!important;justify-content:center!important;align-items:center!important;padding:0!important;width:auto!important}
-  .srv-right-price-main{font-size:16px!important}
+  .srv-collapsed-row--pkg .srv-right-col{order:3!important;flex:0 0 100%!important;padding:8px 0 4px!important;width:100%!important}
 
   /* Order success modal — stack vertically */
   #order-success-modal .modal{max-width:100%!important;border-radius:16px!important}
@@ -7362,42 +7381,38 @@ function makeRow(item, type){
         ${indDaysText?`<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>${indDaysText}</span>`:''}
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end" onclick="event.stopPropagation()">
-      <!-- grid 2×2: [ціна | лічильник] / [Ціна за 1 зразок | зразків у кошику] -->
-      <div style="display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:8px;row-gap:2px;align-items:center">
-        <!-- [1,1] ціна -->
-        <div style="font-size:20px;font-weight:800;color:var(--navy);white-space:nowrap;text-align:right;line-height:1.15" id="cprice-main-${safeCode}">${item.price!=null?item.price.toLocaleString('uk-UA')+' грн':'Уточнити'}</div>
-        <!-- [1,2] лічильник або іконка -->
-        <div style="display:flex;align-items:center;gap:6px">
-          <div class="srv-qty-inline ${alreadyInCart?'open':''}" id="czone-${safeCode}" style="flex-direction:row;align-items:center">
-            <div class="srv-qty-counter-sm">
-              <button id="cdec-${safeCode}" onclick="changeIndQty('${safeCode}',-1)" disabled>−</button>
-              <input id="cqty-${safeCode}" type="number" value="1" min="1" max="9999"
-                oninput="inputIndQty('${safeCode}',this.value)"
-                onblur="if(!this.value||parseInt(this.value)<1){this.value=1;inputIndQty('${safeCode}',1)}">
-              <button onclick="changeIndQty('${safeCode}',1)">+</button>
-            </div>
-          </div>
-          <button class="srv-cart-icon" id="cicon-${safeCode}"
-            style="${alreadyInCart?'display:none':''}"
-            onclick="clickIndIcon('${safeCode}',event)"
-            title="Додати до зразків">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-          </button>
-        </div>
-        <!-- [2,1] підпис ціни -->
-        <div style="font-size:11px;color:var(--text-soft);text-align:left;line-height:1.3">
+    <div class="srv-ind-right" onclick="event.stopPropagation()">
+      <div class="srv-ind-price">
+        <div class="srv-right-price-main" id="cprice-main-${safeCode}">${item.price!=null?item.price.toLocaleString('uk-UA')+' грн':'Уточнити'}</div>
+        <div style="font-size:11px;color:var(--text-soft);line-height:1.3;margin-top:1px">
           <span id="cprice-sub-${safeCode}"></span>
           <span id="cprice-label-${safeCode}">Ціна за 1 зразок</span>
         </div>
-        <!-- [2,2] зразків у кошику -->
-        <div style="font-size:11px;color:var(--t3);font-weight:500;white-space:nowrap;line-height:1.3;text-align:center" id="cqty-label-${safeCode}">${alreadyInCart?'зразків у кошику':''}</div>
       </div>
-      <!-- ∨ -->
-      ${noExpand ? '' : `<button class="srv-expand-arrow" id="sarrow-${safeCode}"
-        onclick="toggleRowExpand('${safeCode}');event.stopPropagation()" title="Детальніше">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>`}
+      <div class="srv-qty-wrap">
+        <div class="srv-qty-inline ${alreadyInCart?'open':''}" id="czone-${safeCode}" style="flex-direction:row;align-items:center">
+          <div class="srv-qty-counter-sm">
+            <button id="cdec-${safeCode}" onclick="changeIndQty('${safeCode}',-1)" disabled>−</button>
+            <input id="cqty-${safeCode}" type="number" value="1" min="1" max="9999"
+              oninput="inputIndQty('${safeCode}',this.value)"
+              onblur="if(!this.value||parseInt(this.value)<1){this.value=1;inputIndQty('${safeCode}',1)}">
+            <button onclick="changeIndQty('${safeCode}',1)">+</button>
+          </div>
+        </div>
+        <span id="cqty-label-${safeCode}" style="font-size:11px;color:var(--t3);font-weight:500;white-space:nowrap;line-height:1.3;text-align:center">${alreadyInCart?'зразків у кошику':''}</span>
+      </div>
+      <div class="srv-action-btns">
+        <button class="srv-cart-icon" id="cicon-${safeCode}"
+          style="${alreadyInCart?'display:none':''}"
+          onclick="clickIndIcon('${safeCode}',event)"
+          title="Додати до зразків">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        </button>
+        ${noExpand ? '' : `<button class="srv-expand-arrow" id="sarrow-${safeCode}"
+          onclick="toggleRowExpand('${safeCode}');event.stopPropagation()" title="Детальніше">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>`}
+      </div>
     </div>
   </div>
   <div class="service-body ind-body" onclick="event.stopPropagation()" ${noExpand ? 'style="display:none"' : ''}>
@@ -7468,29 +7483,31 @@ function makeRow(item, type){
     <div class="srv-right-col" onclick="event.stopPropagation()">
       <!-- кнопки: верх -->
       <div class="srv-right-btns">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-        <div class="srv-qty-inline ${inCart?'open':''}" id="czone-${safeCode}" style="flex-direction:row;align-items:center">
-          <div class="srv-qty-counter-sm">
-            <button id="cdec-${safeCode}" onclick="changeCollapsedQty('${safeCode}',-1)" title="${qty<=1?'Видалити з кошика':'Зменшити'}" style="${qty<=1?'color:#EF4444':''}">${qty<=1?'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><polyline points="2,4 14,4"/><path d="M5 4V3h6v1M6 7v5M10 7v5" stroke-linecap="round"/><rect x="3" y="4" width="10" height="9" rx="1.5"/></svg>':'−'}</button>
-            <input id="cqty-${safeCode}" type="number" value="${qty}" min="1" max="9999" oninput="inputCollapsedQty('${safeCode}',this.value)" onblur="if(!this.value||parseInt(this.value)<1){this.value=1;inputCollapsedQty('${safeCode}',1)}">
-            <button onclick="changeCollapsedQty('${safeCode}',1)">+</button>
+        <div class="srv-qty-wrap">
+          <div class="srv-qty-inline ${inCart?'open':''}" id="czone-${safeCode}" style="flex-direction:row;align-items:center">
+            <div class="srv-qty-counter-sm">
+              <button id="cdec-${safeCode}" onclick="changeCollapsedQty('${safeCode}',-1)" title="${qty<=1?'Видалити з кошика':'Зменшити'}" style="${qty<=1?'color:#EF4444':''}">${qty<=1?'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><polyline points="2,4 14,4"/><path d="M5 4V3h6v1M6 7v5M10 7v5" stroke-linecap="round"/><rect x="3" y="4" width="10" height="9" rx="1.5"/></svg>':'−'}</button>
+              <input id="cqty-${safeCode}" type="number" value="${qty}" min="1" max="9999" oninput="inputCollapsedQty('${safeCode}',this.value)" onblur="if(!this.value||parseInt(this.value)<1){this.value=1;inputCollapsedQty('${safeCode}',1)}">
+              <button onclick="changeCollapsedQty('${safeCode}',1)">+</button>
+            </div>
           </div>
+          <span id="cqty-label-${safeCode}" style="font-size:11px;color:var(--t3);font-weight:500;white-space:nowrap">${inCart?qty+' зразків у кошику':''}</span>
         </div>
-        <span id="cqty-label-${safeCode}" style="font-size:11px;color:var(--t3);font-weight:500;white-space:nowrap">${inCart?qty+' зразків у кошику':''}</span>
+        <div class="srv-action-btns">
+          <button class="srv-cart-icon" id="cicon-${safeCode}"
+            style="${inCart?'display:none':''}"
+            onclick="clickCartIcon('${safeCode}',event)"
+            title="Додати в кошик">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          </button>
+          <button class="srv-exp-del" id="cdel-${safeCode}" onclick="removeFromCart('${safeCode}')" title="Видалити з кошика" style="${inCart?'':'display:none'}">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 17 6"/><path d="M16 6l-1 11H5L4 6"/><path d="M8 6V4h4v2" stroke-linecap="round"/></svg>
+          </button>
+          <button class="srv-expand-arrow" id="sarrow-${safeCode}"
+            onclick="toggleRowExpand('${safeCode}');event.stopPropagation()" title="Детальніше">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
-        <button class="srv-cart-icon" id="cicon-${safeCode}"
-          style="${inCart?'display:none':''}"
-          onclick="clickCartIcon('${safeCode}',event)"
-          title="Додати в кошик">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-        </button>
-        <button class="srv-exp-del" id="cdel-${safeCode}" onclick="removeFromCart('${safeCode}')" title="Видалити з кошика" style="${inCart?'':'display:none'}">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 17 6"/><path d="M16 6l-1 11H5L4 6"/><path d="M8 6V4h4v2" stroke-linecap="round"/></svg>
-        </button>
-        <button class="srv-expand-arrow" id="sarrow-${safeCode}"
-          onclick="toggleRowExpand('${safeCode}');event.stopPropagation()" title="Детальніше">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
       </div>
       <!-- ціна: низ -->
       <div class="srv-right-price">
