@@ -2485,7 +2485,7 @@ function admSwitch(tab, btn) {
     if (b2) b2.classList.add('active');
   }
   if (tab === 'docs') { docRender(); if(typeof docUpdateQF==='function') docUpdateQF(); }
-  if (tab === 'requests' && !_crLoaded) { crLoad(); }
+  if (tab === 'requests') { if (!_crLoaded) { crLoad(); } else { crRender(); } }
 }
 
 function _admFiltered() {
