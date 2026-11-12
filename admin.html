@@ -3088,7 +3088,25 @@ async function generateProtocolAdmin(sIdx) {
         const dispName=p.display_name||'—';
         const rawVal=resultsMap[p.result_parameter_id];
         const val=rawVal!=null?rawVal:'—';
-        allRows.push({type:'data',html:`<tr><td class="num">${rowNum}</td><td>${dispName}</td><td class="num">${val}</td><td class="num">${unit}</td><td class="optimal-range num">${optRange}</td><td>${stdCode}</td></tr>`});
+        // Check if value is outside optimal range
+        const numVal=rawVal!=null?Number(rawVal):NaN;
+        let outOfRange=false;
+        if(!isNaN(numVal)&&rawVal!=null){
+          const from=p.optimum_from, to=p.optimum_to;
+          if(from!=null&&to!=null){
+            const loOk=numVal>=Number(from);
+            const hiOk=p.upper_inclusive===false?numVal<Number(to):numVal<=Number(to);
+            outOfRange=!(loOk&&hiOk);
+          } else if(from!=null){
+            outOfRange=numVal<Number(from);
+          } else if(to!=null){
+            outOfRange=p.upper_inclusive===false?numVal>=Number(to):numVal>Number(to);
+          }
+        }
+        const valCell=outOfRange
+          ?`<td class="num" style="color:#c0392b;font-weight:600"><span style="border:1.5px solid #c0392b;border-radius:3px;padding:0 4px">${val}</span></td>`
+          :`<td class="num">${val}</td>`;
+        allRows.push({type:'data',html:`<tr><td class="num">${rowNum}</td><td>${dispName}</td>${valCell}<td class="num">${unit}</td><td class="optimal-range num">${optRange}</td><td>${stdCode}</td></tr>`});
       });
     }
     // Fallback: show raw results if params empty but results exist
