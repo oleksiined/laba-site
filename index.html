@@ -9566,6 +9566,20 @@ function mcatSetMat(btn, matId) {
   _mcatMat = matId;
   _mcatPage = 1;
   document.querySelectorAll('.mcat-pill').forEach(p=>p.classList.toggle('active', p===btn));
+  // Rebuild group dropdown to show only groups for the selected material
+  const relevantRows = matId ? _mcatAllRows.filter(r=>r.matId===matId) : _mcatAllRows;
+  const groups = [...new Set(relevantRows.map(r=>r.group).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'uk'));
+  const groupDrop = document.getElementById('mcatGroupDropdown');
+  groupDrop.innerHTML = '<button class="mcat-group-option active" data-val="" onclick="mcatGroupPick(\'\',\'Напрям дослідження\',this)">Усі напрями<span class="check">✓</span></button>';
+  groups.forEach(g=>{ groupDrop.innerHTML += `<button class="mcat-group-option" data-val="${g}" onclick="mcatGroupPick('${g.replace(/'/g,"\\'")}','${g.replace(/'/g,"\\'")}',this)">${g}</button>`; });
+  // Reset group filter if currently selected group is no longer available
+  if (_mcatGroup && !groups.includes(_mcatGroup)) {
+    _mcatGroup = '';
+    const lbl=document.getElementById('mcatGroupLabel');
+    if(lbl) lbl.textContent='Напрям дослідження';
+    const gbtn=document.getElementById('mcatGroupBtn');
+    if(gbtn) gbtn.classList.remove('active');
+  }
   mcatApplyFilters();
 }
 
