@@ -14,18 +14,16 @@
 'use strict';
 const https = require('https');
 
-// ── Нова таблиця інтерпретацій ───────────────────────────────────────────────
-// Spreadsheet ID: 1w3gmtnIs2OX9FOGMa840kYTK-upvdHMT1BimO83zorw
-// Published ID: отримати після публікації (Файл → Поділитися → Опублікувати у вебі)
-const GS_PUB_ID = process.env.INTERP_GS_PUB_ID || '__REPLACE_WITH_PUBLISHED_ID__';
+// ── Таблиця інтерпретацій ────────────────────────────────────────────────────
+// Spreadsheet ID (незмінний — з URL таблиці)
+const GS_SPREADSHEET_ID = process.env.INTERP_GS_ID || '1w3gmtnIs2OX9FOGMa840kYTK-upvdHMT1BimO83zorw';
 
-// GID-и потрібних аркушів — перевірити в URL Google Sheets (#gid=...)
-// Поточні значення — PLACEHOLDER, треба замінити після відкриття таблиці
+// GID-и аркушів (hardcoded; env var-и дозволяють перевизначити при потребі)
 const GS_GIDS = {
-  spec:    process.env.INTERP_GID_SPEC    || null,  // Специфікація протоколу
-  bands:   process.env.INTERP_GID_BANDS   || null,  // Шкали рівнів
-  texture: process.env.INTERP_GID_TEXTURE || null,  // Текстура за CEC
-  cation:  process.env.INTERP_GID_CATION  || null,  // Баланс катіонів (Ca/Mg за CEC) — опційно
+  spec:    process.env.INTERP_GID_SPEC    || '10',  // Специфікація протоколу
+  bands:   process.env.INTERP_GID_BANDS   || '11',  // Шкали рівнів
+  texture: process.env.INTERP_GID_TEXTURE || '12',  // Текстура за CEC
+  cation:  process.env.INTERP_GID_CATION  || '17',  // Баланс катіонів (Ca/Mg за CEC)
 };
 
 // ─── CSV parser (RFC 4180) ────────────────────────────────────────────────────
@@ -102,10 +100,10 @@ function httpGet(url, redirects) {
   });
 }
 
-// Завантажує CSV аркуша за gid
+// Завантажує CSV аркуша за gid (таблиця має бути shared "Anyone with link can view")
 function fetchSheet(gid) {
   return new Promise((resolve, reject) => {
-    const url = `https://docs.google.com/spreadsheets/d/e/${GS_PUB_ID}/pub?output=csv&gid=${gid}`;
+    const url = `https://docs.google.com/spreadsheets/d/${GS_SPREADSHEET_ID}/export?format=csv&gid=${gid}`;
     Promise.resolve(httpGet(url)).then(res => {
       const chunks = [];
       res.on('data', d => chunks.push(d));
@@ -190,8 +188,9 @@ async function syncInterpretations() {
   }
 
   // cation — optional sheet; skip if GID not set
-  if (!GS_GIDS.spec) {
-    throw new Error('GID не заданий для аркушу spec. Встанови env var INTERP_GID_SPEC.');
+  // GID-и вже hardcoded, але перевіримо що spreadsheet ID є
+  if (!GS_SPREADSHEET_ID) {
+    throw new Error('INTERP_GS_ID не задано.');
   }
 
   const now = new Date().toISOString();
