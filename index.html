@@ -6417,13 +6417,9 @@ function navigate(page) {
   const navEl = document.getElementById('nav-' + page);
   if (navEl) navEl.classList.add('active');
   currentPage = page;
-  const stepPages = ['catalog','samples','checkout-ext','payment','confirm'];
   const stepBar = document.getElementById('stepBar');
-  if (stepPages.includes(page)) {
-    stepBar.style.display = 'block';
-  } else {
-    stepBar.style.display = 'none';
-  }
+  // Old step-bar only on catalog; new nc-stepbar handles samples/checkout-ext/payment/confirm
+  if (stepBar) stepBar.style.display = (page === 'catalog') ? 'block' : 'none';
   const nsi2=document.getElementById('navSearchInp'); if(nsi2){nsi2.value='';} const nsd2=document.getElementById('navSearchDrop'); if(nsd2){nsd2.innerHTML='';nsd2.style.display='none';}
   if (page === 'services') { if(!srvMat) { srvMat=''; currentMaterial=''; srvFmtChosen=false; const ctx=document.getElementById('srvTaskContext'); if(ctx) ctx.style.display='none'; } buildTasksFromGroups(); renderTaskFilter(); render(); }
   else { searchQ=''; const si=document.getElementById('searchInput'); if(si) si.value=''; const sim=document.getElementById('searchInputMobile'); if(sim) sim.value=''; }
