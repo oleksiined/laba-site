@@ -2945,7 +2945,7 @@ async function generateProtocolAdmin(sIdx) {
   if (pdfBtn) { pdfBtn.disabled=true; pdfBtn.textContent='...'; }
   try {
     const [samplesData, pkgItemsRaw] = await Promise.all([
-      sbGet('samples', `order_id=eq.${o.dbId}&order=created_at.asc&select=id,sample_number,lab_sample_id,crop_planned,crop_previous,target_yield,sampling_date`),
+      sbGet('samples', `order_id=eq.${o.dbId}&order=created_at.asc&select=id,sample_number,lab_sample_id,crop_planned,crop_previous,target_yield`),
       (!s.packageItems && s.packageId)
         ? sbGet('catalog_package_items', `package_id=eq.${s.packageId}&select=method_id,service_id`)
         : Promise.resolve(null),
