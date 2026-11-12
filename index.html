@@ -2676,17 +2676,19 @@ main{flex:1}
   .srv-collapsed-left .service-name{white-space:normal!important;overflow:visible!important;text-overflow:unset!important;font-size:15px!important}
   .srv-collapsed-left .service-short{white-space:normal!important;overflow:visible!important}
   .service-code{white-space:nowrap!important}
-  .srv-right-col{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;align-self:stretch!important;gap:0!important;padding:8px 0 4px!important;width:100%!important}
-  .srv-right-price{flex:1!important;text-align:left!important;order:1}
+  .srv-right-col{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:0!important;padding:8px 0 4px!important;width:100%!important}
+  .srv-right-price{flex:1!important;text-align:left!important;order:1;align-self:center!important}
   .srv-right-price-main{font-size:18px!important}
   .srv-right-btns{display:contents!important}
-  .srv-qty-wrap{order:2;display:flex;flex-direction:column;align-items:center;gap:2px;padding:0 8px}
-  .srv-action-btns{order:3;display:flex;gap:6px;align-items:center;flex-shrink:0;margin-left:auto}
+  .srv-qty-wrap{order:2;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px;padding:0 8px;align-self:center!important}
+  .srv-action-btns{order:3;display:flex!important;align-items:center!important;gap:6px;flex-shrink:0;margin-left:auto;align-self:center!important}
   /* IND mobile */
-  .srv-ind-right{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;align-self:stretch!important;padding:8px 0 4px!important;width:100%!important;gap:0!important}
-  .srv-ind-price{flex:1!important;text-align:left!important;order:1}
-  .srv-ind-right .srv-qty-wrap{order:2;padding:0 8px}
-  .srv-ind-right .srv-action-btns{order:3;margin-left:auto}
+  .srv-ind-right{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;padding:8px 0 4px!important;width:100%!important;gap:0!important}
+  .srv-ind-price{flex:1!important;text-align:left!important;order:1;align-self:center!important}
+  .srv-ind-right .srv-qty-wrap{order:2;padding:0 8px;align-self:center!important}
+  .srv-ind-right .srv-action-btns{order:3;margin-left:auto;align-self:center!important}
+  /* PKG: right-col override needs align-items too */
+  .srv-collapsed-row--pkg .srv-right-col{align-items:center!important}
   /* PKG mobile: name/desc → meta row → price+btns row */
   .srv-collapsed-row--pkg{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;align-items:flex-start!important}
   .srv-collapsed-row--pkg .srv-collapsed-left{display:contents!important;width:auto!important}
