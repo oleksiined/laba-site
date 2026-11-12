@@ -190,10 +190,8 @@ async function syncInterpretations() {
   }
 
   // cation — optional sheet; skip if GID not set
-  const requiredGids = ['spec', 'bands', 'texture'];
-  const missingGids = requiredGids.filter(k => !GS_GIDS[k]);
-  if (missingGids.length) {
-    throw new Error(`GID-и не задані для аркушів: ${missingGids.join(', ')}. Встанови env vars INTERP_GID_SPEC, INTERP_GID_BANDS, INTERP_GID_TEXTURE.`);
+  if (!GS_GIDS.spec) {
+    throw new Error('GID не заданий для аркушу spec. Встанови env var INTERP_GID_SPEC.');
   }
 
   const now = new Date().toISOString();
@@ -201,9 +199,9 @@ async function syncInterpretations() {
   // Завантажуємо аркуші паралельно (cation — опційно)
   const [specRows, bandRows, textureRows, cationRowsRaw] = await Promise.all([
     fetchSheet(GS_GIDS.spec),
-    fetchSheet(GS_GIDS.bands),
-    fetchSheet(GS_GIDS.texture),
-    GS_GIDS.cation ? fetchSheet(GS_GIDS.cation).catch(() => []) : Promise.resolve(null),
+    GS_GIDS.bands   ? fetchSheet(GS_GIDS.bands).catch(() => [])   : Promise.resolve([]),
+    GS_GIDS.texture ? fetchSheet(GS_GIDS.texture).catch(() => []) : Promise.resolve([]),
+    GS_GIDS.cation  ? fetchSheet(GS_GIDS.cation).catch(() => [])  : Promise.resolve(null),
   ]);
 
   // ── Специфікація протоколу ──────────────────────────────────────────────────
@@ -221,16 +219,14 @@ async function syncInterpretations() {
       display_name:        r['Назва в протоколі']              || null,
       unit:                r['Од. вим.']                       || null,
       section_name:        r['Розділ протоколу']               || null,
-      section_order:       r['Порядок розділу']  != null ? Number(r['Порядок розділу'])  : null,
-      item_order:          r['Порядок у розділі'] != null ? Number(r['Порядок у розділі']) : null,
+      section_order:       r['Порядок розділу']  != null && r['Порядок розділу'] !== ''
+                             ? Number(r['Порядок розділу']) : null,
+      item_order:          r['Порядок у розділі'] != null && r['Порядок у розділі'] !== ''
+                             ? Number(r['Порядок у розділі']) : null,
       decimal_places:      r['Знаки після коми'] != null && r['Знаки після коми'] !== ''
                              ? Number(r['Знаки після коми']) : null,
-      lab_column:          r['Колонка в шаблоні лабораторії'] || null,
-      result_type:         r['Тип результату']                 || null,
-      value_source:        r['Хто дає значення']              || null,
+      value_source:        r['Тип результату']                || null,
       formula:             r['Формула / правило']             || null,
-      selection_group:     r['Група вибору']                  || null,
-      scale_id:            r['Шкала рівнів']                  || null,
       optimum_from:        toNum(r['Оптимум від']),
       optimum_to:          toNum(r['Оптимум до']),
       upper_inclusive:     toBool(r['Верхня межа включно'], null),
@@ -298,8 +294,8 @@ async function syncInterpretations() {
     : [];
 
   // Захист від wipe
-  if (spec.length === 0 && bands.length === 0 && texture.length === 0) {
-    throw new Error('Синк скасовано: усі три аркуші порожні. Перевір публікацію таблиці і GID-и.');
+  if (spec.length === 0) {
+    throw new Error('Синк скасовано: аркуш Специфікація протоколу порожній. Перевір публікацію таблиці і INTERP_GID_SPEC.');
   }
 
   // Повна заміна (DELETE + INSERT) — дзеркало Sheet
