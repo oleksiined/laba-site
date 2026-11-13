@@ -3312,7 +3312,7 @@ main{flex:1}
 .os-date-btn:hover{border-color:#a0cc30}
 .os-date-btn.selected{background:#CCFF00;border-color:#a0cc30;color:#111}
 /* readiness */
-.os-readiness-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;margin-top:12px}
+.os-readiness-grid{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 .os-readiness-row{display:flex;align-items:center;gap:8px}
 .os-readiness-row input[type=checkbox]{width:17px;height:17px;accent-color:#111;cursor:pointer}
 .os-readiness-row label{font-size:13px;color:var(--navy);cursor:pointer}
@@ -13870,11 +13870,6 @@ function toast(msg) {
 <div class="os-wrap">
 
   <!-- Breadcrumb -->
-  <div class="os-breadcrumb">
-    <a onclick="navigate('home');return false" href="#">Головна</a>
-    <span>/</span>
-    Замовити відбір проб
-  </div>
 
   <!-- Header -->
   <div class="os-header">
