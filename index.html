@@ -13961,10 +13961,6 @@ function toast(msg) {
           </div>
           <input type="file" id="osFileInput" accept=".kml,.kmz,.geojson,.json,.zip" style="display:none" onchange="osHandleFile(this.files[0])">
           <div id="osFileList"></div>
-          <a class="os-map-link" onclick="return false" href="#">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-            Намалювати поля на карті
-          </a>
 
           <div id="osFieldsSection" style="display:none">
             <div class="os-fields-section">
@@ -14541,7 +14537,6 @@ function osRenderFieldBody(f, i) {
     + '<div class="os-form-row">'
     + osSelect('Культура','culture_'+i,['Пшениця озима','Пшениця яра','Кукурудза','Соняшник','Ріпак','Ячмінь','Соя','Цукровий буряк','Пар / багаторічні трави','Інше'],s.culture,"osFieldChange("+i+",'culture',this.value)")
     + osSelect('Стан поля','state_'+i,['Посіви','Пар','Стерня','Зяб','Збирання'],s.fieldState,"osFieldChange("+i+",'fieldState',this.value)")
-    + '<div class="os-form-group"><div class="os-form-label">Останні внесення та обробки</div><a style="font-size:14px;font-weight:600;color:#2563eb;text-decoration:none;cursor:pointer;display:inline-block;margin-top:10px" onclick="return false">Вказати →</a></div>'
     + '</div>'
     + soilSection
     + moistSection
