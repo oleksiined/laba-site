@@ -5912,6 +5912,15 @@ function docUpdateQF(){
 
 // ── Login gate ──
 function admDoLogin() {
+  const val = document.getElementById('admPassInput').value;
+  if (val !== '134679') {
+    const inp = document.getElementById('admPassInput');
+    inp.style.borderColor = '#ff4444';
+    inp.value = '';
+    inp.placeholder = 'Невірний пароль';
+    setTimeout(() => { inp.style.borderColor = ''; inp.placeholder = 'Введіть пароль'; }, 2000);
+    return;
+  }
   sessionStorage.setItem('_admAuth', '1');
   document.getElementById('admLoginScreen').style.display = 'none';
   admLoad();
