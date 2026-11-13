@@ -14219,12 +14219,7 @@ function toast(msg) {
           <div class="os-sb-note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Вартість: розрахунок після адреси виїзду.</div>
         </div>
 
-        <div id="osSbAllSetBlock" style="display:none;margin-top:4px">
-          <div class="os-saved-row">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3a7a2a" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-            Усі поля налаштовано
-          </div>
-        </div>
+        <div id="osSbAllSetBlock" style="display:none"></div>
 
         <div id="osSbCta"></div>
       </div>
@@ -14535,7 +14530,7 @@ function osRenderFieldBody(f, i) {
     + '</div>' : '')
     + '<div class="os-form-group" style="justify-content:flex-end">'
     + '<div class="os-probe-row"><span class="os-probe-count" id="probeCount_'+i+'">'+probes+'</span><span class="os-probe-note">проб</span></div>'
-    + (probes < 25 ? '<span class="os-probe-warn" id="probeWarn_'+i+'">Мінімум 25 проб</span>' : '<span class="os-probe-ok" id="probeWarn_'+i+'">Мінімум 25 — виконано</span>')
+    + (probes < 25 ? '<span class="os-probe-warn" id="probeWarn_'+i+'">Мінімум 25 проб</span>' : '<span class="os-probe-ok" id="probeWarn_'+i+'"></span>')
     + '</div></div>'
     + '</div>'
     + '<div class="os-map-wrap-sm"><div id="os-map-s2-'+i+'"></div></div>'
@@ -14589,7 +14584,7 @@ function osUpdateProbes(i) {
   var warn = document.getElementById('probeWarn_' + i);
   if (warn) {
     if (p < 25) { warn.className = 'os-probe-warn'; warn.textContent = 'Мінімум 25 проб'; }
-    else        { warn.className = 'os-probe-ok';   warn.textContent = 'Мінімум 25 — виконано'; }
+    else        { warn.className = 'os-probe-ok';   warn.textContent = ''; }
   }
   osRenderSidebar();
 }
