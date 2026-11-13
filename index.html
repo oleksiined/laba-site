@@ -3338,7 +3338,7 @@ main{flex:1}
 .os-step4-placeholder h3{font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px}
 .os-step4-placeholder p{font-size:14px;color:var(--text-soft)}
 /* Step 4 review */
-.os-review-block{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px}
+.os-review-block{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px;width:100%;box-sizing:border-box}
 .os-review-block-title{font-size:13px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.06em;padding:14px 20px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .os-review-edit-btn{background:none;border:none;cursor:pointer;font-size:12px;color:var(--text-mid);padding:0;font-weight:600;text-transform:none;letter-spacing:0;flex-shrink:0}
 .os-review-edit-btn:hover{color:var(--navy)}
@@ -3391,7 +3391,7 @@ main{flex:1}
 .os-sb-cta-btn:hover{background:#b8e600}
 /* steps visibility */
 .os-step-panel{display:none}
-.os-step-panel.active{display:block}
+.os-step-panel.active{display:block;width:100%;min-width:0}
 /* bottom nav (steps 2+) */
 .os-bottom-bar-2{display:flex;align-items:center;justify-content:space-between;margin-top:20px}
 .os-back-link{background:none;border:none;cursor:pointer;font-size:14px;color:var(--text-mid);text-decoration:none;padding:0;display:inline-flex;align-items:center;gap:4px;font-weight:500}
@@ -14680,7 +14680,7 @@ function osRenderSidebar() {
           + '<div>'
           + '<div class="os-sb-service-name">' + info.name + '</div>'
           + (showCounts && count>0 ? '<div class="os-sb-service-count">' + count + ' ' + info.unit + '</div>' : '')
-          + (showCounts && count>0 && minOk  ? '<div class="os-sb-service-min"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Мінімум ' + info.min + ' — виконано</div>' : '')
+          + ''
           + (showCounts && count>0 && !minOk ? '<div class="os-sb-service-min" style="color:#c0590a"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c0590a" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Мінімум ' + info.min + ' — не виконано</div>' : '')
           + '</div></div>';
       }).join('');
