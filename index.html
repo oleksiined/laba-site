@@ -14025,7 +14025,7 @@ function toast(msg) {
         </button>
 
         <!-- Delivery -->
-        <div class="os-section" style="margin-top:16px">
+        <div id="osDeliveryBlock" class="os-section" style="margin-top:16px">
           <div class="os-section-title">Куди передати зразки?</div>
           <div class="os-delivery-cards" style="margin-top:14px">
             <div class="os-delivery-card selected" data-del="laba" onclick="osSelectDelivery(this)">
@@ -14303,6 +14303,8 @@ function osSelectMode(el) {
   document.querySelectorAll('.os-mode-card').forEach(function(c){ c.classList.remove('selected'); });
   el.classList.add('selected');
   OS.mode = el.dataset.mode;
+  var deliveryBlock = document.getElementById('osDeliveryBlock');
+  if (deliveryBlock) deliveryBlock.style.display = OS.mode === 'only' ? 'none' : '';
 }
 function osSelectDelivery(el) {
   document.querySelectorAll('.os-delivery-card').forEach(function(c){ c.classList.remove('selected'); });
@@ -14503,16 +14505,17 @@ function osRenderFieldBody(f, i) {
     + '<div>'
     + '<div class="os-form-row">'
     + osSelect('Схема відбору','soil_scheme_'+i,['За сіткою','За агровиробничими групами','За рівнозначними зонами (CRZ)','Вручну'],s.soilScheme,"osFieldChange("+i+",'soilScheme',this.value)")
-    + osSelect('Площа проби','soil_area_'+i,['1 га','2 га','4 га','5 га'],s.areaPerProbe+' га',"osFieldChange("+i+",'areaPerProbe',parseFloat(this.value));osUpdateProbes("+i+")")
+    + '<div class="os-form-group"><label class="os-form-label" for="soil_area_'+i+'">Площа проби, га</label><input class="os-form-input" type="number" id="soil_area_'+i+'" min="0.1" step="0.1" value="'+s.areaPerProbe+'" oninput="osFieldChange('+i+',\'areaPerProbe\',parseFloat(this.value)||1);osUpdateProbes('+i+')"></div>'
     + osSelect('Глибина','soil_depth_'+i,['За протоколом пакета','0–20 см','0–30 см'],s.depth,"osFieldChange("+i+",'depth',this.value)")
     + '</div>'
     + '<div class="os-form-row-2">'
+    + '<div>'
     + osSelect('Пакет досліджень','soil_pkg_'+i,['Базова оцінка ґрунту','Розширена оцінка ґрунту','Агрохімічний аналіз','Мікроелементи','Повний аналіз'],s.soilPackage,"osFieldChange("+i+",'soilPackage',this.value)")
+    + '<a class="os-proto-link" onclick="return false" href="#" style="margin-top:4px">Переглянути протокол</a>'
+    + '</div>'
     + '<div class="os-form-group" style="justify-content:flex-end">'
     + '<div class="os-probe-row"><span class="os-probe-count" id="probeCount_'+i+'">'+probes+'</span><span class="os-probe-note">проб</span></div>'
     + (probes < 25 ? '<span class="os-probe-warn" id="probeWarn_'+i+'">Мінімум 25 проб</span>' : '<span class="os-probe-ok" id="probeWarn_'+i+'">Мінімум 25 — виконано</span>')
-    + '<span class="os-probe-note">Глибину визначено обраним пакетом</span>'
-    + '<a class="os-proto-link" onclick="return false" href="#">Переглянути протокол</a>'
     + '</div></div>'
     + '</div>'
     + '<div class="os-map-wrap-sm"><div id="os-map-s2-'+i+'"></div></div>'
