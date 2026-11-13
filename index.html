@@ -3186,6 +3186,12 @@ main{flex:1}
 .os-service-info{flex:1;min-width:0}
 .os-service-name{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:2px}
 .os-service-desc{font-size:12px;color:var(--text-soft)}
+.os-service-price{font-size:13px;font-weight:700;color:var(--navy);margin-top:5px}
+.os-service-price span{font-weight:400;color:var(--text-soft)}
+/* location section */
+.os-location-section{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-md);margin-top:12px}
+.os-location-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.os-location-status{font-size:12px;color:var(--text-soft);margin-top:6px;padding-left:2px}
 /* upload zone */
 .os-upload-zone{border:2px dashed var(--border);border-radius:var(--radius-md);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;cursor:pointer;transition:border-color .15s,background .15s}
 .os-upload-zone:hover{border-color:#a0cc30;background:#fafff2}
@@ -13938,6 +13944,7 @@ function toast(msg) {
               <div class="os-service-info">
                 <div class="os-service-name">Ґрунт: агрохімія</div>
                 <div class="os-service-desc">Автоматичний ґрунтовідбірник · від 25 проб</div>
+                <div class="os-service-price">550 грн <span>/ проба</span></div>
               </div>
             </label>
             <label class="os-service-card" data-svc="moisture" onclick="osToggleService(this)">
@@ -13946,6 +13953,7 @@ function toast(msg) {
               <div class="os-service-info">
                 <div class="os-service-name">Продуктивна волога</div>
                 <div class="os-service-desc">Від 10 точок</div>
+                <div class="os-service-price">450 грн <span>/ точка</span></div>
               </div>
             </label>
             <label class="os-service-card" data-svc="plants" onclick="osToggleService(this)">
@@ -13954,6 +13962,7 @@ function toast(msg) {
               <div class="os-service-info">
                 <div class="os-service-name">Рослини</div>
                 <div class="os-service-desc">Від 10 зразків</div>
+                <div class="os-service-price">350 грн <span>/ зразок</span></div>
               </div>
             </label>
             <label class="os-service-card" data-svc="density" onclick="osToggleService(this)">
@@ -13962,6 +13971,7 @@ function toast(msg) {
               <div class="os-service-info">
                 <div class="os-service-name">Об'ємна щільність</div>
                 <div class="os-service-desc">Від 10 точок</div>
+                <div class="os-service-price">480 грн <span>/ точка</span></div>
               </div>
             </label>
           </div>
@@ -13983,17 +13993,28 @@ function toast(msg) {
           <input type="file" id="osFileInput" accept=".kml,.kmz,.geojson,.json,.zip" style="display:none" onchange="osHandleFile(this.files[0])">
           <div id="osFileList"></div>
 
-          <div id="osFieldsSection" style="display:none">
+        </div>
+
+        <!-- Location -->
+        <div class="os-section">
+          <div class="os-section-title">Куди приїхати?</div>
+          <div class="os-location-section">
+            <div class="os-location-left">
+              <div class="os-location-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+              <input class="os-location-input" id="osLocationInput" placeholder="Населений пункт або адреса" type="text" oninput="osLocationInputChange()">
+            </div>
+            <button class="os-map-btn" onclick="osToggleMap1()" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg> Змінити на карті</button>
+          </div>
+          <p class="os-location-status" id="osLocationStatus" style="display:none">Точку заїзду позначено</p>
+        </div>
+
+        <div id="osFieldsSection" style="display:none">
             <div class="os-fields-section">
               <div class="os-fields-title">Поля з файлу</div>
               <p class="os-fields-sub">Назви та площі визначили з файлу. Перевірте їх перед продовженням.</p>
               <div class="os-fields-and-map">
                 <div>
                   <div id="osFieldsList"></div>
-                  <div class="os-location-row" style="margin-top:16px">
-                    <div class="os-location-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-                    <input class="os-location-input" id="osLocationInput" placeholder="Де розташовані поля" type="text">
-                  </div>
                 </div>
                 <div class="os-map-wrap">
                   <div id="os-map-s1"></div>
@@ -14001,7 +14022,6 @@ function toast(msg) {
               </div>
             </div>
           </div>
-        </div>
 
       </div><!-- /step 1 -->
 
@@ -14302,6 +14322,17 @@ function osSelectDelivery(el) {
 /* ── KML / file handling ── */
 function osDragOver(e) { e.preventDefault(); e.currentTarget.style.borderColor='#a0cc30'; e.currentTarget.style.background='#fafff2'; }
 function osDrop(e) { e.preventDefault(); e.currentTarget.style.borderColor=''; e.currentTarget.style.background=''; var f=e.dataTransfer.files[0]; if(f) osHandleFile(f); }
+function osToggleMap1() {
+  var fs = document.getElementById('osFieldsSection');
+  if (!fs) return;
+  if (fs.style.display === 'block') { fs.style.display = 'none'; } else { fs.style.display = 'block'; setTimeout(function(){ if(OS.map1) OS.map1.invalidateSize(); },100); }
+}
+function osLocationInputChange() {
+  var val = (document.getElementById('osLocationInput')||{}).value||'';
+  var st = document.getElementById('osLocationStatus');
+  if (st) st.style.display = val ? '' : 'none';
+  osRenderSidebar();
+}
 
 function osHandleFile(file) {
   if (!file) return;
