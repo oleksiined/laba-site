@@ -3146,7 +3146,7 @@ main{flex:1}
 /* ════════════════════════════════════════════════════════════
    ORDER SAMPLING PAGE  (.os-)
 ════════════════════════════════════════════════════════════ */
-.os-page{background:var(--bg);min-height:100vh}
+.os-page{background:var(--bg);min-height:calc(100vh - 68px);width:100%;flex:1}
 .os-wrap{max-width:1280px;margin:0 auto;padding:0 32px 60px}
 .os-breadcrumb{padding:20px 0 0;font-size:13px;color:var(--text-soft)}
 .os-breadcrumb a{color:var(--text-soft);text-decoration:none}
@@ -3444,7 +3444,7 @@ main{flex:1}
         <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M26 8l6 6-16 16-6-6 16-16z"/><path d="M22 12l6 6"/><path d="M8 32l4-8 4 4-8 4z"/><path d="M32 6l2-2M30 4l2 2"/></svg>
         Як відібрати зразок
       </button>
-      <button class="mega-card" onclick="closeMegaMenu()">
+      <button class="mega-card" onclick="closeMegaMenu();navigate('order-sampling')">
         <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M34 26l-14 8-14-8V14l14-8 14 8v12z"/><path d="M6 14l14 8 14-8"/><path d="M20 22v12"/></svg>
         Замовити відбір проб
       </button>
