@@ -6628,7 +6628,7 @@ function navigateToArticle(slug) {
   var art = BLOG_ARTICLES[slug];
   if (!art) { navigate('blog'); return; }
   var tagEl = document.getElementById('art-meta-tag');
-  if (tagEl) { tagEl.textContent = art.category; tagEl.style.background = art.catColor; }
+  if (tagEl) { tagEl.textContent = art.category; tagEl.style.background = art.catColor; tagEl.style.color = '#fff'; }
   var timeEl = document.getElementById('art-meta-time-txt');
   if (timeEl) timeEl.textContent = art.readTime;
   var dateEl = document.getElementById('art-meta-date');
@@ -13069,10 +13069,12 @@ function ncf_downloadInvoice(saveOnly) {
     if (NCO.fop.rnokpp) buyerLines.push({ text: 'Код за ЄДРПОУ / ІПН: ' + NCO.fop.rnokpp, fontSize: 8, color: '#000' });
     if (NCO.fop.address) buyerLines.push({ text: 'Адреса: ' + NCO.fop.address, fontSize: 8, color: '#000' });
   } else {
-    const nm = (NCO.recipient && NCO.recipient.name) || '';
+    const nm = (NCO.person && NCO.person.name) || (NCO.recipient && NCO.recipient.name) || '';
     buyerLines.push({ text: nm || '—', bold: true, fontSize: 9 });
+    const ph = (NCO.person && NCO.person.phone) || (NCO.recipient && NCO.recipient.phone) || '';
+    if (ph) buyerLines.push({ text: ph, fontSize: 8, color: '#000' });
   }
-  if (NCO.recipient && NCO.recipient.phone) {
+  if (NCO.payerType !== 'individual' && NCO.recipient && NCO.recipient.phone) {
     buyerLines.push({ text: 'Контакт: ' + NCO.recipient.name + (NCO.recipient.phone ? ', ' + NCO.recipient.phone : ''), fontSize: 8, color: '#000' });
   }
 
@@ -13297,6 +13299,7 @@ function ncf_downloadInvoice(saveOnly) {
                 stack: [
                   { text: 'ДЕТАЛІ ОПЛАТИ', fontSize: 7.5, bold: true, color: '#000', margin: [0,0,0,5] },
                   { text: `Призначення платежу: ${purpose}`, fontSize: 8, color: '#000', lineHeight: 1.3 },
+                  { text: 'Без ПДВ', fontSize: 8, color: '#555', margin: [0,3,0,0] },
                 ],
                 fillColor: '#f0f0f0',
                 border: [false,false,false,false],
