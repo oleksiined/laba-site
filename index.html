@@ -14054,43 +14054,6 @@ function toast(msg) {
       <!-- ═══ STEP 3 ═══ -->
       <div class="os-step-panel" id="os-panel-3">
 
-        <!-- Entry points -->
-        <div class="os-section">
-          <div class="os-section-title">Заїзди та доступ до полів</div>
-          <div id="osEntryList" class="os-entry-list" style="margin-top:14px"></div>
-          <div class="os-map-wrap-entry"><div id="os-map-s3"></div></div>
-          <div class="os-form-row-2">
-            <div class="os-form-group">
-              <div class="os-form-label">Дорога до поля</div>
-              <select class="os-form-select" id="osRoadType">
-                <option>Ґрунтова</option>
-                <option>Асфальт</option>
-                <option>Лісова</option>
-              </select>
-            </div>
-            <div class="os-form-group">
-              <div class="os-form-label">Доступ техніки</div>
-              <select class="os-form-select" id="osAccessType">
-                <option>Проїзд вільний</option>
-                <option>Обмежений проїзд</option>
-                <option>Лише пішки</option>
-              </select>
-            </div>
-          </div>
-          <div class="os-form-group" style="margin-top:4px">
-            <div class="os-form-label">Як заїхати та що врахувати</div>
-            <textarea class="os-textarea" id="osAccessNotes" placeholder="Опишіть особливості доступу до полів"></textarea>
-          </div>
-          <a class="os-attach-link" onclick="return false" href="#">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            Додати фото під'їзду або схему
-          </a>
-          <div class="os-access-row">
-            <input type="checkbox" id="osAccessPermit" class="os-access-chk">
-            <label for="osAccessPermit" class="os-access-label">Маю дозвіл на роботи та забезпечу доступ до полів.</label>
-            <a class="os-access-link" onclick="return false" href="#">Вимоги до проїзду техніки</a>
-          </div>
-        </div>
 
         <!-- Dates -->
         <div class="os-section">
@@ -14408,7 +14371,6 @@ function osRenderFieldsList() {
       + '<input class="os-field-name-input" value="' + osEsc(f.name) + '" onchange="OS.fields['+i+'].name=this.value;osRenderSidebar()" />'
       + '<span class="os-field-area">' + f.areaHa.toFixed(2) + ' га</span>'
       + '<span class="os-field-services">' + svcs + '</span>'
-      + '<button class="os-field-setup-btn" onclick="osGoStep(2)">Налаштувати →</button>'
       + '</div>';
   }).join('');
 }
