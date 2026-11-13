@@ -3224,7 +3224,7 @@ main{flex:1}
 .os-bottom-bar{display:flex;align-items:center;justify-content:space-between;margin-top:20px}
 .os-bottom-draft{background:none;border:none;cursor:pointer;font-size:14px;color:var(--text-mid);text-decoration:underline;padding:0}
 .os-bottom-draft:hover{color:var(--navy)}
-.os-next-btn{padding:14px 28px;background:#CCFF00;border:none;border-radius:var(--radius-pill);font-size:15px;font-weight:700;color:#111;cursor:pointer;transition:background .15s}
+.os-next-btn{padding:14px 28px;background:#CCFF00;border:none;border-radius:8px;font-size:15px;font-weight:700;color:#111;cursor:pointer;transition:background .15s}
 .os-next-btn:hover{background:#b8e600}
 .os-next-btn:disabled{opacity:.45;cursor:not-allowed}
 /* ── STEP 2 ── */
@@ -3324,8 +3324,9 @@ main{flex:1}
 .os-contact-row-2{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;margin-top:8px}
 .os-form-input{padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--navy);font-family:inherit;width:100%;box-sizing:border-box}
 .os-form-input:focus{outline:none;border-color:#a0cc30}
-.os-contact-avail{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#3a7a2a}
-.os-same-contact{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#3a7a2a}
+.os-contact-avail{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#3a7a2a;cursor:pointer;user-select:none}
+.os-same-contact{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#3a7a2a;cursor:pointer;user-select:none}
+.os-contact-avail.os-check-off,.os-same-contact.os-check-off{color:var(--text-soft)}
 /* ── STEP 4 (placeholder) ── */
 .os-step4-placeholder{text-align:center;padding:60px 20px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-lg)}
 .os-step4-placeholder h3{font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px}
@@ -13987,11 +13988,6 @@ function toast(msg) {
           </div>
         </div>
 
-        <!-- Bottom bar -->
-        <div class="os-bottom-bar">
-          <button class="os-bottom-draft" onclick="osSaveDraft()">Зберегти чернетку</button>
-        </div>
-
       </div><!-- /step 1 -->
 
       <!-- ═══ STEP 2 ═══ -->
@@ -14099,13 +14095,13 @@ function toast(msg) {
               <input class="os-form-input" id="osContactRole" placeholder="Агроном">
             </div>
           </div>
-          <div class="os-contact-avail">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3a7a2a" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <div class="os-contact-avail" id="osContactAvail" onclick="osToggleCheck('osContactAvail')">
+            <svg id="osContactAvailIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3a7a2a" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
             Контакт доступний у день виїзду.
           </div>
           <div style="margin-top:12px;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center">
-            <div class="os-same-contact">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3a7a2a" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <div class="os-same-contact" id="osSameContact" onclick="osToggleCheck('osSameContact')">
+              <svg id="osSameContactIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3a7a2a" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
               Контакт замовника · Та сама людина
             </div>
             <div class="os-form-group">
@@ -14117,10 +14113,7 @@ function toast(msg) {
 
         <div class="os-bottom-bar-2">
           <button class="os-back-link" onclick="osGoStep(2)">← Параметри відбору</button>
-          <div style="display:flex;align-items:center;gap:16px">
-            <button class="os-bottom-draft" onclick="osSaveDraft()">Зберегти чернетку</button>
-            <button class="os-next-btn" onclick="osGoStep(4)">Перевірити замовлення →</button>
-          </div>
+          <button class="os-next-btn" onclick="osGoStep(4)">Перевірити замовлення →</button>
         </div>
 
       </div><!-- /step 3 -->
@@ -14233,6 +14226,22 @@ function osInit() {
   osRenderSidebar();
   osRenderDates();
   if (OS.map1) { OS.map1.invalidateSize(); }
+}
+
+/* ── Contact checkboxes ── */
+function osToggleCheck(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var off = el.classList.toggle('os-check-off');
+  var svg = el.querySelector('svg');
+  if (!svg) return;
+  if (off) {
+    svg.setAttribute('stroke', '#aaa');
+    svg.innerHTML = '<circle cx="12" cy="12" r="9"/>';
+  } else {
+    svg.setAttribute('stroke', '#3a7a2a');
+    svg.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
+  }
 }
 
 /* ── Step navigation ── */
