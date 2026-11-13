@@ -3331,6 +3331,28 @@ main{flex:1}
 .os-step4-placeholder{text-align:center;padding:60px 20px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-lg)}
 .os-step4-placeholder h3{font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px}
 .os-step4-placeholder p{font-size:14px;color:var(--text-soft)}
+/* Step 4 review */
+.os-review-block{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px}
+.os-review-block-title{font-size:13px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.06em;padding:14px 20px 10px;border-bottom:1px solid var(--border)}
+.os-review-rows{padding:12px 20px}
+.os-review-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:7px 0;border-bottom:1px solid var(--border)}
+.os-review-row:last-child{border-bottom:none}
+.os-review-label{font-size:13px;color:var(--text-soft);min-width:120px;flex-shrink:0}
+.os-review-val{font-size:14px;font-weight:600;color:var(--navy);text-align:right}
+.os-review-val.muted{font-weight:500;color:var(--text-soft)}
+.os-review-fields-list{padding:4px 20px 12px}
+.os-review-field-item{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)}
+.os-review-field-item:last-child{border-bottom:none}
+.os-review-field-name{font-size:14px;font-weight:700;color:var(--navy)}
+.os-review-field-meta{font-size:13px;color:var(--text-soft);margin-top:3px}
+.os-review-field-right{text-align:right;flex-shrink:0}
+.os-review-field-ha{font-size:14px;font-weight:600;color:var(--navy)}
+.os-review-field-pkg{font-size:12px;color:var(--text-soft);margin-top:2px}
+.os-review-checks{padding:10px 20px 14px;display:flex;flex-direction:column;gap:6px}
+.os-review-check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--navy)}
+.os-review-check svg{flex-shrink:0}
+.os-review-submit-row{display:flex;justify-content:flex-end;gap:12px;padding:4px 0 8px}
+@media(max-width:600px){.os-review-row{flex-direction:column;gap:2px}.os-review-val{text-align:left}.os-review-field-item{flex-direction:column;gap:4px}.os-review-field-right{text-align:left}}
 /* ── SIDEBAR ── */
 .os-sidebar{position:sticky;top:84px;display:flex;flex-direction:column;gap:16px}
 .os-sb-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:20px}
@@ -3660,7 +3682,6 @@ main{flex:1}
       </div>
       <div class="laba-footer-col">
         <div class="laba-footer-col-title">Клієнтам</div>
-        <a href="#">Оплата і доставка</a>
         <a href="#" onclick="navigate('status');return false;">Статус замовлення</a>
         <a href="#">Поширені запитання</a>
       </div>
@@ -3909,7 +3930,6 @@ main{flex:1}
       </div>
       <div class="laba-footer-col">
         <div class="laba-footer-col-title">Клієнтам</div>
-        <a href="#">Оплата і доставка</a>
         <a href="#" onclick="navigate('status');return false;">Статус замовлення</a>
         <a href="#">Поширені запитання</a>
       </div>
@@ -4926,7 +4946,6 @@ main{flex:1}
       </div>
       <div class="laba-footer-col">
         <div class="laba-footer-col-title">Клієнтам</div>
-        <a href="#">Оплата і доставка</a>
         <a href="#" onclick="navigate('status');return false;">Статус замовлення</a>
         <a href="#">Поширені запитання</a>
       </div>
@@ -5236,7 +5255,6 @@ main{flex:1}
       </div>
       <div class="laba-footer-col">
         <div class="laba-footer-col-title">Клієнтам</div>
-        <a href="#">Оплата і доставка</a>
         <a href="#" onclick="navigate('status');return false;">Статус замовлення</a>
         <a href="#">Поширені запитання</a>
       </div>
@@ -5380,7 +5398,6 @@ main{flex:1}
       </div>
       <div class="laba-footer-col">
         <div class="laba-footer-col-title">Клієнтам</div>
-        <a href="#">Оплата і доставка</a>
         <a href="#" onclick="navigate('status');return false;">Статус замовлення</a>
         <a href="#">Поширені запитання</a>
       </div>
@@ -5541,7 +5558,6 @@ main{flex:1}
       </div>
       <div class="laba-footer-col">
         <div class="laba-footer-col-title">Клієнтам</div>
-        <a href="#">Оплата і доставка</a>
         <a href="#" onclick="navigate('status');return false;">Статус замовлення</a>
         <a href="#">Поширені запитання</a>
       </div>
@@ -5987,7 +6003,6 @@ main{flex:1}
       </div>
       <div class="laba-footer-col">
         <div class="laba-footer-col-title">Клієнтам</div>
-        <a href="#">Оплата і доставка</a>
         <a href="#" onclick="navigate('status');return false;">Статус замовлення</a>
         <a href="#">Поширені запитання</a>
       </div>
@@ -6700,7 +6715,7 @@ function navigate(page) {
   var nb = document.querySelector('nav.navbar');
   if(nb) nb.classList.toggle('navbar--transparent', page === 'about');
   if (page === 'calculator') calcInit();
-  if (page === 'order-sampling') osInit();
+  if (page === 'order-sampling') { if (typeof osInit === 'function') osInit(); }
   document.querySelector('nav.navbar').style.display = '';
   if (page === 'checkout') {
     const _ck = JSON.stringify((cart||[]).map(c=>c.code+':'+(c.qty||getCartQty(c)))) +
@@ -14113,19 +14128,16 @@ function toast(msg) {
 
         <div class="os-bottom-bar-2">
           <button class="os-back-link" onclick="osGoStep(2)">← Параметри відбору</button>
-          <button class="os-next-btn" onclick="osGoStep(4)">Перевірити замовлення →</button>
         </div>
 
       </div><!-- /step 3 -->
 
       <!-- ═══ STEP 4 ═══ -->
       <div class="os-step-panel" id="os-panel-4">
-        <div class="os-step4-placeholder">
-          <h3>Перевірка замовлення</h3>
-          <p>Цей крок буде доступний після заповнення попередніх кроків.</p>
-        </div>
+        <div id="osStep4Content"></div>
         <div class="os-bottom-bar-2" style="margin-top:16px">
           <button class="os-back-link" onclick="osGoStep(3)">← Виїзд і контакти</button>
+          <button class="os-next-btn" onclick="osSubmitOrder()">Надіслати замовлення →</button>
         </div>
       </div><!-- /step 4 -->
 
@@ -14258,6 +14270,7 @@ function osGoStep(n) {
   window.scrollTo(0,0);
   if (n === 2) { osRenderAccordions(); setTimeout(function(){ Object.values(OS.fieldMaps).forEach(function(m){ if(m) m.invalidateSize(); }); }, 100); }
   if (n === 3) { osRenderEntryList(); setTimeout(function(){ osInitMap3(); }, 100); }
+  if (n === 4) osRenderStep4();
   osRenderSidebar();
 }
 
@@ -14278,6 +14291,7 @@ function osSelectMode(el) {
   OS.mode = el.dataset.mode;
   var deliveryBlock = document.getElementById('osDeliveryBlock');
   if (deliveryBlock) deliveryBlock.style.display = OS.mode === 'only' ? 'none' : '';
+  osRenderAccordions();
 }
 function osSelectDelivery(el) {
   document.querySelectorAll('.os-delivery-card').forEach(function(c){ c.classList.remove('selected'); });
@@ -14481,10 +14495,10 @@ function osRenderFieldBody(f, i) {
     + osSelect('Глибина','soil_depth_'+i,['За протоколом пакета','0–20 см','0–30 см'],s.depth,"osFieldChange("+i+",'depth',this.value)")
     + '</div>'
     + '<div class="os-form-row-2">'
-    + '<div>'
+    + (OS.mode !== 'only' ? '<div>'
     + osSelect('Пакет досліджень','soil_pkg_'+i,['Базова оцінка ґрунту','Розширена оцінка ґрунту','Агрохімічний аналіз','Мікроелементи','Повний аналіз'],s.soilPackage,"osFieldChange("+i+",'soilPackage',this.value)")
     + '<a class="os-proto-link" onclick="return false" href="#" style="margin-top:4px">Переглянути протокол</a>'
-    + '</div>'
+    + '</div>' : '')
     + '<div class="os-form-group" style="justify-content:flex-end">'
     + '<div class="os-probe-row"><span class="os-probe-count" id="probeCount_'+i+'">'+probes+'</span><span class="os-probe-note">проб</span></div>'
     + (probes < 25 ? '<span class="os-probe-warn" id="probeWarn_'+i+'">Мінімум 25 проб</span>' : '<span class="os-probe-ok" id="probeWarn_'+i+'">Мінімум 25 — виконано</span>')
@@ -14739,7 +14753,112 @@ function osRenderSidebar() {
   }
 }
 
+function osRenderStep4() {
+  var el = document.getElementById('osStep4Content');
+  if (!el) return;
+
+  var svcNames = { soil:'Ґрунт: агрохімія', moisture:'Продуктивна волога', plants:'Рослини', density:"Об'ємна щільність" };
+  var modeLabel = OS.mode === 'only' ? 'Лише відбір' : 'Відбір + дослідження';
+  var delivLabel = OS.delivery === 'client' ? 'Лишаються мені' : 'Дослідження в LABA';
+  var loc = (document.getElementById('osLocationInput')||{}).value || '';
+  var dateStr = OS.date ? (OS.date.day + ' ' + OS.date.month) : '';
+  var contactName  = (document.getElementById('osContactName')||{}).value || '';
+  var contactPhone = (document.getElementById('osContactPhone')||{}).value || '';
+  var contactRole  = (document.getElementById('osContactRole')||{}).value || '';
+  var contactEmail = (document.getElementById('osContactEmail')||{}).value || '';
+  var contactAvail = !(document.getElementById('osContactAvail')||{classList:{contains:function(){return false;}}}).classList.contains('os-check-off');
+  var sameContact  = !(document.getElementById('osSameContact')||{classList:{contains:function(){return false;}}}).classList.contains('os-check-off');
+  var ready1 = (document.getElementById('osReady1')||{checked:false}).checked;
+  var ready2 = (document.getElementById('osReady2')||{checked:false}).checked;
+  var ready3 = (document.getElementById('osReady3')||{checked:false}).checked;
+
+  var totalHa = OS.fields.reduce(function(s,f){ return s + f.areaHa; }, 0);
+
+  function row(label, val, muted) {
+    return '<div class="os-review-row"><span class="os-review-label">' + osEsc(label) + '</span><span class="os-review-val' + (muted?' muted':'') + '">' + val + '</span></div>';
+  }
+  function chk(label, done) {
+    var col = done ? '#3a7a2a' : '#aaa';
+    var ico = done
+      ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + col + '" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>'
+      : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + col + '" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/></svg>';
+    return '<div class="os-review-check">' + ico + '<span style="color:' + col + '">' + osEsc(label) + '</span></div>';
+  }
+
+  var html = '';
+
+  // ── Block 1: Поля та послуги ──
+  html += '<div class="os-review-block">';
+  html += '<div class="os-review-block-title">Поля та послуги</div>';
+  if (OS.fields.length) {
+    html += '<div class="os-review-fields-list">';
+    OS.fields.forEach(function(f, i){
+      var pkgStr = '';
+      if (OS.mode !== 'only') {
+        var parts = [];
+        if (OS.services.includes('soil') && f.settings && f.settings.soilPackage) parts.push(f.settings.soilPackage);
+        if (OS.services.includes('moisture')) parts.push('Продуктивна волога');
+        if (OS.services.includes('plants')) parts.push('Рослини');
+        if (OS.services.includes('density')) parts.push("Об'ємна щільність");
+        if (parts.length) pkgStr = parts.join(', ');
+      }
+      html += '<div class="os-review-field-item">';
+      html += '<div><div class="os-review-field-name">' + osEsc(f.name || ('Поле ' + (i+1))) + '</div>';
+      if (pkgStr) html += '<div class="os-review-field-meta">' + osEsc(pkgStr) + '</div>';
+      html += '</div>';
+      html += '<div class="os-review-field-right"><div class="os-review-field-ha">' + f.areaHa.toFixed(1) + ' га</div></div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+  html += '<div class="os-review-rows">';
+  html += row('Полів', OS.fields.length + ' · ' + totalHa.toFixed(0) + ' га');
+  html += row('Послуги', OS.services.map(function(s){ return svcNames[s]||s; }).join(', ') || '—', !OS.services.length);
+  html += row('Формат', modeLabel);
+  if (OS.mode !== 'only') html += row('Передача зразків', delivLabel);
+  html += '</div></div>';
+
+  // ── Block 2: Виїзд ──
+  html += '<div class="os-review-block">';
+  html += '<div class="os-review-block-title">Виїзд</div>';
+  html += '<div class="os-review-rows">';
+  html += row('Локація', loc || '—', !loc);
+  html += row('Дата', dateStr || '—', !dateStr);
+  html += row('Час приїзду', 'Повідомимо за годину');
+  html += '</div>';
+  html += '<div class="os-review-checks">';
+  html += chk('Збір урожаю / обробіток завершено', ready1);
+  html += chk('Дані про внесення й обробки заповнено', ready2);
+  html += chk('Відсутня стерня вище 20 см', ready3);
+  html += '</div></div>';
+
+  // ── Block 3: Контакт ──
+  html += '<div class="os-review-block">';
+  html += '<div class="os-review-block-title">Контакт на місці</div>';
+  html += '<div class="os-review-rows">';
+  if (contactName) {
+    html += row('Ім\'я', osEsc(contactName));
+    if (contactRole) html += row('Роль', osEsc(contactRole));
+    if (contactPhone) html += row('Телефон', osEsc(contactPhone));
+    html += row('Доступний у день виїзду', contactAvail ? 'Так' : 'Ні');
+    html += row('Контакт замовника', sameContact ? 'Та сама людина' : 'Інша людина');
+  } else {
+    html += row('Контакт', 'Не вказано', true);
+  }
+  if (contactEmail) html += row('Email', osEsc(contactEmail));
+  html += '</div></div>';
+
+  el.innerHTML = html;
+}
+
+function osSubmitOrder() {
+  alert('Замовлення надіслано! Ми звʼяжемось із вами найближчим часом.');
+}
+
 function osSaveDraft() { /* stub */ }
+
+// Auto-init when page loads directly via hash
+(function(){ var p = document.getElementById('page-order-sampling'); if (p && p.classList.contains('active')) osInit(); })();
 
 function osEsc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
