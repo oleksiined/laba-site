@@ -13914,7 +13914,7 @@ function toast(msg) {
           <div class="os-section-title">Який відбір потрібен?</div>
           <p class="os-section-sub">Можна обрати кілька послуг.</p>
           <div class="os-services-grid" id="osServicesGrid">
-            <label class="os-service-card selected" data-svc="soil" onclick="osToggleService(this)">
+            <label class="os-service-card" data-svc="soil" onclick="osToggleService(this)">
               <div class="os-service-chk"><svg class="os-service-chk-icon" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="os-service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/></svg></div>
               <div class="os-service-info">
@@ -13922,7 +13922,7 @@ function toast(msg) {
                 <div class="os-service-desc">Автоматичний ґрунтовідбірник · від 25 проб</div>
               </div>
             </label>
-            <label class="os-service-card selected" data-svc="moisture" onclick="osToggleService(this)">
+            <label class="os-service-card" data-svc="moisture" onclick="osToggleService(this)">
               <div class="os-service-chk"><svg class="os-service-chk-icon" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="os-service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg></div>
               <div class="os-service-info">
@@ -14038,6 +14038,13 @@ function toast(msg) {
                 <div class="os-delivery-desc">Зразки доставимо до нашої лабораторії</div>
               </div>
             </div>
+            <div class="os-delivery-card" data-del="client" onclick="osSelectDelivery(this)">
+              <div class="os-delivery-chk"><div class="os-delivery-dot"></div></div>
+              <div>
+                <div class="os-delivery-name">Лишаються мені</div>
+                <div class="os-delivery-desc">Зразки залишаємо замовнику після відбору</div>
+              </div>
+            </div>
           </div>
           <p class="os-delivery-note">Для варіанта «Лише відбір» потрібно вказати лабораторію та доставку.</p>
         </div>
@@ -14095,22 +14102,7 @@ function toast(msg) {
           <div class="os-section-title">Коли приїхати?</div>
           <p class="os-section-sub">Доступні дати для цього маршруту</p>
           <div class="os-dates-row" id="osDatesRow"></div>
-          <div class="os-form-row-2">
-            <div class="os-form-group">
-              <div class="os-form-label">Прибуття бригади</div>
-              <select class="os-form-select" id="osArrivalTime">
-                <option>09:00 – 11:00</option>
-                <option>11:00 – 13:00</option>
-                <option>13:00 – 15:00</option>
-                <option>15:00 – 17:00</option>
-              </select>
-            </div>
-            <div class="os-form-group">
-              <div class="os-form-label">Поля доступні для робіт</div>
-              <input class="os-form-input" id="osFieldAvail" placeholder="Вкажіть період">
-            </div>
-          </div>
-          <p style="font-size:12px;color:var(--text-soft);margin:4px 0 14px">За непридатної погоди повідомимо про перенесення.</p>
+          <p style="font-size:13px;color:var(--text-soft);margin:4px 0 14px">Повідомимо за годину до приїзду.</p>
           <div class="os-form-label" style="margin-bottom:8px">Готовність до відбору</div>
           <div class="os-readiness-grid">
             <div class="os-readiness-row">
@@ -14121,13 +14113,17 @@ function toast(msg) {
               <input type="checkbox" id="osReady2" checked>
               <label for="osReady2">Дані про останні внесення й обробки заповнено</label>
             </div>
+            <div class="os-readiness-row">
+              <input type="checkbox" id="osReady3">
+              <label for="osReady3">Відсутня стерня вище 20 см</label>
+            </div>
           </div>
           <p class="os-readiness-note">Для посівів враховуємо культуру, фазу та обмеження після обробок.</p>
         </div>
 
         <!-- Contact -->
         <div class="os-section">
-          <div class="os-section-title">Хто зустріне бригаду?</div>
+          <div class="os-section-title">Хто зустріне бригаду? <span style="font-size:14px;font-weight:500;color:var(--text-soft)">(необов'язково)</span></div>
           <div class="os-contact-grid" style="margin-top:14px">
             <div class="os-form-group">
               <div class="os-form-label">Ім'я та прізвище</div>
@@ -14260,7 +14256,7 @@ function toast(msg) {
 ════════════════════════════════════════════════════════════ */
 var OS = {
   step: 1,
-  services: ['soil','moisture'],
+  services: [],
   fields: [],   // [{name, areaHa, latLngs, settings:{...}}]
   mode: 'full', // 'full' | 'only'
   delivery: 'laba',
@@ -14720,8 +14716,7 @@ function osRenderSidebar() {
     if (showDate && OS.date) {
       var dl = document.getElementById('osSbDateLabel'); if(dl) dl.textContent = OS.date.day + ' ' + OS.date.month;
       var arr = document.getElementById('osSbArrivalLabel');
-      var at = (document.getElementById('osArrivalTime')||{}).value || '09:00 – 11:00';
-      if(arr) arr.textContent = 'Прибуття: ' + at;
+      if(arr) arr.textContent = 'Повідомимо за годину до приїзду';
     }
   }
 
