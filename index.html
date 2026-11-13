@@ -14503,8 +14503,8 @@ function osRenderFieldBody(f, i) {
     + '<div>'
     + '<div class="os-form-row">'
     + osSelect('Схема відбору','soil_scheme_'+i,['За сіткою','За агровиробничими групами','За рівнозначними зонами (CRZ)','Вручну'],s.soilScheme,"osFieldChange("+i+",'soilScheme',this.value)")
-    + osSelect('Площа на одну пробу','soil_area_'+i,['1 га','2 га','4 га','5 га'],s.areaPerProbe+' га',"osFieldChange("+i+",'areaPerProbe',parseFloat(this.value));osUpdateProbes("+i+")")
-    + osSelect('Глибина','soil_depth_'+i,['За протоколом пакета','0–20 см','0–30 см','0–40 см'],s.depth,"osFieldChange("+i+",'depth',this.value)")
+    + osSelect('Площа проби','soil_area_'+i,['1 га','2 га','4 га','5 га'],s.areaPerProbe+' га',"osFieldChange("+i+",'areaPerProbe',parseFloat(this.value));osUpdateProbes("+i+")")
+    + osSelect('Глибина','soil_depth_'+i,['За протоколом пакета','0–20 см','0–30 см'],s.depth,"osFieldChange("+i+",'depth',this.value)")
     + '</div>'
     + '<div class="os-form-row-2">'
     + osSelect('Пакет досліджень','soil_pkg_'+i,['Базова оцінка ґрунту','Розширена оцінка ґрунту','Агрохімічний аналіз','Мікроелементи','Повний аналіз'],s.soilPackage,"osFieldChange("+i+",'soilPackage',this.value)")
