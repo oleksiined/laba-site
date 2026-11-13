@@ -7631,37 +7631,39 @@ function makeRow(item, type){
         ${indDaysText?`<span class="srv-meta-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>${indDaysText}</span>`:''}
       </div>
     </div>
-    <div class="srv-ind-right" onclick="event.stopPropagation()">
-      <div class="srv-ind-price">
-        <div class="srv-right-price-main" id="cprice-main-${safeCode}">${item.price!=null?item.price.toLocaleString('uk-UA')+' грн':'Уточнити'}</div>
-        <div style="font-size:11px;color:var(--text-soft);line-height:1.3;margin-top:1px">
-          <span id="cprice-sub-${safeCode}"></span>
-          <span id="cprice-label-${safeCode}">Ціна за 1 зразок</span>
-        </div>
-      </div>
-      <div class="srv-qty-wrap">
-        <div class="srv-qty-inline ${alreadyInCart?'open':''}" id="czone-${safeCode}" style="flex-direction:row;align-items:center">
-          <div class="srv-qty-counter-sm">
-            <button id="cdec-${safeCode}" onclick="changeIndQty('${safeCode}',-1)" disabled>−</button>
-            <input id="cqty-${safeCode}" type="number" value="1" min="1" max="9999"
-              oninput="inputIndQty('${safeCode}',this.value)"
-              onblur="if(!this.value||parseInt(this.value)<1){this.value=1;inputIndQty('${safeCode}',1)}">
-            <button onclick="changeIndQty('${safeCode}',1)">+</button>
+    <div class="srv-right-col" onclick="event.stopPropagation()">
+      <div class="srv-right-btns">
+        <div class="srv-qty-wrap">
+          <div class="srv-qty-inline ${alreadyInCart?'open':''}" id="czone-${safeCode}" style="flex-direction:row;align-items:center">
+            <div class="srv-qty-counter-sm">
+              <button id="cdec-${safeCode}" onclick="changeIndQty('${safeCode}',-1)" disabled>−</button>
+              <input id="cqty-${safeCode}" type="number" value="1" min="1" max="9999"
+                oninput="inputIndQty('${safeCode}',this.value)"
+                onblur="if(!this.value||parseInt(this.value)<1){this.value=1;inputIndQty('${safeCode}',1)}">
+              <button onclick="changeIndQty('${safeCode}',1)">+</button>
+            </div>
           </div>
+          <span id="cqty-label-${safeCode}" style="font-size:11px;color:var(--t3);font-weight:500;white-space:nowrap;line-height:1.3;text-align:center">${alreadyInCart?'зразків у кошику':''}</span>
         </div>
-        <span id="cqty-label-${safeCode}" style="font-size:11px;color:var(--t3);font-weight:500;white-space:nowrap;line-height:1.3;text-align:center">${alreadyInCart?'зразків у кошику':''}</span>
+        <div class="srv-action-btns">
+          <button class="srv-cart-icon" id="cicon-${safeCode}"
+            style="${alreadyInCart?'display:none':''}"
+            onclick="clickIndIcon('${safeCode}',event)"
+            title="Додати до зразків">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          </button>
+          ${noExpand ? '' : `<button class="srv-expand-arrow" id="sarrow-${safeCode}"
+            onclick="toggleRowExpand('${safeCode}');event.stopPropagation()" title="Детальніше">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>`}
+        </div>
       </div>
-      <div class="srv-action-btns">
-        <button class="srv-cart-icon" id="cicon-${safeCode}"
-          style="${alreadyInCart?'display:none':''}"
-          onclick="clickIndIcon('${safeCode}',event)"
-          title="Додати до зразків">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-        </button>
-        ${noExpand ? '' : `<button class="srv-expand-arrow" id="sarrow-${safeCode}"
-          onclick="toggleRowExpand('${safeCode}');event.stopPropagation()" title="Детальніше">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>`}
+      <div class="srv-right-price">
+        <div class="srv-right-price-main" id="cprice-main-${safeCode}">${item.price!=null?item.price.toLocaleString('uk-UA')+' грн':'Уточнити'}</div>
+        <div class="srv-right-price-sub">
+          <span id="cprice-sub-${safeCode}" style="display:block">${alreadyInCart?((item.price||0).toLocaleString('uk-UA')+' грн × 1'):''}</span>
+          <span id="cprice-label-${safeCode}" style="${alreadyInCart?'display:none':''}">${alreadyInCart?'':'Ціна за 1 зразок'}</span>
+        </div>
       </div>
     </div>
   </div>
