@@ -3339,7 +3339,9 @@ main{flex:1}
 .os-step4-placeholder p{font-size:14px;color:var(--text-soft)}
 /* Step 4 review */
 .os-review-block{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px}
-.os-review-block-title{font-size:13px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.06em;padding:14px 20px 10px;border-bottom:1px solid var(--border)}
+.os-review-block-title{font-size:13px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.06em;padding:14px 20px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.os-review-edit-btn{background:none;border:none;cursor:pointer;font-size:12px;color:var(--text-mid);padding:0;font-weight:600;text-transform:none;letter-spacing:0;flex-shrink:0}
+.os-review-edit-btn:hover{color:var(--navy)}
 .os-review-rows{padding:12px 20px}
 .os-review-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:7px 0;border-bottom:1px solid var(--border)}
 .os-review-row:last-child{border-bottom:none}
@@ -14803,11 +14805,13 @@ function osRenderStep4() {
   var ready1 = (document.getElementById('osReady1')||{checked:false}).checked;
   var ready2 = (document.getElementById('osReady2')||{checked:false}).checked;
   var ready3 = (document.getElementById('osReady3')||{checked:false}).checked;
-
+  var hasSoil = OS.services.includes('soil');
+  var hasMoisture = OS.services.includes('moisture');
   var totalHa = OS.fields.reduce(function(s,f){ return s + f.areaHa; }, 0);
+  var totalProbes = OS.fields.reduce(function(s,f){ return s + osCalcProbes(f.areaHa, f.settings.areaPerProbe); }, 0);
 
   function row(label, val, muted) {
-    return '<div class="os-review-row"><span class="os-review-label">' + osEsc(label) + '</span><span class="os-review-val' + (muted?' muted':'') + '">' + val + '</span></div>';
+    return '<div class="os-review-row"><span class="os-review-label">' + osEsc(label) + '</span><span class="os-review-val' + (muted?' muted':'') + '">' + (typeof val === 'string' ? val : osEsc(String(val))) + '</span></div>';
   }
   function chk(label, done) {
     var col = done ? '#3a7a2a' : '#aaa';
@@ -14816,35 +14820,42 @@ function osRenderStep4() {
       : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + col + '" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/></svg>';
     return '<div class="os-review-check">' + ico + '<span style="color:' + col + '">' + osEsc(label) + '</span></div>';
   }
+  function blockHead(title, step) {
+    return '<div class="os-review-block-title"><span>' + title + '</span><button class="os-review-edit-btn" onclick="osGoStep(' + step + ')">Редагувати →</button></div>';
+  }
 
   var html = '';
 
-  // ── Block 1: Поля та послуги ──
+  // ── Block 1: Поля й послуги ──
   html += '<div class="os-review-block">';
-  html += '<div class="os-review-block-title">Поля та послуги</div>';
+  html += blockHead('Поля й послуги', 1);
   if (OS.fields.length) {
     html += '<div class="os-review-fields-list">';
     OS.fields.forEach(function(f, i){
-      var pkgStr = '';
-      if (OS.mode !== 'only') {
-        var parts = [];
-        if (OS.services.includes('soil') && f.settings && f.settings.soilPackage) parts.push(f.settings.soilPackage);
-        if (OS.services.includes('moisture')) parts.push('Продуктивна волога');
-        if (OS.services.includes('plants')) parts.push('Рослини');
-        if (OS.services.includes('density')) parts.push("Об'ємна щільність");
-        if (parts.length) pkgStr = parts.join(', ');
-      }
+      var s = f.settings;
+      var probes = osCalcProbes(f.areaHa, s.areaPerProbe);
       html += '<div class="os-review-field-item">';
-      html += '<div><div class="os-review-field-name">' + osEsc(f.name || ('Поле ' + (i+1))) + '</div>';
-      if (pkgStr) html += '<div class="os-review-field-meta">' + osEsc(pkgStr) + '</div>';
+      html += '<div style="flex:1;min-width:0">';
+      html += '<div class="os-review-field-name">' + osEsc(f.name || ('Поле ' + (i+1))) + '</div>';
+      html += '<div class="os-review-field-meta">' + osEsc(s.culture) + ' · ' + osEsc(s.fieldState) + '</div>';
+      if (hasSoil) {
+        html += '<div class="os-review-field-meta">Агрохімія: ' + osEsc(s.soilScheme) + ' · ' + s.areaPerProbe + ' га/проба · ' + probes + ' проб</div>';
+        if (OS.mode !== 'only') html += '<div class="os-review-field-meta">' + osEsc(s.soilPackage) + ' · ' + osEsc(s.depth) + '</div>';
+      }
+      if (hasMoisture) {
+        html += '<div class="os-review-field-meta">Волога: ' + s.moistureCount + ' точок · ' + osEsc(s.moistureLayers) + '</div>';
+      }
       html += '</div>';
-      html += '<div class="os-review-field-right"><div class="os-review-field-ha">' + f.areaHa.toFixed(1) + ' га</div></div>';
+      html += '<div class="os-review-field-right"><div class="os-review-field-ha">' + f.areaHa.toFixed(1) + ' га</div>';
+      if (hasSoil) html += '<div class="os-review-field-pkg">' + probes + ' проб</div>';
+      html += '</div>';
       html += '</div>';
     });
     html += '</div>';
   }
   html += '<div class="os-review-rows">';
-  html += row('Полів', OS.fields.length + ' · ' + totalHa.toFixed(0) + ' га');
+  html += row('Полів', OS.fields.length + ' · ' + totalHa.toFixed(0) + ' га');
+  if (hasSoil) html += row('Всього проб', totalProbes + ' проб');
   html += row('Послуги', OS.services.map(function(s){ return svcNames[s]||s; }).join(', ') || '—', !OS.services.length);
   html += row('Формат', modeLabel);
   if (OS.mode !== 'only') html += row('Передача зразків', delivLabel);
@@ -14852,7 +14863,7 @@ function osRenderStep4() {
 
   // ── Block 2: Виїзд ──
   html += '<div class="os-review-block">';
-  html += '<div class="os-review-block-title">Виїзд</div>';
+  html += blockHead('Виїзд', 3);
   html += '<div class="os-review-rows">';
   html += row('Локація', loc || '—', !loc);
   html += row('Дата', dateStr || '—', !dateStr);
@@ -14866,7 +14877,7 @@ function osRenderStep4() {
 
   // ── Block 3: Контакт ──
   html += '<div class="os-review-block">';
-  html += '<div class="os-review-block-title">Контакт на місці</div>';
+  html += blockHead('Контакт на місці', 3);
   html += '<div class="os-review-rows">';
   if (contactName) {
     html += row('Ім\'я', osEsc(contactName));
