@@ -14386,7 +14386,7 @@ function osCalcAreaHa(latLngs) {
 }
 
 function osDefaultFieldSettings() {
-  return { culture:'Пшениця озима', fieldState:'Посіви', soilScheme:'За сіткою', areaPerProbe:2, depth:'За протоколом пакета', soilPackage:'Базова оцінка ґрунту', moisturePlacement:'На карті', moistureCount:6, moistureLayers:'За протоколом дослідження' };
+  return { culture:'Пшениця озима', fieldState:'Посіви', soilScheme:'За сіткою', areaPerProbe:2, depth:'0–20 см', soilPackage:'Базова оцінка ґрунту', moisturePlacement:'На карті', moistureCount:6, moistureLayers:'За протоколом дослідження' };
 }
 
 function osShowFileRow(name, count) {
@@ -14509,7 +14509,7 @@ function osRenderFieldBody(f, i) {
     + '<div class="os-form-row">'
     + osSelect('Схема відбору','soil_scheme_'+i,['За сіткою','За агровиробничими групами','За рівнозначними зонами (CRZ)','Вручну'],s.soilScheme,"osFieldChange("+i+",'soilScheme',this.value)")
     + '<div class="os-form-group"><label class="os-form-label" for="soil_area_'+i+'">Площа проби, га</label><input class="os-form-input" type="number" id="soil_area_'+i+'" min="0.1" step="0.1" value="'+s.areaPerProbe+'" oninput="osFieldChange('+i+',\'areaPerProbe\',parseFloat(this.value)||1);osUpdateProbes('+i+')"></div>'
-    + osSelect('Глибина','soil_depth_'+i,['За протоколом пакета','0–20 см','0–30 см'],s.depth,"osFieldChange("+i+",'depth',this.value)")
+    + osSelect('Глибина','soil_depth_'+i,['0–10 см','0–15 см','0–20 см','0–25 см','0–30 см'],s.depth,"osFieldChange("+i+",'depth',this.value)")
     + '</div>'
     + '<div class="os-form-row-2">'
     + (OS.mode !== 'only' ? '<div>'
