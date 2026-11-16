@@ -6757,7 +6757,7 @@ function _buildRelatedCard(slug) {
   return '<div class="article-rel-card" onclick="navigateToArticle(\'' + slug + '\')">' +
     relImgHtml +
     '<div class="article-rel-body">' +
-    '<span class="blog-tag">' + art.category + '</span>' +
+    '<span class="blog-tag" style="background:' + (art.catColor||'#2e7d32') + ';color:#fff">' + art.category + '</span>' +
     '<div class="blog-card-title" style="font-size:14px;margin-top:6px">' + art.title + '</div>' +
     '<div class="blog-card-date" style="margin-top:6px">' + art.date + '</div>' +
     '</div></div>';
@@ -6837,6 +6837,8 @@ function navigateToArticle(slug) {
       toc.style.marginTop = (contentTop - gridTop) + 'px';
     }
     _artTocSpyInit();
+    // Update dynamic prices in article product cards
+    if (typeof updateArticlePrices === 'function') updateArticlePrices();
   }, 50);
 }
 function artTocClick(e, id) {
@@ -6953,8 +6955,13 @@ window.addEventListener('popstate', e => {
   if(e.state?.card){
     // Повернення до розгорнутої картки — просто відкриваємо її
     openCardFromHash();
+  } else if(e.state?.page === 'article' && e.state?.slug){
+    navigateToArticle(e.state.slug);
   } else if(e.state?.page){
     navigate(e.state.page);
+  } else if(!e.state) {
+    // Browser back to base URL — go home
+    navigate('home');
   }
 });
 
@@ -11480,12 +11487,26 @@ function fillArticlePrices() {
   Object.values(SERVICES).forEach(srv => {
     (srv.packages || []).forEach(p => { if (p.name && p.price != null) allPkgs.push(p); });
   });
+  window._allPkgsCache = allPkgs;
   document.querySelectorAll('[data-pkg-name]').forEach(el => {
     const search = el.dataset.pkgName.toLowerCase();
     // Шукаємо точний збіг, потім часткове включення
     const found = allPkgs.find(p => p.name.toLowerCase() === search)
                 || allPkgs.find(p => p.name.toLowerCase().includes(search))
                 || allPkgs.find(p => search.includes(p.name.toLowerCase()));
+    if (found && found.price > 0) {
+      el.textContent = `від ${found.price.toLocaleString('uk-UA')} грн`;
+    }
+  });
+}
+
+function updateArticlePrices() {
+  if (!window._allPkgsCache) return;
+  document.querySelectorAll('[data-pkg-name]').forEach(el => {
+    const search = el.dataset.pkgName.toLowerCase();
+    const found = window._allPkgsCache.find(p => p.name.toLowerCase() === search)
+                || window._allPkgsCache.find(p => p.name.toLowerCase().includes(search))
+                || window._allPkgsCache.find(p => search.includes(p.name.toLowerCase()));
     if (found && found.price > 0) {
       el.textContent = `від ${found.price.toLocaleString('uk-UA')} грн`;
     }
