@@ -6915,7 +6915,7 @@ function navigate(page) {
     if (typeof nc_setMaxStep === 'function') nc_setMaxStep(1);
     try { history.pushState({page},'','#checkout'); } catch(e){} window.scrollTo(0,0); updateCartUI(); return;
   }
-  try { history.pushState({page}, '', '#' + page); } catch(e){}
+  if (page !== 'article') { try { history.pushState({page}, '', '#' + page); } catch(e){} }
   window.scrollTo(0,0);
   updateCartUI();
 }
@@ -6953,15 +6953,13 @@ function goStep(step) {
 
 window.addEventListener('popstate', e => {
   if(e.state?.card){
-    // Повернення до розгорнутої картки — просто відкриваємо її
     openCardFromHash();
   } else if(e.state?.page === 'article' && e.state?.slug){
     navigateToArticle(e.state.slug);
   } else if(e.state?.page){
     navigate(e.state.page);
-  } else if(!e.state) {
-    // Browser back to base URL — go home
-    navigate('home');
+  } else if(window._navigateFromHash) {
+    window._navigateFromHash(location.hash);
   }
 });
 
@@ -9282,7 +9280,7 @@ function showToast(msg,ms=2500){
 
   // Відкриваємо сторінку з хешу або Головну
   const _ALL_PAGES=['home','services','about','contacts','checkout','calculator','sampling','order-sampling','blog','article','status','methods','payment','confirm','samples','contract','os-confirm'];
-  function _navigateFromHash(hash) {
+  window._navigateFromHash = function(hash) {
     if(hash.startsWith('#card-')){
       navigate('services');
     } else if(hash.startsWith('#article=')){
@@ -9294,7 +9292,7 @@ function showToast(msg,ms=2500){
     } else {
       navigate('home');
     }
-  }
+  };
   // Handle ?paid=ORDER_NUM redirect from LiqPay — must check BEFORE navigate so we don't show home
   const _liqpayPaid = new URLSearchParams(window.location.search).get('paid');
   if (_liqpayPaid) {
@@ -9310,11 +9308,7 @@ function showToast(msg,ms=2500){
   } else {
     _navigateFromHash(location.hash);
   }
-  window.addEventListener('popstate', function(e){
-    if(e.state && e.state.page === 'article' && e.state.slug) navigateToArticle(e.state.slug);
-    else if(e.state && e.state.page) navigate(e.state.page);
-    else _navigateFromHash(location.hash);
-  });
+  // popstate handled by the global listener above
   // Скидаємо матеріал — показуємо всі послуги
   srvMat = ''; currentMaterial = '';
   updateCartUI();
@@ -11488,6 +11482,8 @@ function fillArticlePrices() {
     (srv.packages || []).forEach(p => { if (p.name && p.price != null) allPkgs.push(p); });
   });
   window._allPkgsCache = allPkgs;
+  // If article page is active — refresh prices immediately
+  if (typeof updateArticlePrices === 'function') updateArticlePrices();
   document.querySelectorAll('[data-pkg-name]').forEach(el => {
     const search = el.dataset.pkgName.toLowerCase();
     // Шукаємо точний збіг, потім часткове включення
