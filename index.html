@@ -1763,6 +1763,20 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .article-rel-body{padding:14px 16px 16px}
 @media(max-width:700px){.article-products-grid{grid-template-columns:1fr}.article-related-grid{grid-template-columns:1fr}.article-checklist{grid-template-columns:1fr}.article-h1{font-size:24px}.article-outer{padding:20px 16px 60px}.article-related-wrap{padding:0 16px 60px}}
 
+/* ══ ARTICLE TOC ══ */
+.article-with-toc{display:grid;grid-template-columns:1fr 240px;gap:48px;align-items:start;max-width:1280px;margin:0 auto;padding:32px 32px 80px}
+.article-with-toc .article-main{min-width:0}
+.article-toc{position:sticky;top:80px;max-height:calc(100vh - 100px);overflow-y:auto}
+.article-toc-inner{background:var(--white);border:1px solid var(--border-soft);border-radius:12px;padding:18px 20px}
+.article-toc-title{font-size:11px;font-weight:800;color:var(--text-soft);letter-spacing:.8px;text-transform:uppercase;margin:0 0 12px}
+.article-toc-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.article-toc-item a{display:block;font-size:13px;color:var(--text-mid);text-decoration:none;padding:4px 8px;border-radius:6px;border-left:2px solid transparent;line-height:1.4;transition:color .15s,background .15s,border-color .15s}
+.article-toc-item a:hover{color:var(--navy);background:var(--bg)}
+.article-toc-item a.active{color:var(--navy);font-weight:600;background:var(--bg);border-left-color:var(--green)}
+/* article-outer used when no ToC (fallback) */
+.article-outer{max-width:760px;margin:0 auto;padding:32px 32px 80px}
+@media(max-width:960px){.article-with-toc{grid-template-columns:1fr;padding:20px 16px 60px}.article-toc{display:none}}
+
 /* ══ ABOUT PAGE ══ */
 .about-page{background:linear-gradient(175deg,#0a1a0a 0%,#122a12 40%,#1a3a1a 70%,#0d1f0d 100%);height:100vh;overflow:hidden}
 .about-fp-track{will-change:transform;transition:transform .75s cubic-bezier(.77,0,.175,1)}
@@ -5140,6 +5154,7 @@ main{flex:1}
         <button class="blog-tab" onclick="blogFilter(this,'nasinnya')">Насіння</button>
         <button class="blog-tab" onclick="blogFilter(this,'sezonni')">Сезонне</button>
         <button class="blog-tab" onclick="blogFilter(this,'porady')">Практичні поради</button>
+        <button class="blog-tab" onclick="blogFilter(this,'interviu')">Інтерв'ю</button>
       </div>
       <div class="blog-search-wrap">
         <span class="blog-search-ico">
@@ -5152,6 +5167,26 @@ main{flex:1}
   <!-- Article grid -->
   <div class="blog-content">
     <div class="blog-grid" id="blog-grid">
+
+      <!-- 0: Інтерв'ю — Валерія Ващенко -->
+      <div class="blog-card" data-cat="interviu" onclick="navigateToArticle('vid-zrazka-do-rishennia-valeriia-vashchenko')">
+        <div class="blog-card-media">
+          <img class="blog-card-photo" src="/blog/laba-interviu-valeriia-vashchenko.png" alt="Від зразка до рішення — Валерія Ващенко" loading="lazy" style="height:210px;object-fit:cover">
+          <span class="blog-card-cat" style="background:#1565c0">Інтерв'ю</span>
+          <span class="blog-card-time">8 хв читання</span>
+        </div>
+        <div class="blog-card-body">
+          <div class="blog-card-title">Від зразка до рішення</div>
+          <p class="blog-card-excerpt">Валерія Ващенко — про те, як LABA об'єднує дослідження для господарства й бере на себе контроль їхньої якості.</p>
+          <div class="blog-card-footer">
+            <span class="blog-card-meta">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              16 листопада 2026
+            </span>
+            <button class="blog-card-read">Читати →</button>
+          </div>
+        </div>
+      </div>
 
       <!-- 1: Ґрунт -->
       <div class="blog-card" data-cat="grunt" onclick="navigateToArticle('analizy-gruntu-pered-posivom-kukurudzy')">
@@ -5351,31 +5386,39 @@ main{flex:1}
 
 <!-- ══ PAGE: ARTICLE ══ -->
 <div class="page article-page" id="page-article">
-  <div class="article-outer">
-    <button class="article-back" onclick="navigate('blog')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      До всіх статей
-    </button>
-    <div class="article-meta-row">
-      <span class="article-meta-tag" id="art-meta-tag">Ґрунт</span>
-      <span class="article-meta-sep">|</span>
-      <span class="article-meta-time">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span id="art-meta-time-txt">6 хв читання</span>
-      </span>
-      <span class="article-meta-sep">|</span>
-      <span class="article-meta-date" id="art-meta-date">12 березня 2024</span>
-    </div>
-    <h1 class="article-h1" id="art-h1">Які аналізи ґрунту потрібні перед посівом кукурудзи?</h1>
-    <div class="article-author">
-      <div class="article-author-avatar" style="background:linear-gradient(135deg,#b2dfdb,#4db6ac);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#00695c">О</div>
-      <div>
-        <div class="article-author-name">Олена Коваленко</div>
-        <div class="article-author-role">Агроном-консультант LABA</div>
+  <div class="article-with-toc">
+    <div class="article-main">
+      <button class="article-back" onclick="navigate('blog')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        До всіх статей
+      </button>
+      <div class="article-meta-row">
+        <span class="article-meta-tag" id="art-meta-tag">Ґрунт</span>
+        <span class="article-meta-sep">|</span>
+        <span class="article-meta-time">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="art-meta-time-txt">6 хв читання</span>
+        </span>
+        <span class="article-meta-sep">|</span>
+        <span class="article-meta-date" id="art-meta-date">12 березня 2024</span>
       </div>
+      <h1 class="article-h1" id="art-h1">Які аналізи ґрунту потрібні перед посівом кукурудзи?</h1>
+      <div class="article-author" id="art-author-block">
+        <div class="article-author-avatar" style="background:linear-gradient(135deg,#b2dfdb,#4db6ac);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#00695c">О</div>
+        <div>
+          <div class="article-author-name">Олена Коваленко</div>
+          <div class="article-author-role">Агроном-консультант LABA</div>
+        </div>
+      </div>
+      <div class="article-hero" id="art-hero" style="background:linear-gradient(160deg,#c8e6c9 0%,#558b2f 55%,#e65100 100%);display:flex;align-items:flex-end;border-radius:14px;height:340px;margin-bottom:24px"></div>
+      <div id="art-content"></div>
     </div>
-    <div class="article-hero" id="art-hero" style="background:linear-gradient(160deg,#c8e6c9 0%,#558b2f 55%,#e65100 100%);display:flex;align-items:flex-end;border-radius:14px;height:340px;margin-bottom:24px"></div>
-    <div id="art-content"></div>
+    <aside class="article-toc" id="art-toc">
+      <div class="article-toc-inner">
+        <div class="article-toc-title">Зміст</div>
+        <ul class="article-toc-list" id="art-toc-list"></ul>
+      </div>
+    </aside>
   </div>
   <div class="article-related-wrap">
     <div class="article-related-head">
@@ -6691,6 +6734,42 @@ var BLOG_ARTICLES = {
 <h2 class="article-h2">5. Спланувати контроль у сезоні</h2>
 <p class="article-p">Визначте, коли проводити листкову діагностику рослин після появи сходів. Поєднання аналізу ґрунту до посіву та діагностики рослин у сезоні дає змогу перевіряти, як працює система удобрення.</p>
 <p class="article-p article-conclusion"><strong>Практичний висновок.</strong> Перевірте родючість ґрунту, правильно відберіть проби, оцініть склад добрив, протестуйте насіння та сплануйте сезонну діагностику. Лабораторні дослідження допомагають перейти від припущень до вимірюваних показників.</p>`
+  },
+  'vid-zrazka-do-rishennia-valeriia-vashchenko': {
+    title: 'Від зразка до рішення',
+    category: 'Інтерв\'ю', catColor: '#1565c0', catFilter: 'interviu',
+    readTime: '8 хв читання', date: '16 листопада 2026',
+    gradient: 'linear-gradient(160deg,#e3eaf5 0%,#1565c0 60%,#0d47a1 100%)',
+    cover: '/blog/laba-interviu-valeriia-vashchenko.png',
+    author: 'Валерія Ващенко',
+    authorRole: 'Операційна директорка «Землероба»',
+    authorAvatar: '<div class="article-author-avatar" style="background:linear-gradient(135deg,#bbdefb,#1565c0);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff">В</div>',
+    seoTitle: 'Від зразка до рішення — Валерія Ващенко про LABA | Землероб',
+    metaDesc: 'Операційна директорка «Землероба» Валерія Ващенко — про те, як LABA об\'єднує дослідження для господарства, робить результати зрозумілими й бере на себе контроль якості.',
+    related: ['analizy-gruntu-pered-posivom-kukurudzy','yak-pereviryty-yakist-dobryv','navishcho-pereviryaty-yakist-nasinnia'],
+    content: `<p class="article-lead">До посівної ще є час, але рішення вже накопичуються. Приїхала нова партія насіння, і агроном хоче перевірити її схожість. Для обприскування планують брати воду з іншої свердловини. А перед закупівлею добрив потрібно з'ясувати, чи відповідає їхній склад тому, що зазначив постачальник. Три різні задачі, які легко перетворюються на три окремі переписки, кілька дзвінків і пошук того, хто саме може провести кожне дослідження.</p>
+<p class="article-p">Валерія Ващенко уявляє це інакше. Агроном відкриває LABA, додає всі потрібні дослідження до одного замовлення й одразу бачить, як підготувати кожен зразок. Пізніше відкриває результати та розуміє, що виміряли, як це зробили і з чим можна порівняти отримані дані. Команда LABA відповідає за організацію досліджень і контроль якості. У господарстві тим часом можуть зосередитися на рішеннях, заради яких усе й починалося.</p>
+<h2 class="article-h2">Якою ти хочеш бачити LABA для фермера?</h2>
+<p class="article-p">— Я хочу, щоб дослідження було легко замовити саме тоді, коли виник запит. Людина думає, чи якісна ця партія насіння або як використовувати воду з нового джерела. У цей момент їй потрібен зрозумілий спосіб перевірити те, що вплине на рішення. Мені хочеться, щоб вона могла відкрити LABA, знайти потрібне й одразу зрозуміти, скільки це коштує, що підготувати і який результат отримає.</p>
+<p class="article-p">Агроному потрібно займатися посівною, закупівлями й технікою. Зводити докупи заявки, шукати контакти лабораторій і з'ясовувати, де зараз кожен зразок, теж забирає час. Я хочу, щоб цю частину роботи ми взяли на себе. А фермер міг повернутися до справ із відчуттям, що із замовленням усе зрозуміло.</p>
+<h2 class="article-h2">«Сінево в агро»: що ти хотіла запозичити?</h2>
+<p class="article-p">— Відчуття, що це буквально в два кліки. Коли мені потрібно здати аналіз крові, я можу зайти на сайт, знайти дослідження, подивитися ціну й прочитати, як підготуватися. Я можу зробити це ввечері, коли маю час. А якщо сумніваюся, завжди можу запитати. Мені подобається саме ця свобода, і я хочу дати її клієнту LABA.</p>
+<p class="article-p">На старті мене цікавило просте питання. Чи може клієнт замовити дослідження сам, якщо менеджера зараз немає поруч? Ми звикли, що менеджер багато пояснює в розмові. Я хотіла перенести ці пояснення туди, де людина ухвалює рішення.</p>
+<h2 class="article-h2">Як виглядає одне замовлення, коли зразки такі різні?</h2>
+<p class="article-p">— В одному місці можна замовити дослідження ґрунту, води, добрив, насіння, зерна та рослин. У кожного матеріалу свої вимоги до відбору, підготовки й відправлення. Клієнт отримує інструкції для своїх зразків, а ми координуємо роботу з лабораторіями-партнерами. Якщо в одному замовленні є і насіння, і вода, фермеру достатньо оформити його один раз. Йому не потрібно заповнювати окрему заявку для кожної лабораторії, повторювати свої дані чи обдзвонювати кількох людей, щоб дізнатися, що відбувається.</p>
+<p class="article-p">Є задачі, які повторюються щосезону. Є й такі, що виникають раптово, наприклад, коли господарство змінює постачальника й хоче перевірити новий матеріал. Я хочу, щоб і в такій ситуації людина знала, з чого почати.</p>
+<h2 class="article-h2">Що ти називаєш зрозумілим результатом?</h2>
+<p class="article-p">— Уявімо, що господарство перевірило схожість двох партій насіння. Керівник відкриває звіти й одразу бачить, до якої партії належить кожен результат, що виміряли і в яких одиницях. Агроном у тому ж звіті може знайти метод дослідження. Якщо для дослідження є доречні референтні значення, їх теж має бути видно. Обом людям потрібен той самий результат, просто вони дивляться на нього з різними запитаннями.</p>
+<p class="article-p">Саме тому ми приводимо протоколи партнерських лабораторій до єдиної структури. Щоразу шукати результат у новому місці або розшифровувати незнайоме скорочення втомлює, особливо коли звітів кілька. У LABA ми впорядкували подачу, щоб людина могла швидко знайти відповідь і за потреби перевірити деталі. Я хочу, щоб звіт було зручно відкрити на нараді, переслати колезі або підняти через рік, коли знову виникне подібне питання.</p>
+<h2 class="article-h2">А що робить результати порівнюваними?</h2>
+<p class="article-p">— Уяви, що ти відкриваєш два звіти про дослідження води, нинішній і минулорічний. Назва дослідження знайома, значення відрізняються. Перше питання очевидне: змінилася вода чи змінився спосіб, у який її дослідили? Якщо в обох звітах видно, якому зразку належить результат, яким методом його отримали і в яких одиницях подали, є з чого почати. За цими деталями можна оцінити, чи коректно зіставляти цифри і що з такого порівняння випливає.</p>
+<p class="article-p">Мені хочеться, щоб дослідження з часом складалися в історію господарства. Сьогодні агроном перевірив партію насіння, наступного сезону повернувся до цього звіту, коли приймав іншу. А якщо в команді змінилася людина, новий колега може зрозуміти, що саме перевіряли до нього і які результати отримали.</p>
+<h2 class="article-h2">Що стоїть за результатом, якому можна довіряти?</h2>
+<p class="article-p">— Робота, яку клієнт зазвичай не бачить. Ми регулярно проводимо міжлабораторні перевірки, щоб контролювати якість. У таких перевірках можна зіставити результати, отримані різними лабораторіями, побачити, чи вони узгоджуються, і розібратися з розбіжностями, якщо вони є.</p>
+<p class="article-p">Залучаємо лабораторії-партнери, які використовують найсучасніші методи й прилади, і підбираємо їх під конкретне дослідження. Важливо, щоб метод відповідав матеріалу й задачі клієнта. Скажімо, коли господарство хоче перевірити склад добрива, результат має допомогти звірити саме те, що заявлено для цього продукту. Тут професійність починається з того, щоб правильно зрозуміти питання, і продовжується аж до того, як ми подаємо відповідь у звіті. Якщо клієнт захоче уточнити, що означає результат, йому достатньо звернутися до нас.</p>
+<h2 class="article-h2">Коли ти зрозумієш, що мрія про LABA здійснилася?</h2>
+<p class="article-p">— Уявляю, як агроном відкриває три результати. Схожість нової партії насіння можна зіставити з попередньою. Результати дослідження води є під рукою, коли команда планує обприскування. А звіт про склад добрива можна покласти поруч зі специфікацією постачальника й подивитися, чи збігаються значення. Усі три дослідження він замовив в LABA і може пояснити колезі, де знайти відповіді.</p>
+<p class="article-p">А потім, можливо, за місяць виникне зовсім інше питання і хтось у команді скаже: «Давай спершу перевіримо». Мені хочеться, щоб ця фраза звучала легко. Щоб людина знала, де замовити дослідження, була спокійна за якість і розуміла, що робити з результатом, коли він буде готовий. Заради цього ми й робимо LABA.</p>`
   }
 };
 
@@ -6734,6 +6813,36 @@ function navigateToArticle(slug) {
   }
   var contentEl = document.getElementById('art-content');
   if (contentEl) contentEl.innerHTML = art.content;
+  // Update author block
+  var authorBlock = document.getElementById('art-author-block');
+  if (authorBlock) {
+    if (art.author) {
+      var av = art.authorAvatar || '<div class="article-author-avatar" style="background:linear-gradient(135deg,#b2dfdb,#4db6ac);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#00695c">' + (art.author[0]||'А') + '</div>';
+      authorBlock.innerHTML = av + '<div><div class="article-author-name">' + art.author + '</div><div class="article-author-role">' + (art.authorRole||'') + '</div></div>';
+      authorBlock.style.display = '';
+    } else {
+      authorBlock.innerHTML = '<div class="article-author-avatar" style="background:linear-gradient(135deg,#b2dfdb,#4db6ac);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#00695c">О</div><div><div class="article-author-name">Олена Коваленко</div><div class="article-author-role">Агроном-консультант LABA</div></div>';
+      authorBlock.style.display = '';
+    }
+  }
+  // Build ToC from h2 headings
+  var tocList = document.getElementById('art-toc-list');
+  var tocSide = document.getElementById('art-toc');
+  if (tocList && contentEl) {
+    var headings = contentEl.querySelectorAll('h2.article-h2');
+    if (headings.length >= 2) {
+      var tocHtml = '';
+      headings.forEach(function(h, i) {
+        var id = 'art-sec-' + i;
+        h.id = id;
+        tocHtml += '<li class="article-toc-item"><a href="#' + id + '" onclick="artTocClick(event,\'' + id + '\')">' + h.textContent + '</a></li>';
+      });
+      tocList.innerHTML = tocHtml;
+      if (tocSide) tocSide.style.display = '';
+    } else {
+      if (tocSide) tocSide.style.display = 'none';
+    }
+  }
   var relGrid = document.getElementById('art-related-grid');
   if (relGrid && art.related) relGrid.innerHTML = art.related.map(_buildRelatedCard).join('');
   document.title = art.seoTitle;
@@ -6742,6 +6851,30 @@ function navigateToArticle(slug) {
   try { history.pushState({page:'article', slug: slug}, '', '#article=' + slug); } catch(e){}
   navigate('article');
   window.scrollTo(0, 0);
+  // Activate ToC scroll spy
+  _artTocSpyInit();
+}
+function artTocClick(e, id) {
+  e.preventDefault();
+  var el = document.getElementById(id);
+  if (el) { el.scrollIntoView({behavior:'smooth', block:'start'}); }
+}
+var _artTocSpyObs = null;
+function _artTocSpyInit() {
+  if (_artTocSpyObs) { _artTocSpyObs.disconnect(); _artTocSpyObs = null; }
+  var tocLinks = document.querySelectorAll('.article-toc-item a');
+  if (!tocLinks.length) return;
+  var ids = Array.from(tocLinks).map(function(a){ return a.getAttribute('href').slice(1); });
+  _artTocSpyObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(function(a){ a.classList.remove('active'); });
+        var active = document.querySelector('.article-toc-item a[href="#' + entry.target.id + '"]');
+        if (active) active.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-10% 0px -80% 0px', threshold:0});
+  ids.forEach(function(id){ var el=document.getElementById(id); if(el) _artTocSpyObs.observe(el); });
 }
 // ===================== END BLOG ARTICLES DATA =====================
 function blogFilter(btn, cat) {
