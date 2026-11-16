@@ -13797,27 +13797,35 @@ function osToggleMap1() {
 var _osLocTimer = null;
 // Base: Cherkasy office
 var OS_BASE_LAT = 49.4444, OS_BASE_LNG = 32.0598;
-function osHaversine(lat1, lng1, lat2, lng2) {
-  var R = 6371, dLat = (lat2-lat1)*Math.PI/180, dLng = (lng2-lng1)*Math.PI/180;
-  var a = Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-}
 function osLocationInputChange() {
   var val = (document.getElementById('osLocationInput')||{}).value||'';
   var st = document.getElementById('osLocationStatus');
-  if (!val) { if(st){st.style.display='none';st.textContent='';} osRenderSidebar(); return; }
+  if (!val) { if(st){st.style.display='none';st.textContent='';} OS._locDist=null; osRenderSidebar(); return; }
   if(st){st.style.display='';st.textContent='Пошук...';}
   clearTimeout(_osLocTimer);
   _osLocTimer = setTimeout(function(){
+    // 1. Geocode via Nominatim
     fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(val)+',+Ukraine',{headers:{'Accept-Language':'uk'}})
       .then(function(r){return r.json();})
       .then(function(data){
         if(!data||!data.length){if(st){st.textContent='Місце не знайдено';} return;}
         var lat=parseFloat(data[0].lat), lng=parseFloat(data[0].lon);
-        var dist=Math.round(osHaversine(OS_BASE_LAT,OS_BASE_LNG,lat,lng));
-        if(st){st.textContent='📍 '+data[0].display_name.split(',')[0]+' — ~'+dist+' км від бази (Черкаси)';}
-        OS._locLat=lat; OS._locLng=lng; OS._locDist=dist;
-        osRenderSidebar();
+        var placeName=data[0].display_name.split(',')[0];
+        OS._locLat=lat; OS._locLng=lng;
+        if(st){st.textContent='Розраховую відстань по дорогах...';}
+        // 2. Route via OSRM (free, no key)
+        return fetch('https://router.project-osrm.org/route/v1/driving/'+OS_BASE_LNG+','+OS_BASE_LAT+';'+lng+','+lat+'?overview=false')
+          .then(function(r2){return r2.json();})
+          .then(function(route){
+            var dist = route&&route.routes&&route.routes[0] ? Math.round(route.routes[0].distance/1000) : null;
+            if(dist){
+              OS._locDist=dist;
+              if(st){st.textContent='📍 '+placeName+' — ~'+dist+' км по дорогах від Черкас';}
+            } else {
+              if(st){st.textContent='📍 '+placeName+' (відстань не визначена)';}
+            }
+            osRenderSidebar();
+          });
       })
       .catch(function(){if(st){st.textContent='Не вдалося визначити відстань';}});
   }, 700);
