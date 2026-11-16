@@ -6911,6 +6911,14 @@ function goStep(step) {
 }
 
 window.addEventListener('popstate', e => {
+  var _h = location.hash;
+  if (_h && _h.startsWith('#sampling/')) {
+    var _mat = _h.slice('#sampling/'.length);
+    var _btn = document.querySelector('.samp-tab[data-mat="' + _mat + '"]');
+    if (currentPage !== 'sampling') navigate('sampling');
+    if (_btn) sampSwitchTab(_mat, _btn);
+    return;
+  }
   if(e.state?.card){
     openCardFromHash();
   } else if(e.state?.page === 'article' && e.state?.slug){
@@ -13382,6 +13390,15 @@ function _applyRobotImages() {
   if(ctaEl) ctaEl.src = typeof _CTA_SRC !== 'undefined' ? _CTA_SRC : _ROBOT_SRC;
 }
 document.addEventListener('DOMContentLoaded', _applyRobotImages);
+document.addEventListener('DOMContentLoaded', function(){
+  var _h = location.hash;
+  if (_h && _h.startsWith('#sampling/')) {
+    navigate('sampling');
+    var _mat = _h.slice('#sampling/'.length);
+    var _btn = document.querySelector('.samp-tab[data-mat="' + _mat + '"]');
+    if (_btn) sampSwitchTab(_mat, _btn);
+  }
+});
 
 // ── copy navbar logo into about brand & footer sections ──
 document.addEventListener('DOMContentLoaded', function(){
