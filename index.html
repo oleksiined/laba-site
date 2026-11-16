@@ -13721,16 +13721,6 @@ function toast(msg) {
             <svg id="osContactAvailIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/></svg>
             Контакт доступний у день виїзду.
           </div>
-          <div style="margin-top:12px;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center">
-            <div class="os-same-contact os-check-off" id="osSameContact" onclick="osToggleCheck('osSameContact')">
-              <svg id="osSameContactIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/></svg>
-              Контакт замовника · Та сама людина
-            </div>
-            <div class="os-form-group">
-              <div class="os-form-label">Email для підтвердження</div>
-              <input class="os-form-input" id="osContactEmail" placeholder="name@example.com">
-            </div>
-          </div>
         </div>
 
       </div><!-- /step 3 -->
@@ -14612,15 +14602,109 @@ function osRenderSidebar() {
 function osRenderStep5() {
   var el = document.getElementById('osStep5Content');
   if (!el) return;
-  var o = window._osOrderDraft || {};
   var totalProbes = OS.fields.reduce(function(s,f){ return s + osCalcProbes(f.areaHa, f.settings.areaPerProbe); }, 0);
-  var totalHa = OS.fields.reduce(function(s,f){ return s + f.areaHa; }, 0);
   var ss = OS.samplingServices || {};
   var priceEstimate = 0;
   if (OS.services.indexOf('soil') >= 0 && ss.soil) priceEstimate += totalProbes * ss.soil.price;
   var fmtPrice = function(v){ return v.toLocaleString('uk-UA') + ' грн'; };
 
-  el.innerHTML = '<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px">  <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:18px">Оплата замовлення</h3>  <div style="display:flex;flex-direction:column;gap:12px">    <label onclick="osSetPayment(this,\'invoice\')" style="display:flex;align-items:flex-start;gap:14px;padding:16px;border:1.5px solid var(--neon);border-radius:10px;cursor:pointer">      <input type="radio" name="os-payment" value="invoice" checked style="margin-top:2px;accent-color:var(--neon)">      <div>        <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:3px">Рахунок для оплати</div>        <div style="font-size:13px;color:var(--text-soft)">Рахунок буде надіслано на email після підтвердження замовлення менеджером</div>      </div>    </label>    <label onclick="osSetPayment(this,\'online\')" style="display:flex;align-items:flex-start;gap:14px;padding:16px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer">      <input type="radio" name="os-payment" value="online" style="margin-top:2px;accent-color:var(--neon)">      <div>        <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:3px">Онлайн-оплата карткою</div>        <div style="font-size:13px;color:var(--text-soft)">Visa / Mastercard через LiqPay. Посилання на оплату — після підтвердження виїзду</div>      </div>    </label>    <label onclick="osSetPayment(this,\'cod\')" style="display:flex;align-items:flex-start;gap:14px;padding:16px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer">      <input type="radio" name="os-payment" value="cod" style="margin-top:2px;accent-color:var(--neon)">      <div>        <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:3px">Післяплата</div>        <div style="font-size:13px;color:var(--text-soft)">Оплата готівкою або карткою агроному під час виїзду</div>      </div>    </label>  </div></div><div style="background:#f8faf3;border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px">  <div style="font-size:13px;font-weight:600;color:var(--text-mid);margin-bottom:12px">Орієнтовна вартість</div>  ' + (totalProbes > 0 && priceEstimate > 0 ? '  <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-mid);margin-bottom:6px"><span>Відбір ґрунту · ' + totalProbes + ' проб × ' + (ss.soil ? ss.soil.price : 0) + ' грн</span><span>' + fmtPrice(priceEstimate) + '</span></div>  <div style="border-top:1px solid var(--border);margin:10px 0"></div>  <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:var(--navy)"><span>Разом</span><span>' + fmtPrice(priceEstimate) + '</span></div>' : '  <div style="font-size:13px;color:var(--text-soft)">Вартість розрахуємо після підтвердження деталей виїзду</div>') + '</div>';
+  var html = '';
+
+  // Section 1: Контактна особа
+  html += '<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px">';
+  html += '<h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:18px">Контактна особа</h3>';
+  html += '<div style="display:grid;gap:14px">';
+  html += '<div class="os-form-group"><div class="os-form-label">Імʼя та прізвище</div><input class="os-form-input" id="os5-name" placeholder="Іван Петренко"></div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">';
+  html += '<div class="os-form-group"><div class="os-form-label">Телефон</div><input class="os-form-input" id="os5-phone" type="tel" placeholder="+380 99 000 00 00"></div>';
+  html += '<div class="os-form-group"><div class="os-form-label">Email</div><input class="os-form-input" id="os5-email" type="email" placeholder="name@example.com"></div>';
+  html += '</div>';
+  html += '</div></div>';
+
+  // Section 2: Платник і реквізити рахунку
+  html += '<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px">';
+  html += '<h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:18px">Платник і реквізити рахунку</h3>';
+  html += '<div style="display:flex;gap:8px;margin-bottom:16px">';
+  html += '<button id="os5-tab-legal" onclick="os5SwitchPayer(\'legal\')" type="button" style="flex:1;padding:9px 12px;border:1.5px solid var(--neon);border-radius:8px;background:#f4ffcc;color:var(--navy);font-weight:600;font-size:13px;cursor:pointer">Юридична особа</button>';
+  html += '<button id="os5-tab-fop" onclick="os5SwitchPayer(\'fop\')" type="button" style="flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--text-mid);font-weight:500;font-size:13px;cursor:pointer">ФОП</button>';
+  html += '<button id="os5-tab-person" onclick="os5SwitchPayer(\'person\')" type="button" style="flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--text-mid);font-weight:500;font-size:13px;cursor:pointer">Фізична особа</button>';
+  html += '</div>';
+  html += '<div id="os5-payer-fields">';
+  html += '<div class="os-form-group" style="margin-bottom:12px"><div class="os-form-label">Назва організації</div><input class="os-form-input" id="os5-company" placeholder="ТОВ &quot;Агро&quot;"></div>';
+  html += '<div class="os-form-group"><div class="os-form-label">ЄДРПОУ</div><input class="os-form-input" id="os5-edrpou" placeholder="12345678" maxlength="8"></div>';
+  html += '</div>';
+  html += '</div>';
+
+  // Section 3: Оплата та документи
+  html += '<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px">';
+  html += '<h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:18px">Оплата та документи</h3>';
+  html += '<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">';
+  html += '<label onclick="osSetPayment(this,\'invoice\')" style="display:flex;align-items:flex-start;gap:14px;padding:16px;border:1.5px solid var(--neon);border-radius:10px;cursor:pointer">';
+  html += '<input type="radio" name="os-payment" value="invoice" checked style="margin-top:2px;accent-color:var(--neon)">';
+  html += '<div><div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:3px">Рахунок для оплати</div>';
+  html += '<div style="font-size:13px;color:var(--text-soft)">Рахунок буде надіслано на email після підтвердження замовлення менеджером</div></div></label>';
+  html += '<label onclick="osSetPayment(this,\'online\')" style="display:flex;align-items:flex-start;gap:14px;padding:16px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer">';
+  html += '<input type="radio" name="os-payment" value="online" style="margin-top:2px;accent-color:var(--neon)">';
+  html += '<div><div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:3px">Онлайн-оплата карткою</div>';
+  html += '<div style="font-size:13px;color:var(--text-soft)">Visa / Mastercard через LiqPay. Посилання на оплату — після підтвердження виїзду</div></div></label>';
+  html += '<label onclick="osSetPayment(this,\'cod\')" style="display:flex;align-items:flex-start;gap:14px;padding:16px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer">';
+  html += '<input type="radio" name="os-payment" value="cod" style="margin-top:2px;accent-color:var(--neon)">';
+  html += '<div><div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:3px">Післяплата</div>';
+  html += '<div style="font-size:13px;color:var(--text-soft)">Оплата готівкою або карткою агроному під час виїзду</div></div></label>';
+  html += '</div>';
+  html += '<div style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;border-top:1px solid var(--border);padding-top:14px">';
+  html += '<div class="os-same-contact os-check-off" id="os5-send-docs" onclick="osToggleCheck(\'os5-send-docs\')">';
+  html += '<svg width="18" height="18" viewBox="0 0 18 18" id="os5-send-docs-icon"><rect x="1" y="1" width="16" height="16" rx="4" stroke="var(--border)" stroke-width="1.5" fill="none"/></svg>';
+  html += ' Надіслати оригінали документів поштою';
+  html += '</div>';
+  html += '<div class="os-form-group"><div class="os-form-label">Email бухгалтерії</div>';
+  html += '<input class="os-form-input" id="os5-buh-email" type="email" placeholder="buh@company.ua"></div>';
+  html += '</div></div>';
+
+  // Section 4: Коментар
+  html += '<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px">';
+  html += '<h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:14px">Коментар до замовлення</h3>';
+  html += '<textarea class="os-form-input" id="os5-comment" rows="3" style="resize:vertical;min-height:80px" placeholder="Будь-яка додаткова інформація для агронома або менеджера..."></textarea>';
+  html += '</div>';
+
+  // Section 5: Орієнтовна вартість
+  html += '<div style="background:#f8faf3;border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px">';
+  html += '<div style="font-size:13px;font-weight:600;color:var(--text-mid);margin-bottom:12px">Орієнтовна вартість</div>';
+  if (totalProbes > 0 && priceEstimate > 0) {
+    html += '<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-mid);margin-bottom:6px"><span>Відбір ґрунту · ' + totalProbes + ' проб × ' + (ss.soil ? ss.soil.price : 0) + ' грн</span><span>' + fmtPrice(priceEstimate) + '</span></div>';
+    html += '<div style="border-top:1px solid var(--border);margin:10px 0"></div>';
+    html += '<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:var(--navy)"><span>Разом</span><span>' + fmtPrice(priceEstimate) + '</span></div>';
+  } else {
+    html += '<div style="font-size:13px;color:var(--text-soft)">Вартість розрахуємо після підтвердження деталей виїзду</div>';
+  }
+  html += '</div>';
+
+  el.innerHTML = html;
+  OS._payerType = 'legal';
+}
+
+function os5SwitchPayer(type) {
+  ['legal','fop','person'].forEach(function(t) {
+    var btn = document.getElementById('os5-tab-' + t);
+    if (!btn) return;
+    var active = t === type;
+    btn.style.borderColor = active ? 'var(--neon)' : 'var(--border)';
+    btn.style.background   = active ? '#f4ffcc' : '#fff';
+    btn.style.color        = active ? 'var(--navy)' : 'var(--text-mid)';
+    btn.style.fontWeight   = active ? '600' : '500';
+  });
+  var fields = document.getElementById('os5-payer-fields');
+  if (!fields) return;
+  OS._payerType = type;
+  if (type === 'legal') {
+    fields.innerHTML = '<div class="os-form-group" style="margin-bottom:12px"><div class="os-form-label">Назва організації</div><input class="os-form-input" id="os5-company" placeholder="ТОВ &quot;Агро&quot;"></div>'
+      + '<div class="os-form-group"><div class="os-form-label">ЄДРПОУ</div><input class="os-form-input" id="os5-edrpou" placeholder="12345678" maxlength="8"></div>';
+  } else if (type === 'fop') {
+    fields.innerHTML = '<div class="os-form-group" style="margin-bottom:12px"><div class="os-form-label">ПІБ підприємця</div><input class="os-form-input" id="os5-company" placeholder="Петренко Іван Васильович"></div>'
+      + '<div class="os-form-group"><div class="os-form-label">РНОКПП / ІПН</div><input class="os-form-input" id="os5-edrpou" placeholder="1234567890" maxlength="10"></div>';
+  } else {
+    fields.innerHTML = '<div class="os-form-group"><div class="os-form-label">ПІБ</div><input class="os-form-input" id="os5-company" placeholder="Петренко Іван Васильович"></div>';
+  }
 }
 
 function osSetPayment(label, value) {
@@ -14822,10 +14906,7 @@ function osSubmitOrder() {
   });
 
   var now = new Date();
-  var num = 'ВД-' + now.getFullYear().toString().slice(-2) +
-            String(now.getMonth()+1).padStart(2,'0') +
-            String(now.getDate()).padStart(2,'0') + '-' +
-            String(Math.floor(Math.random()*900)+100);
+  var yearPart = now.getFullYear().toString().slice(-2);
 
   var visitDate = null;
   if (OS.date && OS.date.ts) {
@@ -14834,7 +14915,7 @@ function osSubmitOrder() {
   }
 
   var record = {
-    order_number:      num,
+    order_number:      null, // set after Supabase insert returns sequence
     status:            'new',
     fields_count:      OS.fields.length,
     total_area:        Math.round(totalHa * 10) / 10,
@@ -14846,23 +14927,31 @@ function osSubmitOrder() {
     visit_date_label:  OS.date ? (OS.date.day + ' ' + OS.date.month) : '',
     location:          (document.getElementById('osLocationInput')||{}).value || '',
     distance_km:       OS._locDist || null,
-    contact_name:      (document.getElementById('osContactName')||{}).value || '',
-    contact_phone:     (document.getElementById('osContactPhone')||{}).value || '',
-    contact_email:     (document.getElementById('osContactEmail')||{}).value || '',
+    contact_name:      (document.getElementById('os5-name')||{}).value || '',
+    contact_phone:     (document.getElementById('os5-phone')||{}).value || '',
+    contact_email:     (document.getElementById('os5-email')||{}).value || '',
+    payer_company:     (document.getElementById('os5-company')||{}).value || '',
+    payer_edrpou:      (document.getElementById('os5-edrpou')||{}).value || '',
+    payer_type:        OS._payerType || 'legal',
+    buh_email:         (document.getElementById('os5-buh-email')||{}).value || '',
+    payment_method:    OS._payment || 'invoice',
+    comment:           (document.getElementById('os5-comment')||{}).value || '',
     contact_role:      (document.getElementById('osContactRole')||{}).value || '',
     contact_available: !(document.getElementById('osContactAvail')||{classList:{contains:function(){return true;}}}).classList.contains('os-check-off'),
-    same_contact:      !(document.getElementById('osSameContact')||{classList:{contains:function(){return true;}}}).classList.contains('os-check-off'),
     ready_harvest:     (document.getElementById('osReady1')||{checked:false}).checked,
     ready_data:        (document.getElementById('osReady2')||{checked:false}).checked,
     ready_stubble:     (document.getElementById('osReady3')||{checked:false}).checked,
     price_estimate:    priceEstimate || null,
   };
 
+  // Генерація номеру замовлення: AS + 2-значний рік + 4-значний порядковий номер
+  function buildOrderNum(seq) {
+    return 'AS' + yearPart + String(seq).padStart(4, '0');
+  }
+
   // Зберегти в Supabase
   if (typeof SUPABASE_URL !== 'undefined' && typeof SUPABASE_ANON_KEY !== 'undefined') {
-    // Ensure services is always a proper JS array (never a string)
     record.services = Array.isArray(record.services) ? record.services : (record.services ? String(record.services).split(',') : []);
-    console.log('Saving order to Supabase, services type:', typeof record.services, 'value:', JSON.stringify(record.services));
     var body = JSON.stringify(record);
     fetch(SUPABASE_URL + '/rest/v1/sampling_orders', {
       method: 'POST',
@@ -14874,35 +14963,44 @@ function osSubmitOrder() {
       },
       body: body,
     }).then(function(res) {
-      if (res.ok) {
-        console.log('sampling_orders saved OK', num);
-      } else {
-        res.text().then(function(txt) {
-          console.error('sampling_orders save error ' + res.status + ':', txt);
-          // If distance_km column missing, retry without it
-          if (txt.indexOf('distance_km') >= 0) {
-            var r2 = Object.assign({}, record);
-            delete r2.distance_km;
-            fetch(SUPABASE_URL + '/rest/v1/sampling_orders', {
-              method: 'POST',
-              headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-              body: JSON.stringify(r2),
-            }).then(function(res2) {
-              if (res2.ok) { console.log('sampling_orders saved OK (without distance_km)', num); }
-              else { res2.text().then(function(t2){ console.error('sampling_orders retry error:', t2); showToast('Помилка: ' + t2.slice(0,150)); }); }
-            });
-          } else {
-            showToast('Помилка збереження: ' + res.status + ' — ' + txt.slice(0, 200));
-          }
+      return res.json().then(function(data) { return { ok: res.ok, status: res.status, data: data }; });
+    }).then(function(r) {
+      if (r.ok && r.data && r.data[0] && r.data[0].id) {
+        var num = buildOrderNum(r.data[0].id);
+        record.order_number = num;
+        // Update the row with the generated order number
+        fetch(SUPABASE_URL + '/rest/v1/sampling_orders?id=eq.' + r.data[0].id, {
+          method: 'PATCH',
+          headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order_number: num }),
         });
+        console.log('sampling_orders saved OK', num);
+        _osFinishOrder(record, num);
+      } else {
+        var fallbackNum = buildOrderNum(Math.floor(Math.random()*9000)+1000);
+        record.order_number = fallbackNum;
+        console.error('sampling_orders save error ' + r.status + ':', JSON.stringify(r.data));
+        showToast('Помилка збереження: ' + r.status);
+        _osFinishOrder(record, fallbackNum);
       }
     }).catch(function(e) {
+      var fallbackNum = buildOrderNum(Math.floor(Math.random()*9000)+1000);
+      record.order_number = fallbackNum;
       console.warn('sampling_orders network error:', e);
       showToast('Мережева помилка збереження заявки');
+      _osFinishOrder(record, fallbackNum);
     });
   } else {
     console.warn('Supabase not configured — order saved to localStorage only');
+    var fallbackNum = buildOrderNum(Math.floor(Math.random()*9000)+1000);
+    record.order_number = fallbackNum;
+    _osFinishOrder(record, fallbackNum);
   }
+}
+
+function _osFinishOrder(record, num) {
+  var now = new Date();
+  var priceEstimate = record.price_estimate || 0;
 
   // Також у localStorage як fallback
   var lsRecord = Object.assign({}, record, { created_at: now.toISOString() });
@@ -14920,10 +15018,8 @@ function osSubmitOrder() {
     var _dh = document.getElementById('oscf-date-hint');
     if (_dh) _dh.textContent = 'Запланована дата: ' + record.visit_date_label;
   }
-  // Price estimate
   var _pe = document.getElementById('oscf-price-est');
   if (_pe) _pe.textContent = priceEstimate ? Math.round(priceEstimate).toLocaleString('uk-UA') + ' грн' : 'за запитом';
-  // Fields list
   var _fl = document.getElementById('oscf-fields-list');
   if (_fl && OS.fields && OS.fields.length) {
     _fl.innerHTML = OS.fields.map(function(f) {
