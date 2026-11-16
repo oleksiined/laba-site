@@ -6659,6 +6659,21 @@ function blogFilter(btn, cat) {
     const show = cat === 'all' || card.dataset.cat === cat;
     card.style.display = show ? '' : 'none';
   });
+  var grid = document.getElementById('blog-grid');
+  var noEl = document.getElementById('blog-no-results');
+  var anyVisible = Array.from(grid.querySelectorAll('.blog-card')).some(c => c.style.display !== 'none');
+  if (!anyVisible) {
+    if (!noEl) {
+      noEl = document.createElement('div');
+      noEl.id = 'blog-no-results';
+      noEl.style.cssText = 'grid-column:1/-1;text-align:center;padding:64px 0;color:var(--text-soft);font-size:16px';
+      noEl.innerHTML = '<div style="font-size:40px;margin-bottom:16px">📭</div><div>Статей у цій категорії поки немає</div>';
+      grid.appendChild(noEl);
+    }
+    noEl.style.display = '';
+  } else if (noEl) {
+    noEl.style.display = 'none';
+  }
 }
 function blogSearch(q) {
   const qLow = q.toLowerCase().trim();
