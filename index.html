@@ -947,6 +947,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .cab-nav2-item .badge-soon { margin-left: auto; font-size: 10px; font-weight: 600; background: var(--border); color: var(--text-soft); border-radius: 4px; padding: 2px 6px; }
 .cab-nav2-divider { height: 1px; background: var(--border); margin: 8px 0; }
 .cab-nav2-logout { display: flex; align-items: center; gap: 12px; padding: 11px 20px; font-size: 14px; color: #EF4444; cursor: pointer; transition: background .12s; border: none; background: none; width: 100%; text-align: left; }
+.cab-nav2-badge { margin-left: auto; min-width: 18px; height: 18px; padding: 0 5px; background: var(--neon-dark, #74c143); color: #0d2b3e; border-radius: 9px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
 .cab-nav2-logout:hover { background: #FEF2F2; }
 .cab-nav2-logout svg { width: 18px; height: 18px; color: #EF4444; }
 .cab-main { min-width: 0; }
@@ -4583,6 +4584,11 @@ main{flex:1}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6M9 16h4M5 3h14a2 2 0 012 2v16a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg>
             Замовлення
           </div>
+          <div class="cab-nav2-item" onclick="cabShowSection('sampling',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+            Відбір
+            <span class="cab-nav2-badge" id="cabSamplingBadge" style="display:none"></span>
+          </div>
           <div class="cab-nav2-item" onclick="cabShowSection('profile',this)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
             Профіль
@@ -4630,6 +4636,15 @@ main{flex:1}
               <div class="cab-profile-field full"><label>Email</label><value id="cabProfileEmail">—</value></div>
               <div class="cab-profile-field full"><label>Господарство / компанія</label><value id="cabProfileFarm">—</value></div>
             </div>
+          </div>
+        </div>
+        <div class="cab-subtab" id="cab-section-sampling">
+          <div class="cab-section">
+            <div class="cab-section-head">
+              <div class="cab-section-title">Заявки на відбір</div>
+              <button class="cab-section-link" onclick="navigate('order-sampling')">+ Нова заявка</button>
+            </div>
+            <div id="cabSamplingBody"></div>
           </div>
         </div>
       </main>
@@ -9024,6 +9039,7 @@ function cabInit() {
   cabFillProfile();
   cabRenderOrders();
   cabUpdateStats();
+  cabUpdateSamplingBadge();
 }
 
 function cabSwitch(tab, btn) {
@@ -9624,6 +9640,51 @@ function cabShowSection(section, btn) {
   document.querySelectorAll('.cab-nav2-item').forEach(el => el.classList.remove('active'));
   if (btn) btn.classList.add('active');
   if (section === 'orders') cabRenderOrders();
+  if (section === 'sampling') cabRenderSampling();
+}
+
+function cabRenderSampling() {
+  const el = document.getElementById('cabSamplingBody');
+  if (!el) return;
+  let items = [];
+  try { items = JSON.parse(localStorage.getItem('laba_sampling_orders') || '[]'); } catch(e) {}
+
+  if (!items.length) {
+    el.innerHTML = '<div class="cab-empty"><svg viewBox="0 0 48 48" fill="none"><rect x="8" y="8" width="32" height="32" rx="4" stroke="currentColor" stroke-width="2"/><path d="M16 20h16M16 28h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><p>Заявок на відбір ще немає</p></div>';
+    return;
+  }
+
+  const statusMap = {
+    new:         ['cab-status-new',    'Нова'],
+    in_progress: ['cab-status-work',   'В роботі'],
+    done:        ['cab-status-done',   'Виконано'],
+    cancelled:   ['cab-status-cancel', 'Скасовано'],
+  };
+
+  el.innerHTML = '<table class="cab-orders-table"><tbody>' +
+    items.map(r => {
+      const [cls, label] = statusMap[r.status] || ['cab-status-new', 'Нова'];
+      const date = r.created_at ? new Date(r.created_at).toLocaleDateString('uk-UA', {day:'numeric',month:'long',year:'numeric'}) : '—';
+      const fields = r.fields_count ? r.fields_count + ' ' + (r.fields_count === 1 ? 'поле' : r.fields_count < 5 ? 'поля' : 'полів') : '—';
+      const area = r.total_area ? r.total_area.toLocaleString('uk-UA') + ' га' : '';
+      return `<tr>
+        <td><div class="cab-order-num">${r.order_number || '—'}</div><div class="cab-order-date">${date}</div></td>
+        <td><div class="cab-order-pkgs">${r.contact_name || r.contact_phone || '—'}</div><div class="pkg-list">${fields}${area ? ' · ' + area : ''}</div></td>
+        <td><span class="cab-status ${cls}">${label}</span></td>
+        <td class="cab-order-price">${r.probes_total ? r.probes_total + ' проб' : '—'}</td>
+        <td></td>
+      </tr>`;
+    }).join('') + '</tbody></table>';
+}
+
+function cabUpdateSamplingBadge() {
+  const badge = document.getElementById('cabSamplingBadge');
+  if (!badge) return;
+  let items = [];
+  try { items = JSON.parse(localStorage.getItem('laba_sampling_orders') || '[]'); } catch(e) {}
+  const count = items.filter(r => r.status === 'new').length;
+  if (count > 0) { badge.textContent = count; badge.style.display = 'inline-block'; }
+  else { badge.style.display = 'none'; }
 }
 
 function cabSetFilter(f, btn) {
@@ -14887,7 +14948,51 @@ function osRenderStep4() {
 }
 
 function osSubmitOrder() {
-  alert('Замовлення надіслано! Ми звʼяжемось із вами найближчим часом.');
+  // Collect totals
+  var totalProbes = 0, totalHa = 0;
+  OS.fields.forEach(function(f) {
+    totalHa += f.areaHa || 0;
+    var s = f.settings || {};
+    if (OS.services.indexOf('soil') >= 0) {
+      totalProbes += s.areaPerProbe ? Math.ceil((f.areaHa || 0) / s.areaPerProbe) : 0;
+    }
+  });
+
+  var now = new Date();
+  var num = 'ВД-' + now.getFullYear().toString().slice(-2) +
+            String(now.getMonth()+1).padStart(2,'0') +
+            String(now.getDate()).padStart(2,'0') + '-' +
+            String(Math.floor(Math.random()*900)+100);
+
+  var record = {
+    order_number:  num,
+    status:        'new',
+    created_at:    now.toISOString(),
+    fields_count:  OS.fields.length,
+    total_area:    Math.round(totalHa * 10) / 10,
+    probes_total:  totalProbes,
+    services:      OS.services.slice(),
+    mode:          OS.mode,
+    delivery:      OS.delivery,
+    date_label:    OS.date ? (OS.date.day + ' ' + OS.date.month) : '',
+    contact_name:  (document.getElementById('osContactName')||{}).value || '',
+    contact_phone: (document.getElementById('osContactPhone')||{}).value || '',
+    contact_email: (document.getElementById('osContactEmail')||{}).value || '',
+  };
+
+  var items = [];
+  try { items = JSON.parse(localStorage.getItem('laba_sampling_orders') || '[]'); } catch(e) {}
+  items.unshift(record);
+  try { localStorage.setItem('laba_sampling_orders', JSON.stringify(items.slice(0, 100))); } catch(e) {}
+
+  showToast('Заявку ' + num + ' збережено');
+  setTimeout(function() {
+    navigate('cab');
+    setTimeout(function() {
+      var btn = document.querySelector('.cab-nav2-item[onclick*="sampling"]');
+      cabShowSection('sampling', btn);
+    }, 150);
+  }, 600);
 }
 
 function osSaveDraft() { /* stub */ }
