@@ -702,6 +702,11 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           <span>Заявки</span>
           <span class="adm-nav-badge" style="background:#D97706" id="admBadgeRequests">0</span>
         </button>
+        <button class="adm-nav-item" onclick="admSwitch('sampling',this)" id="adm-navbtn-sampling">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 5h14M3 10h14M3 15h8" stroke-linecap="round"/><circle cx="16" cy="15" r="2.5" fill="none"/><path d="M16 13.8v1.2l.8.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Відбір</span>
+          <span class="adm-nav-badge" style="background:#3b82f6;display:none" id="admBadgeSampling">0</span>
+        </button>
         <button class="adm-nav-item" onclick="admSwitch('samples',this)" id="adm-navbtn-samples">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 3v8l-2 4h8l-2-4V3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 3h4" stroke-linecap="round"/><path d="M6 14h8" stroke-linecap="round"/></svg>
           <span>Зразки</span>
@@ -1077,6 +1082,54 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
             <div id="crHistoryList" style="font-size:12.5px;color:var(--text-mid)"></div>
           </div>
         </div>
+      </div>
+
+      <!-- ── SAMPLING TAB ── -->
+      <div class="adm-subtab" id="admtab-sampling">
+        <div class="adm-topbar">
+          <div>
+            <div class="adm-page-title">Відбір</div>
+            <div class="adm-page-sub">Заявки на виїзд для відбору проб ґрунту</div>
+          </div>
+          <div class="adm-topbar-actions">
+            <button class="adm-btn adm-btn-ghost" onclick="samplingLoad()">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="14" height="14"><path d="M4 10a6 6 0 1012 0 6 6 0 00-12 0"/><path d="M10 4V2M10 18v-2M4 10H2M18 10h-2" stroke-linecap="round"/></svg>
+              Оновити
+            </button>
+          </div>
+        </div>
+
+        <div class="adm-kpi-row">
+          <div class="adm-kpi-card">
+            <div class="adm-kpi-left"><div class="adm-kpi-label">Всього заявок</div><div class="adm-kpi-val" id="sampKpiTotal">—</div></div>
+            <div class="adm-kpi-icon kpi-gray"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h12M4 10h12M4 15h8" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="adm-kpi-card">
+            <div class="adm-kpi-left"><div class="adm-kpi-label">Нових</div><div class="adm-kpi-val" id="sampKpiNew">—</div></div>
+            <div class="adm-kpi-icon kpi-blue"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2 2" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="adm-kpi-card">
+            <div class="adm-kpi-left"><div class="adm-kpi-label">У роботі</div><div class="adm-kpi-val" id="sampKpiWork">—</div></div>
+            <div class="adm-kpi-icon kpi-yellow"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 3v8l-2 4h8l-2-4V3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 3h4" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="adm-kpi-card">
+            <div class="adm-kpi-left"><div class="adm-kpi-label">Виконано</div><div class="adm-kpi-val" id="sampKpiDone">—</div></div>
+            <div class="adm-kpi-icon kpi-green"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+        </div>
+
+        <div class="adm-filter-bar">
+          <input class="adm-search-in" id="sampSearch" type="text" placeholder="Пошук за номером, контактом…" oninput="samplingRender()">
+          <select class="adm-filter-sel" id="sampFStatus" onchange="samplingRender()">
+            <option value="">Статус: Всі</option>
+            <option value="new">Нова</option>
+            <option value="in_progress">У роботі</option>
+            <option value="done">Виконано</option>
+            <option value="cancelled">Скасовано</option>
+          </select>
+        </div>
+
+        <div id="sampBody"></div>
       </div>
 
       <!-- ── DASHBOARD TAB ── -->
@@ -2466,6 +2519,13 @@ function admInit() {
   setT('admBadgeOrders', all);
   const totalSamples = _admOrders.reduce((s,o)=>s+(o.samples||0), 0);
   setT('admBadgeSamples', totalSamples);
+  // Sampling badge
+  try {
+    const sampItems = JSON.parse(localStorage.getItem('laba_sampling_orders')||'[]');
+    const sampNew = sampItems.filter(r=>r.status==='new').length;
+    const badge = document.getElementById('admBadgeSampling');
+    if (badge) { badge.textContent = sampNew; badge.style.display = sampNew > 0 ? 'inline-block' : 'none'; }
+  } catch(e) {}
   // Update quick-filter counts
   const qNew  = _admOrders.filter(o=>o.status==='new').length;
   const qWork = _admOrders.filter(o=>o.status==='work').length;
@@ -2489,6 +2549,7 @@ function admSwitch(tab, btn) {
   }
   if (tab === 'docs') { docRender(); if(typeof docUpdateQF==='function') docUpdateQF(); }
   if (tab === 'requests') { if (!_crLoaded) { crLoad(); } else { crRender(); } }
+  if (tab === 'sampling') { samplingLoad(); }
 }
 
 function _admFiltered() {
@@ -6130,6 +6191,98 @@ function _settShowSaved(id) {
   el.style.color = 'var(--green,#22a35a)';
   el.style.opacity = '1';
   setTimeout(() => { el.style.opacity = '0'; }, 2500);
+}
+
+// ── SAMPLING ORDERS (Відбір) ─────────────────────────────────
+let _sampItems = [];
+
+function samplingLoad() {
+  // Load from laba_sampling_orders in localStorage (written by osSubmitOrder on main site)
+  try { _sampItems = JSON.parse(localStorage.getItem('laba_sampling_orders') || '[]'); } catch(e) { _sampItems = []; }
+  samplingRender();
+  samplingUpdateBadge();
+}
+
+function samplingRender() {
+  const el = document.getElementById('sampBody');
+  if (!el) return;
+
+  const q = (document.getElementById('sampSearch')?.value || '').toLowerCase();
+  const fs = document.getElementById('sampFStatus')?.value || '';
+
+  let list = _sampItems.filter(r => {
+    if (fs && r.status !== fs) return false;
+    if (q && !(r.order_number||'').toLowerCase().includes(q) &&
+             !(r.contact_name||'').toLowerCase().includes(q) &&
+             !(r.contact_phone||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  // Update KPIs
+  const setKpi = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
+  setKpi('sampKpiTotal', _sampItems.length || '—');
+  setKpi('sampKpiNew',   _sampItems.filter(r=>r.status==='new').length || '—');
+  setKpi('sampKpiWork',  _sampItems.filter(r=>r.status==='in_progress').length || '—');
+  setKpi('sampKpiDone',  _sampItems.filter(r=>r.status==='done').length || '—');
+
+  if (!list.length) {
+    el.innerHTML = `<div style="padding:48px 24px;text-align:center;color:var(--text-soft)">
+      <svg width="40" height="40" viewBox="0 0 48 48" fill="none" style="margin-bottom:12px"><rect x="8" y="8" width="32" height="32" rx="4" stroke="currentColor" stroke-width="2"/><path d="M16 20h16M16 28h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <p style="margin:0;font-size:14px">${_sampItems.length ? 'Нічого не знайдено' : 'Заявок на відбір ще немає'}</p>
+    </div>`;
+    return;
+  }
+
+  const statusMap = {
+    new:         { cls: 'adm-status-new',    label: 'Нова' },
+    in_progress: { cls: 'adm-status-work',   label: 'У роботі' },
+    done:        { cls: 'adm-status-done',   label: 'Виконано' },
+    cancelled:   { cls: 'adm-status-cancel', label: 'Скасовано' },
+  };
+
+  el.innerHTML = `<table class="adm-table">
+    <thead><tr>
+      <th>№ ЗАЯВКИ</th><th>КОНТАКТ</th><th>ПОЛЯ / ПЛОЩА</th><th>ПРОБ</th><th>ДАТА ВИЇЗДУ</th><th>СТАТУС</th><th></th>
+    </tr></thead>
+    <tbody>` +
+    list.map(r => {
+      const st = statusMap[r.status] || { cls: 'adm-status-new', label: 'Нова' };
+      const date = r.created_at ? new Date(r.created_at).toLocaleDateString('uk-UA', {day:'numeric',month:'short',year:'numeric'}) : '—';
+      const fields = r.fields_count ? `${r.fields_count} пол. · ${(r.total_area||0).toFixed(0)} га` : '—';
+      return `<tr>
+        <td><div class="adm-order-num">${r.order_number||'—'}</div><div class="adm-order-date">${date}</div></td>
+        <td><div class="adm-order-client">${r.contact_name||'—'}</div><div class="adm-order-contact">${r.contact_phone||''}</div></td>
+        <td>${fields}</td>
+        <td>${r.probes_total||'—'}</td>
+        <td>${r.date_label||'—'}</td>
+        <td><span class="adm-status ${st.cls}">${st.label}</span></td>
+        <td>
+          <select class="adm-filter-sel" style="font-size:11px;padding:3px 6px;min-width:110px" onchange="samplingSetStatus('${r.order_number}',this.value)">
+            <option value="new"${r.status==='new'?' selected':''}>Нова</option>
+            <option value="in_progress"${r.status==='in_progress'?' selected':''}>У роботі</option>
+            <option value="done"${r.status==='done'?' selected':''}>Виконано</option>
+            <option value="cancelled"${r.status==='cancelled'?' selected':''}>Скасовано</option>
+          </select>
+        </td>
+      </tr>`;
+    }).join('') + `</tbody></table>`;
+}
+
+function samplingSetStatus(orderNum, newStatus) {
+  const idx = _sampItems.findIndex(r => r.order_number === orderNum);
+  if (idx < 0) return;
+  _sampItems[idx].status = newStatus;
+  try { localStorage.setItem('laba_sampling_orders', JSON.stringify(_sampItems)); } catch(e) {}
+  samplingRender();
+  samplingUpdateBadge();
+}
+
+function samplingUpdateBadge() {
+  const badge = document.getElementById('admBadgeSampling');
+  if (!badge) return;
+  const count = _sampItems.filter(r => r.status === 'new').length;
+  badge.textContent = count;
+  badge.style.display = count > 0 ? 'inline-block' : 'none';
 }
 </script>
 
