@@ -147,6 +147,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 /* ── PAGE SHELL ── */
 .page{display:none}
 .page.active{display:flex;flex-direction:column;min-height:calc(100vh - 68px);overflow-x:clip;max-width:100vw}
+.article-page.active{overflow:visible;overflow-x:visible}
 .page.active>.laba-footer{margin-top:auto}
 
 /* ══════════════════════════════
@@ -1714,7 +1715,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 @media(max-width:600px){.blog-grid{grid-template-columns:1fr}.blog-header-inner h1{font-size:30px}.blog-filters{flex-direction:column;align-items:stretch}.blog-search-wrap{max-width:100%;min-width:0}}
 
 /* ── Article detail ── */
-.article-page{background:var(--bg);min-height:100vh}
+.article-page{background:var(--bg);min-height:100vh;overflow:visible}
 .article-outer{max-width:1280px;margin:0 auto;padding:32px 32px 80px}
 .article-back{display:inline-flex;align-items:center;gap:6px;color:var(--text-mid);font-size:14px;font-weight:500;background:none;border:none;cursor:pointer;padding:0;margin-bottom:22px;transition:color .15s;font-family:inherit}
 .article-back:hover{color:var(--navy)}
@@ -1766,7 +1767,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 /* ══ ARTICLE TOC ══ */
 .article-with-toc{display:grid;grid-template-columns:1fr 240px;gap:48px;align-items:start;max-width:1280px;margin:0 auto;padding:32px 32px 80px}
 .article-with-toc .article-main{min-width:0}
-.article-toc{position:sticky;top:80px;max-height:calc(100vh - 100px);overflow-y:auto}
+.article-toc{position:-webkit-sticky;position:sticky;top:80px;max-height:calc(100vh - 100px);overflow-y:auto;align-self:start}
 .article-toc-inner{background:var(--white);border:1px solid var(--border-soft);border-radius:12px;padding:18px 20px}
 .article-toc-title{font-size:11px;font-weight:800;color:var(--text-soft);letter-spacing:.8px;text-transform:uppercase;margin:0 0 12px}
 .article-toc-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
