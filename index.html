@@ -9306,7 +9306,9 @@ function showToast(msg,ms=2500){
     window._ncfPaidViaLiqpay = true;
     window.addEventListener('load', function(){ if (typeof ncf_show === 'function') ncf_show(); });
   } else {
-    _navigateFromHash(location.hash);
+    // Defer hash navigation so it runs after all IIFE init code completes
+    // (prevents content being overwritten by subsequent init steps)
+    setTimeout(function(){ _navigateFromHash(location.hash); }, 0);
   }
   // popstate handled by the global listener above
   // Скидаємо матеріал — показуємо всі послуги
