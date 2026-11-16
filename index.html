@@ -4589,6 +4589,12 @@ main{flex:1}
                 <span style="font-size:15px;font-weight:700;color:var(--t1)" id="oscf-order-num">ВД-000000-000</span>
                 <span style="background:#fff8e6;color:#c07000;border:1px solid #f5d97a;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600">Нова заявка</span>
               </div>
+              <div style="margin-top:16px">
+                <button class="btn-outline" style="gap:8px;padding:10px 18px;font-size:14px;display:inline-flex;align-items:center" onclick="osf_downloadInvoice()">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3M3 13h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Завантажити рахунок
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -4637,7 +4643,7 @@ main{flex:1}
             </div>
             <div>
               <div style="font-size:14px;font-weight:600;color:var(--t1)">Контакт-центр</div>
-              <div style="font-size:12.5px;color:var(--t3)">097 816 46 78 · <a href="mailto:order@zemlerob.com.ua" style="color:var(--t2)">order@zemlerob.com.ua</a></div>
+              <div style="font-size:12.5px;color:var(--t3)"><a href="tel:+380671819967" style="color:inherit;text-decoration:none">+380 67 181 99 67</a> · <a href="mailto:order@zemlerob.com.ua" style="color:var(--t2)">order@zemlerob.com.ua</a></div>
             </div>
           </div>
         </div>
@@ -4660,7 +4666,7 @@ main{flex:1}
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5A7.5 7.5 0 1 1 1.5 9 7.5 7.5 0 0 1 9 1.5z" stroke="var(--t3)" stroke-width="1.4"/><path d="M9 8.25v3.75M9 6h.008" stroke="var(--t3)" stroke-width="1.5" stroke-linecap="round"/></svg>
             <span style="font-size:13px;color:var(--t2);font-weight:600">Потрібна допомога?</span>
           </div>
-          <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:2px">097 816 46 78</div>
+          <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:2px"><a href="tel:+380671819967" style="color:inherit;text-decoration:none">+380 67 181 99 67</a></div>
           <div style="font-size:12px;color:var(--t3)">Пн–Пт, 09:00–18:00</div>
         </div>
         <button class="btn-primary" style="width:100%;margin-top:14px;padding:12px" onclick="osStartOver()">Нова заявка на відбір</button>
@@ -15037,6 +15043,7 @@ function osSubmitOrder() {
 
 function _osFinishOrder(record, num) {
   var now = new Date();
+  window._osfLastRecord = Object.assign({}, record, { order_number: num });
   var priceEstimate = record.price_estimate || 0;
 
   // Також у localStorage як fallback
@@ -15068,6 +15075,202 @@ function _osFinishOrder(record, num) {
     }).join('');
   }
   navigate('os-confirm');
+}
+
+function osf_downloadInvoice() {
+  if (typeof pdfMake === 'undefined') {
+    showToast('PDF-бібліотека завантажується, спробуйте ще раз');
+    return;
+  }
+  var rec = window._osfLastRecord || {};
+  var orderNum  = rec.order_number || (document.getElementById('oscf-order-num') || {}).textContent || 'AS000000';
+  var now = new Date();
+  var invoiceDate = now.toLocaleDateString('uk-UA');
+  var dueDateObj  = new Date(now); dueDateObj.setDate(dueDateObj.getDate() + 7);
+  var dueDate     = dueDateObj.toLocaleDateString('uk-UA');
+  var total       = rec.price_estimate || 0;
+
+  var SELLER = {
+    name:    'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ «ЗЕМЛЕРОБ ХАБ»',
+    edrpou:  '45801119',
+    iban:    'UA63 305299 00000 26001031616283',
+    bank:    'ПАТ КБ «ПРИВАТБАНК»',
+    mfo:     '305299',
+    address: 'вул. Б. Вишневецького, 36/1, м. Черкаси, 18000',
+    phone:   '+380 67 181 99 67',
+    site:    'laba.zemlerob.com.ua',
+  };
+
+  // Покупець
+  var buyerLines = [];
+  var ptype = rec.payer_type || 'legal';
+  if (ptype === 'legal') {
+    buyerLines.push({ text: rec.payer_company || '—', bold: true, fontSize: 9, color: '#000' });
+    if (rec.payer_edrpou) buyerLines.push({ text: 'Код за ЄДРПОУ: ' + rec.payer_edrpou, fontSize: 8, color: '#333' });
+  } else if (ptype === 'fop') {
+    buyerLines.push({ text: 'ФОП ' + (rec.payer_company || '—'), bold: true, fontSize: 9, color: '#000' });
+    if (rec.payer_edrpou) buyerLines.push({ text: 'РНОКПП: ' + rec.payer_edrpou, fontSize: 8, color: '#333' });
+  } else {
+    buyerLines.push({ text: rec.payer_company || rec.contact_name || '—', bold: true, fontSize: 9, color: '#000' });
+  }
+  if (rec.contact_name) buyerLines.push({ text: 'Контактна особа: ' + rec.contact_name, fontSize: 8, color: '#333' });
+  if (rec.contact_phone) buyerLines.push({ text: 'Тел.: ' + rec.contact_phone, fontSize: 8, color: '#333' });
+  if (rec.contact_email) buyerLines.push({ text: rec.contact_email, fontSize: 8, color: '#333' });
+
+  // Таблиця послуг
+  var thStyle = { fontSize: 8, bold: true, color: '#000', fillColor: '#f0f0f0' };
+  var tdStyle = { fontSize: 8.5, color: '#000' };
+  var tableBody = [[
+    { text: '№',                     color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'center' },
+    { text: 'Послуга',               color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0' },
+    { text: 'К-сть
+полів',          color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'center' },
+    { text: 'Площа, га',             color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'right' },
+    { text: 'К-сть
+проб',           color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'center' },
+    { text: 'Ціна, грн',             color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'right' },
+    { text: 'Сума, грн',             color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'right' },
+  ]];
+
+  var svcNames = { soil: 'Відбір ґрунту (агрохімія)', moisture: 'Відбір ґрунту (волога)', plants: 'Відбір рослин', density: 'Відбір (об'ємна щільність)' };
+  var services = rec.services || [];
+  var rowNum = 1;
+  services.forEach(function(svc) {
+    var ss = (window.OS && window.OS.samplingServices && window.OS.samplingServices[svc]) || {};
+    var price = ss.price || 0;
+    var probes = rec.probes_total || 0;
+    var area   = rec.total_area   || 0;
+    var fields = rec.fields_count || 0;
+    var sum    = price * probes;
+    tableBody.push([
+      { text: rowNum++, fontSize: 8.5, color: '#000', alignment: 'center' },
+      { text: svcNames[svc] || svc, fontSize: 8.5, color: '#000' },
+      { text: fields,  fontSize: 8.5, color: '#000', alignment: 'center' },
+      { text: area,    fontSize: 8.5, color: '#000', alignment: 'right' },
+      { text: probes,  fontSize: 8.5, color: '#000', alignment: 'center' },
+      { text: price > 0 ? price.toLocaleString('uk-UA', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—', fontSize: 8.5, color: '#000', alignment: 'right' },
+      { text: sum > 0 ? sum.toLocaleString('uk-UA', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—', fontSize: 8.5, color: '#000', alignment: 'right' },
+    ]);
+  });
+  if (services.length === 0) {
+    tableBody.push([
+      { text: '1', fontSize: 8.5, color: '#000', alignment: 'center' },
+      { text: 'Послуга відбору ґрунту', fontSize: 8.5, color: '#000' },
+      { text: rec.fields_count||'—', fontSize: 8.5, color: '#000', alignment: 'center' },
+      { text: rec.total_area||'—',   fontSize: 8.5, color: '#000', alignment: 'right' },
+      { text: rec.probes_total||'—', fontSize: 8.5, color: '#000', alignment: 'center' },
+      { text: '—', fontSize: 8.5, color: '#000', alignment: 'right' },
+      { text: total > 0 ? total.toLocaleString('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—', fontSize: 8.5, color: '#000', alignment: 'right' },
+    ]);
+  }
+
+  var fmtUAH = function(n){ return n.toLocaleString('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  var purpose = 'оплата за послуги відбору проб за рахунком ' + orderNum + ' від ' + invoiceDate;
+
+  var docDef = {
+    pageSize: 'A4',
+    pageMargins: [36, 24, 36, 40],
+    defaultStyle: { font: 'Helvetica', fontSize: 9, color: '#000' },
+    content: [
+      { columns: [
+          { width: 120, stack: [
+              { text: 'LABA.', fontSize: 22, bold: true, color: '#000', lineHeight: 1 },
+              { text: 'by Zemlerob', fontSize: 8, color: '#000' },
+          ]},
+          { stack: [
+              { text: 'РАХУНОК НА ОПЛАТУ', fontSize: 13, bold: true, alignment: 'right', color: '#000' },
+              { text: invoiceDate, fontSize: 8.5, color: '#000', alignment: 'right', margin: [0,3,0,0] },
+          ]}
+        ], margin: [0,0,0,10]
+      },
+      { columns: [
+          { stack: [{ text: 'ЗАМОВЛЕННЯ', fontSize: 7.5, color: '#888', bold: true }, { text: orderNum, fontSize: 10, bold: true, color: '#000', margin: [0,2,0,0] }] },
+          { stack: [{ text: 'ДІЙСНИЙ ДО', fontSize: 7.5, color: '#888', bold: true }, { text: dueDate, fontSize: 10, bold: true, color: '#000', margin: [0,2,0,0] }], alignment: 'right' },
+        ], margin: [0,0,0,4]
+      },
+      { text: 'Рахунок № ' + orderNum + ' від ' + invoiceDate, fontSize: 10, bold: true, color: '#000', alignment: 'center', margin: [0,13,0,4] },
+      { canvas: [{ type:'line', x1:0, y1:0, x2:523, y2:0, lineWidth:0.5, lineColor:'#ccc' }], margin:[0,0,0,8] },
+      { columns: [
+          { width: '50%', stack: [
+              { text: 'ПОСТАЧАЛЬНИК', fontSize: 7.5, bold: true, color: '#888', margin: [0,0,0,4] },
+              { text: SELLER.name, fontSize: 8.5, bold: true, color: '#000', lineHeight: 1.2 },
+              { text: 'Код за ЄДРПОУ: ' + SELLER.edrpou, fontSize: 8, color: '#333', margin: [0,2,0,0] },
+              { text: 'п/р ' + SELLER.iban, fontSize: 8, color: '#333' },
+              { text: 'у банку ' + SELLER.bank + ', МФО ' + SELLER.mfo, fontSize: 8, color: '#333' },
+              { text: SELLER.address, fontSize: 8, color: '#333' },
+            ], margin: [0,0,16,0]
+          },
+          { width: '50%', stack: [
+              { text: 'ПЛАТНИК', fontSize: 7.5, bold: true, color: '#888', margin: [0,0,0,4] },
+            ].concat(buyerLines)
+          }
+        ], margin: [0,0,0,8]
+      },
+      { canvas: [{ type:'line', x1:0, y1:0, x2:523, y2:0, lineWidth:0.5, lineColor:'#ccc' }], margin:[0,0,0,6] },
+      { text: 'ПОСЛУГИ ЗА ЗАМОВЛЕННЯМ', fontSize: 9, bold: true, color: '#000', margin: [0,0,0,4] },
+      {
+        table: { headerRows: 1, widths: [16, '*', 36, 42, 36, 48, 52], body: tableBody },
+        layout: {
+          hLineWidth: function(i, node) { return i === 0 || i === 1 || i === node.table.body.length ? 1 : 0.5; },
+          vLineWidth: function() { return 0.5; },
+          hLineColor: function() { return '#d8dce8'; },
+          vLineColor: function() { return '#d8dce8'; },
+          paddingLeft: function() { return 5; },
+          paddingRight: function() { return 5; },
+          paddingTop: function() { return 3; },
+          paddingBottom: function() { return 3; },
+        },
+        margin: [0,0,0,8]
+      },
+      { columns: [
+          { width: '55%',
+            table: { widths: ['*'], body: [[{
+              stack: [
+                { text: 'ДЕТАЛІ ОПЛАТИ', fontSize: 7.5, bold: true, color: '#000', margin: [0,0,0,5] },
+                { text: 'Призначення платежу: ' + purpose, fontSize: 8, color: '#000', lineHeight: 1.3 },
+                { text: 'Без ПДВ', fontSize: 8, color: '#555', margin: [0,3,0,0] },
+              ], fillColor: '#f0f0f0', border: [false,false,false,false], margin: [8,8,8,8],
+            }]] },
+            layout: { defaultBorder: false }
+          },
+          { width: '5%', text: '' },
+          { width: '40%',
+            table: { widths: ['*', 'auto'], body: [
+              [{ text: 'Сума', fontSize: 11, bold: true, border: [false,false,false,false] },
+               { text: (total > 0 ? fmtUAH(total) : '—') + '
+грн', fontSize: 11, bold: true, alignment: 'right', border: [false,false,false,false] }],
+            ]},
+            layout: { defaultBorder: false }, margin: [0,6,0,0]
+          }
+        ], margin: [0,0,0,8]
+      },
+      { canvas: [{ type:'line', x1:0, y1:0, x2:523, y2:0, lineWidth:0.5, lineColor:'#ccc' }], margin:[0,0,0,5] },
+      { text: 'Примітка. Рахунок дійсний протягом 7 календарних днів з дати виставлення. Послуга надається тільки після надходження 50% коштів на розрахунковий рахунок.', fontSize: 8, italics: true, color: '#555', margin: [0,0,0,10] },
+      { columns: [
+          { stack: [{ text: 'ГАРЯЧА ЛІНІЯ', fontSize: 7.5, bold: true, color: '#888' }, { text: SELLER.phone, fontSize: 8.5, color: '#000', margin: [0,2,0,0] }], width: '50%' },
+          { stack: [{ text: 'САЙТ', fontSize: 7.5, bold: true, color: '#888' }, { text: SELLER.site, fontSize: 8.5, color: '#000', margin: [0,2,0,0] }], width: '50%' },
+        ]
+      },
+    ],
+    footer: function(currentPage, pageCount) {
+      return { columns: [
+        { text: 'LABA by Zemlerob · Відбір проб ґрунту', fontSize: 7, color: '#333', margin: [40,10,0,0] },
+        { text: 'Сторінка ' + currentPage + ' з ' + pageCount, fontSize: 7, color: '#333', alignment: 'right', margin: [0,10,40,0] },
+      ]};
+    },
+  };
+
+  pdfMake.fonts = {
+    Helvetica: {
+      normal:      'LiberationSans-Regular.ttf',
+      bold:        'LiberationSans-Bold.ttf',
+      italics:     'LiberationSans-Italic.ttf',
+      bolditalics: 'LiberationSans-BoldItalic.ttf',
+    }
+  };
+
+  var safeDate = invoiceDate.replace(/\./g, '-');
+  pdfMake.createPdf(docDef).download('Рахунок_' + orderNum + '_' + safeDate + '.pdf');
 }
 
 function osStartOver() {
