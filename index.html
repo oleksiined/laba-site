@@ -14636,6 +14636,10 @@ function osSubmitOrder() {
 
   // Зберегти в Supabase
   if (typeof SUPABASE_URL !== 'undefined' && typeof SUPABASE_ANON_KEY !== 'undefined') {
+    // Ensure services is always a proper JS array (never a string)
+    record.services = Array.isArray(record.services) ? record.services : (record.services ? String(record.services).split(',') : []);
+    console.log('Saving order to Supabase, services type:', typeof record.services, 'value:', JSON.stringify(record.services));
+    var body = JSON.stringify(record);
     fetch(SUPABASE_URL + '/rest/v1/sampling_orders', {
       method: 'POST',
       headers: {
@@ -14644,14 +14648,28 @@ function osSubmitOrder() {
         'Content-Type':  'application/json',
         'Prefer':        'return=representation',
       },
-      body: JSON.stringify(record),
+      body: body,
     }).then(function(res) {
       if (res.ok) {
         console.log('sampling_orders saved OK', num);
       } else {
         res.text().then(function(txt) {
           console.error('sampling_orders save error ' + res.status + ':', txt);
-          showToast('Помилка збереження: ' + res.status + ' — ' + txt.slice(0, 200));
+          // If distance_km column missing, retry without it
+          if (txt.indexOf('distance_km') >= 0) {
+            var r2 = Object.assign({}, record);
+            delete r2.distance_km;
+            fetch(SUPABASE_URL + '/rest/v1/sampling_orders', {
+              method: 'POST',
+              headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+              body: JSON.stringify(r2),
+            }).then(function(res2) {
+              if (res2.ok) { console.log('sampling_orders saved OK (without distance_km)', num); }
+              else { res2.text().then(function(t2){ console.error('sampling_orders retry error:', t2); showToast('Помилка: ' + t2.slice(0,150)); }); }
+            });
+          } else {
+            showToast('Помилка збереження: ' + res.status + ' — ' + txt.slice(0, 200));
+          }
         });
       }
     }).catch(function(e) {
