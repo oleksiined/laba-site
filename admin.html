@@ -6540,7 +6540,7 @@ function esc(s) {
 async function blogSave() {
   const slug    = document.getElementById('bf-slug')?.value?.trim();
   const title   = document.getElementById('bf-title')?.value?.trim();
-  if (!slug || !title) { alert('Slug та заголовок обов'язкові'); return; }
+  if (!slug || !title) { alert('Slug та заголовок обов’язкові'); return; }
 
   const payload = {
     slug,
