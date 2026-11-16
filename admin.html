@@ -6195,12 +6195,22 @@ function _settShowSaved(id) {
 
 // ── SAMPLING ORDERS (Відбір) ─────────────────────────────────
 let _sampItems = [];
+const _SAMP_URL = 'https://lczccbminjzefmmehntq.supabase.co';
+const _SAMP_KEY = 'sb_publishable_Axo6-4xZHWuXXlUY2zU5lA_lPbz2eFn';
+function _sampFetch(params) {
+  return fetch(`${_SAMP_URL}/rest/v1/sampling_orders?${params}`, {
+    headers: { apikey: _SAMP_KEY, Authorization: 'Bearer ' + _SAMP_KEY, Accept: 'application/json' }
+  }).then(r => r.ok ? r.json() : []).catch(() => []);
+}
 
 function samplingLoad() {
-  // Load from laba_sampling_orders in localStorage (written by osSubmitOrder on main site)
-  try { _sampItems = JSON.parse(localStorage.getItem('laba_sampling_orders') || '[]'); } catch(e) { _sampItems = []; }
-  samplingRender();
-  samplingUpdateBadge();
+  const el = document.getElementById('sampBody');
+  if (el) el.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-soft)">Завантаження…</div>';
+  _sampFetch('order=created_at.desc&limit=200').then(function(rows) {
+    _sampItems = Array.isArray(rows) ? rows : [];
+    samplingRender();
+    samplingUpdateBadge();
+  });
 }
 
 function samplingRender() {
@@ -6254,7 +6264,7 @@ function samplingRender() {
         <td><div class="adm-order-client">${r.contact_name||'—'}</div><div class="adm-order-contact">${r.contact_phone||''}</div></td>
         <td>${fields}</td>
         <td>${r.probes_total||'—'}</td>
-        <td>${r.date_label||'—'}</td>
+        <td>${r.visit_date_label||r.date_label||'—'}</td>
         <td><span class="adm-status ${st.cls}">${st.label}</span></td>
         <td>
           <select class="adm-filter-sel" style="font-size:11px;padding:3px 6px;min-width:110px" onchange="samplingSetStatus('${r.order_number}',this.value)">
@@ -6272,9 +6282,14 @@ function samplingSetStatus(orderNum, newStatus) {
   const idx = _sampItems.findIndex(r => r.order_number === orderNum);
   if (idx < 0) return;
   _sampItems[idx].status = newStatus;
-  try { localStorage.setItem('laba_sampling_orders', JSON.stringify(_sampItems)); } catch(e) {}
   samplingRender();
   samplingUpdateBadge();
+  fetch(`${_SAMP_URL}/rest/v1/sampling_orders?order_number=eq.${encodeURIComponent(orderNum)}`, {
+    method: 'PATCH',
+    headers: { apikey: _SAMP_KEY, Authorization: 'Bearer ' + _SAMP_KEY,
+               'Content-Type': 'application/json', Prefer: 'return=minimal' },
+    body: JSON.stringify({ status: newStatus }),
+  }).catch(function(e) { console.warn('samplingSetStatus error:', e); });
 }
 
 function samplingUpdateBadge() {
