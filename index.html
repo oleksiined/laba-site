@@ -6442,8 +6442,8 @@ var BLOG_ARTICLES = {};
 var _blogLoaded = false;
 
 function _renderBlogCard(art, slug) {
-  var imgHtml = art.cover_url
-    ? '<img class="blog-card-photo" src="' + art.cover_url + '" alt="' + art.title.replace(/"/g,'&quot;') + '" loading="lazy" style="height:210px;object-fit:cover">'
+  var imgHtml = (art.cover_url || art.cover)
+    ? '<img class="blog-card-photo" src="' + (art.cover_url || art.cover) + '" alt="' + art.title.replace(/"/g,'&quot;') + '" loading="lazy" style="height:210px;object-fit:cover">'
     : '<div class="blog-card-photo" style="height:210px;background:' + (art.gradient||'#c8dbd0') + '"></div>';
   var catStyle = art.cat_color ? ' style="background:' + art.cat_color + '"' : '';
   return '<div class="blog-card" data-cat="' + (art.cat_filter||'all') + '" onclick="navigateToArticle(\'' + slug + '\')">' +
