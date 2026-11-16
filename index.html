@@ -6868,25 +6868,27 @@ var _artTocResizeHandler = null;
 
 function _artTocPosition() {
   var toc = document.getElementById('art-toc');
+  var grid = document.querySelector('.article-with-toc');
   var main = document.querySelector('.article-main');
-  if (!toc || !main) return;
+  if (!toc || !grid || !main) return;
+  if (window.innerWidth <= 960) { toc.classList.remove('toc-visible'); return; }
+  var gridRect = grid.getBoundingClientRect();
   var mainRect = main.getBoundingClientRect();
+  // Position ToC in the right column of the grid
   var left = mainRect.right + 24;
-  var maxRight = window.innerWidth - 16;
-  if (left + 240 > maxRight) { toc.classList.remove('toc-visible'); return; }
+  if (left + 240 > window.innerWidth - 8) { toc.classList.remove('toc-visible'); return; }
   toc.style.left = left + 'px';
-  // Align top with first h2 in article, clamped to nav height
+  toc.style.width = (gridRect.right - mainRect.right - 32) + 'px';
+  // Top: align with first h2 when it's visible, then clamp to nav
   var firstH2 = main.querySelector('h2.article-h2');
-  var navH = 76;
+  var navH = 80;
+  var top = navH;
   if (firstH2) {
-    var h2rect = firstH2.getBoundingClientRect();
-    var desiredTop = Math.max(navH, h2rect.top);
-    toc.style.top = desiredTop + 'px';
-    toc.style.maxHeight = (window.innerHeight - desiredTop - 20) + 'px';
-  } else {
-    toc.style.top = navH + 'px';
-    toc.style.maxHeight = (window.innerHeight - navH - 20) + 'px';
+    var h2top = firstH2.getBoundingClientRect().top;
+    top = h2top > navH ? h2top : navH;
   }
+  toc.style.top = top + 'px';
+  toc.style.maxHeight = (window.innerHeight - top - 20) + 'px';
   toc.classList.add('toc-visible');
 }
 
