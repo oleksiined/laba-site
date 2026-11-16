@@ -6446,7 +6446,7 @@ function _renderBlogCard(art, slug) {
     ? '<img class="blog-card-photo" src="' + art.cover_url + '" alt="' + art.title.replace(/"/g,'&quot;') + '" loading="lazy" style="height:210px;object-fit:cover">'
     : '<div class="blog-card-photo" style="height:210px;background:' + (art.gradient||'#c8dbd0') + '"></div>';
   var catStyle = art.cat_color ? ' style="background:' + art.cat_color + '"' : '';
-  return '<div class="blog-card" data-cat="' + (art.cat_filter||'all') + '" onclick="navigateToArticle('' + slug + '')">' +
+  return '<div class="blog-card" data-cat="' + (art.cat_filter||'all') + '" onclick="navigateToArticle(\'' + slug + '\')">' +
     '<div class="blog-card-media">' + imgHtml +
     '<span class="blog-card-cat"' + catStyle + '>' + (art.category||'') + '</span>' +
     '<span class="blog-card-time">' + (art.read_time||'') + '</span>' +
@@ -14932,16 +14932,14 @@ function osf_downloadInvoice() {
   var tableBody = [[
     { text: '№',                     color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'center' },
     { text: 'Послуга',               color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0' },
-    { text: 'К-сть
-полів',          color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'center' },
+    { text: 'К-сть\nполів',          color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'center' },
     { text: 'Площа, га',             color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'right' },
-    { text: 'К-сть
-проб',           color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'center' },
+    { text: 'К-сть\nпроб',           color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'center' },
     { text: 'Ціна, грн',             color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'right' },
     { text: 'Сума, грн',             color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'right' },
   ]];
 
-  var svcNames = { soil: 'Відбір ґрунту (агрохімія)', moisture: 'Відбір ґрунту (волога)', plants: 'Відбір рослин', density: 'Відбір (об'ємна щільність)' };
+  var svcNames = { soil: 'Відбір ґрунту (агрохімія)', moisture: 'Відбір ґрунту (волога)', plants: 'Відбір рослин', density: 'Відбір (об’ємна щільність)' };
   var services = rec.services || [];
   var rowNum = 1;
   services.forEach(function(svc) {
@@ -15046,8 +15044,7 @@ function osf_downloadInvoice() {
           { width: '40%',
             table: { widths: ['*', 'auto'], body: [
               [{ text: 'Сума', fontSize: 11, bold: true, border: [false,false,false,false] },
-               { text: (total > 0 ? fmtUAH(total) : '—') + '
-грн', fontSize: 11, bold: true, alignment: 'right', border: [false,false,false,false] }],
+               { text: (total > 0 ? fmtUAH(total) : '—') + '\nгрн', fontSize: 11, bold: true, alignment: 'right', border: [false,false,false,false] }],
             ]},
             layout: { defaultBorder: false }, margin: [0,6,0,0]
           }
