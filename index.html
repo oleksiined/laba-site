@@ -4519,6 +4519,111 @@ main{flex:1}
 </div>
 
 
+<!-- ══ PAGE: OS CONFIRM ══ -->
+<div class="page" id="page-os-confirm">
+<main>
+  <div class="container">
+    <div class="page-hd" style="margin-bottom:28px">
+      <h1 class="page-title">Заявку прийнято!</h1>
+      <p class="page-sub">Дякуємо! Ваша заявка на відбір ґрунту оформлена.</p>
+    </div>
+    <div class="page-grid">
+      <!-- LEFT -->
+      <div>
+        <!-- Success card -->
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:28px 24px;margin-bottom:20px">
+          <div style="display:flex;align-items:flex-start;gap:20px">
+            <div style="width:56px;height:56px;background:#eef6ff;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 14l6 6L22 8" stroke="var(--neon)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <h2 style="font-size:18px;font-weight:700;color:var(--t1);margin-bottom:6px">Заявку успішно оформлено</h2>
+              <p style="font-size:13.5px;color:var(--t3);margin-bottom:10px">Менеджер зателефонує на <span id="oscf-phone" style="color:var(--t2);font-weight:500">—</span> для підтвердження виїзду</p>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <span style="font-size:15px;font-weight:700;color:var(--t1)" id="oscf-order-num">ВД-000000-000</span>
+                <span style="background:#fff8e6;color:#c07000;border:1px solid #f5d97a;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600">Нова заявка</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Що далі -->
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:24px;margin-bottom:20px">
+          <h3 style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:18px">Що далі?</h3>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;gap:14px;align-items:flex-start">
+              <div class="ncf-step-num" style="width:28px;height:28px;border-radius:50%;background:var(--neon);color:#242729;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:2px">Менеджер зателефонує</div>
+                <div style="font-size:13px;color:var(--t3)" id="oscf-call-hint">Протягом 1 робочого дня для підтвердження виїзду</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:14px;align-items:flex-start">
+              <div class="ncf-step-num" style="width:28px;height:28px;border-radius:50%;background:var(--neon);color:#242729;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:2px">Узгодимо дату та час</div>
+                <div style="font-size:13px;color:var(--t3)" id="oscf-date-hint">Визначимо зручний день виїзду агронома</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:14px;align-items:flex-start">
+              <div class="ncf-step-num" style="width:28px;height:28px;border-radius:50%;background:var(--neon);color:#242729;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:2px">Відбір зразків у полі</div>
+                <div style="font-size:13px;color:var(--t3)">Агроном приїде та відбере зразки ґрунту згідно з замовленням</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:14px;align-items:flex-start">
+              <div class="ncf-step-num" style="width:28px;height:28px;border-radius:50%;background:var(--neon);color:#242729;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:2px">Результати аналізів</div>
+                <div style="font-size:13px;color:var(--t3)">Лабораторні результати будуть готові у встановлений термін — ми повідомимо</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Контакт -->
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:24px">
+          <h3 style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:16px">Питання?</h3>
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--bd);border-radius:var(--r-sm)">
+            <div style="width:40px;height:40px;background:#f4f6fb;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M17.5 14.09v2.26a1.5 1.5 0 01-1.64 1.5A14.84 14.84 0 012.15 4.14 1.5 1.5 0 013.64 2.5h2.26a1.5 1.5 0 011.5 1.29 9.63 9.63 0 00.52 2.1 1.5 1.5 0 01-.34 1.58L6.59 8.46a12 12 0 005.95 5.95l.99-1.0a1.5 1.5 0 011.58-.34c.69.22 1.4.38 2.1.52a1.5 1.5 0 011.29 1.5z" stroke="var(--t3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div style="font-size:14px;font-weight:600;color:var(--t1)">Контакт-центр</div>
+              <div style="font-size:12.5px;color:var(--t3)">097 816 46 78 · <a href="mailto:order@zemlerob.com.ua" style="color:var(--t2)">order@zemlerob.com.ua</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDEBAR -->
+      <aside>
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:24px;margin-bottom:16px">
+          <h3 style="font-size:15px;font-weight:700;color:var(--t1);margin-bottom:16px">Ваша заявка</h3>
+          <div id="oscf-fields-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px"></div>
+          <div style="border-top:1px solid var(--bd);padding-top:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:14px;font-weight:700;color:var(--t1)">Орієнтовно</span>
+              <span style="font-size:16px;font-weight:700;color:var(--t1)" id="oscf-price-est">— грн</span>
+            </div>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:20px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5A7.5 7.5 0 1 1 1.5 9 7.5 7.5 0 0 1 9 1.5z" stroke="var(--t3)" stroke-width="1.4"/><path d="M9 8.25v3.75M9 6h.008" stroke="var(--t3)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span style="font-size:13px;color:var(--t2);font-weight:600">Потрібна допомога?</span>
+          </div>
+          <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:2px">097 816 46 78</div>
+          <div style="font-size:12px;color:var(--t3)">Пн–Пт, 09:00–18:00</div>
+        </div>
+        <button class="btn-primary" style="width:100%;margin-top:14px;padding:12px" onclick="osStartOver()">Нова заявка на відбір</button>
+      </aside>
+    </div>
+  </div>
+</main>
+</div>
+
 <!-- ══ PAGE: PAYMENT ══ -->
 <div class="page" id="page-payment">
   <div class="payment-layout">
@@ -9049,7 +9154,7 @@ function showToast(msg,ms=2500){
   localStorage.removeItem('laba_notes');
 
   // Відкриваємо сторінку з хешу або Головну
-  const _ALL_PAGES=['home','services','about','contacts','checkout','calculator','sampling','order-sampling','blog','article','status','methods','payment','confirm','samples','contract'];
+  const _ALL_PAGES=['home','services','about','contacts','checkout','calculator','sampling','order-sampling','blog','article','status','methods','payment','confirm','samples','contract','os-confirm'];
   function _navigateFromHash(hash) {
     if(hash.startsWith('#card-')){
       navigate('services');
@@ -14479,9 +14584,9 @@ function osSubmitOrder() {
     fields_count:      OS.fields.length,
     total_area:        Math.round(totalHa * 10) / 10,
     probes_total:      totalProbes,
-    services:          OS.services.slice(),
-    mode:              OS.mode,
-    delivery:          OS.delivery,
+    services:          OS.services.join(','),
+    mode:              OS.mode || '',
+    delivery:          OS.delivery || '',
     visit_date:        visitDate,
     visit_date_label:  OS.date ? (OS.date.day + ' ' + OS.date.month) : '',
     location:          (document.getElementById('osLocationInput')||{}).value || '',
@@ -14494,7 +14599,6 @@ function osSubmitOrder() {
     ready_harvest:     (document.getElementById('osReady1')||{checked:false}).checked,
     ready_data:        (document.getElementById('osReady2')||{checked:false}).checked,
     ready_stubble:     (document.getElementById('osReady3')||{checked:false}).checked,
-    fields_data:       OS.fields,
     price_estimate:    priceEstimate || null,
   };
 
@@ -14506,17 +14610,24 @@ function osSubmitOrder() {
         'apikey':        SUPABASE_ANON_KEY,
         'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
         'Content-Type':  'application/json',
-        'Prefer':        'return=minimal',
+        'Prefer':        'return=representation',
       },
       body: JSON.stringify(record),
     }).then(function(res) {
-      if (!res.ok) {
+      if (res.ok) {
+        console.log('sampling_orders saved OK', num);
+      } else {
         res.text().then(function(txt) {
           console.error('sampling_orders save error ' + res.status + ':', txt);
-          showToast('Помилка збереження в базу: ' + res.status + ' — ' + txt.slice(0, 120));
+          showToast('Помилка збереження: ' + res.status + ' — ' + txt.slice(0, 200));
         });
       }
-    }).catch(function(e) { console.warn('sampling_orders network error:', e); });
+    }).catch(function(e) {
+      console.warn('sampling_orders network error:', e);
+      showToast('Мережева помилка збереження заявки');
+    });
+  } else {
+    console.warn('Supabase not configured — order saved to localStorage only');
   }
 
   // Також у localStorage як fallback
@@ -14526,10 +14637,36 @@ function osSubmitOrder() {
   items.unshift(lsRecord);
   try { localStorage.setItem('laba_sampling_orders', JSON.stringify(items.slice(0, 100))); } catch(e) {}
 
-  document.getElementById('confirmOrderNum').textContent = num;
-  var _hint = document.getElementById('confirmDeliveryHint');
-  if (_hint) _hint.innerHTML = '<strong>Менеджер зателефонує</strong> для узгодження дати та часу виїзду';
-  navigate('confirm');
+  // Fill os-confirm page
+  var _el = document.getElementById('oscf-order-num');
+  if (_el) _el.textContent = num;
+  var _ph = document.getElementById('oscf-phone');
+  if (_ph) _ph.textContent = record.contact_phone || record.contact_name || '—';
+  if (record.visit_date_label) {
+    var _dh = document.getElementById('oscf-date-hint');
+    if (_dh) _dh.textContent = 'Запланована дата: ' + record.visit_date_label;
+  }
+  // Price estimate
+  var _pe = document.getElementById('oscf-price-est');
+  if (_pe) _pe.textContent = priceEstimate ? Math.round(priceEstimate).toLocaleString('uk-UA') + ' грн' : 'за запитом';
+  // Fields list
+  var _fl = document.getElementById('oscf-fields-list');
+  if (_fl && OS.fields && OS.fields.length) {
+    _fl.innerHTML = OS.fields.map(function(f) {
+      var ha = f.area ? f.area + ' га' : '';
+      return '<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)">' +
+        '<span style="color:var(--t1);font-weight:500">' + (f.name || ('Поле ' + (OS.fields.indexOf(f)+1))) + (ha ? ' · <span style="color:var(--t3)">' + ha + '</span>' : '') + '</span>' +
+        '<span style="color:var(--t3)">' + (f.settings && f.settings.soilPackage ? f.settings.soilPackage.replace('Базовий чекап ґрунту','Базовий') : '') + '</span>' +
+      '</div>';
+    }).join('');
+  }
+  navigate('os-confirm');
+}
+
+function osStartOver() {
+  OS = { step: 1, services: [], fields: [], mode: 'grid', delivery: 'pickup', date: null, samplingServices: null };
+  navigate('order-sampling');
+  setTimeout(function() { osInit(); }, 100);
 }
 
 function osSaveDraft() { /* stub */ }

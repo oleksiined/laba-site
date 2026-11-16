@@ -2376,6 +2376,8 @@ async function admLoad() {
   admInit();
   // Load results in background so Results tab is populated on first open
   resLoadFromDb();
+  // Load sampling orders in background (badge update + ready when tab opens)
+  samplingLoad();
 }
 
 // Автооновлення кожні 30 хвилин
@@ -2519,13 +2521,8 @@ function admInit() {
   setT('admBadgeOrders', all);
   const totalSamples = _admOrders.reduce((s,o)=>s+(o.samples||0), 0);
   setT('admBadgeSamples', totalSamples);
-  // Sampling badge
-  try {
-    const sampItems = JSON.parse(localStorage.getItem('laba_sampling_orders')||'[]');
-    const sampNew = sampItems.filter(r=>r.status==='new').length;
-    const badge = document.getElementById('admBadgeSampling');
-    if (badge) { badge.textContent = sampNew; badge.style.display = sampNew > 0 ? 'inline-block' : 'none'; }
-  } catch(e) {}
+  // Sampling badge — read from Supabase _sampItems (async update)
+  samplingUpdateBadge();
   // Update quick-filter counts
   const qNew  = _admOrders.filter(o=>o.status==='new').length;
   const qWork = _admOrders.filter(o=>o.status==='work').length;
