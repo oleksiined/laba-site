@@ -14505,7 +14505,8 @@ function osCalcAreaHa(latLngs) {
 }
 
 function osDefaultFieldSettings() {
-  var _firstPkg = (typeof SERVICES !== 'undefined' && SERVICES.soil && SERVICES.soil.packages && SERVICES.soil.packages.length) ? SERVICES.soil.packages[0].name : '';
+  var _soilPkgs = (typeof SERVICES !== 'undefined' && SERVICES.soil && SERVICES.soil.packages) ? SERVICES.soil.packages : [];
+  var _firstPkg = _soilPkgs.find(function(p){ return p.name === 'Базовий чекап ґрунту'; }) ? 'Базовий чекап ґрунту' : (_soilPkgs.length ? _soilPkgs[0].name : 'Базовий чекап ґрунту');
   return { culture:'Пшениця озима', fieldState:'Посіви', soilScheme:'За сіткою', areaPerProbe:2, depth:'0–30 см', soilPackage:_firstPkg, moisturePlacement:'На карті', moistureCount:6, moistureLayers:'3 шари', plantsCount:10, densityCount:10, densityLayers:'1 шар (0–15 см)' };
 }
 
@@ -14621,12 +14622,13 @@ function osRenderFieldBody(f, i) {
   var hasSoil = OS.services.includes('soil');
   var hasMoisture = OS.services.includes('moisture');
   var probes = osCalcProbes(f.areaHa, s.areaPerProbe);
-  // Normalize soilPackage: if stored value not in current options, use first available
+  // Normalize soilPackage: if stored value not in current options, use 'Базовий чекап ґрунту' or first available
   if (hasSoil) {
     var _pkgOpts = osSoilPkgOptions();
     if (_pkgOpts.length && !_pkgOpts.includes(s.soilPackage)) {
-      s.soilPackage = _pkgOpts[0];
-      OS.fields[i].settings.soilPackage = _pkgOpts[0];
+      var _fallback = _pkgOpts.includes('Базовий чекап ґрунту') ? 'Базовий чекап ґрунту' : _pkgOpts[0];
+      s.soilPackage = _fallback;
+      OS.fields[i].settings.soilPackage = _fallback;
     }
   }
   var soilSection = hasSoil ? (
