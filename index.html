@@ -11299,12 +11299,19 @@ async function loadCatalogFromSupabase() {
       if (!key) continue;
       const existing = NC_CATALOG.packages[key] || {};
       NC_CATALOG.packages[key] = {
-        id:         key,
-        name:       pkg.name || existing.name || key,
-        materialId: matKey,
-        price:      pkg.price,
-        termDays:   pkg.turnaround_value || existing.termDays || 5,
-        included:   pkgIncluded[pkg.package_id] || existing.included || [],
+        id:              key,
+        name:            pkg.name || existing.name || key,
+        materialId:      matKey,
+        price:           pkg.price,
+        termDays:        pkg.turnaround_value || existing.termDays || 5,
+        included:        pkgIncluded[pkg.package_id] || existing.included || [],
+        minSamplesCount: pkg.min_samples_count != null ? parseInt(pkg.min_samples_count, 10) || 1 : 1,
+        billingUnit:     pkg.billing_unit || 'sample',
+        minSampleQty:    pkg.min_sample_quantity || null,
+        sampleQtyUnit:   pkg.sample_quantity_unit || null,
+        indicatorsCount: pkg.indicators_count != null ? parseInt(pkg.indicators_count, 10) || null : null,
+        vatIncluded:     pkg.vat_included === true || pkg.vat_included === 'TRUE',
+        packageId:       pkg.package_id,
       };
     }
 
@@ -11315,11 +11322,14 @@ async function loadCatalogFromSupabase() {
       if (!key) continue;
       const existing = NS_CAT.packages[key] || {};
       NS_CAT.packages[key] = {
-        name:       pkg.name || existing.name || key,
-        materialId: matKey,
-        price:      pkg.price,
-        termDays:   pkg.turnaround_value || existing.termDays || 5,
-        included:   pkgIncluded[pkg.package_id] || existing.included || [],
+        name:            pkg.name || existing.name || key,
+        materialId:      matKey,
+        price:           pkg.price,
+        termDays:        pkg.turnaround_value || existing.termDays || 5,
+        included:        pkgIncluded[pkg.package_id] || existing.included || [],
+        minSamplesCount: pkg.min_samples_count != null ? parseInt(pkg.min_samples_count, 10) || 1 : 1,
+        billingUnit:     pkg.billing_unit || 'sample',
+        packageId:       pkg.package_id,
       };
     }
 
@@ -11378,6 +11388,8 @@ async function loadCatalogFromSupabase() {
         material: _matKeyToLabel[mk] || mk,
         days:     pkg.turnaround_value || 5,
         tags:     pkgTags(pkg.package_id), tasks:[], params:[], bundles:[],
+        minSamplesCount: pkg.min_samples_count != null ? parseInt(pkg.min_samples_count, 10) || 1 : 1,
+        billingUnit:     pkg.billing_unit || 'sample',
         seasonal: (function(){
           if (!pkg.is_seasonal) return false;
           // Якщо є дати — перевіряємо чи зараз в діапазоні
@@ -11415,7 +11427,11 @@ async function loadCatalogFromSupabase() {
         keywords:   svc.search_keywords || '',
         groups:     svc.group_name ? [svc.group_name] : [],
         methods:    svcMethods[svc.service_id] || [],
-        exampleUrl: svc.report_example_url || null,
+        exampleUrl:          svc.report_example_url || null,
+        methodSelectionMode: svc.method_selection_mode || 'fixed',
+        orderable:           svc.orderable_standalone !== false,
+        turnaround:          svc.turnaround_value || null,
+        turnaroundUnit:      svc.turnaround_unit || null,
       });
     }
     // ── Показуємо тільки матеріали з Supabase ──
