@@ -14977,11 +14977,48 @@ function osSubmitOrder() {
         console.log('sampling_orders saved OK', num);
         _osFinishOrder(record, num);
       } else {
-        var fallbackNum = buildOrderNum(Math.floor(Math.random()*9000)+1000);
-        record.order_number = fallbackNum;
         console.error('sampling_orders save error ' + r.status + ':', JSON.stringify(r.data));
-        showToast('Помилка збереження: ' + r.status);
-        _osFinishOrder(record, fallbackNum);
+        var errText = JSON.stringify(r.data);
+        // If unknown columns, retry with only base columns
+        var newCols = ['payer_company','payer_edrpou','payer_type','buh_email','payment_method','contact_name','contact_phone','contact_email','comment'];
+        var hasNewCol = newCols.some(function(c){ return errText.indexOf(c) >= 0; });
+        if (hasNewCol) {
+          var r2 = {
+            order_number: null, status: record.status,
+            fields_count: record.fields_count, total_area: record.total_area,
+            probes_total: record.probes_total, services: record.services,
+            mode: record.mode, delivery: record.delivery,
+            visit_date: record.visit_date, visit_date_label: record.visit_date_label,
+            location: record.location, distance_km: record.distance_km,
+            contact_role: record.contact_role, contact_available: record.contact_available,
+            ready_harvest: record.ready_harvest, ready_data: record.ready_data,
+            ready_stubble: record.ready_stubble, price_estimate: record.price_estimate,
+          };
+          fetch(SUPABASE_URL + '/rest/v1/sampling_orders', {
+            method: 'POST',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+            body: JSON.stringify(r2),
+          }).then(function(res2) {
+            return res2.json().then(function(d2){ return { ok: res2.ok, data: d2 }; });
+          }).then(function(r2r) {
+            var fallbackNum = buildOrderNum(r2r.ok && r2r.data && r2r.data[0] ? r2r.data[0].id : (Math.floor(Math.random()*9000)+1000));
+            record.order_number = fallbackNum;
+            if (r2r.ok && r2r.data && r2r.data[0] && r2r.data[0].id) {
+              fetch(SUPABASE_URL + '/rest/v1/sampling_orders?id=eq.' + r2r.data[0].id, {
+                method: 'PATCH',
+                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ order_number: fallbackNum }),
+              });
+            }
+            console.log('sampling_orders saved (compat mode)', fallbackNum);
+            _osFinishOrder(record, fallbackNum);
+          });
+        } else {
+          var fallbackNum = buildOrderNum(Math.floor(Math.random()*9000)+1000);
+          record.order_number = fallbackNum;
+          showToast('Помилка збереження: ' + r.status);
+          _osFinishOrder(record, fallbackNum);
+        }
       }
     }).catch(function(e) {
       var fallbackNum = buildOrderNum(Math.floor(Math.random()*9000)+1000);
