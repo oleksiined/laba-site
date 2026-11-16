@@ -1768,7 +1768,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 /* ══ ARTICLE TOC ══ */
 .article-with-toc{display:grid;grid-template-columns:1fr 260px;gap:48px;align-items:start;max-width:1280px;margin:0 auto;padding:32px 32px 80px}
 .article-with-toc .article-main{min-width:0}
-.article-toc{position:sticky;top:88px;max-height:calc(100vh - 108px);overflow-y:auto;align-self:start}
+.article-toc{position:sticky;top:80px;max-height:calc(100vh - 100px);overflow-y:auto;align-self:start}
 .article-toc-inner{background:var(--white);border:1px solid var(--border-soft);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow-sm)}
 .article-toc-title{font-size:11px;font-weight:800;color:var(--text-soft);letter-spacing:.8px;text-transform:uppercase;margin:0 0 12px}
 .article-toc-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
@@ -6853,8 +6853,18 @@ function navigateToArticle(slug) {
   try { history.pushState({page:'article', slug: slug}, '', '#article=' + slug); } catch(e){}
   navigate('article');
   window.scrollTo(0, 0);
-  // Activate ToC scroll spy
-  _artTocSpyInit();
+  // Align ToC top with #art-content, then activate scroll spy
+  setTimeout(function() {
+    var toc = document.getElementById('art-toc');
+    var content = document.getElementById('art-content');
+    var grid = document.querySelector('.article-with-toc');
+    if (toc && content && grid) {
+      var gridTop = grid.getBoundingClientRect().top + window.scrollY;
+      var contentTop = content.getBoundingClientRect().top + window.scrollY;
+      toc.style.marginTop = (contentTop - gridTop) + 'px';
+    }
+    _artTocSpyInit();
+  }, 50);
 }
 function artTocClick(e, id) {
   e.preventDefault();
