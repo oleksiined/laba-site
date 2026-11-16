@@ -2349,7 +2349,7 @@ main{flex:1}
 .search-row{display:flex;gap:8px;margin-bottom:12px}
 .search-inp{flex:1;padding:7px 10px 7px 32px;border:1.5px solid var(--bd);border-radius:var(--r-sm);font-size:13.5px;color:var(--t1);outline:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 10px center;transition:border-color .15s}
 .search-inp:focus{border-color:var(--neon-dark)}
-.cat-sel{padding:7px 10px;border:1.5px solid var(--bd);border-radius:var(--r-sm);font-size:13.5px;color:var(--t2);outline:none;background:#fff;cursor:pointer;transition:border-color .15s;appearance:auto;flex-shrink:0;max-width:160px;min-width:0}
+.cat-sel{padding:7px 10px;border:1.5px solid var(--bd);border-radius:var(--r-sm);font-size:13px;color:var(--t2);outline:none;background:#fff;cursor:pointer;transition:border-color .15s;appearance:auto;flex-shrink:0;max-width:140px;min-width:100px;overflow:hidden;text-overflow:ellipsis}
 .cat-sel:focus{border-color:var(--neon-dark)}
 .ind-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;min-width:0}
 .add-ind-btn{display:flex;align-items:center;gap:7px;padding:8px 10px;border:1.5px solid var(--bd);border-radius:var(--r-sm);background:#fff;font-size:13px;color:var(--t2);transition:all .15s;text-align:left;width:100%}
@@ -4485,7 +4485,7 @@ main{flex:1}
               <p style="font-size:13.5px;color:var(--t3);margin-bottom:10px">Ми надіслали підтвердження та рахунок на <span id="ncf-email" style="color:var(--t2);font-weight:500">—</span></p>
               <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
                 <span style="font-size:15px;font-weight:700;color:var(--t1)" id="ncf-order-num">№ LAB-000000-0000</span>
-                <span id="ncf-pay-badge" style="background:#fff8e6;color:#c07000;border:1px solid #f5d97a;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600">Очікує оплату</span>
+
               </div>
             </div>
           </div>
@@ -4536,26 +4536,7 @@ main{flex:1}
           </div>
         </div>
 
-        <!-- Передавання зразків -->
-        <div style="background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:24px">
-          <h3 style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:16px">Передавання зразків</h3>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <a href="https://novaposhta.ua" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--bd);border-radius:var(--r-sm);cursor:pointer;text-decoration:none">
-              <div style="width:40px;height:40px;background:#f4f6fb;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="7" width="14" height="10" rx="2" stroke="var(--t3)" stroke-width="1.5"/><path d="M7 7V5a3 3 0 016 0v2" stroke="var(--t3)" stroke-width="1.5" stroke-linecap="round"/></svg>
-              </div>
-              <div style="flex:1">
-                <div style="font-size:14px;font-weight:600;color:var(--t1)">Нова пошта</div>
-                <div style="font-size:12.5px;color:var(--t3)">Відділення № 120, м. Київ, отримувач LABA</div>
-              </div>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="var(--t3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-
-          </div>
-        </div>
-      </div>
-
-      <!-- RIGHT SIDEBAR -->
+            <!-- RIGHT SIDEBAR -->
       <aside id="ncf-sidebar">
         <!-- rendered by ncf_renderSidebar() -->
       </aside>
@@ -10926,13 +10907,18 @@ function renderAdd() {
         <div class="pkg-opt-term">До ${p.termDays} робочих днів</div>
       </div>`).join('')}
     </div>`).join('');
+  const _selPkg = NC_CATALOG.packages[nc_A.pkgId] || {};
+  const _minSamp = parseInt(_selPkg.minSamplesCount || _selPkg.min_samples_count || 1, 10) || 1;
+  const _stepSamp = _minSamp > 1 ? _minSamp : 1;
+  if (nc_A.qty < _minSamp) nc_A.qty = _minSamp;
+  if (_stepSamp > 1 && nc_A.qty % _stepSamp !== 0) nc_A.qty = Math.ceil(nc_A.qty / _stepSamp) * _stepSamp;
   document.getElementById('add-body').innerHTML = groupsHtml + `
     <div class="qty-wrap">
-      <span class="qty-lbl">Кількість зразків</span>
+      <span class="qty-lbl">Кількість зразків${_stepSamp > 1 ? ' <span style=\'font-size:11px;color:var(--t3);font-weight:400\'>(кратно ${_stepSamp})</span>' : ''}</span>
       <div class="qty-stp">
-        <button class="qty-btn" onclick="nc_A.qty=Math.max(1,nc_A.qty-1);renderAdd()" ${nc_A.qty<=1?'disabled':''}>−</button>
+        <button class="qty-btn" onclick="nc_A.qty=Math.max(${_minSamp},nc_A.qty-${_stepSamp});renderAdd()" ${nc_A.qty<=_minSamp?'disabled':''}>−</button>
         <span class="qty-val">${nc_A.qty}</span>
-        <button class="qty-btn" onclick="nc_A.qty=Math.min(99,nc_A.qty+1);renderAdd()" ${nc_A.qty>=99?'disabled':''}>+</button>
+        <button class="qty-btn" onclick="nc_A.qty=Math.min(99,nc_A.qty+${_stepSamp});renderAdd()" ${nc_A.qty>=99?'disabled':''}>+</button>
       </div>
     </div>
     <div class="add-preview">
@@ -11180,10 +11166,10 @@ async function _sbFetch(table, params = '') {
 async function loadCatalogFromSupabase() {
   try {
     const [services, packages, pkgItems, methods, materials, serviceChips] = await Promise.all([
-      _sbFetch('catalog_services',      'select=*&or=(status.in.(active,draft),status.is.null)&order=sort_order.asc.nullslast,service_id'),
-      _sbFetch('catalog_packages',      'select=*&or=(status.in.(active,draft),status.is.null)&order=sort_order.asc.nullslast,package_id'),
+      _sbFetch('catalog_services',      'select=*&or=(status.eq.active,status.is.null)&order=sort_order.asc.nullslast,service_id'),
+      _sbFetch('catalog_packages',      'select=*&or=(status.eq.active,status.is.null)&order=sort_order.asc.nullslast,package_id'),
       _sbFetch('catalog_package_items', 'select=*'),
-      _sbFetch('catalog_methods',       'select=*&or=(status.in.(active,draft),status.is.null)&order=sort_order.asc.nullslast,method_id').catch(e=>{console.warn('methods fetch:',e);return[];}),
+      _sbFetch('catalog_methods',       'select=*&or=(status.eq.active,status.is.null)&order=sort_order.asc.nullslast,method_id').catch(e=>{console.warn('methods fetch:',e);return[];}),
       _sbFetch('catalog_materials',     'select=material_id,name,status,sort_order&order=sort_order.asc.nullslast,material_id').catch(e=>{console.warn('materials fetch:',e);return[];}),
       _sbFetch('catalog_service_chips', 'select=*&order=sort_order.asc.nullslast,label').catch(e=>{console.warn('service_chips fetch:',e);return[];}),
     ]);
@@ -11399,7 +11385,7 @@ async function loadCatalogFromSupabase() {
     // Build service lookup for package keyword enrichment (reuse _svcById built above)
     const svcById = _svcById;
     for (const pkg of packages) {
-      if (pkg.status !== 'active' && pkg.status !== 'draft') continue;
+      if (pkg.status !== 'active' && pkg.status != null) continue;
       const mk = _matIdToKey[_pkgMatId(pkg)] || 'soil';
       const sk = _matKeyToSvcKey[mk] || mk;
       if (!SERVICES[sk]) continue;
@@ -11430,7 +11416,7 @@ async function loadCatalogFromSupabase() {
       });
     }
     for (const svc of services) {
-      if (svc.status !== 'active' && svc.status !== 'draft') continue;
+      if (svc.status !== 'active' && svc.status != null) continue;
       if (svc.orderable_standalone === false) continue;
       const mk = _matIdToKey[_normMatId(svc.material_id)];
       if (!mk) continue; // немає матеріалу — пропускаємо, щоб не забруднювати 'soil'
@@ -12603,7 +12589,7 @@ function ncf_renderSidebar() {
     <div style="margin-bottom:4px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
         <span style="font-size:14px;font-weight:700;color:var(--t1)">Рахунок № ${invoiceSeq}</span>
-        ${window._ncfPaidViaLiqpay ? '<span style="background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;border-radius:20px;padding:3px 10px;font-size:11.5px;font-weight:600;white-space:nowrap">Оплачено</span>' : '<span style="background:#fff8e6;color:#c07000;border:1px solid #f5d97a;border-radius:20px;padding:3px 10px;font-size:11.5px;font-weight:600;white-space:nowrap">Очікує оплату</span>'}
+        
       </div>
       <div style="font-size:12.5px;color:var(--t3);margin-bottom:12px">Сформовано ${o.date || '—'}</div>
       <button onclick="ncf_downloadInvoice()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;background:#fff;border:1.5px solid var(--bd);border-radius:var(--r-sm);font-size:14px;font-weight:600;color:var(--t1);cursor:pointer;font-family:inherit;transition:background .15s;box-sizing:border-box" onmouseover="this.style.background='#f6f8fc'" onmouseout="this.style.background='#fff'">
@@ -12611,7 +12597,7 @@ function ncf_renderSidebar() {
         Завантажити PDF
       </button>
       <div style="text-align:center;margin-top:10px">
-        <a href="#" onclick="toast('Рахунок надіслано повторно');return false" style="font-size:13px;color:var(--t3);text-decoration:none">Надіслати рахунок повторно</a>
+
       </div>
     </div>
 
