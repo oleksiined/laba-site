@@ -6461,9 +6461,9 @@ function _renderBlogCard(art, slug) {
 // Blog uses _sbFetch which is defined later; provide it here if not yet available
 async function _sbFetchBlog(table, params) {
   if (typeof _sbFetch === 'function') return _sbFetch(table, params);
-  var url = (typeof SUPABASE_URL !== 'undefined' ? SUPABASE_URL : '') + '/rest/v1/' + table + '?' + (params||'');
-  var key = typeof SUPABASE_ANON_KEY !== 'undefined' ? SUPABASE_ANON_KEY : '';
-  var r = await fetch(url, { headers: { 'apikey': key, 'Authorization': 'Bearer ' + key } });
+  var _url = 'https://lczccbminjzefmmehntq.supabase.co';
+  var _key = 'sb_publishable_Axo6-4xZHWuXXlUY2zU5lA_lPbz2eFn';
+  var r = await fetch(_url + '/rest/v1/' + table + '?' + (params||''), { headers: { 'apikey': _key, 'Authorization': 'Bearer ' + _key } });
   if (!r.ok) throw new Error('Supabase ' + table + ': ' + r.status);
   return r.json();
 }

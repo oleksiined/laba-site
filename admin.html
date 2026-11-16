@@ -6489,7 +6489,7 @@ function blogOpenModal(art) {
           <label style="font-size:12px;font-weight:600;color:var(--text-mid);display:block;margin-bottom:4px">Обкладинка</label>
           <div style="display:flex;gap:10px;align-items:flex-start">
             <div id="bf-cover-preview" style="width:120px;min-width:120px;height:72px;border-radius:8px;background:var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-soft)">
-              ${v.cover_url ? \`<img src="\${esc(v.cover_url)}" style="width:100%;height:100%;object-fit:cover">\` : 'Немає фото'}
+              ${v.cover_url ? '<img src="' + esc(v.cover_url) + '" style="width:100%;height:100%;object-fit:cover">' : 'Немає фото'}
             </div>
             <div style="flex:1;display:flex;flex-direction:column;gap:6px">
               <input id="bf-cover_url" value="${esc(v.cover_url)}" oninput="blogCoverPreview(this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;box-sizing:border-box" placeholder="https://...">
@@ -6602,7 +6602,7 @@ async function blogUploadCover(input) {
 async function blogSave() {
   const slug    = document.getElementById('bf-slug')?.value?.trim();
   const title   = document.getElementById('bf-title')?.value?.trim();
-  if (!slug || !title) { alert(‘Slug та заголовок обов’язкові’); return; }
+  if (!slug || !title) { alert("Slug та заголовок обов'язкові"); return; }
 
   const payload = {
     slug,
