@@ -3356,6 +3356,13 @@ main{flex:1}
 .os-step4-placeholder p{font-size:14px;color:var(--text-soft)}
 /* Step 4 review */
 .os-review-block{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px;width:100%;box-sizing:border-box}
+.os-price-block{background:var(--white);border:2px solid var(--green);border-radius:var(--radius-lg);padding:20px 20px 16px;margin-bottom:16px}
+.os-price-title{font-size:13px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.os-price-line{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--text-mid);padding:3px 0}
+.os-price-line-label{color:var(--text-soft)}
+.os-price-divider{border:none;border-top:1px solid var(--border);margin:10px 0}
+.os-price-total{display:flex;justify-content:space-between;align-items:center;font-size:17px;font-weight:800;color:var(--navy)}
+.os-price-note{font-size:11px;color:var(--text-soft);margin-top:8px}
 .os-review-block-title{font-size:13px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.06em;padding:14px 20px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .os-review-edit-btn{background:none;border:none;cursor:pointer;font-size:12px;color:var(--text-mid);padding:0;font-weight:600;text-transform:none;letter-spacing:0;flex-shrink:0}
 .os-review-edit-btn:hover{color:var(--navy)}
@@ -14317,10 +14324,45 @@ var OS = {
 };
 
 /* ── Init ── */
+function osSoilPkgOptions() {
+  var pkgs = (typeof SERVICES !== 'undefined' && SERVICES.soil && SERVICES.soil.packages) ? SERVICES.soil.packages : [];
+  if (pkgs.length) return pkgs.map(function(p){ return p.name; });
+  return ['Базова оцінка ґрунту','Розширена оцінка ґрунту','Агрохімічний аналіз','Мікроелементи','Повний аналіз'];
+}
+
 function osInit() {
   osRenderSidebar();
   osRenderDates();
   if (OS.map1) { OS.map1.invalidateSize(); }
+  // Завантажуємо ціни послуг відбору з Supabase
+  if (typeof _sbFetch === 'function') {
+    _sbFetch('sampling_services', 'is_active=eq.true&order=sort_order').then(function(rows) {
+      if (!Array.isArray(rows)) return;
+      OS.samplingServices = {};
+      rows.forEach(function(r) { OS.samplingServices[r.service_key] = r; });
+      osApplySamplingPrices();
+    }).catch(function(){});
+  }
+}
+
+function osApplySamplingPrices() {
+  var ss = OS.samplingServices || {};
+  document.querySelectorAll('.os-service-card[data-svc]').forEach(function(card) {
+    var key = card.dataset.svc;
+    var svc = ss[key];
+    if (!svc) return;
+    var priceEl = card.querySelector('.os-service-price');
+    var descEl  = card.querySelector('.os-service-desc');
+    if (priceEl) priceEl.innerHTML = svc.price + ' грн <span>/ ' + svc.unit + '</span>';
+    if (descEl && svc.description) {
+      var minPart = svc.min_units ? ' · від ' + svc.min_units + ' ' + svc.unit : '';
+      descEl.textContent = svc.description + minPart;
+    } else if (descEl && svc.min_units) {
+      // оновити тільки мінімум
+      var cap = svc.unit.charAt(0).toUpperCase() + svc.unit.slice(1);
+      descEl.textContent = 'Від ' + svc.min_units + ' ' + svc.unit;
+    }
+  });
 }
 
 /* ── Contact checkboxes ── */
@@ -14590,7 +14632,7 @@ function osRenderFieldBody(f, i) {
     + '</div>'
     + '<div class="os-form-row-2">'
     + (OS.mode !== 'only' ? '<div>'
-    + osSelect('Пакет досліджень','soil_pkg_'+i,['Базова оцінка ґрунту','Розширена оцінка ґрунту','Агрохімічний аналіз','Мікроелементи','Повний аналіз'],s.soilPackage,"osFieldChange("+i+",'soilPackage',this.value)")
+    + osSelect('Пакет досліджень','soil_pkg_'+i, osSoilPkgOptions(), s.soilPackage,"osFieldChange("+i+",'soilPackage',this.value)")
     + '<a class="os-proto-link" onclick="return false" href="#" style="margin-top:4px">Переглянути протокол</a>'
     + '</div>' : '')
     + '<div class="os-form-group" style="justify-content:flex-end">'
@@ -15037,6 +15079,67 @@ function osRenderStep4() {
   }
   if (contactEmail) html += row('Email', osEsc(contactEmail));
   html += '</div></div>';
+
+  // ── Block 4: Вартість ──
+  if (OS.services.length && OS.samplingServices) {
+    var ss = OS.samplingServices;
+    var priceLines = [];
+    var grandTotal = 0;
+    var hasPkgPrice = false;
+
+    if (hasSoil) {
+      var soilSvc = ss['soil'];
+      if (soilSvc) {
+        // Відбір: к-ть проб * ціна за пробу
+        var soilCost = totalProbes * soilSvc.price;
+        priceLines.push({ label: 'Відбір ґрунту · ' + totalProbes + ' проб × ' + soilSvc.price + ' грн', val: soilCost });
+        grandTotal += soilCost;
+        // Пакет дослідження
+        if (OS.mode !== 'only') {
+          var pkgName = (OS.fields[0] && OS.fields[0].settings.soilPackage) || '';
+          var soilPkgs = (typeof SERVICES !== 'undefined' && SERVICES.soil) ? SERVICES.soil.packages : [];
+          var pkg = soilPkgs.find(function(p){ return p.name === pkgName; });
+          if (pkg && pkg.price) {
+            var pkgCost = totalProbes * pkg.price;
+            priceLines.push({ label: pkgName + ' · ' + totalProbes + ' проб × ' + pkg.price + ' грн', val: pkgCost });
+            grandTotal += pkgCost;
+            hasPkgPrice = true;
+          } else if (pkgName) {
+            priceLines.push({ label: pkgName, val: null });
+          }
+        }
+      }
+    }
+    ['moisture','plants','density'].forEach(function(key) {
+      if (!OS.services.includes(key)) return;
+      var svc = ss[key];
+      if (!svc) return;
+      // Для вологи/рослин/щільності — рахуємо точки з полів (або мінімум)
+      var units = OS.fields.reduce(function(sum, f) {
+        var s = f.settings || {};
+        if (key === 'moisture') return sum + (s.moistureCount || 0);
+        return sum;
+      }, 0) || svc.min_units;
+      var cost = units * svc.price;
+      priceLines.push({ label: svc.name + ' · ' + units + ' ' + svc.unit + ' × ' + svc.price + ' грн', val: cost });
+      grandTotal += cost;
+    });
+
+    if (priceLines.length) {
+      html += '<div class="os-price-block">';
+      html += '<div class="os-price-title">Орієнтовна вартість</div>';
+      priceLines.forEach(function(l) {
+        html += '<div class="os-price-line"><span class="os-price-line-label">' + osEsc(l.label) + '</span>';
+        html += '<span>' + (l.val !== null ? l.val.toLocaleString('uk-UA') + ' грн' : 'за запитом') + '</span></div>';
+      });
+      html += '<hr class="os-price-divider">';
+      html += '<div class="os-price-total"><span>Разом</span><span>' + grandTotal.toLocaleString('uk-UA') + ' грн</span></div>';
+      if (!hasPkgPrice && OS.mode !== 'only') {
+        html += '<div class="os-price-note">* Вартість дослідження буде розраховано після підтвердження пакету</div>';
+      }
+      html += '</div>';
+    }
+  }
 
   el.innerHTML = html;
 }
