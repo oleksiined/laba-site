@@ -6465,7 +6465,7 @@ function _renderBlogCard(art, slug) {
     '</div><div class="blog-card-body">' +
     '<div class="blog-card-title">' + art.title + '</div>' +
     '<p class="blog-card-excerpt">' + (art.meta_desc||'') + '</p>' +
-    '<div class="blog-card-footer"><button class="blog-card-read">Читати →</button></div>' +
+    '<div class="blog-card-footer">' + (art.date ? '<span class="blog-card-meta"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 1v2M11 1v2M1 6h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>' + art.date + '</span>' : '') + '<button class="blog-card-read">Читати →</button></div>' +
     '</div></div>';
 }
 
@@ -6606,7 +6606,7 @@ async function navigateToArticle(slug) {
   var tocList = document.getElementById('art-toc-list');
   var tocSide = document.getElementById('art-toc');
   if (tocList && contentEl) {
-    var headings = contentEl.querySelectorAll('h2.article-h2');
+    var headings = contentEl.querySelectorAll('h2');
     if (headings.length >= 2) {
       var tocHtml = '';
       headings.forEach(function(h, i) {
