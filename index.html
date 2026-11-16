@@ -14042,6 +14042,18 @@ function toast(msg) {
           </div>
         </div>
 
+        <!-- Location -->
+        <div class="os-section">
+          <div class="os-section-title">Куди приїхати?</div>
+          <div class="os-location-section">
+            <div class="os-location-left">
+              <div class="os-location-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+              <input class="os-location-input" id="osLocationInput" placeholder="Населений пункт або адреса" type="text" oninput="osLocationInputChange()">
+            </div>
+          </div>
+          <p class="os-location-status" id="osLocationStatus" style="display:none">Точку заїзду позначено</p>
+        </div>
+
         <!-- Upload -->
         <div class="os-section">
           <div class="os-section-title">Додайте контури полів</div>
@@ -14058,18 +14070,6 @@ function toast(msg) {
           <input type="file" id="osFileInput" accept=".kml,.kmz,.geojson,.json,.zip" style="display:none" onchange="osHandleFile(this.files[0])">
           <div id="osFileList"></div>
 
-        </div>
-
-        <!-- Location -->
-        <div class="os-section">
-          <div class="os-section-title">Куди приїхати?</div>
-          <div class="os-location-section">
-            <div class="os-location-left">
-              <div class="os-location-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-              <input class="os-location-input" id="osLocationInput" placeholder="Населений пункт або адреса" type="text" oninput="osLocationInputChange()">
-            </div>
-          </div>
-          <p class="os-location-status" id="osLocationStatus" style="display:none">Точку заїзду позначено</p>
         </div>
 
         <div id="osFieldsSection" style="display:none">
@@ -14698,13 +14698,43 @@ function osRenderDates() {
   OS.date = OS.dates[1]; // default: 2nd available date
   el.innerHTML = OS.dates.map(function(d, idx){
     return '<button class="os-date-btn' + (idx===1?' selected':'') + '" onclick="osSelectDate(this,'+idx+')">' + d.day + ' ' + d.month + '</button>';
-  }).join('') + '<button class="os-date-btn" onclick="osSelectDate(this,-1)">Інша дата</button>';
+  }).join('') + '<button class="os-date-btn" onclick="osPickOtherDate(this)" id="osDateOtherBtn">Інша дата</button>' +
+    '<input type="date" id="osDatePicker" style="display:none;position:absolute;opacity:0;pointer-events:none" onchange="osApplyPickedDate(this.value)">';
 }
 
 function osSelectDate(el, idx) {
   document.querySelectorAll('.os-date-btn').forEach(function(b){ b.classList.remove('selected'); });
   el.classList.add('selected');
   OS.date = idx >= 0 ? OS.dates[idx] : null;
+  osRenderSidebar();
+}
+
+function osPickOtherDate(btn) {
+  var picker = document.getElementById('osDatePicker');
+  if (!picker) return;
+  // Set min date to tomorrow
+  var tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+  picker.min = tomorrow.toISOString().slice(0,10);
+  picker.style.position = 'absolute';
+  picker.style.opacity = '0';
+  picker.style.pointerEvents = 'none';
+  picker.style.display = 'block';
+  picker.showPicker ? picker.showPicker() : picker.click();
+}
+
+function osApplyPickedDate(val) {
+  if (!val) return;
+  var months = ['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
+  var d = new Date(val + 'T00:00:00');
+  var day = d.getDate(), month = months[d.getMonth()];
+  OS.date = { day: day, month: month, ts: d.getTime(), custom: true };
+  // Update button label
+  var btn = document.getElementById('osDateOtherBtn');
+  if (btn) {
+    document.querySelectorAll('.os-date-btn').forEach(function(b){ b.classList.remove('selected'); });
+    btn.textContent = day + ' ' + month;
+    btn.classList.add('selected');
+  }
   osRenderSidebar();
 }
 
