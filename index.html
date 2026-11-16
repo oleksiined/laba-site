@@ -3320,6 +3320,22 @@ main{flex:1}
 .os-date-btn{padding:10px 18px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-weight:600;color:var(--navy);background:var(--white);cursor:pointer;transition:border-color .15s,background .15s}
 .os-date-btn:hover{border-color:#a0cc30}
 .os-date-btn.selected{background:#CCFF00;border-color:#a0cc30;color:#111}
+/* custom calendar */
+.os-cal-wrap{position:relative;display:inline-block}
+.os-cal-popup{display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:200;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:14px;min-width:260px}
+.os-cal-popup.open{display:block}
+.os-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.os-cal-nav{background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;font-size:16px;color:var(--navy);line-height:1}
+.os-cal-nav:hover{background:#f1f5f9}
+.os-cal-title{font-size:14px;font-weight:600;color:var(--navy)}
+.os-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.os-cal-dow{font-size:11px;color:var(--text-soft);text-align:center;padding:2px 0;font-weight:600}
+.os-cal-day{background:none;border:none;cursor:pointer;border-radius:6px;padding:5px 0;font-size:13px;color:var(--navy);text-align:center;line-height:1.3}
+.os-cal-day:hover:not(:disabled){background:#f1f5f9}
+.os-cal-day.today{font-weight:700;color:var(--green)}
+.os-cal-day.selected{background:var(--green);color:#fff!important}
+.os-cal-day:disabled{color:#ccc;cursor:default}
+.os-cal-day.other-month{color:#ccc}
 /* readiness */
 .os-readiness-grid{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 .os-readiness-row{display:flex;align-items:center;gap:8px}
@@ -14158,11 +14174,11 @@ function toast(msg) {
           <div class="os-form-label" style="margin-bottom:8px">Готовність до відбору</div>
           <div class="os-readiness-grid">
             <div class="os-readiness-row">
-              <input type="checkbox" id="osReady1" checked>
+              <input type="checkbox" id="osReady1">
               <label for="osReady1">Збір урожаю / обробіток завершено</label>
             </div>
             <div class="os-readiness-row">
-              <input type="checkbox" id="osReady2" checked>
+              <input type="checkbox" id="osReady2">
               <label for="osReady2">Дані про останні внесення й обробки заповнено</label>
             </div>
             <div class="os-readiness-row">
@@ -14698,8 +14714,7 @@ function osRenderDates() {
   OS.date = OS.dates[1]; // default: 2nd available date
   el.innerHTML = OS.dates.map(function(d, idx){
     return '<button class="os-date-btn' + (idx===1?' selected':'') + '" onclick="osSelectDate(this,'+idx+')">' + d.day + ' ' + d.month + '</button>';
-  }).join('') + '<button class="os-date-btn" onclick="osPickOtherDate(this)" id="osDateOtherBtn">Інша дата</button>' +
-    '<input type="date" id="osDatePicker" style="display:none;position:absolute;opacity:0;pointer-events:none" onchange="osApplyPickedDate(this.value)">';
+  }).join('') + '<span class="os-cal-wrap" id="osCalWrap"><button class="os-date-btn" onclick="osToggleCal(this)" id="osDateOtherBtn">Інша дата</button><div class="os-cal-popup" id="osCalPopup"></div></span>';
 }
 
 function osSelectDate(el, idx) {
@@ -14709,32 +14724,81 @@ function osSelectDate(el, idx) {
   osRenderSidebar();
 }
 
-function osPickOtherDate(btn) {
-  var picker = document.getElementById('osDatePicker');
-  if (!picker) return;
-  // Set min date to tomorrow
-  var tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
-  picker.min = tomorrow.toISOString().slice(0,10);
-  picker.style.position = 'absolute';
-  picker.style.opacity = '0';
-  picker.style.pointerEvents = 'none';
-  picker.style.display = 'block';
-  picker.showPicker ? picker.showPicker() : picker.click();
+var _osCalYear, _osCalMonth;
+
+function osToggleCal(btn) {
+  var popup = document.getElementById('osCalPopup');
+  if (!popup) return;
+  if (popup.classList.contains('open')) { popup.classList.remove('open'); return; }
+  var now = new Date();
+  _osCalYear = now.getFullYear();
+  _osCalMonth = now.getMonth();
+  osRenderCal();
+  popup.classList.add('open');
+  // close on outside click
+  setTimeout(function(){
+    document.addEventListener('click', osCalOutside, {once:true, capture:true});
+  }, 10);
 }
 
-function osApplyPickedDate(val) {
-  if (!val) return;
+function osCalOutside(e) {
+  var wrap = document.getElementById('osCalWrap');
+  if (wrap && wrap.contains(e.target)) { document.addEventListener('click', osCalOutside, {once:true, capture:true}); return; }
+  var popup = document.getElementById('osCalPopup');
+  if (popup) popup.classList.remove('open');
+}
+
+function osCalNav(dir) {
+  _osCalMonth += dir;
+  if (_osCalMonth < 0) { _osCalMonth = 11; _osCalYear--; }
+  if (_osCalMonth > 11) { _osCalMonth = 0; _osCalYear++; }
+  osRenderCal();
+}
+
+function osRenderCal() {
+  var popup = document.getElementById('osCalPopup');
+  if (!popup) return;
+  var monthNames = ['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
+  var dowNames = ['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
+  var today = new Date(); today.setHours(0,0,0,0);
+  var tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+  var firstDay = new Date(_osCalYear, _osCalMonth, 1);
+  var lastDay = new Date(_osCalYear, _osCalMonth+1, 0);
+  // Monday-first offset
+  var startDow = (firstDay.getDay()+6)%7;
+  var html = '<div class="os-cal-head">' +
+    '<button class="os-cal-nav" onclick="osCalNav(-1);event.stopPropagation()">&#8249;</button>' +
+    '<span class="os-cal-title">' + monthNames[_osCalMonth] + ' ' + _osCalYear + '</span>' +
+    '<button class="os-cal-nav" onclick="osCalNav(1);event.stopPropagation()">&#8250;</button>' +
+    '</div><div class="os-cal-grid">';
+  dowNames.forEach(function(d){ html += '<div class="os-cal-dow">'+d+'</div>'; });
+  for (var i=0;i<startDow;i++) html += '<div></div>';
+  for (var d=1;d<=lastDay.getDate();d++) {
+    var dt = new Date(_osCalYear, _osCalMonth, d);
+    var isToday = dt.getTime()===today.getTime();
+    var disabled = dt < tomorrow;
+    var isSel = OS.date && OS.date.custom && OS.date.ts === dt.getTime();
+    var cls = 'os-cal-day' + (isToday?' today':'') + (isSel?' selected':'') + (dt.getTime()<firstDay.getTime()?' other-month':'');
+    var ts = dt.getTime();
+    html += '<button class="'+cls+'"' + (disabled?' disabled':'') + ' onclick="osPickCalDay('+ts+');event.stopPropagation()">'+d+'</button>';
+  }
+  html += '</div>';
+  popup.innerHTML = html;
+}
+
+function osPickCalDay(ts) {
   var months = ['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
-  var d = new Date(val + 'T00:00:00');
+  var d = new Date(ts);
   var day = d.getDate(), month = months[d.getMonth()];
-  OS.date = { day: day, month: month, ts: d.getTime(), custom: true };
-  // Update button label
+  OS.date = { day: day, month: month, ts: ts, custom: true };
   var btn = document.getElementById('osDateOtherBtn');
   if (btn) {
     document.querySelectorAll('.os-date-btn').forEach(function(b){ b.classList.remove('selected'); });
     btn.textContent = day + ' ' + month;
     btn.classList.add('selected');
   }
+  var popup = document.getElementById('osCalPopup');
+  if (popup) popup.classList.remove('open');
   osRenderSidebar();
 }
 
