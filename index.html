@@ -13436,7 +13436,7 @@ function toast(msg) {
               <input class="os-location-input" id="osLocationInput" placeholder="Населений пункт або адреса" type="text" oninput="osLocationInputChange()">
             </div>
           </div>
-          <p class="os-location-status" id="osLocationStatus" style="display:none">Точку заїзду позначено</p>
+          <p class="os-location-status" id="osLocationStatus" style="display:none"></p>
         </div>
 
         <!-- Upload -->
@@ -13794,10 +13794,33 @@ function osToggleMap1() {
   if (!fs) return;
   if (fs.style.display === 'block') { fs.style.display = 'none'; } else { fs.style.display = 'block'; setTimeout(function(){ if(OS.map1) OS.map1.invalidateSize(); },100); }
 }
+var _osLocTimer = null;
+// Base: Cherkasy office
+var OS_BASE_LAT = 49.4444, OS_BASE_LNG = 32.0598;
+function osHaversine(lat1, lng1, lat2, lng2) {
+  var R = 6371, dLat = (lat2-lat1)*Math.PI/180, dLng = (lng2-lng1)*Math.PI/180;
+  var a = Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
 function osLocationInputChange() {
   var val = (document.getElementById('osLocationInput')||{}).value||'';
   var st = document.getElementById('osLocationStatus');
-  if (st) st.style.display = val ? '' : 'none';
+  if (!val) { if(st){st.style.display='none';st.textContent='';} osRenderSidebar(); return; }
+  if(st){st.style.display='';st.textContent='Пошук...';}
+  clearTimeout(_osLocTimer);
+  _osLocTimer = setTimeout(function(){
+    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(val)+',+Ukraine',{headers:{'Accept-Language':'uk'}})
+      .then(function(r){return r.json();})
+      .then(function(data){
+        if(!data||!data.length){if(st){st.textContent='Місце не знайдено';} return;}
+        var lat=parseFloat(data[0].lat), lng=parseFloat(data[0].lon);
+        var dist=Math.round(osHaversine(OS_BASE_LAT,OS_BASE_LNG,lat,lng));
+        if(st){st.textContent='📍 '+data[0].display_name.split(',')[0]+' — ~'+dist+' км від бази (Черкаси)';}
+        OS._locLat=lat; OS._locLng=lng; OS._locDist=dist;
+        osRenderSidebar();
+      })
+      .catch(function(){if(st){st.textContent='Не вдалося визначити відстань';}});
+  }, 700);
   osRenderSidebar();
 }
 
@@ -14590,6 +14613,7 @@ function osSubmitOrder() {
     visit_date:        visitDate,
     visit_date_label:  OS.date ? (OS.date.day + ' ' + OS.date.month) : '',
     location:          (document.getElementById('osLocationInput')||{}).value || '',
+    distance_km:       OS._locDist || null,
     contact_name:      (document.getElementById('osContactName')||{}).value || '',
     contact_phone:     (document.getElementById('osContactPhone')||{}).value || '',
     contact_email:     (document.getElementById('osContactEmail')||{}).value || '',
