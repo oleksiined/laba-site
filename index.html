@@ -15252,7 +15252,14 @@ function osSubmitOrder() {
         'Prefer':        'return=minimal',
       },
       body: JSON.stringify(record),
-    }).catch(function(e) { console.warn('sampling_orders save failed:', e); });
+    }).then(function(res) {
+      if (!res.ok) {
+        res.text().then(function(txt) {
+          console.error('sampling_orders save error ' + res.status + ':', txt);
+          showToast('Помилка збереження в базу: ' + res.status + ' — ' + txt.slice(0, 120));
+        });
+      }
+    }).catch(function(e) { console.warn('sampling_orders network error:', e); });
   }
 
   // Також у localStorage як fallback
@@ -15263,12 +15270,14 @@ function osSubmitOrder() {
   try { localStorage.setItem('laba_sampling_orders', JSON.stringify(items.slice(0, 100))); } catch(e) {}
 
   showToast('Заявку ' + num + ' збережено');
+  cabUpdateSamplingBadge();
   setTimeout(function() {
     navigate('cab');
     setTimeout(function() {
       var btn = document.querySelector('.cab-nav2-item[onclick*="sampling"]');
-      cabShowSection('sampling', btn);
-    }, 150);
+      if (btn) { cabShowSection('sampling', btn); }
+      else { cabRenderSampling(); }
+    }, 300);
   }, 600);
 }
 
