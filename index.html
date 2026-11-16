@@ -14584,7 +14584,7 @@ function osSubmitOrder() {
     fields_count:      OS.fields.length,
     total_area:        Math.round(totalHa * 10) / 10,
     probes_total:      totalProbes,
-    services:          OS.services.join(','),
+    services:          OS.services.slice(),
     mode:              OS.mode || '',
     delivery:          OS.delivery || '',
     visit_date:        visitDate,
