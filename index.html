@@ -1765,10 +1765,12 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 @media(max-width:700px){.article-products-grid{grid-template-columns:1fr}.article-related-grid{grid-template-columns:1fr}.article-checklist{grid-template-columns:1fr}.article-h1{font-size:24px}.article-outer{padding:20px 16px 60px}.article-related-wrap{padding:0 16px 60px}}
 
 /* ══ ARTICLE TOC ══ */
-.article-with-toc{display:grid;grid-template-columns:1fr 240px;gap:48px;align-items:start;max-width:1280px;margin:0 auto;padding:32px 32px 80px}
+.article-with-toc{display:grid;grid-template-columns:1fr 260px;gap:48px;align-items:start;max-width:1280px;margin:0 auto;padding:32px 32px 80px}
 .article-with-toc .article-main{min-width:0}
-.article-toc{position:-webkit-sticky;position:sticky;top:80px;max-height:calc(100vh - 100px);overflow-y:auto;align-self:start}
-.article-toc-inner{background:var(--white);border:1px solid var(--border-soft);border-radius:12px;padding:18px 20px}
+/* ToC: fixed position, shown/hidden + positioned by JS */
+.article-toc{position:fixed;top:88px;width:240px;max-height:calc(100vh - 108px);overflow-y:auto;z-index:10;display:none}
+.article-toc.toc-visible{display:block}
+.article-toc-inner{background:var(--white);border:1px solid var(--border-soft);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow-sm)}
 .article-toc-title{font-size:11px;font-weight:800;color:var(--text-soft);letter-spacing:.8px;text-transform:uppercase;margin:0 0 12px}
 .article-toc-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
 .article-toc-item a{display:block;font-size:13px;color:var(--text-mid);text-decoration:none;padding:4px 8px;border-radius:6px;border-left:2px solid transparent;line-height:1.4;transition:color .15s,background .15s,border-color .15s}
@@ -1776,7 +1778,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .article-toc-item a.active{color:var(--navy);font-weight:600;background:var(--bg);border-left-color:var(--green)}
 /* article-outer used when no ToC (fallback) */
 .article-outer{max-width:760px;margin:0 auto;padding:32px 32px 80px}
-@media(max-width:960px){.article-with-toc{grid-template-columns:1fr;padding:20px 16px 60px}.article-toc{display:none}}
+@media(max-width:960px){.article-with-toc{grid-template-columns:1fr;padding:20px 16px 60px}.article-toc{display:none!important}}
 
 /* ══ ABOUT PAGE ══ */
 .about-page{background:linear-gradient(175deg,#0a1a0a 0%,#122a12 40%,#1a3a1a 70%,#0d1f0d 100%);height:100vh;overflow:hidden}
@@ -6861,11 +6863,37 @@ function artTocClick(e, id) {
   if (el) { el.scrollIntoView({behavior:'smooth', block:'start'}); }
 }
 var _artTocSpyObs = null;
+var _artTocScrollHandler = null;
+var _artTocResizeHandler = null;
+
+function _artTocPosition() {
+  var toc = document.getElementById('art-toc');
+  var main = document.querySelector('.article-main');
+  if (!toc || !main) return;
+  var rect = main.getBoundingClientRect();
+  var left = rect.right + 24;
+  var maxRight = window.innerWidth - 16;
+  if (left + 240 > maxRight) { toc.classList.remove('toc-visible'); return; }
+  toc.style.left = left + 'px';
+  toc.classList.add('toc-visible');
+}
+
 function _artTocSpyInit() {
   if (_artTocSpyObs) { _artTocSpyObs.disconnect(); _artTocSpyObs = null; }
+  if (_artTocScrollHandler) { window.removeEventListener('scroll', _artTocScrollHandler); _artTocScrollHandler = null; }
+  if (_artTocResizeHandler) { window.removeEventListener('resize', _artTocResizeHandler); _artTocResizeHandler = null; }
   var tocLinks = document.querySelectorAll('.article-toc-item a');
   if (!tocLinks.length) return;
   var ids = Array.from(tocLinks).map(function(a){ return a.getAttribute('href').slice(1); });
+
+  // Position on scroll and resize
+  _artTocScrollHandler = _artTocPosition;
+  _artTocResizeHandler = _artTocPosition;
+  window.addEventListener('scroll', _artTocScrollHandler, {passive:true});
+  window.addEventListener('resize', _artTocResizeHandler, {passive:true});
+  setTimeout(_artTocPosition, 60);
+
+  // Scroll spy
   _artTocSpyObs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
       if (entry.isIntersecting) {
