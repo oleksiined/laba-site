@@ -6622,7 +6622,7 @@ async function navigateToArticle(slug) {
   }
   var relGrid = document.getElementById('art-related-grid');
   if (relGrid && art.related) relGrid.innerHTML = art.related.map(_buildRelatedCard).join('');
-  document.title = art.seoTitle;
+  document.title = art.seoTitle || art.title || 'LABA';
   var metaDesc = document.querySelector('meta[name="description"]');
   if (metaDesc) metaDesc.setAttribute('content', art.metaDesc);
   try { history.pushState({page:'article', slug: slug}, '', '#article=' + slug); } catch(e){}
