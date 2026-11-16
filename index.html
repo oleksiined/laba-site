@@ -13795,8 +13795,8 @@ function osToggleMap1() {
   if (fs.style.display === 'block') { fs.style.display = 'none'; } else { fs.style.display = 'block'; setTimeout(function(){ if(OS.map1) OS.map1.invalidateSize(); },100); }
 }
 var _osLocTimer = null;
-// Base: Cherkasy office
-var OS_BASE_LAT = 49.4444, OS_BASE_LNG = 32.0598;
+// Base: Cherkasy office — вул. Байди Вишневецького 36/1
+var OS_BASE_LAT = 49.4418, OS_BASE_LNG = 32.0551;
 function osLocationInputChange() {
   var val = (document.getElementById('osLocationInput')||{}).value||'';
   var st = document.getElementById('osLocationStatus');
