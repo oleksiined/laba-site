@@ -3415,7 +3415,7 @@ main{flex:1}
 .os-sb-cta-btn:hover{background:#b8e600}
 /* steps visibility */
 .os-step-panel{display:none}
-.os-step-panel.active{display:block;width:100%;min-width:0}
+.os-step-panel.active{display:flex;flex-direction:column;gap:5px;width:100%;min-width:0}
 /* bottom nav (steps 2+) */
 .os-bottom-bar-2{display:flex;align-items:center;justify-content:space-between;margin-top:20px}
 .os-back-link{background:none;border:none;cursor:pointer;font-size:14px;color:var(--text-mid);text-decoration:none;padding:0;display:inline-flex;align-items:center;gap:4px;font-weight:500}
@@ -13506,7 +13506,7 @@ function toast(msg) {
         </button>
 
         <!-- Delivery -->
-        <div id="osDeliveryBlock" class="os-section" style="margin-top:16px">
+        <div id="osDeliveryBlock" class="os-section">
           <div class="os-section-title">Куди передати зразки?</div>
           <div class="os-delivery-cards" style="margin-top:14px">
             <div class="os-delivery-card selected" data-del="laba" onclick="osSelectDelivery(this)">
