@@ -6870,11 +6870,23 @@ function _artTocPosition() {
   var toc = document.getElementById('art-toc');
   var main = document.querySelector('.article-main');
   if (!toc || !main) return;
-  var rect = main.getBoundingClientRect();
-  var left = rect.right + 24;
+  var mainRect = main.getBoundingClientRect();
+  var left = mainRect.right + 24;
   var maxRight = window.innerWidth - 16;
   if (left + 240 > maxRight) { toc.classList.remove('toc-visible'); return; }
   toc.style.left = left + 'px';
+  // Align top with first h2 in article, clamped to nav height
+  var firstH2 = main.querySelector('h2.article-h2');
+  var navH = 76;
+  if (firstH2) {
+    var h2rect = firstH2.getBoundingClientRect();
+    var desiredTop = Math.max(navH, h2rect.top);
+    toc.style.top = desiredTop + 'px';
+    toc.style.maxHeight = (window.innerHeight - desiredTop - 20) + 'px';
+  } else {
+    toc.style.top = navH + 'px';
+    toc.style.maxHeight = (window.innerHeight - navH - 20) + 'px';
+  }
   toc.classList.add('toc-visible');
 }
 
