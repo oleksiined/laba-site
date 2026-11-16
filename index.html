@@ -15155,31 +15155,74 @@ function osSubmitOrder() {
     }
   });
 
+  // Розрахунок орієнтовної ціни
+  var priceEstimate = 0;
+  var ss = OS.samplingServices || {};
+  if (OS.services.indexOf('soil') >= 0 && ss.soil) priceEstimate += totalProbes * ss.soil.price;
+  ['moisture','plants','density'].forEach(function(key) {
+    if (OS.services.indexOf(key) < 0 || !ss[key]) return;
+    var units = OS.fields.reduce(function(sum, f) {
+      return sum + (key === 'moisture' ? (f.settings.moistureCount || 0) : 0);
+    }, 0) || ss[key].min_units;
+    priceEstimate += units * ss[key].price;
+  });
+
   var now = new Date();
   var num = 'ВД-' + now.getFullYear().toString().slice(-2) +
             String(now.getMonth()+1).padStart(2,'0') +
             String(now.getDate()).padStart(2,'0') + '-' +
             String(Math.floor(Math.random()*900)+100);
 
+  var visitDate = null;
+  if (OS.date && OS.date.ts) {
+    var d = new Date(OS.date.ts);
+    visitDate = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
   var record = {
-    order_number:  num,
-    status:        'new',
-    created_at:    now.toISOString(),
-    fields_count:  OS.fields.length,
-    total_area:    Math.round(totalHa * 10) / 10,
-    probes_total:  totalProbes,
-    services:      OS.services.slice(),
-    mode:          OS.mode,
-    delivery:      OS.delivery,
-    date_label:    OS.date ? (OS.date.day + ' ' + OS.date.month) : '',
-    contact_name:  (document.getElementById('osContactName')||{}).value || '',
-    contact_phone: (document.getElementById('osContactPhone')||{}).value || '',
-    contact_email: (document.getElementById('osContactEmail')||{}).value || '',
+    order_number:      num,
+    status:            'new',
+    fields_count:      OS.fields.length,
+    total_area:        Math.round(totalHa * 10) / 10,
+    probes_total:      totalProbes,
+    services:          OS.services.slice(),
+    mode:              OS.mode,
+    delivery:          OS.delivery,
+    visit_date:        visitDate,
+    visit_date_label:  OS.date ? (OS.date.day + ' ' + OS.date.month) : '',
+    location:          (document.getElementById('osLocationInput')||{}).value || '',
+    contact_name:      (document.getElementById('osContactName')||{}).value || '',
+    contact_phone:     (document.getElementById('osContactPhone')||{}).value || '',
+    contact_email:     (document.getElementById('osContactEmail')||{}).value || '',
+    contact_role:      (document.getElementById('osContactRole')||{}).value || '',
+    contact_available: !(document.getElementById('osContactAvail')||{classList:{contains:function(){return true;}}}).classList.contains('os-check-off'),
+    same_contact:      !(document.getElementById('osSameContact')||{classList:{contains:function(){return true;}}}).classList.contains('os-check-off'),
+    ready_harvest:     (document.getElementById('osReady1')||{checked:false}).checked,
+    ready_data:        (document.getElementById('osReady2')||{checked:false}).checked,
+    ready_stubble:     (document.getElementById('osReady3')||{checked:false}).checked,
+    fields_data:       OS.fields,
+    price_estimate:    priceEstimate || null,
   };
 
+  // Зберегти в Supabase
+  if (typeof SUPABASE_URL !== 'undefined' && typeof SUPABASE_ANON_KEY !== 'undefined') {
+    fetch(SUPABASE_URL + '/rest/v1/sampling_orders', {
+      method: 'POST',
+      headers: {
+        'apikey':        SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type':  'application/json',
+        'Prefer':        'return=minimal',
+      },
+      body: JSON.stringify(record),
+    }).catch(function(e) { console.warn('sampling_orders save failed:', e); });
+  }
+
+  // Також у localStorage як fallback
+  var lsRecord = Object.assign({}, record, { created_at: now.toISOString() });
   var items = [];
   try { items = JSON.parse(localStorage.getItem('laba_sampling_orders') || '[]'); } catch(e) {}
-  items.unshift(record);
+  items.unshift(lsRecord);
   try { localStorage.setItem('laba_sampling_orders', JSON.stringify(items.slice(0, 100))); } catch(e) {}
 
   showToast('Заявку ' + num + ' збережено');
