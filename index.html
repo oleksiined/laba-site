@@ -6457,12 +6457,22 @@ function _renderBlogCard(art, slug) {
     '</div></div>';
 }
 
+// Blog uses _sbFetch which is defined later; provide it here if not yet available
+async function _sbFetchBlog(table, params) {
+  if (typeof _sbFetch === 'function') return _sbFetch(table, params);
+  var url = (typeof SUPABASE_URL !== 'undefined' ? SUPABASE_URL : '') + '/rest/v1/' + table + '?' + (params||'');
+  var key = typeof SUPABASE_ANON_KEY !== 'undefined' ? SUPABASE_ANON_KEY : '';
+  var r = await fetch(url, { headers: { 'apikey': key, 'Authorization': 'Bearer ' + key } });
+  if (!r.ok) throw new Error('Supabase ' + table + ': ' + r.status);
+  return r.json();
+}
+
 async function loadBlogFromSupabase(force) {
   if (_blogLoaded && !force) return;
   var grid = document.getElementById('blog-grid');
   if (!grid) return;
   try {
-    var rows = await _sbFetch('blog_articles', 'select=slug,title,category,cat_color,cat_filter,read_time,published_at,cover_url,gradient,meta_desc,author_name,related&status=eq.published&order=sort_order.desc.nullslast,published_at.desc');
+    var rows = await _sbFetchBlog('blog_articles', 'select=slug,title,category,cat_color,cat_filter,read_time,published_at,cover_url,gradient,meta_desc,author_name,related&status=eq.published&order=sort_order.desc.nullslast,published_at.desc');
     rows.forEach(function(row) {
       BLOG_ARTICLES[row.slug] = {
         title:      row.title,
@@ -6492,7 +6502,7 @@ async function loadBlogFromSupabase(force) {
 async function _loadArticleContent(slug) {
   if (BLOG_ARTICLES[slug] && BLOG_ARTICLES[slug]._loaded) return BLOG_ARTICLES[slug];
   try {
-    var rows = await _sbFetch('blog_articles', 'select=*&slug=eq.' + encodeURIComponent(slug) + '&status=eq.published&limit=1');
+    var rows = await _sbFetchBlog('blog_articles', 'select=*&slug=eq.' + encodeURIComponent(slug) + '&status=eq.published&limit=1');
     if (!rows || !rows.length) return null;
     var row = rows[0];
     BLOG_ARTICLES[slug] = Object.assign(BLOG_ARTICLES[slug] || {}, {
