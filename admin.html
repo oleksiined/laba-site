@@ -6486,8 +6486,23 @@ function blogOpenModal(art) {
           <input id="bf-read_time" value="${esc(v.read_time)}" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;box-sizing:border-box" placeholder="8 хв читання">
         </div>
         <div style="grid-column:1/-1">
-          <label style="font-size:12px;font-weight:600;color:var(--text-mid);display:block;margin-bottom:4px">URL обкладинки</label>
-          <input id="bf-cover_url" value="${esc(v.cover_url)}" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;box-sizing:border-box" placeholder="https://...">
+          <label style="font-size:12px;font-weight:600;color:var(--text-mid);display:block;margin-bottom:4px">Обкладинка</label>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div id="bf-cover-preview" style="width:120px;min-width:120px;height:72px;border-radius:8px;background:var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-soft)">
+              ${v.cover_url ? \`<img src="\${esc(v.cover_url)}" style="width:100%;height:100%;object-fit:cover">\` : 'Немає фото'}
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+              <input id="bf-cover_url" value="${esc(v.cover_url)}" oninput="blogCoverPreview(this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;box-sizing:border-box" placeholder="https://...">
+              <div style="display:flex;align-items:center;gap:8px">
+                <label style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--navy);color:#fff;border-radius:7px;font-size:12px;font-weight:600">
+                  <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13V7M7 10l3-3 3 3"/><rect x="3" y="14" width="14" height="3" rx="1"/></svg>
+                  Завантажити фото
+                  <input type="file" accept="image/*" onchange="blogUploadCover(this)" style="display:none">
+                </label>
+                <span id="bf-cover-status" style="font-size:12px;color:var(--text-soft)"></span>
+              </div>
+            </div>
+          </div>
         </div>
         <div>
           <label style="font-size:12px;font-weight:600;color:var(--text-mid);display:block;margin-bottom:4px">Градієнт (якщо без фото)</label>
@@ -6535,6 +6550,53 @@ function blogOpenModal(art) {
 function esc(s) {
   if (!s) return '';
   return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function blogCoverPreview(url) {
+  var el = document.getElementById('bf-cover-preview');
+  if (!el) return;
+  if (url && url.startsWith('http')) {
+    el.innerHTML = '<img src="' + url + '" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.textContent=\'Помилка\'">';
+  } else {
+    el.textContent = 'Немає фото';
+  }
+}
+
+async function blogUploadCover(input) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  var status = document.getElementById('bf-cover-status');
+  status.textContent = 'Завантаження...';
+  try {
+    var SUPABASE_URL = 'https://lczccbminjzefmmehntq.supabase.co';
+    var SUPABASE_ANON_KEY = 'sb_publishable_Axo6-4xZHWuXXlUY2zU5lA_lPbz2eFn';
+    var ext = file.name.split('.').pop().toLowerCase();
+    var slug = document.getElementById('bf-slug')?.value?.trim() || 'cover';
+    var filename = slug + '-' + Date.now() + '.' + ext;
+    var resp = await fetch(SUPABASE_URL + '/storage/v1/object/blog/' + filename, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type': file.type,
+        'x-upsert': 'true'
+      },
+      body: file
+    });
+    if (!resp.ok) {
+      var err = await resp.text();
+      throw new Error(err);
+    }
+    var publicUrl = SUPABASE_URL + '/storage/v1/object/public/blog/' + filename;
+    document.getElementById('bf-cover_url').value = publicUrl;
+    blogCoverPreview(publicUrl);
+    status.textContent = 'Завантажено ✓';
+    status.style.color = '#2d7a4f';
+  } catch(e) {
+    console.error('blogUploadCover:', e);
+    status.textContent = 'Помилка: ' + e.message;
+    status.style.color = '#c0392b';
+  }
 }
 
 async function blogSave() {
