@@ -23,7 +23,7 @@
 <style>
 /* ── RESET ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;overflow-x:hidden}
+html{scroll-behavior:smooth}
 
 :root{
   --bg:#F5F6F7;
@@ -147,7 +147,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 /* ── PAGE SHELL ── */
 .page{display:none}
 .page.active{display:flex;flex-direction:column;min-height:calc(100vh - 68px);overflow-x:clip;max-width:100vw}
-.article-page.active{overflow:visible;overflow-x:visible}
+.article-page.active{overflow-x:visible}
 .page.active>.laba-footer{margin-top:auto}
 
 /* ══════════════════════════════
@@ -1768,9 +1768,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 /* ══ ARTICLE TOC ══ */
 .article-with-toc{display:grid;grid-template-columns:1fr 260px;gap:48px;align-items:start;max-width:1280px;margin:0 auto;padding:32px 32px 80px}
 .article-with-toc .article-main{min-width:0}
-/* ToC: fixed position, shown/hidden + positioned by JS */
-.article-toc{position:fixed;top:88px;width:240px;max-height:calc(100vh - 108px);overflow-y:auto;z-index:10;display:none}
-.article-toc.toc-visible{display:block}
+.article-toc{position:sticky;top:88px;max-height:calc(100vh - 108px);overflow-y:auto;align-self:start}
 .article-toc-inner{background:var(--white);border:1px solid var(--border-soft);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow-sm)}
 .article-toc-title{font-size:11px;font-weight:800;color:var(--text-soft);letter-spacing:.8px;text-transform:uppercase;margin:0 0 12px}
 .article-toc-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
@@ -6864,51 +6862,12 @@ function artTocClick(e, id) {
   if (el) { el.scrollIntoView({behavior:'smooth', block:'start'}); }
 }
 var _artTocSpyObs = null;
-var _artTocScrollHandler = null;
-var _artTocResizeHandler = null;
-
-function _artTocPosition() {
-  var toc = document.getElementById('art-toc');
-  var grid = document.querySelector('.article-with-toc');
-  var main = document.querySelector('.article-main');
-  if (!toc || !grid || !main) return;
-  if (window.innerWidth <= 960) { toc.classList.remove('toc-visible'); return; }
-  var gridRect = grid.getBoundingClientRect();
-  var mainRect = main.getBoundingClientRect();
-  // Position ToC in the right column of the grid
-  var left = mainRect.right + 24;
-  if (left + 240 > window.innerWidth - 8) { toc.classList.remove('toc-visible'); return; }
-  toc.style.left = left + 'px';
-  toc.style.width = (gridRect.right - mainRect.right - 32) + 'px';
-  // Top: align with first h2 when it's visible, then clamp to nav
-  var firstH2 = main.querySelector('h2.article-h2');
-  var navH = 80;
-  var top = navH;
-  if (firstH2) {
-    var h2top = firstH2.getBoundingClientRect().top;
-    top = h2top > navH ? h2top : navH;
-  }
-  toc.style.top = top + 'px';
-  toc.style.maxHeight = (window.innerHeight - top - 20) + 'px';
-  toc.classList.add('toc-visible');
-}
 
 function _artTocSpyInit() {
   if (_artTocSpyObs) { _artTocSpyObs.disconnect(); _artTocSpyObs = null; }
-  if (_artTocScrollHandler) { window.removeEventListener('scroll', _artTocScrollHandler); _artTocScrollHandler = null; }
-  if (_artTocResizeHandler) { window.removeEventListener('resize', _artTocResizeHandler); _artTocResizeHandler = null; }
   var tocLinks = document.querySelectorAll('.article-toc-item a');
   if (!tocLinks.length) return;
   var ids = Array.from(tocLinks).map(function(a){ return a.getAttribute('href').slice(1); });
-
-  // Position on scroll and resize
-  _artTocScrollHandler = _artTocPosition;
-  _artTocResizeHandler = _artTocPosition;
-  window.addEventListener('scroll', _artTocScrollHandler, {passive:true});
-  window.addEventListener('resize', _artTocResizeHandler, {passive:true});
-  setTimeout(_artTocPosition, 60);
-
-  // Scroll spy
   _artTocSpyObs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
       if (entry.isIntersecting) {
