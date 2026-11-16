@@ -14505,7 +14505,7 @@ function osCalcAreaHa(latLngs) {
 }
 
 function osDefaultFieldSettings() {
-  return { culture:'Пшениця озима', fieldState:'Посіви', soilScheme:'За сіткою', areaPerProbe:2, depth:'0–30 см', soilPackage:'Базова оцінка ґрунту', moisturePlacement:'На карті', moistureCount:6, moistureLayers:'3 шари', plantsCount:10, densityCount:10 };
+  return { culture:'Пшениця озима', fieldState:'Посіви', soilScheme:'За сіткою', areaPerProbe:2, depth:'0–30 см', soilPackage:'Базова оцінка ґрунту', moisturePlacement:'На карті', moistureCount:6, moistureLayers:'3 шари', plantsCount:10, densityCount:10, densityLayers:'1 шар (0–15 см)' };
 }
 
 function osShowFileRow(name, count) {
@@ -14663,6 +14663,7 @@ function osRenderFieldBody(f, i) {
     + '<div class="os-srv-section-header"><div class="os-srv-section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="4" rx="1"/><rect x="2" y="10" width="20" height="4" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1"/></svg></div><div><div class="os-srv-section-name">Об\'ємна щільність</div></div></div>'
     + '<div class="os-form-row">'
     + osSelect('Кількість точок','density_count_'+i,['5','10','15','20'],String(s.densityCount||10),"osFieldChange("+i+",'densityCount',parseInt(this.value));osRenderSidebar()")
+    + osSelect('Глибина відбору','density_layers_'+i,['1 шар (0–15 см)','2 шари (0–15, 15–30 см)','3 шари (0–15, 15–30, 30–60 см)'],s.densityLayers||'1 шар (0–15 см)',"osFieldChange("+i+",'densityLayers',this.value)")
     + '</div>'
     + '<p class="os-step2-note">Мінімум 10 точок для мінімального виїзду.</p>'
     + '</div>'
