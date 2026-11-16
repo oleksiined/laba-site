@@ -3218,6 +3218,24 @@ main{flex:1}
 .os-upload-formats{font-size:12px;color:var(--text-soft);margin-top:2px}
 .os-upload-btn{padding:10px 18px;border:1.5px solid var(--border);border-radius:var(--radius-pill);font-size:14px;font-weight:600;color:var(--navy);background:var(--white);cursor:pointer;transition:border-color .15s,background .15s;white-space:nowrap}
 .os-upload-btn:hover{border-color:#111;background:#f9f9f9}
+.os-manual-area-wrap{margin-top:16px}
+.os-manual-area-divider{display:flex;align-items:center;gap:12px;margin:0 0 12px;color:var(--text-soft);font-size:13px}
+.os-manual-area-divider::before,.os-manual-area-divider::after{content:'';flex:1;height:1px;background:var(--border-soft)}
+.os-manual-area-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.os-manual-name-input{flex:1;min-width:140px;height:42px;padding:0 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--navy);background:var(--white);outline:none;transition:border-color .15s}
+.os-manual-name-input:focus{border-color:var(--green)}
+.os-manual-ha-wrap{display:flex;align-items:center;gap:0;border:1.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--white);transition:border-color .15s}
+.os-manual-ha-wrap:focus-within{border-color:var(--green)}
+.os-manual-ha-input{width:90px;height:38px;padding:0 10px;border:none;font-size:14px;color:var(--navy);background:transparent;outline:none}
+.os-manual-ha-label{padding:0 10px 0 0;font-size:14px;color:var(--text-soft);font-weight:500;pointer-events:none}
+.os-manual-add-btn{height:42px;padding:0 18px;border:none;border-radius:var(--radius-sm);background:var(--navy);color:#fff;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .15s}
+.os-manual-add-btn:hover{background:#1a3a5c}
+.os-manual-fields-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.os-manual-field-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);font-size:14px}
+.os-manual-field-item-name{flex:1;font-weight:600;color:var(--navy)}
+.os-manual-field-item-ha{color:var(--text-soft)}
+.os-manual-field-item-del{background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:18px;line-height:1;padding:0 2px;transition:color .15s}
+.os-manual-field-item-del:hover{color:#c0392b}
 .os-file-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);margin-top:10px}
 .os-file-row-name{flex:1;font-size:14px;font-weight:600;color:var(--navy)}
 .os-file-row-status{display:flex;align-items:center;gap:6px;font-size:13px;color:#3a7a2a;font-weight:600}
@@ -13601,6 +13619,20 @@ function toast(msg) {
           <input type="file" id="osFileInput" accept=".kml,.kmz,.geojson,.json,.zip" style="display:none" onchange="osHandleFile(this.files[0])">
           <div id="osFileList"></div>
 
+          <!-- Manual area entry -->
+          <div class="os-manual-area-wrap" id="osManualAreaWrap">
+            <div class="os-manual-area-divider"><span>або вкажіть площу вручну</span></div>
+            <div class="os-manual-area-row">
+              <input class="os-manual-name-input" id="osManualFieldName" type="text" placeholder="Назва поля (необов'язково)" maxlength="40">
+              <div class="os-manual-ha-wrap">
+                <input class="os-manual-ha-input" id="osManualFieldArea" type="number" min="0.1" max="99999" step="0.1" placeholder="0">
+                <span class="os-manual-ha-label">га</span>
+              </div>
+              <button class="os-manual-add-btn" type="button" onclick="osAddManualField()">Додати поле</button>
+            </div>
+            <div id="osManualFieldsList"></div>
+          </div>
+
         </div>
 
         <div id="osFieldsSection" style="display:none">
@@ -13976,6 +14008,59 @@ function osLocationInputChange() {
       .catch(function(){if(st){st.textContent='Не вдалося визначити відстань';}});
   }, 700);
   osRenderSidebar();
+}
+
+function osAddManualField() {
+  var nameEl = document.getElementById('osManualFieldName');
+  var areaEl = document.getElementById('osManualFieldArea');
+  var areaHa = parseFloat(areaEl.value);
+  if (!areaHa || areaHa <= 0) {
+    areaEl.focus();
+    areaEl.style.background = '#fff3f3';
+    setTimeout(function(){ areaEl.style.background = ''; }, 1000);
+    return;
+  }
+  var name = (nameEl.value.trim()) || ('Поле ' + (OS.fields.length + 1));
+  OS.fields.push({ name: name, areaHa: areaHa, latLngs: [], settings: osDefaultFieldSettings() });
+  // show fields section
+  var sec = document.getElementById('osFieldsSection');
+  if (sec) sec.style.display = '';
+  osRenderFieldsList();
+  osRenderSidebar();
+  osRenderManualFieldsList();
+  // reset inputs
+  nameEl.value = '';
+  areaEl.value = '';
+  nameEl.focus();
+}
+
+function osRenderManualFieldsList() {
+  var container = document.getElementById('osManualFieldsList');
+  if (!container) return;
+  // show only fields that were added manually (latLngs is empty)
+  var manualFields = OS.fields.filter(function(f){ return !f.latLngs || f.latLngs.length === 0; });
+  if (!manualFields.length) { container.innerHTML = ''; return; }
+  container.innerHTML = '<div class="os-manual-fields-list">' +
+    manualFields.map(function(f, i) {
+      var realIdx = OS.fields.indexOf(f);
+      return '<div class="os-manual-field-item">' +
+        '<span class="os-manual-field-item-name">' + f.name + '</span>' +
+        '<span class="os-manual-field-item-ha">' + f.areaHa.toLocaleString('uk-UA', {maximumFractionDigits:2}) + ' га</span>' +
+        '<button class="os-manual-field-item-del" onclick="osRemoveManualField(' + realIdx + ')" title="Видалити">×</button>' +
+      '</div>';
+    }).join('') +
+  '</div>';
+}
+
+function osRemoveManualField(idx) {
+  OS.fields.splice(idx, 1);
+  if (!OS.fields.length) {
+    var sec = document.getElementById('osFieldsSection');
+    if (sec) sec.style.display = 'none';
+  }
+  osRenderFieldsList();
+  osRenderSidebar();
+  osRenderManualFieldsList();
 }
 
 function osHandleFile(file) {
