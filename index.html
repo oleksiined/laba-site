@@ -14505,7 +14505,8 @@ function osCalcAreaHa(latLngs) {
 }
 
 function osDefaultFieldSettings() {
-  return { culture:'Пшениця озима', fieldState:'Посіви', soilScheme:'За сіткою', areaPerProbe:2, depth:'0–30 см', soilPackage:'Базова оцінка ґрунту', moisturePlacement:'На карті', moistureCount:6, moistureLayers:'3 шари', plantsCount:10, densityCount:10, densityLayers:'1 шар (0–15 см)' };
+  var _firstPkg = (typeof SERVICES !== 'undefined' && SERVICES.soil && SERVICES.soil.packages && SERVICES.soil.packages.length) ? SERVICES.soil.packages[0].name : '';
+  return { culture:'Пшениця озима', fieldState:'Посіви', soilScheme:'За сіткою', areaPerProbe:2, depth:'0–30 см', soilPackage:_firstPkg, moisturePlacement:'На карті', moistureCount:6, moistureLayers:'3 шари', plantsCount:10, densityCount:10, densityLayers:'1 шар (0–15 см)' };
 }
 
 function osShowFileRow(name, count) {
@@ -14620,6 +14621,14 @@ function osRenderFieldBody(f, i) {
   var hasSoil = OS.services.includes('soil');
   var hasMoisture = OS.services.includes('moisture');
   var probes = osCalcProbes(f.areaHa, s.areaPerProbe);
+  // Normalize soilPackage: if stored value not in current options, use first available
+  if (hasSoil) {
+    var _pkgOpts = osSoilPkgOptions();
+    if (_pkgOpts.length && !_pkgOpts.includes(s.soilPackage)) {
+      s.soilPackage = _pkgOpts[0];
+      OS.fields[i].settings.soilPackage = _pkgOpts[0];
+    }
+  }
   var soilSection = hasSoil ? (
     '<div class="os-srv-section">'
     + '<div class="os-srv-section-header"><div class="os-srv-section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/></svg></div><div><div class="os-srv-section-name">Ґрунт: агрохімія</div><div class="os-srv-section-desc">Автоматичний ґрунтовідбірник</div></div></div>'
