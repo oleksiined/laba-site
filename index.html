@@ -1867,7 +1867,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .article-with-toc{display:grid;grid-template-columns:1fr 260px;gap:48px;align-items:start;max-width:1280px;margin:0 auto;padding:32px 32px 80px}
 .article-with-toc .article-main{min-width:0}
 .article-toc-spacer{display:none}
-.article-toc{position:sticky;top:80px;max-height:calc(100vh - 100px);overflow-y:auto;align-self:start}
+.article-toc{position:sticky;top:80px;align-self:start}
 .article-toc-inner{background:var(--white);border:1px solid var(--border-soft);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow-sm)}
 .article-toc-title{font-size:11px;font-weight:800;color:var(--text-soft);letter-spacing:.8px;text-transform:uppercase;margin:0 0 12px}
 .article-toc-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
@@ -6595,14 +6595,6 @@ async function navigateToArticle(slug) {
     var spacer = document.getElementById('art-toc-spacer');
     var heroEl = document.getElementById('art-hero');
     if (spacer && heroEl) spacer.style.height = (heroEl.offsetHeight + 24) + 'px';
-    var tocInner = document.querySelector('.article-toc-inner');
-    var heroEl = document.getElementById('art-hero');
-    if (tocInner && heroEl) {
-      var heroBottom = heroEl.getBoundingClientRect().bottom + window.scrollY;
-      var tocTop = document.getElementById('art-toc').getBoundingClientRect().top + window.scrollY;
-      var offset = Math.max(0, heroBottom - tocTop);
-      tocInner.style.marginTop = offset + 'px';
-    }
     _artTocSpyInit();
     // Update dynamic prices in article product cards
     if (typeof updateArticlePrices === 'function') updateArticlePrices();
