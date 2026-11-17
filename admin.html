@@ -686,7 +686,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
 .pg-state.future{background:#edf4ff;color:#315e9f}
 .pg-positive{color:#137748}.pg-negative{color:#c0392b}.pg-light{color:var(--text-soft)}
 .pg-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid var(--pg-border);font-size:12px;color:var(--text-soft)}
-.pg-pager{display:flex;align-items:center;gap:6px;font-size:12px}
+.pg-pager{display:none}
 .pg-empty{text-align:center;padding:32px;color:var(--text-soft)}
 .pg-btn{padding:7px 14px;border-radius:8px;border:1.5px solid var(--pg-border);background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text-dark);transition:border-color .15s,background .15s}
 .pg-btn:hover{border-color:#aab5c0;background:var(--pg-bg)}
@@ -6816,13 +6816,11 @@ function pgRender(){
   const base=pgScopedOffers();
   const metrics=[['','Пропозиції лабораторій','▤'],['current','Чинні ціни','✓'],['wait','Очікуємо ціну','◷'],['review','Потрібне підтвердження','↻']];
   pgId('pg-metrics').innerHTML=metrics.map(([key,label,icon])=>'<button class="pg-metric '+key+'" data-pg-filter="'+key+'" aria-pressed="'+String(pgId('pg-status').value===key)+'"><div><span>'+label+'</span><strong>'+(key?base.filter(r=>pgCurrent(r).status===key).length:base.length)+'</strong></div><i>'+icon+'</i></button>').join('');
-  const rows=pgFiltered(),size=12,pages=Math.max(1,Math.ceil(rows.length/size));
-  pgState.page=Math.min(pgState.page,pages);
-  const first=(pgState.page-1)*size,shown=rows.slice(first,first+size);
+  const rows=pgFiltered(),shown=rows;
   pgId('pg-list').innerHTML=shown.map(row=>{const{price,status}=pgCurrent(row);const margin=price&&row.sale>0?(row.sale-price.price)/row.sale*100:null;const meta=row.service?row.details.split('\n')[0]:row.group;const avail=price?.available;const prep=price?.prepIncluded;const dMin=price?.daysMin,dMax=price?.daysMax;return'<tr><td class="pg-pos-code">'+pgEsc(row.key)+'</td><td><div class="pg-item">'+pgEsc(row.name)+'<small>'+pgEsc(meta)+'</small></div></td><td>'+pgEsc(pgLabs[row.lab])+'</td><td class="pg-num">'+pgFmt(price?.price)+'</td><td class="pg-num">'+pgFmt(row.sale)+'</td><td class="pg-num '+(margin==null?'pg-light':margin<0?'pg-negative':'pg-positive')+'">'+(margin==null?'—':pgMoney.format(Math.round(margin*10)/10)+'%')+'</td><td class="pg-center pg-light">'+(avail==null?'—':avail?'<span class="pg-yes">Так</span>':'<span class="pg-no">Ні</span>')+'</td><td class="pg-center pg-light">'+(prep==null?'—':prep?'<span class="pg-yes">Так</span>':'<span class="pg-no">Ні</span>')+'</td><td class="pg-center pg-light">'+(dMin!=null&&dMax!=null?dMin+'–'+dMax:'—')+'</td><td class="pg-light">'+pgDate(price?.from)+'</td><td class="pg-light">'+pgDate(price?.to)+'</td><td>'+pgBadge(status)+'</td><td><button class="pg-arrow-btn" data-pg-row="'+pgEsc(row.key)+'" data-pg-lab="'+row.lab+'">›</button></td></tr>';}).join('')||'<tr><td class="pg-empty" colspan="13">За цими фільтрами позицій немає.</td></tr>';
-  pgId('pg-count').textContent=rows.length?(first+1)+'–'+(first+shown.length)+' з '+rows.length:'0 позицій';
-  pgId('pg-page').textContent=pgState.page+' / '+pages;
-  pgId('pg-prev').disabled=pgState.page===1;pgId('pg-next').disabled=pgState.page>=pages;
+  pgId('pg-count').textContent=rows.length?rows.length+' позицій':'0 позицій';
+  pgId('pg-page').textContent='';
+  pgId('pg-prev').disabled=true;pgId('pg-next').disabled=true;
 }
 function pgShowDetail(key,lab){
   const row=pgByKey.get(key);if(!row||!pgSupportedLabs(row).includes(lab))return;
