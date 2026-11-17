@@ -5109,15 +5109,8 @@ main{flex:1}
     </div>
     <!-- Filter tabs + search -->
     <div class="blog-filters">
-      <div class="blog-tabs">
+      <div class="blog-tabs" id="blog-tabs">
         <button class="blog-tab active" onclick="blogFilter(this,'all')">Усі статті</button>
-        <button class="blog-tab" onclick="blogFilter(this,'grunt')">Ґрунт</button>
-        <button class="blog-tab" onclick="blogFilter(this,'dobryva')">Добрива</button>
-        <button class="blog-tab" onclick="blogFilter(this,'roslyny')">Рослини</button>
-        <button class="blog-tab" onclick="blogFilter(this,'nasinnya')">Насіння</button>
-        <button class="blog-tab" onclick="blogFilter(this,'sezonni')">Сезонне</button>
-        <button class="blog-tab" onclick="blogFilter(this,'porady')">Практичні поради</button>
-        <button class="blog-tab" onclick="blogFilter(this,'interviu')">Інтерв'ю</button>
       </div>
       <div class="blog-search-wrap">
         <span class="blog-search-ico">
@@ -6365,12 +6358,18 @@ async function loadBlogFromSupabase(force) {
     grid.innerHTML = rows.length
       ? rows.map(function(r){ return _renderBlogCard(BLOG_ARTICLES[r.slug], r.slug); }).join('')
       : '<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--text-soft)">Статей поки немає</div>';
-    _blogLoaded = true;
-    // Re-apply active filter after load
-    if (_blogActiveCat !== 'all') {
-      var activeTab = document.querySelector('.blog-tab.active');
-      if (activeTab) blogFilter(activeTab, _blogActiveCat);
+    // Build category tabs dynamically from actual data
+    var tabsEl = document.getElementById('blog-tabs');
+    if (tabsEl) {
+      var seen = {};
+      var tabsHtml = '<button class="blog-tab active" onclick="blogFilter(this,\'all\')">Усі статті</button>';
+      rows.forEach(function(r) {
+        var cf = r.cat_filter, cn = (BLOG_ARTICLES[r.slug]||{}).category;
+        if (cf && cn && !seen[cf]) { seen[cf] = true; tabsHtml += '<button class="blog-tab" onclick="blogFilter(this,\'' + cf + '\')">' + cn + '</button>'; }
+      });
+      tabsEl.innerHTML = tabsHtml;
     }
+    _blogLoaded = true;
   } catch(e) {
     console.error('loadBlogFromSupabase:', e);
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--text-soft)">Не вдалося завантажити статті</div>';
@@ -6583,14 +6582,9 @@ function navigate(page) {
   else { searchQ=''; const si=document.getElementById('searchInput'); if(si) si.value=''; const sim=document.getElementById('searchInputMobile'); if(sim) sim.value=''; }
   if (page === 'methods') loadMethodsCatalog();
   if (page === 'blog') {
-    // Reset filter to "all" on each navigation to blog
     _blogActiveCat = 'all';
-    document.querySelectorAll('.blog-tab').forEach(function(t){ t.classList.remove('active'); });
-    var allTab = document.querySelector('.blog-tab[onclick*="\'all\'"]');
-    if (allTab) allTab.classList.add('active');
     document.querySelectorAll('#blog-grid .blog-card').forEach(function(c){ c.style.display=''; });
-    var noEl = document.getElementById('blog-no-results');
-    if (noEl) noEl.style.display = 'none';
+    var noEl = document.getElementById('blog-no-results'); if (noEl) noEl.style.display='none';
     loadBlogFromSupabase();
   }
   if (page === 'status') ostPageInit();
