@@ -12095,6 +12095,11 @@ async function submitOrder() {
   const _snapSamples = (NS.samples && NS.samples.length) ? NS.samples.map(s=>({...s}))
                      : (NC_S.samples && NC_S.samples.length) ? NC_S.samples.map(s=>({...s})) : [];
   window._ncfOrder = { num: orderNum, email: clientEmail, total: grand, date: `${dd}.${mm}.20${yy}`, samples: _snapSamples };
+  // Store contact data in NCO.person so invoice PDF can read it for individual payers
+  if (NCO.payerType !== 'legal' && NCO.payerType !== 'fop') {
+    NCO.person.name  = clientName;
+    NCO.person.phone = clientPhone;
+  }
 
   // ── Build order payload for backend ──
   const clientName = name ? name.value.trim() : '';
@@ -12425,10 +12430,11 @@ function ncf_downloadInvoice(saveOnly) {
     if (NCO.fop.rnokpp) buyerLines.push({ text: 'Код за ЄДРПОУ / ІПН: ' + NCO.fop.rnokpp, fontSize: 8, color: '#000' });
     if (NCO.fop.address) buyerLines.push({ text: 'Адреса: ' + NCO.fop.address, fontSize: 8, color: '#000' });
   } else {
-    const nm = (NCO.person && NCO.person.name) || (NCO.recipient && NCO.recipient.name) || '';
+    const nm = (NCO.person && NCO.person.name) || (NCO.recipient && NCO.recipient.name) || (o.clientName || '');
     buyerLines.push({ text: nm || '—', bold: true, fontSize: 9 });
     const ph = (NCO.person && NCO.person.phone) || (NCO.recipient && NCO.recipient.phone) || '';
     if (ph) buyerLines.push({ text: ph, fontSize: 8, color: '#000' });
+    if (o.email) buyerLines.push({ text: o.email, fontSize: 8, color: '#000' });
   }
   if (NCO.payerType !== 'individual' && NCO.recipient && NCO.recipient.phone) {
     buyerLines.push({ text: 'Контакт: ' + NCO.recipient.name + (NCO.recipient.phone ? ', ' + NCO.recipient.phone : ''), fontSize: 8, color: '#000' });
