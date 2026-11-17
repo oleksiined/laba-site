@@ -8979,6 +8979,11 @@ function showToast(msg,ms=2500){
     } else if(hash.startsWith('#article=')){
       const _slug = hash.slice('#article='.length);
       if(_slug && BLOG_ARTICLES[_slug]) navigateToArticle(_slug); else navigate('blog');
+    } else if(hash.startsWith('#sampling/')){
+      navigate('sampling');
+      var _mat = hash.slice('#sampling/'.length);
+      var _btn = document.querySelector('.samp-tab[data-mat="' + _mat + '"]');
+      if(_btn) sampSwitchTab(_mat, _btn);
     } else if(hash && hash !== '#'){
       const _pg = hash.slice(1);
       if(_ALL_PAGES.includes(_pg)) navigate(_pg); else navigate('home');
@@ -13132,15 +13137,6 @@ function _applyRobotImages() {
   if(ctaEl) ctaEl.src = typeof _CTA_SRC !== 'undefined' ? _CTA_SRC : _ROBOT_SRC;
 }
 document.addEventListener('DOMContentLoaded', _applyRobotImages);
-document.addEventListener('DOMContentLoaded', function(){
-  var _h = location.hash;
-  if (_h && _h.startsWith('#sampling/')) {
-    navigate('sampling');
-    var _mat = _h.slice('#sampling/'.length);
-    var _btn = document.querySelector('.samp-tab[data-mat="' + _mat + '"]');
-    if (_btn) sampSwitchTab(_mat, _btn);
-  }
-});
 
 // ── copy navbar logo into about brand & footer sections ──
 document.addEventListener('DOMContentLoaded', function(){
