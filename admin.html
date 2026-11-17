@@ -6794,6 +6794,9 @@ const pgMoney=new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2});
 const pgFmt=n=>n==null?'—':pgMoney.format(n)+' ₴';
 const pgDate=s=>s?s.split('-').reverse().join('.'):'—';
 const pgEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// Supabase
+const SUPA_URL='https://lczccbminjzefmmehntq.supabase.co';
+const SUPA_KEY='sb_publishable_Axo6-4xZHWuXXlUY2zU5lA_lPbz2eFn';
 // SAT LAB — реальні ціни, дійсні до 2027-06-30
 async function pgLoadFromSupabase(){try{const r=await fetch(SUPA_URL+'/rest/v1/lab_price_offers?select=position_id,version,lab_id,price,valid_from,valid_to,note,available,prep_included,days_min,days_max&order=position_id,valid_from.desc',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,Accept:'application/json'}});if(!r.ok)throw new Error('HTTP '+r.status);const rows=await r.json();if(!Array.isArray(rows)||!rows.length)return null;return rows.map(r=>({key:r.position_id,version:r.version,price:Number(r.price),lab:r.lab_id,from:r.valid_from,to:r.valid_to||null,note:r.note||'',available:r.available??null,prepIncluded:r.prep_included??null,daysMin:r.days_min??null,daysMax:r.days_max??null}));}catch(e){console.warn('pgLoadFromSupabase error:',e);return null;}}
 async function pgSaveToSupabase(item){const body=JSON.stringify({position_id:item.key,version:item.version,lab_id:item.lab,price:item.price,valid_from:item.from,valid_to:item.to||null,note:item.note||'',available:item.available??null,prep_included:item.prepIncluded??null,days_min:item.daysMin??null,days_max:item.daysMax??null});const r=await fetch(SUPA_URL+'/rest/v1/lab_price_offers',{method:'POST',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json',Accept:'application/json',Prefer:'return=minimal'},body});if(!r.ok){const t=await r.text();throw new Error('Supabase: '+r.status+' '+t);}return true;}
