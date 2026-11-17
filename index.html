@@ -6312,7 +6312,7 @@ function _renderBlogCard(art, slug) {
     : '<div class="blog-card-photo" style="height:210px;background:' + (art.gradient||'#c8dbd0') + '"></div>';
   var _catColor = art.catColor || art.cat_color;
   var catStyle = _catColor ? ' style="background:' + _catColor + '!important"' : '';
-  return '<div class="blog-card" data-cat="' + (art.cat_filter||'all') + '" onclick="navigateToArticle(\'' + slug + '\')">' +
+  return '<div class="blog-card" data-cat="' + (art.catFilter||art.cat_filter||'all') + '" onclick="navigateToArticle(\'' + slug + '\')">' +
     '<div class="blog-card-media">' + imgHtml +
     '<span class="blog-card-cat"' + catStyle + '>' + (art.category||'') + '</span>' +
     '<span class="blog-card-time">' + (art.read_time||'') + '</span>' +
