@@ -11117,7 +11117,9 @@ async function loadCatalogFromSupabase() {
           items: [],
         });
       }
-      const matKey = _matIdToKey[svc.material_id];
+      const matKey = _matIdToKey[_normMatId(svc.material_id)]
+                  || _nameToSvcKey[(svc.material_id||'').trim().toLowerCase()]
+                  || _matCodeFallback[_normMatId(svc.material_id).toLowerCase()];
       const svcName = _isCleanText(svc.name) ? svc.name : svc.name.replace(/[�◆■●￾]/g, '?');
       catMap.get(group).items.push({
         id:    svc.service_id,
@@ -11135,7 +11137,7 @@ async function loadCatalogFromSupabase() {
     }
 
     // ── Оновлюємо SERVICES (стара сторінка каталогу) ──
-    const _matKeyToSvcKey  = { soil:'soil', water:'water', fertilizer:'fertilizer', seeds:'seeds', grain:'grain', plant:'plants' };
+    const _matKeyToSvcKey  = { soil:'soil', water:'water', fertilizer:'fertilizer', seeds:'seeds', grain:'grain', plant:'plants', plants:'plants' };
     const _matKeyToLabel   = { soil:'Ґрунт', water:'Вода', fertilizer:'Добрива', seeds:'Насіння', grain:'Зерно', plant:'Рослини', plants:'Рослини' };
     Object.values(SERVICES).forEach(s => { s.packages = []; s.individual = []; });
     // Build service lookup for package keyword enrichment (reuse _svcById built above)
