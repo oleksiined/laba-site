@@ -7306,15 +7306,21 @@ function changeCollapsedQty(safeCode, delta){
     syncCollapsedQty(safeCode);
     return;
   }
-  const newQty = Math.min(9999, cur + delta);
+  const _stepCCQ = (_PKG_NAMES[safeCode]||{}).samplesStep||1;
+  let newQty = Math.min(9999, cur + delta);
+  // Округлення до кратного кроку
+  if(_stepCCQ > 1) newQty = Math.max(_stepCCQ, Math.round(newQty / _stepCCQ) * _stepCCQ);
   cart[idx].qty = newQty;
   saveCart(); updateCartUI();
   syncCollapsedQty(safeCode);
 }
 
-function inputCollapsedQty(safeCode, val){
+function inputCollapsedQty(safeCode, val, step){
   if(val===''||val===null) return;
-  const v = Math.max(1, Math.min(9999, parseInt(val)||1));
+  const _step = step||(_PKG_NAMES[safeCode]||{}).samplesStep||1;
+  let v = Math.max(_step, Math.min(9999, parseInt(val)||_step));
+  // Округлення до кратного кроку
+  if(_step > 1) v = Math.round(v / _step) * _step;
   const inp = document.getElementById('cqty-'+safeCode);
   if(inp && inp.value!=='' && String(v)!==String(val)) inp.value=v;
   const label = document.getElementById('cqty-label-'+safeCode);
@@ -7528,7 +7534,8 @@ function makeRow(item, type){
   const safeCode = item.code.replace(/[^a-zA-Z0-9-]/g,'');
   const itemSlug = (item.slug||item.code).replace(/[^a-zA-Z0-9-]/g,'');
   // Зберігаємо назву і ціну в словнику — не передаємо в inline onclick щоб уникнути проблем зі спецсимволами
-  _PKG_NAMES[safeCode] = { name: item.name, price: item.price||0, materialKey: item.materialKey||'', slug: itemSlug };
+  const _samplesStep = (item.minSamplesCount||1) > 1 ? (item.minSamplesCount||1) : 1;
+  _PKG_NAMES[safeCode] = { name: item.name, price: item.price||0, materialKey: item.materialKey||'', slug: itemSlug, samplesStep: _samplesStep };
   const qty = getRowQty(safeCode);
   const subtotal = (item.price||0)*qty;
 
@@ -7662,9 +7669,9 @@ function makeRow(item, type){
         <div class="srv-qty-wrap">
           <div class="srv-qty-inline ${inCart?'open':''}" id="czone-${safeCode}" style="flex-direction:row;align-items:center">
             <div class="srv-qty-counter-sm">
-              <button id="cdec-${safeCode}" onclick="changeCollapsedQty('${safeCode}',-1)" title="${qty<=1?'Видалити з кошика':'Зменшити'}" style="${qty<=1?'color:#EF4444':''}">${qty<=1?'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><polyline points="2,4 14,4"/><path d="M5 4V3h6v1M6 7v5M10 7v5" stroke-linecap="round"/><rect x="3" y="4" width="10" height="9" rx="1.5"/></svg>':'−'}</button>
-              <input id="cqty-${safeCode}" type="number" value="${qty}" min="1" max="9999" oninput="inputCollapsedQty('${safeCode}',this.value)" onblur="if(!this.value||parseInt(this.value)<1){this.value=1;inputCollapsedQty('${safeCode}',1)}">
-              <button onclick="changeCollapsedQty('${safeCode}',1)">+</button>
+              <button id="cdec-${safeCode}" onclick="changeCollapsedQty('${safeCode}',-${_samplesStep})" title="${qty<=_samplesStep?'Видалити з кошика':'Зменшити'}" style="${qty<=_samplesStep?'color:#EF4444':''}">${qty<=_samplesStep?'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><polyline points="2,4 14,4"/><path d="M5 4V3h6v1M6 7v5M10 7v5" stroke-linecap="round"/><rect x="3" y="4" width="10" height="9" rx="1.5"/></svg>':'−'}</button>
+              <input id="cqty-${safeCode}" type="number" value="${qty}" min="${_samplesStep}" step="${_samplesStep}" max="9999" oninput="inputCollapsedQty('${safeCode}',this.value,${_samplesStep})" onblur="if(!this.value||parseInt(this.value)<${_samplesStep}){this.value=${_samplesStep};inputCollapsedQty('${safeCode}',${_samplesStep},${_samplesStep})}">
+              <button onclick="changeCollapsedQty('${safeCode}',${_samplesStep})">+</button>
             </div>
           </div>
           <span id="cqty-label-${safeCode}" style="font-size:11px;color:var(--t3);font-weight:500;white-space:nowrap">${inCart?qty+' зразків у кошику':''}</span>
