@@ -1867,7 +1867,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .article-with-toc{display:grid;grid-template-columns:1fr 260px;gap:48px;align-items:start;max-width:1280px;margin:0 auto;padding:32px 32px 80px}
 .article-with-toc .article-main{min-width:0}
 .article-toc-spacer{display:none}
-.article-toc{position:sticky;top:80px;align-self:start}
+.article-toc{position:sticky;top:80px;max-height:calc(100vh - 100px);overflow-y:auto;align-self:start}
 .article-toc-inner{background:var(--white);border:1px solid var(--border-soft);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow-sm)}
 .article-toc-title{font-size:11px;font-weight:800;color:var(--text-soft);letter-spacing:.8px;text-transform:uppercase;margin:0 0 12px}
 .article-toc-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
@@ -1876,7 +1876,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .article-toc-item a.active{color:var(--navy);font-weight:600;background:var(--bg);border-left-color:var(--green)}
 /* article-outer used when no ToC (fallback) */
 .article-outer{max-width:760px;margin:0 auto;padding:32px 32px 80px}
-@media(max-width:960px){.article-with-toc{grid-template-columns:1fr;padding:20px 16px 60px}.article-toc{display:none!important}.article-toc-spacer{display:none}}
+@media(max-width:960px){.article-with-toc{grid-template-columns:1fr;padding:20px 16px 60px}.article-toc{display:none!important}}
 
 /* ══ ABOUT PAGE ══ */
 .about-page{background:linear-gradient(175deg,#0a1a0a 0%,#122a12 40%,#1a3a1a 70%,#0d1f0d 100%);height:100vh;overflow:hidden}
@@ -6595,6 +6595,14 @@ async function navigateToArticle(slug) {
     var spacer = document.getElementById('art-toc-spacer');
     var heroEl = document.getElementById('art-hero');
     if (spacer && heroEl) spacer.style.height = (heroEl.offsetHeight + 24) + 'px';
+    var toc = document.getElementById('art-toc');
+    var content = document.getElementById('art-content');
+    var grid = document.querySelector('.article-with-toc');
+    if (toc && content && grid) {
+      var gridTop = grid.getBoundingClientRect().top + window.scrollY;
+      var contentTop = content.getBoundingClientRect().top + window.scrollY;
+      toc.style.marginTop = (contentTop - gridTop) + 'px';
+    }
     _artTocSpyInit();
     // Update dynamic prices in article product cards
     if (typeof updateArticlePrices === 'function') updateArticlePrices();
