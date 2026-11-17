@@ -6344,7 +6344,7 @@ async function loadBlogFromSupabase(force) {
   var grid = document.getElementById('blog-grid');
   if (!grid) return;
   try {
-    var rows = await _sbFetchBlog('blog_articles', 'select=slug,title,category,cat_color,cat_filter,read_time,published_at,cover_url,gradient,meta_desc,author_name,related&status=eq.published&order=sort_order.desc.nullslast,published_at.desc');
+    var rows = await _sbFetchBlog('blog_articles', 'select=slug,title,category,cat_color,cat_filter,read_time,published_at,cover_url,gradient,meta_desc,author_name,related&status=eq.published&order=published_at.desc');
     rows.forEach(function(row) {
       BLOG_ARTICLES[row.slug] = {
         title:      row.title,
@@ -6365,6 +6365,9 @@ async function loadBlogFromSupabase(force) {
       ? rows.map(function(r){ return _renderBlogCard(BLOG_ARTICLES[r.slug], r.slug); }).join('')
       : '<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--text-soft)">Статей поки немає</div>';
     _blogLoaded = true;
+    // Re-apply active filter after load
+    var activeTab = document.querySelector('.blog-tab.active');
+    if (activeTab) { var cat = activeTab.getAttribute('onclick').match(/'([^']+)'\s*\)/); if (cat) blogFilter(activeTab, cat[1]); }
   } catch(e) {
     console.error('loadBlogFromSupabase:', e);
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--text-soft)">Не вдалося завантажити статті</div>';
