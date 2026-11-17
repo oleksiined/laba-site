@@ -8976,6 +8976,7 @@ function showToast(msg,ms=2500){
   window._navigateFromHash = function(hash) {
     if(hash.startsWith('#card-')){
       navigate('services');
+      try { history.replaceState({page:'services',card:hash.slice(6)}, '', hash); } catch(e){}
     } else if(hash.startsWith('#article=')){
       const _slug = hash.slice('#article='.length);
       if(_slug) navigateToArticle(_slug); else navigate('blog');
