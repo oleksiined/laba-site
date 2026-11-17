@@ -1864,9 +1864,10 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 #art-content blockquote{border-left:3px solid var(--navy);margin:24px 0;padding:12px 20px;background:#f5f5f0;border-radius:0 8px 8px 0;font-size:15px;color:var(--text-mid)}
 #art-content hr{border:none;border-top:1px solid var(--border-soft);margin:32px 0}
 /* ══ ARTICLE TOC ══ */
-.article-with-toc{display:grid;grid-template-columns:1fr 260px;gap:48px;align-items:start;max-width:1280px;margin:0 auto;padding:32px 32px 80px}
-.article-with-toc .article-main{min-width:0}
-.article-toc{position:sticky;top:80px;max-height:calc(100vh - 100px);overflow-y:auto;align-self:start;padding-top:364px}
+.article-with-toc{display:grid;grid-template-columns:1fr 260px;grid-template-rows:auto 1fr;gap:0 48px;align-items:start;max-width:1280px;margin:0 auto;padding:32px 32px 80px}
+.article-with-toc .article-main{min-width:0;grid-column:1;grid-row:1/3}
+.article-toc-spacer{grid-column:2;grid-row:1}
+.article-toc{position:sticky;top:80px;max-height:calc(100vh - 100px);overflow-y:auto;align-self:start;grid-column:2;grid-row:2}
 .article-toc-inner{background:var(--white);border:1px solid var(--border-soft);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow-sm)}
 .article-toc-title{font-size:11px;font-weight:800;color:var(--text-soft);letter-spacing:.8px;text-transform:uppercase;margin:0 0 12px}
 .article-toc-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
@@ -1875,7 +1876,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .article-toc-item a.active{color:var(--navy);font-weight:600;background:var(--bg);border-left-color:var(--green)}
 /* article-outer used when no ToC (fallback) */
 .article-outer{max-width:760px;margin:0 auto;padding:32px 32px 80px}
-@media(max-width:960px){.article-with-toc{grid-template-columns:1fr;padding:20px 16px 60px}.article-toc{display:none!important}}
+@media(max-width:960px){.article-with-toc{grid-template-columns:1fr;padding:20px 16px 60px}.article-toc{display:none!important}.article-toc-spacer{display:none}}
 
 /* ══ ABOUT PAGE ══ */
 .about-page{background:linear-gradient(175deg,#0a1a0a 0%,#122a12 40%,#1a3a1a 70%,#0d1f0d 100%);height:100vh;overflow:hidden}
@@ -5271,6 +5272,7 @@ main{flex:1}
       <div class="article-hero" id="art-hero" style="background:linear-gradient(160deg,#c8e6c9 0%,#558b2f 55%,#e65100 100%);display:flex;align-items:flex-end;border-radius:14px;height:340px;margin-bottom:24px"></div>
       <div id="art-content"></div>
     </div>
+    <div class="article-toc-spacer" id="art-toc-spacer"></div>
     <aside class="article-toc" id="art-toc">
       <div class="article-toc-inner">
         <div class="article-toc-title">Зміст</div>
@@ -6590,6 +6592,9 @@ async function navigateToArticle(slug) {
   window.scrollTo(0, 0);
   // Align ToC top with #art-content, then activate scroll spy
   setTimeout(function() {
+    var spacer = document.getElementById('art-toc-spacer');
+    var heroEl = document.getElementById('art-hero');
+    if (spacer && heroEl) spacer.style.height = (heroEl.offsetHeight + 24) + 'px';
     _artTocSpyInit();
     // Update dynamic prices in article product cards
     if (typeof updateArticlePrices === 'function') updateArticlePrices();
