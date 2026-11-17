@@ -6577,7 +6577,11 @@ async function navigateToArticle(slug) {
     }
   }
   var relGrid = document.getElementById('art-related-grid');
-  if (relGrid && art.related) relGrid.innerHTML = art.related.map(_buildRelatedCard).join('');
+  if (relGrid) {
+    var relSlugs = (art.related && art.related.length) ? art.related
+      : Object.keys(BLOG_ARTICLES).filter(function(s){ return s !== slug; }).slice(0, 3);
+    relGrid.innerHTML = relSlugs.map(_buildRelatedCard).join('');
+  }
   document.title = art.seoTitle || art.title || 'LABA';
   var metaDesc = document.querySelector('meta[name="description"]');
   if (metaDesc) metaDesc.setAttribute('content', art.metaDesc);
