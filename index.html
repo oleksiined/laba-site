@@ -11525,26 +11525,24 @@ function renderAddPanel(sid) {
   const curFilter = NS.catFilter[sid] || 'all';
   const curSearch = (NS.search[sid] || '').toLowerCase().trim();
 
-  // available = not included in package AND matches material
-  // Пробопідготовка відображається, але заблокована для додавання до пакетного дослідження
+  // available = not included in package AND matches sample material
   const allCats = NS_CAT.categories.filter(c => c.id !== 'all');
   const prepCat = allCats.find(c => c.name === 'Пробопідготовка' || c.id === 'Пробопідготовка');
   const prepIds = new Set((prepCat ? prepCat.items : []).map(i => i.id));
 
-  // Collect unique material IDs from available indicators
-  const allItems = allCats.flatMap(c => c.items);
-  const availMatIds = [...new Set(allItems.map(i => i.mat).flat().filter(Boolean))];
-  const matOpts = [
-    `<option value="all" ${curFilter === 'all' ? 'selected' : ''}>Всі матеріали</option>`,
-    ...availMatIds.map(mid => {
-      const mname = (NS_CAT.materials[mid] || {}).name || mid;
-      return `<option value="${mid}" ${curFilter === mid ? 'selected' : ''}>${mname}</option>`;
-    })
+  // Filter categories to only those relevant for the sample's material
+  const matId = s.materialId || 'soil';
+  const matCats = allCats
+    .map(c => ({ ...c, items: c.items.filter(i => !i.mat || i.mat.includes(matId)) }))
+    .filter(c => c.items.length > 0);
+  const catOpts = [
+    `<option value="all" ${curFilter === 'all' ? 'selected' : ''}>Всі категорії</option>`,
+    ...matCats.map(c => `<option value="${c.id}" ${curFilter === c.id ? 'selected' : ''}>${c.name}</option>`)
   ].join('');
 
   const srcItems = curFilter === 'all'
-    ? allItems
-    : allItems.filter(i => i.mat && i.mat.includes(curFilter));
+    ? matCats.flatMap(c => c.items)
+    : (matCats.find(c => c.id === curFilter) || {items:[]}).items;
 
   const avail = srcItems.filter(i =>
     !incl.has(i.id) &&
@@ -11560,7 +11558,7 @@ function renderAddPanel(sid) {
   <input class="search-inp" id="search-inp-${sid}" type="text" placeholder="Пошук дослідження"
          value="${NS.search[sid] || ''}"
          oninput="setSearch('${sid}', this.value)">
-  <select class="cat-sel" onchange="setCatFilter('${sid}', this.value)">${matOpts}</select>
+  <select class="cat-sel" onchange="setCatFilter('${sid}', this.value)">${catOpts}</select>
 </div>
 <div class="ind-grid">
   ${avail.length ? avail.map(i => {
