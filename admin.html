@@ -677,7 +677,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
 .pg-yes{color:#2a7a3b;font-weight:600}
 .pg-no{color:#c0392b;font-weight:600}
 .pg-pos-code{font-size:11px;color:var(--text-soft);white-space:nowrap}
-.pg-item{font-size:13px;color:var(--text-dark);max-width:280px;white-space:normal}
+.pg-item{font-size:13px;color:var(--text-dark);white-space:normal;overflow:hidden}
 .pg-item small{display:block;font-size:11px;color:var(--text-soft);margin-top:1px}
 .pg-state{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
 .pg-state.current{background:#e9faf1;color:#137748}
@@ -1788,7 +1788,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
               <select id="pg-laboratory" class="pg-select"><option value="">Лабораторії: усі</option><option value="sat">SAT LAB</option></select>
               <span class="pg-asof">Ґрунт · ціни за зразок без ПДВ</span>
             </div>
-            <div class="pg-scroll"><table class="pg-table" style="table-layout:fixed"><colgroup><col style="width:90px"><col style="min-width:90px"><col style="width:90px"><col style="width:90px"><col style="width:90px"><col style="width:70px"><col style="width:72px"><col style="width:72px"><col style="width:80px"><col style="width:88px"><col style="width:88px"><col style="width:100px"><col style="width:36px"></colgroup><thead><tr><th>Код</th><th id="pg-colname">Назва пакета</th><th>Лабораторія</th><th class="pg-num">Ціна, грн</th><th class="pg-num">Наша ціна</th><th class="pg-num">Маржа</th><th class="pg-center">Спромож.</th><th class="pg-center">Пробопідг.</th><th class="pg-center">Термін, дн.</th><th>Діє з</th><th>Діє до</th><th>Статус</th><th></th></tr></thead><tbody id="pg-list"></tbody></table></div>
+            <div class="pg-scroll"><table class="pg-table" style="table-layout:fixed"><colgroup><col style="width:90px"><col style="width:160px"><col style="width:90px"><col style="width:90px"><col style="width:90px"><col style="width:70px"><col style="width:72px"><col style="width:72px"><col style="width:80px"><col style="width:88px"><col style="width:88px"><col style="width:100px"><col style="width:36px"></colgroup><thead><tr><th>Код</th><th id="pg-colname">Назва пакета</th><th>Лабораторія</th><th class="pg-num">Ціна, грн</th><th class="pg-num">Наша ціна</th><th class="pg-num">Маржа</th><th class="pg-center">Спромож.</th><th class="pg-center">Пробопідг.</th><th class="pg-center">Термін, дн.</th><th>Діє з</th><th>Діє до</th><th>Статус</th><th></th></tr></thead><tbody id="pg-list"></tbody></table></div>
             <div class="pg-bar"><span id="pg-count"></span><div class="pg-pager"><button class="pg-icon-btn" id="pg-prev">‹</button><span id="pg-page"></span><button class="pg-icon-btn" id="pg-next">›</button></div></div>
           </section>
         </div>
