@@ -2062,13 +2062,13 @@ main{flex:1}
 .group-card{background:#fff;border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px;overflow:hidden;transition:box-shadow .2s}
 .group-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.07)}
 .gc-inner{display:grid;grid-template-columns:5fr 7fr}
-.gc-left{padding:20px 22px;border-right:1px solid var(--bd);display:flex;flex-direction:column;gap:3px}
+.gc-left{padding:20px 22px;border-right:1px solid var(--bd);display:flex;flex-direction:column;gap:3px;position:relative}
 .gc-name{font-size:16px;font-weight:700;color:var(--t1);line-height:1.3;margin-bottom:2px}
 .gc-material{font-size:12.5px;font-weight:400;color:var(--t3);display:flex;align-items:center;gap:5px}
 .gc-term{font-size:12.5px;font-weight:400;color:var(--t3);display:flex;align-items:center;gap:5px;margin-top:2px}
 .gc-add-inds{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
 .gc-ind-tag{font-size:11.5px;font-weight:500;color:var(--t2);background:#f0f2f4;border:1px solid var(--bd);border-radius:20px;padding:2px 9px;white-space:nowrap}
-.gc-actions{margin-top:auto;display:flex;gap:2px;padding-top:14px}
+.gc-actions{position:absolute;top:10px;right:10px;display:flex;gap:2px}
 .act-btn{width:32px;height:32px;border-radius:var(--r-xs);display:flex;align-items:center;justify-content:center;color:var(--t3);transition:background .15s}
 .act-btn:hover{background:var(--bg)}
 .act-btn-del{color:var(--t3)}
@@ -2752,7 +2752,9 @@ main{flex:1}
   .nc-back-btn:hover{color:var(--t1)}
   .nc-step:not(.nc-active){display:none!important}
   .nc-step-line{display:none!important}
-  .nc-btn-group{display:flex!important;margin-left:0}
+  .nc-stepbar-in{justify-content:space-between!important}
+  .nc-step.nc-active{flex:1;min-width:0}
+  .nc-btn-group{display:flex!important;flex-shrink:0;margin-left:auto}
 
   /* Container — less padding on mobile */
   .container{padding:16px 16px 32px!important}
@@ -10357,7 +10359,7 @@ function renderGroups(gs) {
       ${inds.length ? `<div class="gc-add-inds">${inds.map(i=>`<span class="gc-ind-tag">${i.name}</span>`).join('')}</div>` : ''}
       <div class="gc-actions">
         <button class="act-btn act-btn-del" title="Видалити" onclick="openDelModal(decodeURIComponent('${k}'), ${g.qty})">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7,21q-0.82,0-1.41-0.59T5,19V6H4V4H9V3h6V4h5V6H19V19q0,0.82-0.59,1.41T17,21H7ZM17,6H7V19H17V6ZM9,17h2V8H9v9Zm4,0h2V8H13v9Z"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7,21q-0.82,0-1.41-0.59T5,19V6H4V4H9V3h6V4h5V6H19V19q0,0.82-0.59,1.41T17,21H7ZM17,6H7V19H17V6ZM9,17h2V8H9v9Zm4,0h2V8H13v9Z"/></svg>
         </button>
       </div>
     </div>
