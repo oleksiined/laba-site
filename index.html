@@ -7232,7 +7232,8 @@ function clickCartIcon(safeCode, event){
   const name = _n.name||safeCode, price = _n.price||0;
   const idx = cart.findIndex(c=>c.code===safeCode&&c.type==='pkg');
   if(idx<0){
-    const _pkgMin = (NS_CAT.packages[safeCode]||{}).minSamplesCount||1;
+    const _pkgSlug = (_PKG_NAMES[safeCode]||{}).slug||safeCode;
+    const _pkgMin = (NS_CAT.packages[_pkgSlug]||NS_CAT.packages[safeCode]||{}).minSamplesCount||1;
     cart.push({code:safeCode,type:'pkg',price,name,notes:[],qty:_pkgMin});
     saveCart(); updateCartUI();
   }
@@ -7256,7 +7257,8 @@ function syncCollapsedQty(safeCode){
   const decBtn = document.getElementById('cdec-'+safeCode);
   if(decBtn) {
     decBtn.disabled = false;
-    const _minSQ = (NS_CAT.packages[safeCode]||{}).minSamplesCount||1;
+    const _pkgSlugSCQ = (_PKG_NAMES[safeCode]||{}).slug||safeCode;
+    const _minSQ = (NS_CAT.packages[_pkgSlugSCQ]||NS_CAT.packages[safeCode]||{}).minSamplesCount||1;
     const isOne = (qty||_minSQ) <= _minSQ;
     decBtn.title = isOne ? 'Видалити з кошика' : 'Зменшити';
     decBtn.style.color = isOne ? '#EF4444' : '';
@@ -7289,7 +7291,8 @@ function changeCollapsedQty(safeCode, delta){
   const idx = cart.findIndex(c=>c.code===safeCode&&c.type==='pkg');
   if(idx<0) return;
   const cur = getCartQty(cart[idx]);
-  const _minQ = (NS_CAT.packages[safeCode]||{}).minSamplesCount||1;
+  const _pkgSlugCCQ = (_PKG_NAMES[safeCode]||{}).slug||safeCode;
+  const _minQ = (NS_CAT.packages[_pkgSlugCCQ]||NS_CAT.packages[safeCode]||{}).minSamplesCount||1;
   // При qty<=мінімуму та натисканні − → видалити з кошика
   if (delta < 0 && cur <= _minQ) {
     cart.splice(idx, 1);
@@ -7525,7 +7528,7 @@ function makeRow(item, type){
   const safeCode = item.code.replace(/[^a-zA-Z0-9-]/g,'');
   const itemSlug = (item.slug||item.code).replace(/[^a-zA-Z0-9-]/g,'');
   // Зберігаємо назву і ціну в словнику — не передаємо в inline onclick щоб уникнути проблем зі спецсимволами
-  _PKG_NAMES[safeCode] = { name: item.name, price: item.price||0, materialKey: item.materialKey||'' };
+  _PKG_NAMES[safeCode] = { name: item.name, price: item.price||0, materialKey: item.materialKey||'', slug: itemSlug };
   const qty = getRowQty(safeCode);
   const subtotal = (item.price||0)*qty;
 
