@@ -6801,7 +6801,7 @@ function pgReadPrices(){try{const v=JSON.parse(localStorage.getItem('laba-prices
 let pgPrices=pgReadPrices();
 function pgSave(next){pgPrices=next;return true;}
 function pgHistory(row){return pgPrices.filter(p=>p.key===row.key&&p.lab===row.lab).sort((a,b)=>b.from.localeCompare(a.from)||b.version-a.version);}
-function pgCurrent(row){const all=pgHistory(row);const match=all.find(p=>p.version===row.version&&p.from<=pgToday);if(match&&(!match.to||match.to>=pgToday))return{price:match,status:'current'};if(all.some(p=>p.version===row.version&&p.from>pgToday))return{price:null,status:'future'};return{price:null,status:all.length?'review':'wait'};}
+function pgCurrent(row){const all=pgHistory(row);const match=all.find(p=>p.from<=pgToday);if(match&&(!match.to||match.to>=pgToday))return{price:match,status:'current'};if(all.some(p=>p.from>pgToday))return{price:null,status:'future'};return{price:null,status:all.length?'review':'wait'};}
 function pgBaseRows(){const t=pgId('pg-positionType').value;if(t==='packages')return pgPackages;if(t==='tests')return pgTests;return pgCatalog;}
 function pgScopedOffers(){const lab=pgId('pg-laboratory').value;return pgOffers(pgBaseRows()).filter(row=>!lab||row.lab===lab);}
 function pgFiltered(){const q=pgId('pg-search').value.toLowerCase().trim();return pgScopedOffers().filter(row=>(!pgId('pg-status').value||pgCurrent(row).status===pgId('pg-status').value)&&(pgId('pg-positionType').value!=='packages'||!pgId('pg-group').value||row.group===pgId('pg-group').value)&&[row.name,row.key,row.service,row.details,row.group,pgLabs[row.lab]].join(' ').toLowerCase().includes(q));}
