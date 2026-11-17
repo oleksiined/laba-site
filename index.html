@@ -4025,7 +4025,7 @@ main{flex:1}
         <div class="cart-meta-row">
           <p class="cart-meta" id="cart-meta"></p>
           <button class="cart-clear-btn" id="cart-clear-top" onclick="nc_clearCart()" style="display:none">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M7,21q-0.82,0-1.41-0.59T5,19V6H4V4H9V3h6V4h5V6H19V19q0,0.82-0.59,1.41T17,21H7ZM17,6H7V19H17V6ZM9,17h2V8H9v9Zm4,0h2V8H13v9Z"/></svg>
             Очистити кошик
           </button>
         </div>
@@ -6720,7 +6720,7 @@ function openCart(){
         <button onclick="removeCartItem(${i});openCart()" style="background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:14px;padding:0 2px" title="Видалити">✕</button>
       </div>
       <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
-        <button onclick="cartDrawerDec(${i})" style="width:26px;height:26px;border:1px solid var(--border);border-radius:6px;background:var(--bg);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--navy);flex-shrink:0" title="${qty<=1?'Видалити':'Зменшити'}">${qty<=1?'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="11" height="11"><polyline points="2,4 14,4"/><path d="M5 4V3h6v1M6 7v5M10 7v5" stroke-linecap="round"/><rect x="3" y="4" width="10" height="9" rx="1.5"/></svg>':'−'}</button>
+        <button onclick="cartDrawerDec(${i})" style="width:26px;height:26px;border:1px solid var(--border);border-radius:6px;background:var(--bg);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--navy);flex-shrink:0" title="${qty<=1?'Видалити':'Зменшити'}">${qty<=1?'<svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M7,21q-0.82,0-1.41-0.59T5,19V6H4V4H9V3h6V4h5V6H19V19q0,0.82-0.59,1.41T17,21H7ZM17,6H7V19H17V6ZM9,17h2V8H9v9Zm4,0h2V8H13v9Z"/></svg>':'−'}</button>
         <input type="number" value="${qty}" min="1" max="9999" data-cart-idx="${i}"
           style="width:46px;height:26px;border:1px solid var(--border);border-radius:6px;text-align:center;font-size:13px;font-weight:700;color:var(--navy);background:var(--white);outline:none;-moz-appearance:textfield"
           oninput="cartDrawerInput(${i},this.value)"
@@ -6756,7 +6756,7 @@ function _cartDrawerRefreshItem(idx) {
     const isOne = qty <= 1;
     decBtn.title = isOne ? 'Видалити' : 'Зменшити';
     decBtn.innerHTML = isOne
-      ? '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="11" height="11"><polyline points="2,4 14,4"/><path d="M5 4V3h6v1M6 7v5M10 7v5" stroke-linecap="round"/><rect x="3" y="4" width="10" height="9" rx="1.5"/></svg>'
+      ? '<svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M7,21q-0.82,0-1.41-0.59T5,19V6H4V4H9V3h6V4h5V6H19V19q0,0.82-0.59,1.41T17,21H7ZM17,6H7V19H17V6ZM9,17h2V8H9v9Zm4,0h2V8H13v9Z"/></svg>'
       : '−';
   }
   const total = document.getElementById('cartTotal');
@@ -7263,7 +7263,7 @@ function syncCollapsedQty(safeCode){
     decBtn.title = isOne ? 'Видалити з кошика' : 'Зменшити';
     decBtn.style.color = isOne ? '#EF4444' : '';
     decBtn.innerHTML = isOne
-      ? '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><polyline points="2,4 14,4"/><path d="M5 4V3h6v1M6 7v5M10 7v5" stroke-linecap="round"/><rect x="3" y="4" width="10" height="9" rx="1.5"/></svg>'
+      ? '<svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M7,21q-0.82,0-1.41-0.59T5,19V6H4V4H9V3h6V4h5V6H19V19q0,0.82-0.59,1.41T17,21H7ZM17,6H7V19H17V6ZM9,17h2V8H9v9Zm4,0h2V8H13v9Z"/></svg>'
       : '−';
   }
   const label = document.getElementById('cqty-label-'+safeCode);
@@ -7669,7 +7669,7 @@ function makeRow(item, type){
         <div class="srv-qty-wrap">
           <div class="srv-qty-inline ${inCart?'open':''}" id="czone-${safeCode}" style="flex-direction:row;align-items:center">
             <div class="srv-qty-counter-sm">
-              <button id="cdec-${safeCode}" onclick="changeCollapsedQty('${safeCode}',-${_samplesStep})" title="${qty<=_samplesStep?'Видалити з кошика':'Зменшити'}" style="${qty<=_samplesStep?'color:#EF4444':''}">${qty<=_samplesStep?'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12"><polyline points="2,4 14,4"/><path d="M5 4V3h6v1M6 7v5M10 7v5" stroke-linecap="round"/><rect x="3" y="4" width="10" height="9" rx="1.5"/></svg>':'−'}</button>
+              <button id="cdec-${safeCode}" onclick="changeCollapsedQty('${safeCode}',-${_samplesStep})" title="${qty<=_samplesStep?'Видалити з кошика':'Зменшити'}" style="${qty<=_samplesStep?'color:#EF4444':''}">${qty<=_samplesStep?'<svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M7,21q-0.82,0-1.41-0.59T5,19V6H4V4H9V3h6V4h5V6H19V19q0,0.82-0.59,1.41T17,21H7ZM17,6H7V19H17V6ZM9,17h2V8H9v9Zm4,0h2V8H13v9Z"/></svg>':'−'}</button>
               <input id="cqty-${safeCode}" type="number" value="${qty}" min="${_samplesStep}" step="${_samplesStep}" max="9999" oninput="inputCollapsedQty('${safeCode}',this.value,${_samplesStep})" onblur="if(!this.value||parseInt(this.value)<${_samplesStep}){this.value=${_samplesStep};inputCollapsedQty('${safeCode}',${_samplesStep},${_samplesStep})}">
               <button onclick="changeCollapsedQty('${safeCode}',${_samplesStep})">+</button>
             </div>
@@ -7684,7 +7684,7 @@ function makeRow(item, type){
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
           </button>
           <button class="srv-exp-del" id="cdel-${safeCode}" onclick="removeFromCart('${safeCode}')" title="Видалити з кошика" style="${inCart?'':'display:none'}">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 17 6"/><path d="M16 6l-1 11H5L4 6"/><path d="M8 6V4h4v2" stroke-linecap="round"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7,21q-0.82,0-1.41-0.59T5,19V6H4V4H9V3h6V4h5V6H19V19q0,0.82-0.59,1.41T17,21H7ZM17,6H7V19H17V6ZM9,17h2V8H9v9Zm4,0h2V8H13v9Z"/></svg>
           </button>
           <button class="srv-expand-arrow" id="sarrow-${safeCode}"
             onclick="toggleRowExpand('${safeCode}');event.stopPropagation()" title="Детальніше">
@@ -8140,7 +8140,7 @@ function renderCheckout(){
     <div class="checkout-item-total-label">Сума</div>
     <div class="checkout-item-total">${subtotal.toLocaleString('uk-UA')} грн</div>
   </div>
-  <button class="checkout-remove" onclick="removeCartItem(${i})" title="Видалити">✕</button>
+  <button class="checkout-remove" onclick="removeCartItem(${i})" title="Видалити"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7,21q-0.82,0-1.41-0.59T5,19V6H4V4H9V3h6V4h5V6H19V19q0,0.82-0.59,1.41T17,21H7ZM17,6H7V19H17V6ZM9,17h2V8H9v9Zm4,0h2V8H13v9Z"/></svg></button>
 </div>`;
   }).join('');
   if(totalBox)totalBox.style.display='';
@@ -8355,7 +8355,7 @@ function spRenderPicker(idx) {
       <div class="sp-picker-title">
         Додати дослідження до Зразка ${idx+1}
         <button class="sp-btn-clear" onclick="spClearSel(${idx})">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7,21q-0.82,0-1.41-0.59T5,19V6H4V4H9V3h6V4h5V6H19V19q0,0.82-0.59,1.41T17,21H7ZM17,6H7V19H17V6ZM9,17h2V8H9v9Zm4,0h2V8H13v9Z"/></svg>
           Очистити вибір
         </button>
       </div>
@@ -10023,7 +10023,7 @@ document.addEventListener('DOMContentLoaded', _featInit);
   <div class="modal modal-sm">
     <div class="modal-body" style="padding:28px 22px 20px">
       <div class="del-icon-wrap">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M7,21q-0.82,0-1.41-0.59T5,19V6H4V4H9V3h6V4h5V6H19V19q0,0.82-0.59,1.41T17,21H7ZM17,6H7V19H17V6ZM9,17h2V8H9v9Zm4,0h2V8H13v9Z"/></svg>
       </div>
       <p class="del-title">Видалити групу?</p>
       <p class="del-text" id="del-text"></p>
@@ -10357,7 +10357,7 @@ function renderGroups(gs) {
       ${inds.length ? `<div class="gc-add-inds">${inds.map(i=>`<span class="gc-ind-tag">${i.name}</span>`).join('')}</div>` : ''}
       <div class="gc-actions">
         <button class="act-btn act-btn-del" title="Видалити" onclick="openDelModal(decodeURIComponent('${k}'), ${g.qty})">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7,21q-0.82,0-1.41-0.59T5,19V6H4V4H9V3h6V4h5V6H19V19q0,0.82-0.59,1.41T17,21H7ZM17,6H7V19H17V6ZM9,17h2V8H9v9Zm4,0h2V8H13v9Z"/></svg>
         </button>
       </div>
     </div>
@@ -13854,7 +13854,7 @@ function osShowFileRow(name, count) {
   list.innerHTML = '<div class="os-file-row"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
     + '<span class="os-file-row-name">' + osEsc(name) + ' · ' + count + ' ' + (count===1?'поле':count<5?'поля':'полів') + '</span>'
     + '<span class="os-file-row-status"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3a7a2a" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Контури перевірено</span>'
-    + '<button class="os-file-row-del" onclick="osClearFile()" title="Видалити"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>'
+    + '<button class="os-file-row-del" onclick="osClearFile()" title="Видалити"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7,21q-0.82,0-1.41-0.59T5,19V6H4V4H9V3h6V4h5V6H19V19q0,0.82-0.59,1.41T17,21H7ZM17,6H7V19H17V6ZM9,17h2V8H9v9Zm4,0h2V8H13v9Z"/></svg></button>'
     + '</div>';
 }
 
