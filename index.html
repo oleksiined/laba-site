@@ -11529,20 +11529,25 @@ function renderAddPanel(sid) {
   const prepCat = allCats.find(c => c.name === 'Пробопідготовка' || c.id === 'Пробопідготовка');
   const prepIds = new Set((prepCat ? prepCat.items : []).map(i => i.id));
 
+  // Collect unique material IDs from available indicators
+  const allItems = allCats.flatMap(c => c.items);
+  const availMatIds = [...new Set(allItems.map(i => i.mat).flat().filter(Boolean))];
+  const matOpts = [
+    `<option value="all" ${curFilter === 'all' ? 'selected' : ''}>Всі матеріали</option>`,
+    ...availMatIds.map(mid => {
+      const mname = (NS_CAT.materials[mid] || {}).name || mid;
+      return `<option value="${mid}" ${curFilter === mid ? 'selected' : ''}>${mname}</option>`;
+    })
+  ].join('');
+
   const srcItems = curFilter === 'all'
-    ? allCats.flatMap(c => c.items)
-    : (NS_CAT.categories.find(c => c.id === curFilter) || {items:[]}).items;
+    ? allItems
+    : allItems.filter(i => i.mat && i.mat.includes(curFilter));
 
   const avail = srcItems.filter(i =>
     !incl.has(i.id) &&
-    (!i.mat || i.mat.includes(s.materialId)) &&
     (!curSearch || i.name.toLowerCase().includes(curSearch))
   );
-
-  const catOpts = [
-    {id:'all', name:'Всі категорії'},
-    ...allCats,
-  ].map(c => `<option value="${c.id}" ${c.id === curFilter ? 'selected' : ''}>${c.name}</option>`).join('');
 
   el.innerHTML = `
 <div class="add-title">
@@ -11553,7 +11558,7 @@ function renderAddPanel(sid) {
   <input class="search-inp" id="search-inp-${sid}" type="text" placeholder="Пошук дослідження"
          value="${NS.search[sid] || ''}"
          oninput="setSearch('${sid}', this.value)">
-  <select class="cat-sel" onchange="setCatFilter('${sid}', this.value)">${catOpts}</select>
+  <select class="cat-sel" onchange="setCatFilter('${sid}', this.value)">${matOpts}</select>
 </div>
 <div class="ind-grid">
   ${avail.length ? avail.map(i => {
