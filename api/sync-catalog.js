@@ -299,6 +299,9 @@ async function syncCatalog(debug = false) {
       search_keywords:      r.search_keywords      || null,
       report_example_url:   r.report_example_url   || null,
       result_deliverables:  r.result_deliverables  || null,
+      min_samples_count:    r.min_samples_count    ? Number(r.min_samples_count) : null,
+      min_sample_quantity:  r.min_sample_quantity  ? Number(r.min_sample_quantity) : null,
+      sample_quantity_unit: r.sample_quantity_unit || null,
       synced_at:            now,
     }));
 
