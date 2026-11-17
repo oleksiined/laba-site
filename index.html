@@ -7232,7 +7232,8 @@ function clickCartIcon(safeCode, event){
   const name = _n.name||safeCode, price = _n.price||0;
   const idx = cart.findIndex(c=>c.code===safeCode&&c.type==='pkg');
   if(idx<0){
-    cart.push({code:safeCode,type:'pkg',price,name,notes:[],qty:1});
+    const _pkgMin = (NS_CAT.packages[safeCode]||{}).minSamplesCount||1;
+    cart.push({code:safeCode,type:'pkg',price,name,notes:[],qty:_pkgMin});
     saveCart(); updateCartUI();
   }
   // Ховаємо іконку, показуємо лічильник
@@ -7255,7 +7256,8 @@ function syncCollapsedQty(safeCode){
   const decBtn = document.getElementById('cdec-'+safeCode);
   if(decBtn) {
     decBtn.disabled = false;
-    const isOne = (qty||1) <= 1;
+    const _minSQ = (NS_CAT.packages[safeCode]||{}).minSamplesCount||1;
+    const isOne = (qty||_minSQ) <= _minSQ;
     decBtn.title = isOne ? 'Видалити з кошика' : 'Зменшити';
     decBtn.style.color = isOne ? '#EF4444' : '';
     decBtn.innerHTML = isOne
@@ -7287,8 +7289,9 @@ function changeCollapsedQty(safeCode, delta){
   const idx = cart.findIndex(c=>c.code===safeCode&&c.type==='pkg');
   if(idx<0) return;
   const cur = getCartQty(cart[idx]);
-  // При qty=1 та натисканні − → видалити з кошика
-  if (delta < 0 && cur <= 1) {
+  const _minQ = (NS_CAT.packages[safeCode]||{}).minSamplesCount||1;
+  // При qty<=мінімуму та натисканні − → видалити з кошика
+  if (delta < 0 && cur <= _minQ) {
     cart.splice(idx, 1);
     saveCart(); updateCartUI();
     // Ховаємо лічильник, показуємо іконку кошика
