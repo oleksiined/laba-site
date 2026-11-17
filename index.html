@@ -6513,7 +6513,7 @@ async function navigateToArticle(slug) {
 function artTocClick(e, id) {
   e.preventDefault();
   var el = document.getElementById(id);
-  if (el) { var top = el.getBoundingClientRect().top + window.scrollY - 80; window.scrollTo({top: top, behavior:'smooth'}); }
+  if (el) { var _nb = document.querySelector('.navbar'); var _off = (_nb ? _nb.offsetHeight : 70) + 16; var top = el.getBoundingClientRect().top + window.scrollY - _off; window.scrollTo({top: top, behavior:'smooth'}); }
 }
 var _artTocSpyObs = null;
 
