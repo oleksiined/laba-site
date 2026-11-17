@@ -1818,7 +1818,7 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 .article-author-name{font-size:14px;font-weight:700;color:var(--navy);line-height:1.3}
 .article-author-role{font-size:13px;color:var(--text-mid)}
 .article-hero{width:100%;border-radius:14px;display:block;margin-bottom:24px;object-fit:cover;height:340px;background:#c8dbd0}
-@media(min-width:961px){.article-with-toc .article-hero{width:calc(100% + 308px);max-width:none}}
+@media(min-width:961px){.article-with-toc .article-hero{width:calc(100% + 308px);max-width:none;pointer-events:none}}
 .article-lead{font-size:16px;color:var(--text-mid);line-height:1.7;margin-bottom:32px}
 .article-h2{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.2px;margin:0 0 10px}
 .article-p{font-size:15px;color:var(--text);line-height:1.7;margin-bottom:16px}
@@ -6591,7 +6591,13 @@ async function navigateToArticle(slug) {
   // Align ToC top with #art-content, then activate scroll spy
   setTimeout(function() {
     var toc = document.getElementById('art-toc');
-    if (toc) toc.style.marginTop = '';
+    var content = document.getElementById('art-content');
+    var grid = document.querySelector('.article-with-toc');
+    if (toc && content && grid) {
+      var gridTop = grid.getBoundingClientRect().top + window.scrollY;
+      var contentTop = content.getBoundingClientRect().top + window.scrollY;
+      toc.style.marginTop = (contentTop - gridTop) + 'px';
+    }
     _artTocSpyInit();
     // Update dynamic prices in article product cards
     if (typeof updateArticlePrices === 'function') updateArticlePrices();
