@@ -6311,6 +6311,7 @@ document.addEventListener('click',function(e){
 // ===================== BLOG ARTICLES DATA =====================
 var BLOG_ARTICLES = {};
 var _blogLoaded = false;
+var _blogActiveCat = 'all';
 
 function _renderBlogCard(art, slug) {
   var imgHtml = (art.cover_url || art.cover)
@@ -6366,8 +6367,10 @@ async function loadBlogFromSupabase(force) {
       : '<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--text-soft)">Статей поки немає</div>';
     _blogLoaded = true;
     // Re-apply active filter after load
-    var activeTab = document.querySelector('.blog-tab.active');
-    if (activeTab) { var cat = activeTab.getAttribute('onclick').match(/'([^']+)'\s*\)/); if (cat) blogFilter(activeTab, cat[1]); }
+    if (_blogActiveCat !== 'all') {
+      var activeTab = document.querySelector('.blog-tab.active');
+      if (activeTab) blogFilter(activeTab, _blogActiveCat);
+    }
   } catch(e) {
     console.error('loadBlogFromSupabase:', e);
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--text-soft)">Не вдалося завантажити статті</div>';
@@ -6531,6 +6534,7 @@ function _artTocSpyInit() {
 }
 // ===================== END BLOG ARTICLES DATA =====================
 function blogFilter(btn, cat) {
+  _blogActiveCat = cat;
   document.querySelectorAll('.blog-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
   document.querySelectorAll('#blog-grid .blog-card').forEach(card => {
