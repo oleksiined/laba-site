@@ -6591,13 +6591,7 @@ async function navigateToArticle(slug) {
   // Align ToC top with #art-content, then activate scroll spy
   setTimeout(function() {
     var toc = document.getElementById('art-toc');
-    var content = document.getElementById('art-content');
-    var grid = document.querySelector('.article-with-toc');
-    if (toc && content && grid) {
-      var gridTop = grid.getBoundingClientRect().top + window.scrollY;
-      var contentTop = content.getBoundingClientRect().top + window.scrollY;
-      toc.style.marginTop = (contentTop - gridTop) + 'px';
-    }
+    if (toc) toc.style.marginTop = '';
     _artTocSpyInit();
     // Update dynamic prices in article product cards
     if (typeof updateArticlePrices === 'function') updateArticlePrices();
