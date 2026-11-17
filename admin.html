@@ -1775,7 +1775,6 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
           </div>
         </div>
         <div class="pg-content">
-          <div class="pg-demo"><b>Прототип</b><span>Ціни, редакції складу й можливості другої лабораторії умовні. Зміни зберігаються в цьому браузері.</span></div>
           <section aria-label="Статуси цін" class="pg-metrics" id="pg-metrics"></section>
           <section class="pg-panel" aria-label="Тарифи лабораторії">
             <div class="pg-filters">
@@ -1783,7 +1782,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
               <select id="pg-positionType" class="pg-select"><option value="all">Тип: усі</option><option value="packages" selected>Пакети</option><option value="tests">Окремі дослідження</option></select>
               <select id="pg-status" class="pg-select"><option value="">Статус: усі</option><option value="current">Чинна ціна</option><option value="wait">Очікуємо ціну</option><option value="review">Потрібне підтвердження</option><option value="future">Запланована ціна</option></select>
               <select id="pg-group" class="pg-select"><option value="">Група: усі</option><option>Агрохімічна</option><option>Автоматичний відбір</option></select>
-              <select id="pg-laboratory" class="pg-select"><option value="">Лабораторії: усі</option><option value="sat">SAT LAB</option><option value="demo-b">Лабораторія Б (демо)</option></select>
+              <select id="pg-laboratory" class="pg-select"><option value="">Лабораторії: усі</option><option value="sat">SAT LAB</option></select>
               <span class="pg-asof">Ґрунт · ціни за зразок без ПДВ</span>
             </div>
             <div class="pg-scroll"><table class="pg-table"><thead><tr><th>Код</th><th id="pg-colname">Назва пакета</th><th>Лабораторія</th><th class="pg-num">Ціна лабораторії</th><th class="pg-num">Ціна продажу</th><th class="pg-num">Маржа</th><th>Ціна діє з</th><th>Статус</th><th></th></tr></thead><tbody id="pg-list"></tbody></table></div>
@@ -6767,7 +6766,7 @@ async function blogDelete(slug) {
 
 <!-- ── PRICE GUIDE DIALOGS ── -->
 <dialog id="pg-detail" class="pg-dialog pg-drawer"><div class="pg-dlg-head"><div><h2 id="pg-detailTitle"></h2><span class="pg-light" id="pg-detailCode"></span></div><button class="pg-icon-btn" data-pg-close="pg-detail">×</button></div><div class="pg-dlg-body" id="pg-detailBody"></div></dialog>
-<dialog id="pg-formDialog" class="pg-dialog"><form id="pg-priceForm"><div class="pg-dlg-head"><h2>Додати тариф лабораторії</h2><button type="button" class="pg-icon-btn" data-pg-close="pg-formDialog">×</button></div><div class="pg-dlg-body"><div class="pg-fields"><label class="pg-wide">Лабораторія<select id="pg-formLab" class="pg-input" required><option value="sat">SAT LAB</option><option value="demo-b">Лабораторія Б (демо)</option></select></label><label class="pg-wide">Позиція<select id="pg-position" class="pg-input" required></select></label><label>Закупівельна ціна, грн без ПДВ<input id="pg-amount" class="pg-input" type="number" min="0" max="10000000" step="0.01" required></label><label>Діє з<input id="pg-from" class="pg-input" type="date" required></label><label>Діє до включно<input id="pg-to" class="pg-input" type="date"></label></div><div class="pg-err" id="pg-formError"></div></div><div class="pg-dlg-foot"><button class="pg-btn" type="button" data-pg-close="pg-formDialog">Скасувати</button><button class="pg-btn primary" type="submit">Зберегти тариф</button></div></form></dialog>
+<dialog id="pg-formDialog" class="pg-dialog"><form id="pg-priceForm"><div class="pg-dlg-head"><h2>Додати тариф лабораторії</h2><button type="button" class="pg-icon-btn" data-pg-close="pg-formDialog">×</button></div><div class="pg-dlg-body"><div class="pg-fields"><label class="pg-wide">Лабораторія<select id="pg-formLab" class="pg-input" required><option value="sat">SAT LAB</option></select></label><label class="pg-wide">Позиція<select id="pg-position" class="pg-input" required></select></label><label>Закупівельна ціна, грн без ПДВ<input id="pg-amount" class="pg-input" type="number" min="0" max="10000000" step="0.01" required></label><label>Діє з<input id="pg-from" class="pg-input" type="date" required></label><label>Діє до включно<input id="pg-to" class="pg-input" type="date"></label></div><div class="pg-err" id="pg-formError"></div></div><div class="pg-dlg-foot"><button class="pg-btn" type="button" data-pg-close="pg-formDialog">Скасувати</button><button class="pg-btn primary" type="submit">Зберегти тариф</button></div></form></dialog>
 <dialog id="pg-importDialog" class="pg-dialog"><div class="pg-dlg-head"><h2>Імпорт тарифів лабораторій</h2><button class="pg-icon-btn" data-pg-close="pg-importDialog">×</button></div><div class="pg-dlg-body"><p>Завантажте CSV із заповненими цінами за зразок без ПДВ.</p><button class="pg-btn" id="pg-template">↓ Шаблон CSV</button><p style="margin-top:13px"><input type="file" id="pg-csv" accept=".csv,text/csv"></p><div id="pg-importMessage"></div></div><div class="pg-dlg-foot"><button class="pg-btn" data-pg-close="pg-importDialog">Скасувати</button><button class="pg-btn primary" id="pg-commitImport" disabled>Імпортувати</button></div></dialog>
 <div id="pg-toast" class="pg-toast" hidden></div>
 
@@ -6782,9 +6781,8 @@ const pgPackages=pgCatalogData.packages;
 const pgTests=pgCatalogData.tests;
 const pgCatalog=[...pgPackages,...pgTests];
 const pgByKey=new Map(pgCatalog.map(r=>[r.key,r]));
-const pgLabs={sat:'SAT LAB','demo-b':'Лабораторія Б (демо)'};
-const pgDemoAvailable=new Set(['01-2-003','01-2-014','01-1-001-01','01-1-004-01','01-1-005-02','01-1-023-01','01-1-046-01']);
-function pgSupportedLabs(row){return pgDemoAvailable.has(row.key)?['sat','demo-b']:['sat'];}
+const pgLabs={sat:'SAT LAB'};
+function pgSupportedLabs(row){return['sat'];}
 function pgOffers(rows){return rows.flatMap(row=>pgSupportedLabs(row).map(lab=>({...row,lab})));}
 const pgToday=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Kyiv'}).format(new Date());
 const pgState={page:1,pending:[]};
