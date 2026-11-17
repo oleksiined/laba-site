@@ -6582,7 +6582,17 @@ function navigate(page) {
   if (page === 'services') { if(!srvMat) { srvMat=''; currentMaterial=''; srvFmtChosen=false; const ctx=document.getElementById('srvTaskContext'); if(ctx) ctx.style.display='none'; } buildTasksFromGroups(); renderTaskFilter(); render(); }
   else { searchQ=''; const si=document.getElementById('searchInput'); if(si) si.value=''; const sim=document.getElementById('searchInputMobile'); if(sim) sim.value=''; }
   if (page === 'methods') loadMethodsCatalog();
-  if (page === 'blog') loadBlogFromSupabase();
+  if (page === 'blog') {
+    // Reset filter to "all" on each navigation to blog
+    _blogActiveCat = 'all';
+    document.querySelectorAll('.blog-tab').forEach(function(t){ t.classList.remove('active'); });
+    var allTab = document.querySelector('.blog-tab[onclick*="\'all\'"]');
+    if (allTab) allTab.classList.add('active');
+    document.querySelectorAll('#blog-grid .blog-card').forEach(function(c){ c.style.display=''; });
+    var noEl = document.getElementById('blog-no-results');
+    if (noEl) noEl.style.display = 'none';
+    loadBlogFromSupabase();
+  }
   if (page === 'status') ostPageInit();
   if (page === 'about') { window.scrollTo(0,0); setTimeout(function(){ if(typeof initAboutPin==='function') initAboutPin(); if(typeof initAboutFullpage==='function') initAboutFullpage(); },50); }
   // transparent navbar only on about page
