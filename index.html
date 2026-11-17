@@ -8978,7 +8978,7 @@ function showToast(msg,ms=2500){
       navigate('services');
     } else if(hash.startsWith('#article=')){
       const _slug = hash.slice('#article='.length);
-      if(_slug && BLOG_ARTICLES[_slug]) navigateToArticle(_slug); else navigate('blog');
+      if(_slug) navigateToArticle(_slug); else navigate('blog');
     } else if(hash.startsWith('#sampling/')){
       navigate('sampling');
       var _mat = hash.slice('#sampling/'.length);
