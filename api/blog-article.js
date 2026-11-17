@@ -114,7 +114,7 @@ module.exports = async (req, res) => {
     // If new article (no id), set created_at
     if (!body.id) payload.created_at = now;
     const r = await sbReq(
-      '/rest/v1/blog_articles',
+      '/rest/v1/blog_articles?on_conflict=slug',
       'POST', key, JSON.stringify(payload)
     );
     if (r.status >= 300) return res.status(r.status).json({ ok: false, error: r.body });
