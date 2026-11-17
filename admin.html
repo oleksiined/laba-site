@@ -6794,28 +6794,9 @@ const pgFmt=n=>n==null?'—':pgMoney.format(n)+' ₴';
 const pgDate=s=>s?s.split('-').reverse().join('.'):'—';
 const pgEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 // SAT LAB — реальні ціни, дійсні до 2027-06-30
-const pgSamples=[
-  // Пакети
-  ['01-2-002',1,920],['01-2-003',1,700],['01-2-004',1,1060],['01-2-005',1,780],
-  ['01-2-006',1,1420],['01-2-011',1,380],['01-2-012',1,320],['01-2-014',1,560],
-  ['01-2-015',1,700],['01-2-016',1,310],['01-2-017',1,820],
-  // Окремі дослідження
-  ['01-1-001-01',1,80],['01-1-004-01',1,50],['01-1-005-01',1,50],['01-1-005-02',1,50],
-  ['01-1-006-02',1,50],['01-1-007-01',1,50],
-  ['01-1-016-01',1,250],['01-1-017-01',1,90],['01-1-018-01',1,160],['01-1-020-01',1,150],
-  ['01-1-023-01',1,180],['01-1-023-02',1,180],['01-1-023-03',1,180],['01-1-023-04',1,180],
-  ['01-1-023-05',1,180],['01-1-023-06',1,180],['01-1-023-07',1,180],
-  ['01-1-025-01',1,180],['01-1-025-02',1,180],['01-1-025-03',1,180],
-  ['01-1-026-01',1,100],['01-1-026-02',1,100],
-  ['01-1-028-01',1,100],['01-1-029-01',1,100],['01-1-030-01',1,100],
-  ['01-1-032-02',1,80],['01-1-033-02',1,80],['01-1-034-02',1,80],
-  ['01-1-035-02',1,80],['01-1-036-01',1,100],['01-1-037-01',1,100],['01-1-037-02',1,100],
-  ['01-1-046-01',1,70],
-].map(([key,version,price])=>({key,version,price,lab:'sat',from:'2026-11-17',to:'2027-06-30',note:'SAT LAB, запит цін 2026-11, дійсно до 30.06.2027'}));
-const pgDemoSamples=[];
 async function pgLoadFromSupabase(){try{const r=await fetch(SUPA_URL+'/rest/v1/lab_price_offers?select=position_id,version,lab_id,price,valid_from,valid_to,note&order=position_id,valid_from.desc',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,Accept:'application/json'}});if(!r.ok)throw new Error('HTTP '+r.status);const rows=await r.json();if(!Array.isArray(rows)||!rows.length)return null;return rows.map(r=>({key:r.position_id,version:r.version,price:Number(r.price),lab:r.lab_id,from:r.valid_from,to:r.valid_to||null,note:r.note||''}));}catch(e){console.warn('pgLoadFromSupabase error:',e);return null;}}
 async function pgSaveToSupabase(item){const body=JSON.stringify({position_id:item.key,version:item.version,lab_id:item.lab,price:item.price,valid_from:item.from,valid_to:item.to||null,note:item.note||''});const r=await fetch(SUPA_URL+'/rest/v1/lab_price_offers',{method:'POST',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json',Accept:'application/json',Prefer:'return=minimal'},body});if(!r.ok){const t=await r.text();throw new Error('Supabase: '+r.status+' '+t);}return true;}
-function pgReadPrices(){try{const v=JSON.parse(localStorage.getItem('laba-prices-v2'));if(Array.isArray(v))return v;}catch{}return[...pgSamples];}
+function pgReadPrices(){try{const v=JSON.parse(localStorage.getItem('laba-prices-v2'));if(Array.isArray(v))return v;}catch{}return[];}
 let pgPrices=pgReadPrices();
 function pgSave(next){pgPrices=next;return true;}
 function pgHistory(row){return pgPrices.filter(p=>p.key===row.key&&p.lab===row.lab).sort((a,b)=>b.from.localeCompare(a.from)||b.version-a.version);}
