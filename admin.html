@@ -4029,16 +4029,9 @@ function admGenAkt(o) {
   }
 
 
-  // ── Знижка ──────────────────────────────────────────────
+  // ── Знижка — віднімаємо від підсумку (без рядка в таблиці) ──
   const discountAmt = Number(o.discount || o.discount_amount || 0);
-  if (discountAmt > 0) {
-    tableBody.push([
-      { text: '', colSpan: 5, border: [false,false,false,false] }, {}, {}, {}, {},
-      { text: 'Знижка:', fontSize: 8.5, bold: true, alignment: 'right', border: [false,false,false,false], color: '#1a7c3e' },
-      { text: '\u2212' + fmtUAH(discountAmt), fontSize: 8.5, bold: true, alignment: 'right', border: [false,false,false,false], color: '#1a7c3e' },
-    ]);
-    total = total - discountAmt;
-  }
+  if (discountAmt > 0) total = total - discountAmt;
 
   const docDef = {
     pageSize: 'A4',
@@ -4375,16 +4368,9 @@ function admGenInvoice(o) {
   }
 
 
-  // ── Знижка ──────────────────────────────────────────────
+  // ── Знижка — віднімаємо від підсумку (без рядка в таблиці) ──
   const discountAmt = Number(o.discount || o.discount_amount || 0);
-  if (discountAmt > 0) {
-    tableBody.push([
-      { text: '', colSpan: 5, border: [false,false,false,false] }, {}, {}, {}, {},
-      { text: 'Знижка:', fontSize: 8.5, bold: true, alignment: 'right', border: [false,false,false,false], color: '#1a7c3e' },
-      { text: '\u2212' + fmtUAH(discountAmt), fontSize: 8.5, bold: true, alignment: 'right', border: [false,false,false,false], color: '#1a7c3e' },
-    ]);
-    total = total - discountAmt;
-  }
+  if (discountAmt > 0) total = total - discountAmt;
 
   const docDef = {
     pageSize: 'A4',
