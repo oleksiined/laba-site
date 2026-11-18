@@ -9155,7 +9155,8 @@ function showToast(msg,ms=2500){
   } else {
     // Defer hash navigation so it runs after all IIFE init code completes
     // (prevents content being overwritten by subsequent init steps)
-    setTimeout(function(){ _navigateFromHash(location.hash); }, 0);
+    // 50ms gives enough margin for all synchronous init and any micro-tasks
+    setTimeout(function(){ _navigateFromHash(location.hash); }, 50);
   }
   // popstate handled by the global listener above
   // Скидаємо матеріал — показуємо всі послуги
@@ -11340,6 +11341,21 @@ async function loadCatalogFromSupabase() {
     fillArticlePrices();
 
     console.log(`✅ Каталог з Supabase: ${packages.length} пакетів, ${services.length} послуг`);
+
+    // Re-apply hash navigation if the catalog load finished before the initial hash navigation ran
+    // (can happen on fast connections where async fetch completes before setTimeout fires)
+    // Also fixes the case where hash navigation ran but catalog data was needed to fully init the page
+    if (window._navigateFromHash && location.hash && location.hash !== '#') {
+      var _expectedPage = location.hash.startsWith('#card-') ? 'services'
+        : location.hash.startsWith('#article=') ? 'blog'
+        : location.hash.startsWith('#sampling/') ? 'sampling'
+        : location.hash.slice(1);
+      var _activePage = document.querySelector('.page.active');
+      var _activeId = _activePage ? _activePage.id.replace('page-', '') : '';
+      if (_expectedPage && _activeId !== _expectedPage && typeof currentPage !== 'undefined' && currentPage !== _expectedPage) {
+        window._navigateFromHash(location.hash);
+      }
+    }
   } catch (err) {
     console.warn('⚠ Supabase catalog load failed, using hardcoded data:', err.message);
   }
