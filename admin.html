@@ -4002,7 +4002,7 @@ function admGenAkt(o) {
       total += sum;
       const code = it.package_id || it.packageId || it.service_code || it.code || '—';
       const _itKey = it.package_id || it.packageId || it.service_code || it.code || '';
-      const name = it.serviceName || it.displayName || it.service_name || (_admCatalogSvc[_itKey]||{}).name || it.name || '—';
+      const name = (it.serviceName || it.displayName || it.service_name || (_admCatalogSvc[_itKey]||{}).name || it.name || '—').replace(/�/g, '');
       const mat  = it.material_name || it.material || 'Ґрунт';
       tableBody.push([
         { text: i + 1,        ...tdStyle, alignment: 'center' },
@@ -4344,7 +4344,7 @@ function admGenInvoice(o) {
       total += sum;
       const code = it.package_id || it.packageId || it.service_code || it.code || '—';
       const _itKey = it.package_id || it.packageId || it.service_code || it.code || '';
-      const name = it.serviceName || it.displayName || it.service_name || (_admCatalogSvc[_itKey]||{}).name || it.name || '—';
+      const name = (it.serviceName || it.displayName || it.service_name || (_admCatalogSvc[_itKey]||{}).name || it.name || '—').replace(/�/g, '');
       const mat  = it.material_name || it.material || 'Ґрунт';
       tableBody.push([
         { text: i + 1,        ...tdStyle, alignment: 'center' },
