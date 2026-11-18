@@ -13709,6 +13709,13 @@ function osInit() {
         OS.fields.forEach(function(f){
           if(!OS._soilPkgOptions.includes(f.settings.soilPackage)) f.settings.soilPackage=OS._soilPkgOptions[0];
         });
+        // перерендерити body відкритих акордеонів якщо ми на кроці 2
+        if (OS.step === 2) {
+          OS.fields.forEach(function(f, i){
+            var bodyEl = document.querySelector('#os-accord-'+i+' .os-accord-body');
+            if (bodyEl) bodyEl.innerHTML = osRenderFieldBody(f, i);
+          });
+        }
       }).catch(function(){});
   }
   osUpdateStep1NextBtn();
@@ -14084,7 +14091,17 @@ function osToggleAccord(i) {
   if (!wasOpen) {
     if (collapseBtn) collapseBtn.textContent = 'Згорнути ↑';
     if (summaryEl) summaryEl.style.display='none';
-    setTimeout(function(){ if(OS.fieldMaps[i]) OS.fieldMaps[i].invalidateSize(); }, 100);
+    setTimeout(function(){
+      var m = OS.fieldMaps[i];
+      if (m) {
+        m.invalidateSize();
+        var f = OS.fields[i];
+        if (f && f.latLngs && f.latLngs.length) {
+          var poly = L.polygon(f.latLngs);
+          m.fitBounds(poly.getBounds(), { padding:[10,10] });
+        }
+      }
+    }, 150);
   } else {
     if (collapseBtn) collapseBtn.textContent = 'Редагувати →';
     var f = OS.fields[i], s = f.settings;
