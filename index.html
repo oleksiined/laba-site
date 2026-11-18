@@ -14585,9 +14585,9 @@ function osRenderSidebar() {
         var subtotal = info2.price * cnt;
         totalPrice += subtotal;
         hasPrices = true;
-        priceRows.push('<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:5px">'
-          + '<span style="color:var(--text-mid)">' + (svcNames2[svc]||svc) + ' · ' + cnt + ' ' + (unitNames2[svc]||'') + '</span>'
-          + '<span style="font-weight:700;color:var(--navy)">' + subtotal.toLocaleString('uk-UA') + ' грн</span>'
+        priceRows.push('<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:5px;gap:6px">'
+          + '<span style="color:var(--text-mid);flex:1;min-width:0">' + (svcNames2[svc]||svc) + ' · ' + cnt + ' ' + (unitNames2[svc]||'') + '</span>'
+          + '<span style="font-weight:700;color:var(--navy);flex-shrink:0;white-space:nowrap">' + subtotal.toLocaleString('uk-UA') + ' грн</span>'
           + '</div>');
       } else if (cnt > 0) {
         priceRows.push('<div style="font-size:13px;color:var(--text-soft);margin-bottom:5px">' + (svcNames2[svc]||svc) + ' · ' + cnt + ' ' + (unitNames2[svc]||'') + '</div>');
@@ -14601,9 +14601,9 @@ function osRenderSidebar() {
           var pkgSubtotal2 = pkg2.price * cnt;
           totalPrice += pkgSubtotal2;
           hasPrices = true;
-          priceRows.push('<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:5px">'
-            + '<span style="color:var(--text-mid)">' + osEsc(pkgName2) + ' · ' + cnt + ' проб</span>'
-            + '<span style="font-weight:700;color:var(--navy)">' + pkgSubtotal2.toLocaleString('uk-UA') + ' грн</span>'
+          priceRows.push('<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:5px;gap:6px">'
+            + '<span style="color:var(--text-mid);flex:1;min-width:0">' + osEsc(pkgName2) + ' · ' + cnt + ' проб</span>'
+            + '<span style="font-weight:700;color:var(--navy);flex-shrink:0;white-space:nowrap">' + pkgSubtotal2.toLocaleString('uk-UA') + ' грн</span>'
             + '</div>');
         } else if (pkgName2) {
           priceRows.push('<div style="font-size:13px;color:var(--text-soft);margin-bottom:5px">' + osEsc(pkgName2) + ' · за запитом</div>');
@@ -14611,9 +14611,9 @@ function osRenderSidebar() {
       }
     });
     if (hasPrices) {
-      priceRows.push('<div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--border-soft);margin-top:6px;padding-top:6px">'
-        + '<span style="font-size:13px;font-weight:700;color:var(--navy)">Разом</span>'
-        + '<span style="font-size:15px;font-weight:800;color:var(--navy)">' + totalPrice.toLocaleString('uk-UA') + ' грн</span>'
+      priceRows.push('<div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--border-soft);margin-top:6px;padding-top:6px;gap:6px">'
+        + '<span style="font-size:13px;font-weight:700;color:var(--navy);flex:1;min-width:0">Разом</span>'
+        + '<span style="font-size:15px;font-weight:800;color:var(--navy);flex-shrink:0;white-space:nowrap">' + totalPrice.toLocaleString('uk-UA') + ' грн</span>'
         + '</div>'
         + '<div style="font-size:11px;color:var(--text-soft);margin-top:4px">Без ПДВ · орієнтовно</div>');
     }
