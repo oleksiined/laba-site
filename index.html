@@ -12167,6 +12167,21 @@ function validateEdrpou(inp) {
 
 
 async function submitOrder() {
+  // Guard against double-click / double-call
+  if (window._ncSubmitting) return;
+  window._ncSubmitting = true;
+  // Disable all submit buttons
+  const _submitBtns = Array.from(document.querySelectorAll('[onclick="submitOrder()"]'));
+  _submitBtns.forEach(b => { b.disabled = true; });
+  const _origTexts = _submitBtns.map(b => b.textContent);
+  const _btnMain = _submitBtns.find(b => b.classList.contains('btn-primary')) || _submitBtns[0];
+  if (_btnMain) _btnMain.textContent = 'Зберігаємо...';
+
+  const _resetBtns = () => {
+    window._ncSubmitting = false;
+    _submitBtns.forEach((b, i) => { b.disabled = false; b.textContent = _origTexts[i]; });
+  };
+
   // basic validation
   const name  = document.getElementById('f-name');
   const phone = document.getElementById('f-phone');
@@ -12175,7 +12190,7 @@ async function submitOrder() {
   if (name  && !validateReq(name))   valid = false;
   if (phone && !validatePhone(phone)) valid = false;
   if (email && !validateEmail(email)) valid = false;
-  if (!valid) { toast('Заповніть обов\'язкові поля'); return; }
+  if (!valid) { toast('Заповніть обов\'язкові поля'); _resetBtns(); return; }
   // Generate order number L26XXXX and sample numbers — fetch in parallel
   const now = new Date();
   const dd = String(now.getDate()).padStart(2,'0');
@@ -12282,26 +12297,34 @@ async function submitOrder() {
     });
   }
 
-  // ── Send to backend ──
+  // ── Send to backend (await — order must be saved before showing success) ──
   const BACKEND_URL = '/api/order';
-  const backendPromise = fetch(BACKEND_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(orderPayload),
-  }).then(r => r.json()).then(data => {
-    if (!data.ok && data.errors) console.warn('Backend partial error:', data.errors);
-  }).catch(err => {
+  let _backendOk = false;
+  try {
+    const _r = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderPayload),
+    });
+    const _data = await _r.json();
+    if (!_r.ok || _data.ok === false) {
+      console.warn('Backend order error:', _data);
+      toast('Помилка збереження замовлення. Спробуйте ще раз.');
+      _resetBtns();
+      return;
+    }
+    if (_data.partialErrors) console.warn('Backend partial error:', _data.partialErrors);
+    _backendOk = true;
+  } catch (err) {
     console.warn('Backend request failed:', err.message);
-  });
+    toast('Немає зʼєднання з сервером. Спробуйте ще раз.');
+    _resetBtns();
+    return;
+  }
 
   // ── Online payment → LiqPay redirect ──
   if (NCO.payment === 'online') {
-    const btn = document.querySelector('.btn-primary.btn-full[onclick="submitOrder()"]');
-    if (btn) { btn.disabled = true; btn.textContent = 'Переходимо до оплати…'; }
-
-    // Wait for order to be saved before redirecting
-    await backendPromise.catch(() => {});
-
+    if (_btnMain) { _btnMain.disabled = true; _btnMain.textContent = 'Переходимо до оплати…'; }
     try {
       const lpRes = await fetch('/api/liqpay-create', {
         method:  'POST',
@@ -12333,18 +12356,19 @@ async function submitOrder() {
       } else {
         console.warn('LiqPay create error:', lp);
         toast('Помилка підключення до платіжної системи. Спробуйте ще раз.');
-        if (btn) { btn.disabled = false; btn.textContent = 'Підтвердити замовлення →'; }
+        _resetBtns();
         return;
       }
     } catch (e) {
       console.warn('LiqPay fetch error:', e);
       toast('Помилка підключення до платіжної системи. Спробуйте ще раз.');
-      if (btn) { btn.disabled = false; btn.textContent = 'Підтвердити замовлення →'; }
+      _resetBtns();
       return;
     }
   }
 
   // Show confirmation page (invoice / cod payment methods)
+  window._ncSubmitting = false;
   ncf_show();
 }
 
