@@ -4029,9 +4029,11 @@ function admGenAkt(o) {
   }
 
 
-  // ── Знижка — віднімаємо від підсумку (без рядка в таблиці) ──
+  // ── Фінальна сума: amountRaw (збережена в БД після знижки) має пріоритет ──
   const discountAmt = Number(o.discount || o.discount_amount || 0);
   if (discountAmt > 0) total = total - discountAmt;
+  const _finalTotal = Number(o.amountRaw || o.total || o.grand_total || 0);
+  if (_finalTotal > 0 && _finalTotal < total) total = _finalTotal;
 
   const docDef = {
     pageSize: 'A4',
@@ -4368,9 +4370,11 @@ function admGenInvoice(o) {
   }
 
 
-  // ── Знижка — віднімаємо від підсумку (без рядка в таблиці) ──
+  // ── Фінальна сума: amountRaw (збережена в БД після знижки) має пріоритет ──
   const discountAmt = Number(o.discount || o.discount_amount || 0);
   if (discountAmt > 0) total = total - discountAmt;
+  const _finalTotal = Number(o.amountRaw || o.total || o.grand_total || 0);
+  if (_finalTotal > 0 && _finalTotal < total) total = _finalTotal;
 
   const docDef = {
     pageSize: 'A4',
