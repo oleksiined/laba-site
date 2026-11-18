@@ -25,6 +25,10 @@
       "dest": "/api/$1"
     },
     {
+      "src":  "/(.*\\.(png|jpg|jpeg|gif|webp|svg|ico|css|js|woff2?|ttf|eot|pdf|txt|xml))",
+      "dest": "/$1"
+    },
+    {
       "src":  "/(.*)",
       "has":  [{ "type": "host", "value": "admin\\.laba\\.zemlerob\\.com\\.ua" }],
       "dest": "/admin.html"
