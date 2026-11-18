@@ -12226,11 +12226,13 @@ async function submitOrder() {
     const cat = (typeof NS_CAT !== 'undefined' ? NS_CAT : null) || (typeof NC_CATALOG !== 'undefined' ? NC_CATALOG : null) || {};
     const pkg = (cat.packages && cat.packages[s.packageId]) || {};
     const pname = pkg.name || s.packageId || 'Пакет';
-    pkgCountMap[pname] = (pkgCountMap[pname] || 0) + 1;
+    if (!pkgCountMap[pname]) pkgCountMap[pname] = { qty: 0, code: s.packageId || '' };
+    pkgCountMap[pname].qty++;
   });
-  const pkgItems = Object.entries(pkgCountMap).map(([pname, qty]) => {
+  const pkgItems = Object.entries(pkgCountMap).map(([pname, info]) => {
+    const qty = info.qty;
     const unitPrice = qty > 0 ? Math.round(NCO.pkgSum / (_snapSamples.length || 1)) : 0;
-    return { name: pname, qty, price: unitPrice, subtotal: unitPrice * qty };
+    return { code: info.code, name: pname, qty, price: unitPrice, subtotal: unitPrice * qty };
   });
 
   const orderPayload = {
