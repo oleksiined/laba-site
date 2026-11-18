@@ -4905,7 +4905,7 @@ async function admActionCancel() {
       new_values:  { status: 'cancelled' },
     });
     await _admReload(null);
-    document.getElementById('admOrderPanel').style.display = 'none';
+    admClosePanel();
   } catch (err) {
     alert('Помилка: ' + err.message);
     if (btn) { btn.disabled = false; btn.textContent = 'Скасувати'; }
