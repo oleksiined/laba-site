@@ -2546,6 +2546,9 @@ async function admLoad() {
   resLoadFromDb();
   // Load sampling orders in background (badge update + ready when tab opens)
   samplingLoad();
+  // Ініціалізуємо favicon + запам'ятовуємо поточні замовлення як "бачені"
+  _favSetBase();
+  _favClear();
 }
 
 // Автооновлення кожні 5 хвилин
@@ -2572,11 +2575,85 @@ function _admStartAutoRefresh() {
     admLoad().then(() => {
       _admLastRefresh = Date.now();
       _admUpdateRefreshIndicator();
+      _favCheck();
     });
   }, _ADM_REFRESH_INTERVAL);
   // Оновлюємо текст "X хв тому" щохвилини
   _admRefreshCountdown = setInterval(_admUpdateRefreshIndicator, 60 * 1000);
 }
+
+// ── Favicon badge (нові замовлення) ───────────────────────────────────────────
+let _admFaviconBase = null;   // оригінальний favicon (або null)
+let _admNewOrderCount = 0;    // кількість непереглянутих нових замовлень
+let _admKnownOrderIds = null; // Set із order_num при останньому перегляді
+
+function _favSetBase() {
+  // Якщо вже є <link rel="icon"> — зберігаємо, інакше нічого
+  const el = document.querySelector('link[rel~="icon"]');
+  if (el) { _admFaviconBase = el.href; return; }
+  // Створюємо link якщо немає
+  const lnk = document.createElement('link');
+  lnk.rel = 'icon'; lnk.type = 'image/png';
+  document.head.appendChild(lnk);
+  // Намалюємо порожній 32×32 canvas як базу
+  const c = document.createElement('canvas'); c.width = c.height = 32;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#2563eb'; ctx.beginPath();
+  ctx.arc(16,16,14,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 18px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('L', 16, 17);
+  lnk.href = c.toDataURL();
+  _admFaviconBase = lnk.href;
+}
+
+function _favDraw(count) {
+  if (!_admFaviconBase) _favSetBase();
+  const lnk = document.querySelector('link[rel~="icon"]');
+  if (!lnk) return;
+  if (!count) { lnk.href = _admFaviconBase; document.title = 'LABA — Адмінкабінет'; return; }
+  const img = new Image();
+  img.onload = () => {
+    const c = document.createElement('canvas'); c.width = c.height = 32;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(img, 0, 0, 32, 32);
+    // Red badge
+    const r = count > 9 ? 10 : 8;
+    const x = 32 - r - 1, y = r + 1;
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold ${count > 9 ? 9 : 11}px sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(count > 99 ? '99+' : String(count), x, y + 0.5);
+    lnk.href = c.toDataURL();
+  };
+  img.src = _admFaviconBase;
+  document.title = `(${count}) LABA — Адмінкабінет`;
+}
+
+function _favCheck() {
+  // Перший запуск — просто запам'ятати поточні IDs без badge
+  const current = new Set((_admOrders||[]).map(o=>o.id));
+  if (_admKnownOrderIds === null) { _admKnownOrderIds = current; return; }
+  // Знайти нові (яких не було)
+  let newCount = 0;
+  for (const id of current) { if (!_admKnownOrderIds.has(id)) newCount++; }
+  _admNewOrderCount += newCount;
+  if (_admNewOrderCount > 0 && document.hidden !== false) _favDraw(_admNewOrderCount);
+}
+
+function _favClear() {
+  _admNewOrderCount = 0;
+  _admKnownOrderIds = new Set((_admOrders||[]).map(o=>o.id));
+  _favDraw(0);
+}
+
+// Скидаємо badge коли вкладка стає активною
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) _favClear();
+});
+window.addEventListener('focus', _favClear);
 
 // Будуємо карту з catalog_materials: name → key та materialId → key
 // Також додаємо нові матеріали з Supabase в _MAT_LABEL / _MAT_CLASS динамічно
