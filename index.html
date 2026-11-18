@@ -3406,6 +3406,7 @@ main{flex:1}
 .os-form-select:focus{outline:none;border-color:#a0cc30}
 .os-srv-section{margin-top:16px;padding-top:16px;border-top:1px solid var(--border-soft)}
 .os-srv-section-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.os-srv-section-price{margin-left:auto;font-size:13px;font-weight:700;color:var(--navy);white-space:nowrap}.os-srv-section-price span{font-weight:400;color:var(--text-soft)}
 .os-srv-section-icon{color:var(--text-mid)}
 .os-srv-section-name{font-size:15px;font-weight:700;color:var(--navy)}
 .os-srv-section-desc{font-size:12px;color:var(--text-soft)}
@@ -13386,7 +13387,6 @@ function toast(msg) {
               <div class="os-service-info">
                 <div class="os-service-name">Ґрунт: агрохімія</div>
                 <div class="os-service-desc">Автоматичний ґрунтовідбірник · від 25 проб</div>
-                <div class="os-service-price">550 грн <span>/ проба</span></div>
               </div>
             </label>
             <label class="os-service-card" data-svc="moisture" onclick="osToggleService(this)">
@@ -13395,7 +13395,6 @@ function toast(msg) {
               <div class="os-service-info">
                 <div class="os-service-name">Продуктивна волога</div>
                 <div class="os-service-desc">Від 10 точок</div>
-                <div class="os-service-price">450 грн <span>/ точка</span></div>
               </div>
             </label>
             <label class="os-service-card" data-svc="plants" onclick="osToggleService(this)">
@@ -13404,7 +13403,6 @@ function toast(msg) {
               <div class="os-service-info">
                 <div class="os-service-name">Рослини</div>
                 <div class="os-service-desc">Від 10 зразків</div>
-                <div class="os-service-price">350 грн <span>/ зразок</span></div>
               </div>
             </label>
             <label class="os-service-card" data-svc="density" onclick="osToggleService(this)">
@@ -13413,7 +13411,6 @@ function toast(msg) {
               <div class="os-service-info">
                 <div class="os-service-name">Об'ємна щільність</div>
                 <div class="os-service-desc">Від 10 точок</div>
-                <div class="os-service-price">480 грн <span>/ точка</span></div>
               </div>
             </label>
           </div>
@@ -13680,9 +13677,12 @@ var OS = {
 
 /* ── Init ── */
 function osSoilPkgOptions() {
-  // Use packages loaded from catalog_packages with group "Автоматичний відбір проб ґрунту"
   if (OS._soilPkgOptions && OS._soilPkgOptions.length) return OS._soilPkgOptions;
-  return ['Базовий чекап ґрунту'];
+  return ['Базова агрохімічна карта поля'];
+}
+function osMoistPkgOptions() {
+  if (OS._moistPkgOptions && OS._moistPkgOptions.length) return OS._moistPkgOptions;
+  return ['Визначення запасів продуктивної вологи (0–120 см)'];
 }
 
 function osInit() {
@@ -13700,16 +13700,31 @@ function osInit() {
     }).catch(function(){});
     // Завантажуємо пакети для відбору ґрунту
     var h = {apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY,Accept:'application/json'};
+    // Пакети ґрунту
     fetch(SUPABASE_URL+'/rest/v1/catalog_packages?select=package_id,name,sort_order&package_group=eq.'+encodeURIComponent('Автоматичний відбір проб ґрунту')+'&status=eq.active&order=sort_order.asc.nullslast,package_id.asc',{headers:h})
       .then(function(r){return r.ok?r.json():[];})
       .then(function(pkgs){
         if(!pkgs||!pkgs.length) return;
         OS._soilPkgOptions = pkgs.map(function(p){return p.name;});
-        // оновити налаштування полів якщо вже є
         OS.fields.forEach(function(f){
           if(!OS._soilPkgOptions.includes(f.settings.soilPackage)) f.settings.soilPackage=OS._soilPkgOptions[0];
         });
-        // перерендерити body відкритих акордеонів якщо ми на кроці 2
+        if (OS.step === 2) {
+          OS.fields.forEach(function(f, i){
+            var bodyEl = document.querySelector('#os-accord-'+i+' .os-accord-body');
+            if (bodyEl) bodyEl.innerHTML = osRenderFieldBody(f, i);
+          });
+        }
+      }).catch(function(){});
+    // Пакети вологи
+    fetch(SUPABASE_URL+'/rest/v1/catalog_packages?select=package_id,name,sort_order&package_group=eq.'+encodeURIComponent('Волога')+'&status=eq.active&order=sort_order.asc.nullslast,package_id.asc',{headers:h})
+      .then(function(r){return r.ok?r.json():[];})
+      .then(function(pkgs){
+        if(!pkgs||!pkgs.length) return;
+        OS._moistPkgOptions = pkgs.map(function(p){return p.name;});
+        OS.fields.forEach(function(f){
+          if(!OS._moistPkgOptions.includes(f.settings.moisturePackage)) f.settings.moisturePackage=OS._moistPkgOptions[0];
+        });
         if (OS.step === 2) {
           OS.fields.forEach(function(f, i){
             var bodyEl = document.querySelector('#os-accord-'+i+' .os-accord-body');
@@ -14128,14 +14143,19 @@ function osRenderFieldBody(f, i) {
   if (hasSoil) {
     var _pkgOpts = osSoilPkgOptions();
     if (_pkgOpts.length && !_pkgOpts.includes(s.soilPackage)) {
-      var _fallback = _pkgOpts.includes('Базовий чекап ґрунту') ? 'Базовий чекап ґрунту' : _pkgOpts[0];
-      s.soilPackage = _fallback;
-      OS.fields[i].settings.soilPackage = _fallback;
+      s.soilPackage = _pkgOpts[0];
+      OS.fields[i].settings.soilPackage = _pkgOpts[0];
     }
   }
+  var _ssSoil = (OS.samplingServices && OS.samplingServices['soil']) || {};
+  var _ssMoist = (OS.samplingServices && OS.samplingServices['moisture']) || {};
+  var _ssPlants = (OS.samplingServices && OS.samplingServices['plants']) || {};
+  var _ssDensity = (OS.samplingServices && OS.samplingServices['density']) || {};
   var soilSection = hasSoil ? (
     '<div class="os-srv-section">'
-    + '<div class="os-srv-section-header"><div class="os-srv-section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/></svg></div><div><div class="os-srv-section-name">Ґрунт: агрохімія</div><div class="os-srv-section-desc">Автоматичний ґрунтовідбірник</div></div></div>'
+    + '<div class="os-srv-section-header"><div class="os-srv-section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/></svg></div><div><div class="os-srv-section-name">Ґрунт: агрохімія</div><div class="os-srv-section-desc">Автоматичний ґрунтовідбірник</div></div>'
+    + (_ssSoil.price ? '<div class="os-srv-section-price">'+_ssSoil.price+' грн <span>/ '+(_ssSoil.unit||'проба')+'</span></div>' : '')
+    + '</div>'
     + '<div class="os-srv-and-map">'
     + '<div>'
     + '<div class="os-form-row">'
@@ -14163,7 +14183,9 @@ function osRenderFieldBody(f, i) {
 
   var plantsSection = hasPlants ? (
     '<div class="os-srv-section">'
-    + '<div class="os-srv-section-header"><div class="os-srv-section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 22V2M12 2C12 2 6 6 6 13M12 2C12 2 18 6 18 13M6 13C6 18 9 21 12 22M18 13C18 18 15 21 12 22"/></svg></div><div><div class="os-srv-section-name">Рослини</div><div class="os-srv-section-desc">Відбір рослинних зразків</div></div></div>'
+    + '<div class="os-srv-section-header"><div class="os-srv-section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 22V2M12 2C12 2 6 6 6 13M12 2C12 2 18 6 18 13M6 13C6 18 9 21 12 22M18 13C18 18 15 21 12 22"/></svg></div><div><div class="os-srv-section-name">Рослини</div><div class="os-srv-section-desc">Відбір рослинних зразків</div></div>'
+    + (_ssPlants.price ? '<div class="os-srv-section-price">'+_ssPlants.price+' грн <span>/ '+(_ssPlants.unit||'зразок')+'</span></div>' : '')
+    + '</div>'
     + '<div class="os-form-row">'
     + '<div class="os-form-group"><label class="os-form-label" for="plants_count_'+i+'">Кількість зразків</label><input class="os-form-input" type="number" id="plants_count_'+i+'" min="1" step="1" value="'+(s.plantsCount||10)+'" oninput="osFieldChange('+i+',\'plantsCount\',parseInt(this.value)||10);osRenderSidebar()"></div>'
     + '</div>'
@@ -14174,7 +14196,9 @@ function osRenderFieldBody(f, i) {
   if (hasSoil && s.densityCount !== probes) { s.densityCount = probes; OS.fields[i].settings.densityCount = probes; }
   var densitySection = hasDensity ? (
     '<div class="os-srv-section">'
-    + '<div class="os-srv-section-header"><div class="os-srv-section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="4" rx="1"/><rect x="2" y="10" width="20" height="4" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1"/></svg></div><div><div class="os-srv-section-name">Об\'ємна щільність</div></div></div>'
+    + '<div class="os-srv-section-header"><div class="os-srv-section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="4" rx="1"/><rect x="2" y="10" width="20" height="4" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1"/></svg></div><div><div class="os-srv-section-name">Об\'ємна щільність</div></div>'
+    + (_ssDensity.price ? '<div class="os-srv-section-price">'+_ssDensity.price+' грн <span>/ '+(_ssDensity.unit||'точка')+'</span></div>' : '')
+    + '</div>'
     + (hasSoil
       ? '<p class="os-step2-note" style="margin-top:0;margin-bottom:10px">Кількість точок = кількість агрохімічних проб: <strong>' + probes + '</strong></p>'
         + '<div class="os-form-row">'
@@ -14193,9 +14217,20 @@ function osRenderFieldBody(f, i) {
 
   var moisturePoints = hasSoil ? probes : (s.moistureCount||0);
   if (hasSoil && s.moistureCount !== probes) { s.moistureCount = probes; OS.fields[i].settings.moistureCount = probes; }
+  // Normalize moisturePackage
+  if (hasMoisture) {
+    var _mPkgOpts = osMoistPkgOptions();
+    if (_mPkgOpts.length && !_mPkgOpts.includes(s.moisturePackage)) {
+      s.moisturePackage = _mPkgOpts[0];
+      OS.fields[i].settings.moisturePackage = _mPkgOpts[0];
+    }
+  }
   var moistSection = hasMoisture ? (
     '<div class="os-srv-section">'
-    + '<div class="os-srv-section-header"><div class="os-srv-section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg></div><div><div class="os-srv-section-name">Продуктивна волога</div></div></div>'
+    + '<div class="os-srv-section-header"><div class="os-srv-section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg></div><div><div class="os-srv-section-name">Продуктивна волога</div></div>'
+    + (_ssMoist.price ? '<div class="os-srv-section-price">'+_ssMoist.price+' грн <span>/ '+(_ssMoist.unit||'точка')+'</span></div>' : '')
+    + '</div>'
+    + osSelect('Пакет досліджень','moist_pkg_'+i, osMoistPkgOptions(), s.moisturePackage||osMoistPkgOptions()[0],"osFieldChange("+i+",'moisturePackage',this.value)")
     + (hasSoil
       ? '<p class="os-step2-note" style="margin-top:0;margin-bottom:10px">Кількість точок = кількість агрохімічних проб: <strong>' + probes + '</strong></p>'
         + '<div class="os-form-row">'
