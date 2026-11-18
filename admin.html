@@ -2037,7 +2037,18 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
         <div class="adm-ptab-body" id="admOTab-payment">
           <div class="adm-oi-section">
             <div class="adm-oi-section-title">Оплата</div>
-            <div class="adm-oi-row"><span class="adm-oi-lbl">Статус</span><span class="adm-oi-val" id="admPayStatFull">—</span></div>
+            <div class="adm-oi-row">
+              <span class="adm-oi-lbl">Статус</span>
+              <span class="adm-oi-val" id="admPayStatFull" style="display:flex;align-items:center;gap:8px;">
+                <select id="admPayStatSelect" style="border:1px solid var(--border,#e5e7eb);border-radius:6px;padding:4px 8px;font-size:13px;background:var(--surface,#fff);color:var(--text,#111);cursor:pointer;">
+                  <option value="unpaid">Не оплачено</option>
+                  <option value="pending">Очікується</option>
+                  <option value="partial">Частково</option>
+                  <option value="paid">Оплачено</option>
+                </select>
+                <button id="admPaySaveBtn" class="adm-btn adm-btn-primary" style="padding:4px 12px;font-size:12px;" onclick="admSavePaymentStatus()">Зберегти</button>
+              </span>
+            </div>
             <div class="adm-oi-row"><span class="adm-oi-lbl">Сума</span><span class="adm-oi-val" id="admPayAmount2">—</span></div>
             <div class="adm-oi-row"><span class="adm-oi-lbl">Дата рахунку</span><span class="adm-oi-val" id="admPayDate">—</span></div>
             <div class="adm-oi-row" id="admPayLiqRow" style="display:none"><span class="adm-oi-lbl">LiqPay ID</span><span class="adm-oi-val" id="admPayLiqId">—</span></div>
@@ -3022,7 +3033,8 @@ function admSelect(id) {
   _admRenderDocsTab(o);
 
   // ── Оплата tab ──
-  setH('admPayStatFull', `<span class="adm-pill ${_admPC[o.payment]}">${_admPL[o.payment]}</span>`);
+  const paySelEl = document.getElementById('admPayStatSelect');
+  if (paySelEl) paySelEl.value = o.payment || 'unpaid';
   setT('admPayAmount2', o.amount);
   setT('admPayDate', o.payment==='paid'?o.date:'—');
   // LiqPay transaction details (from callback)
@@ -5016,6 +5028,39 @@ function _smpFiltered() {
 
 const _PAY_LABEL = {paid:'Оплачено',pending:'Очікується',unpaid:'Не оплачено',partial:'Частково'};
 const _PAY_CLASS = {paid:'adm-p-paid',pending:'adm-p-pend',unpaid:'adm-p-unpa',partial:'adm-p-part'};
+
+async function admSavePaymentStatus() {
+  const sel = document.getElementById('admPayStatSelect');
+  const btn = document.getElementById('admPaySaveBtn');
+  if (!sel || !_admSelId) return;
+  const o = _admOrders.find(x => x.id === _admSelId);
+  if (!o) return;
+  const newStatus = sel.value;
+  const oldStatus = o.payment;
+  if (newStatus === oldStatus) return;
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    await _admUpdate(_admSelId, { payment_status: newStatus }, {
+      event_type: 'payment_status_changed',
+      description: `Статус оплати змінено: ${_admPL[oldStatus]||oldStatus} → ${_admPL[newStatus]||newStatus}`,
+      old_values: { payment_status: oldStatus },
+      new_values: { payment_status: newStatus },
+      actor_type: 'admin',
+    });
+    // Оновлюємо локально
+    const raw = (_admOrdersRaw||[]).find(r=>r.order_num===o.id);
+    if (raw) raw.payment_status = newStatus;
+    o.payment = newStatus;
+    const dateEl = document.getElementById('admPayDate');
+    if (dateEl) dateEl.textContent = newStatus==='paid' ? (o.date||'—') : '—';
+    admRender();
+    btn.textContent = 'Збережено ✓';
+    setTimeout(()=>{ btn.disabled=false; btn.textContent='Зберегти'; }, 2000);
+  } catch(e) {
+    alert('Помилка: ' + e.message);
+    btn.disabled = false; btn.textContent = 'Зберегти';
+  }
+}
 
 function smpRender() {
   const list=_smpFiltered(), total=list.length;

@@ -79,7 +79,7 @@ module.exports = async function handler(req, res) {
   if (!id) return res.status(400).json({ error: 'Missing order id' });
 
   // Only allow updating specific fields for safety
-  const allowed = ['status', 'samples', 'payment', 'company', 'name', 'edrpou', 'phone', 'email', 'payer_type', 'notes'];
+  const allowed = ['status', 'samples', 'payment', 'payment_status', 'company', 'name', 'edrpou', 'phone', 'email', 'payer_type', 'notes'];
   const update = {};
   for (const k of allowed) {
     if (k in fields) update[k] = fields[k];
