@@ -13699,8 +13699,8 @@ function osInit() {
       osApplySamplingPrices();
     }).catch(function(){});
     // Завантажуємо пакети для відбору ґрунту
-    var h = {apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,Accept:'application/json'};
-    fetch(SUPA_URL+'/rest/v1/catalog_packages?select=package_id,name,sort_order&package_group=eq.'+encodeURIComponent('Автоматичний відбір проб ґрунту')+'&status=eq.active&order=sort_order.asc.nullslast,package_id.asc',{headers:h})
+    var h = {apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY,Accept:'application/json'};
+    fetch(SUPABASE_URL+'/rest/v1/catalog_packages?select=package_id,name,sort_order&package_group=eq.'+encodeURIComponent('Автоматичний відбір проб ґрунту')+'&status=eq.active&order=sort_order.asc.nullslast,package_id.asc',{headers:h})
       .then(function(r){return r.ok?r.json():[];})
       .then(function(pkgs){
         if(!pkgs||!pkgs.length) return;
