@@ -13658,7 +13658,6 @@ function toast(msg) {
         <div class="os-sb-sep" id="osSbNotesSep"></div>
         <div id="osSbNotes">
           <div class="os-sb-note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Кількість проб і точок визначимо на наступному кроці.</div>
-          <div class="os-sb-note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Вартість розрахуємо після налаштування відбору.</div>
           <div class="os-sb-note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Чернетка зберігається автоматично.</div>
         </div>
 
@@ -13667,7 +13666,12 @@ function toast(msg) {
           <div class="os-sb-label">Дослідження</div>
           <div id="osSbResearchList"></div>
           <div class="os-sb-sep"></div>
-          <div class="os-sb-note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Вартість: розрахунок після адреси виїзду.</div>
+        </div>
+
+        <div class="os-sb-sep" id="osSbPriceSep" style="display:none"></div>
+        <div id="osSbPriceBlock" style="display:none">
+          <div class="os-sb-label">Орієнтовна вартість</div>
+          <div id="osSbPriceList"></div>
         </div>
 
         <div id="osSbAllSetBlock" style="display:none"></div>
@@ -13834,7 +13838,7 @@ function osGoStep(n) {
     it.classList.toggle('done', s < n);
   });
   window.scrollTo(0,0);
-  if (n === 2) { osRenderAccordions(); setTimeout(function(){ Object.values(OS.fieldMaps).forEach(function(m){ if(m) m.invalidateSize(); }); }, 100); }
+  if (n === 2) { osRenderAccordions(); }
   if (n === 3) { osRenderEntryList(); setTimeout(function(){ osInitMap3(); }, 100); }
   if (n === 4) osRenderStep4();
   osRenderSidebar();
@@ -14311,7 +14315,7 @@ function osFieldChangeMoistArea(i, val) {
   OS.fields[i].settings.moistureCount = Math.ceil(OS.fields[i].areaHa / val);
   // re-render this accordion body
   var bodyEl = document.querySelector('#os-accord-'+i+' .os-accord-body');
-  if (bodyEl) bodyEl.innerHTML = osRenderFieldBody(OS.fields[i], i);
+  if (bodyEl) { bodyEl.innerHTML = osRenderFieldBody(OS.fields[i], i); setTimeout(function(){ osInitFieldMap(OS.fields[i], i); }, 50); }
   osRenderSidebar();
 }
 function osFieldChangeDensityArea(i, val) {
@@ -14319,7 +14323,7 @@ function osFieldChangeDensityArea(i, val) {
   OS.fields[i].settings.densityAreaPerPoint = val;
   OS.fields[i].settings.densityCount = Math.ceil(OS.fields[i].areaHa / val);
   var bodyEl = document.querySelector('#os-accord-'+i+' .os-accord-body');
-  if (bodyEl) bodyEl.innerHTML = osRenderFieldBody(OS.fields[i], i);
+  if (bodyEl) { bodyEl.innerHTML = osRenderFieldBody(OS.fields[i], i); setTimeout(function(){ osInitFieldMap(OS.fields[i], i); }, 50); }
   osRenderSidebar();
 }
 
@@ -14339,7 +14343,7 @@ function osUpdateProbes(i) {
   if (OS.services.includes('density'))  { OS.fields[i].settings.densityCount = p; }
   // Re-render body to reflect updated counts
   var bodyEl = document.querySelector('#os-accord-'+i+' .os-accord-body');
-  if (bodyEl) bodyEl.innerHTML = osRenderFieldBody(OS.fields[i], i);
+  if (bodyEl) { bodyEl.innerHTML = osRenderFieldBody(OS.fields[i], i); setTimeout(function(){ osInitFieldMap(OS.fields[i], i); }, 50); }
   osRenderSidebar();
 }
 
@@ -14554,6 +14558,49 @@ function osRenderSidebar() {
     });
     var rList = document.getElementById('osSbResearchList');
     if (rList) rList.innerHTML = pkgs.map(function(p){ return '<div class="os-sb-note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' + osEsc(p) + '</div>'; }).join('');
+  }
+
+  // Price estimate (step 2+)
+  var priceSep = document.getElementById('osSbPriceSep');
+  var priceBlock = document.getElementById('osSbPriceBlock');
+  var priceList = document.getElementById('osSbPriceList');
+  var ss2 = OS.samplingServices || {};
+  var showPrice = OS.step >= 2 && OS.fields.length > 0 && OS.services.length > 0;
+  if (priceSep) priceSep.style.display = showPrice ? '' : 'none';
+  if (priceBlock) priceBlock.style.display = showPrice ? '' : 'none';
+  if (showPrice && priceList) {
+    var priceRows = [];
+    var totalPrice = 0;
+    var hasPrices = false;
+    var svcNames2 = { soil:'Ґрунт: агрохімія', moisture:'Продуктивна волога', plants:'Рослини', density:"Об'ємна щільність" };
+    var unitNames2 = { soil:'проб', moisture:'точок', plants:'зразків', density:'точок' };
+    OS.services.forEach(function(svc) {
+      var info2 = ss2[svc];
+      var cnt = 0;
+      if (svc === 'soil') cnt = OS.fields.reduce(function(s,f){ return s + osCalcProbes(f.areaHa, f.settings.areaPerProbe); }, 0);
+      else if (svc === 'moisture') cnt = OS.fields.reduce(function(s,f){ return s + (f.settings.moistureCount || osCalcProbes(f.areaHa, f.settings.areaPerProbe)); }, 0);
+      else if (svc === 'plants') cnt = OS.fields.reduce(function(s,f){ return s + (f.settings.plantsCount || 10); }, 0);
+      else if (svc === 'density') cnt = OS.fields.reduce(function(s,f){ return s + (f.settings.densityCount || osCalcProbes(f.areaHa, f.settings.areaPerProbe)); }, 0);
+      if (info2 && info2.price && cnt > 0) {
+        var subtotal = info2.price * cnt;
+        totalPrice += subtotal;
+        hasPrices = true;
+        priceRows.push('<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:5px">'
+          + '<span style="color:var(--text-mid)">' + (svcNames2[svc]||svc) + ' · ' + cnt + ' ' + (unitNames2[svc]||'') + '</span>'
+          + '<span style="font-weight:700;color:var(--navy)">' + subtotal.toLocaleString('uk-UA') + ' грн</span>'
+          + '</div>');
+      } else if (cnt > 0) {
+        priceRows.push('<div style="font-size:13px;color:var(--text-soft);margin-bottom:5px">' + (svcNames2[svc]||svc) + ' · ' + cnt + ' ' + (unitNames2[svc]||'') + '</div>');
+      }
+    });
+    if (hasPrices) {
+      priceRows.push('<div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--border-soft);margin-top:6px;padding-top:6px">'
+        + '<span style="font-size:13px;font-weight:700;color:var(--navy)">Разом</span>'
+        + '<span style="font-size:15px;font-weight:800;color:var(--navy)">' + totalPrice.toLocaleString('uk-UA') + ' грн</span>'
+        + '</div>'
+        + '<div style="font-size:11px;color:var(--text-soft);margin-top:4px">Без ПДВ · орієнтовно</div>');
+    }
+    priceList.innerHTML = priceRows.join('');
   }
 
   // All set
