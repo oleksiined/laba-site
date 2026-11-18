@@ -2454,8 +2454,17 @@ main{flex:1}
 .search-row{display:flex;gap:8px;margin-bottom:12px}
 .search-inp{flex:1;padding:7px 10px 7px 32px;border:1.5px solid var(--bd);border-radius:var(--r-sm);font-size:13.5px;color:var(--t1);outline:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 10px center;transition:border-color .15s}
 .search-inp:focus{border-color:var(--neon-dark)}
-.cat-sel{padding:7px 10px;border:1.5px solid var(--bd);border-radius:var(--r-sm);font-size:13px;color:var(--t2);outline:none;background:#fff;cursor:pointer;transition:border-color .15s;appearance:auto;flex-shrink:0;max-width:140px;min-width:100px;overflow:hidden;text-overflow:ellipsis}
-.cat-sel:focus{border-color:var(--neon-dark)}
+.cat-sel{position:relative;flex-shrink:0;max-width:160px;min-width:110px;user-select:none}
+.cat-sel-btn{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 10px;border:1.5px solid var(--bd);border-radius:var(--r-sm);font-size:13px;color:var(--t2);background:#fff;cursor:pointer;transition:border-color .15s;white-space:nowrap;overflow:hidden}
+.cat-sel-btn:hover,.cat-sel.open .cat-sel-btn{border-color:var(--neon-dark)}
+.cat-sel-btn-text{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.cat-sel-arrow{flex-shrink:0;transition:transform .15s;color:var(--t3)}
+.cat-sel.open .cat-sel-arrow{transform:rotate(180deg)}
+.cat-sel-dropdown{position:absolute;top:calc(100% + 4px);right:0;min-width:100%;background:#fff;border:1.5px solid var(--bd);border-radius:var(--r-sm);box-shadow:0 4px 16px rgba(0,0,0,.1);z-index:200;overflow:hidden;display:none}
+.cat-sel.open .cat-sel-dropdown{display:block}
+.cat-sel-opt{padding:8px 12px;font-size:13px;color:var(--t2);cursor:pointer;white-space:nowrap;transition:background .1s}
+.cat-sel-opt:hover{background:#f5ffe0;color:var(--t1)}
+.cat-sel-opt.active{color:var(--neon-dark);font-weight:600;background:#f5ffe0}
 .ind-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;min-width:0}
 .add-ind-btn{display:flex;align-items:center;gap:7px;padding:8px 10px;border:1.5px solid var(--bd);border-radius:var(--r-sm);background:#fff;font-size:13px;color:var(--t2);transition:all .15s;text-align:left;width:100%}
 .add-ind-btn:hover{border-color:var(--neon-dark);background:#f5ffe0;color:var(--t1)}
@@ -2896,6 +2905,8 @@ main{flex:1}
   .add-panel{padding:14px 16px!important}
   .search-row{flex-wrap:wrap}
   .cat-sel{max-width:100%!important;width:100%}
+  .cat-sel-btn{width:100%}
+  .cat-sel-dropdown{right:auto;left:0;min-width:100%}
 
   /* Prevent page-level overflow */
   body{overflow-x:hidden}
@@ -11530,7 +11541,26 @@ function setApplyMode(sampleId, mode) {
 
 function setCatFilter(sampleId, val) {
   NS.catFilter[sampleId] = val;
+  // close dropdown before re-render
+  const el = document.getElementById('cat-sel-' + sampleId);
+  if (el) el.classList.remove('open');
   renderAddPanel(sampleId);
+}
+
+function nsCatToggle(sampleId) {
+  const el = document.getElementById('cat-sel-' + sampleId);
+  if (!el) return;
+  const isOpen = el.classList.toggle('open');
+  if (isOpen) {
+    // close when clicking outside
+    const close = (e) => {
+      if (!el.contains(e.target)) {
+        el.classList.remove('open');
+        document.removeEventListener('click', close, true);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', close, true), 0);
+  }
 }
 
 function setSearch(sampleId, val) {
@@ -11671,10 +11701,11 @@ function renderAddPanel(sid) {
   const matCats = allCats
     .map(c => ({ ...c, items: c.items.filter(i => !i.mat || i.mat.includes(matId)) }))
     .filter(c => c.items.length > 0);
-  const catOpts = [
-    `<option value="all" ${curFilter === 'all' ? 'selected' : ''}>Всі категорії</option>`,
-    ...matCats.map(c => `<option value="${c.id}" ${curFilter === c.id ? 'selected' : ''}>${c.name}</option>`)
-  ].join('');
+  const allCatsList = [{ id:'all', name:'Всі категорії' }, ...matCats];
+  const curFilterName = (allCatsList.find(c => c.id === curFilter) || allCatsList[0]).name;
+  const catOpts = allCatsList.map(c =>
+    `<div class="cat-sel-opt${c.id === curFilter ? ' active' : ''}" onclick="setCatFilter('${sid}','${c.id}')">${c.name}</div>`
+  ).join('');
 
   const srcItems = curFilter === 'all'
     ? matCats.flatMap(c => c.items)
@@ -11694,7 +11725,13 @@ function renderAddPanel(sid) {
   <input class="search-inp" id="search-inp-${sid}" type="text" placeholder="Пошук дослідження"
          value="${NS.search[sid] || ''}"
          oninput="setSearch('${sid}', this.value)">
-  <select class="cat-sel" onchange="setCatFilter('${sid}', this.value)">${catOpts}</select>
+  <div class="cat-sel" id="cat-sel-${sid}">
+    <div class="cat-sel-btn" onclick="nsCatToggle('${sid}')">
+      <span class="cat-sel-btn-text">${curFilterName}</span>
+      <svg class="cat-sel-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="cat-sel-dropdown">${catOpts}</div>
+  </div>
 </div>
 <div class="ind-grid">
   ${avail.length ? avail.map(i => {
