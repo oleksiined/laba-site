@@ -5040,7 +5040,7 @@ async function admSavePaymentStatus() {
   if (newStatus === oldStatus) return;
   btn.disabled = true; btn.textContent = '...';
   try {
-    await _admUpdate(_admSelId, { payment_status: newStatus }, {
+    await _admUpdate(o.dbId, { payment_status: newStatus }, {
       event_type: 'payment_status_changed',
       description: `Статус оплати змінено: ${_admPL[oldStatus]||oldStatus} → ${_admPL[newStatus]||newStatus}`,
       old_values: { payment_status: oldStatus },
