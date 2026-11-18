@@ -4028,6 +4028,18 @@ function admGenAkt(o) {
     ]);
   }
 
+
+  // ── Знижка ──────────────────────────────────────────────
+  const discountAmt = Number(o.discount || o.discount_amount || 0);
+  if (discountAmt > 0) {
+    tableBody.push([
+      { text: '', colSpan: 5, border: [false,false,false,false] }, {}, {}, {}, {},
+      { text: 'Знижка:', fontSize: 8.5, bold: true, alignment: 'right', border: [false,false,false,false], color: '#1a7c3e' },
+      { text: '\u2212' + fmtUAH(discountAmt), fontSize: 8.5, bold: true, alignment: 'right', border: [false,false,false,false], color: '#1a7c3e' },
+    ]);
+    total = total - discountAmt;
+  }
+
   const docDef = {
     pageSize: 'A4',
     pageMargins: [36, 24, 36, 40],
@@ -4360,6 +4372,18 @@ function admGenInvoice(o) {
       { text: fmtUAH(total / (o.samples_count || 1)), ...tdStyle, alignment: 'right' },
       { text: fmtUAH(total),              ...tdStyle, alignment: 'right' },
     ]);
+  }
+
+
+  // ── Знижка ──────────────────────────────────────────────
+  const discountAmt = Number(o.discount || o.discount_amount || 0);
+  if (discountAmt > 0) {
+    tableBody.push([
+      { text: '', colSpan: 5, border: [false,false,false,false] }, {}, {}, {}, {},
+      { text: 'Знижка:', fontSize: 8.5, bold: true, alignment: 'right', border: [false,false,false,false], color: '#1a7c3e' },
+      { text: '\u2212' + fmtUAH(discountAmt), fontSize: 8.5, bold: true, alignment: 'right', border: [false,false,false,false], color: '#1a7c3e' },
+    ]);
+    total = total - discountAmt;
   }
 
   const docDef = {
