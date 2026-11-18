@@ -12629,8 +12629,8 @@ function ncf_downloadInvoice(saveOnly) {
     { text: 'Пакет / дослідження', ...thStyle },
     { text: 'Матеріал',       ...thStyle },
     { text: 'К-сть\nзразків', ...thStyle, alignment: 'center' },
-    { text: 'Ціна, грн',      ...thStyle, alignment: 'right' },
-    { text: 'Сума, грн',      ...thStyle, alignment: 'right' },
+    { text: 'Ціна, грн\nБез ПДВ', ...thStyle, alignment: 'right' },
+    { text: 'Сума, грн\nБез ПДВ', ...thStyle, alignment: 'right' },
   ]];
 
   let rowNum = 1;
@@ -12664,7 +12664,7 @@ function ncf_downloadInvoice(saveOnly) {
   const sumRows = [];
   if (discount > 0) {
     sumRows.push([
-      { text: 'Сума без знижки', fontSize: 8.5, color: '#000', border: [false,false,false,false] },
+      { text: 'Сума без знижки, без ПДВ', fontSize: 8.5, color: '#000', border: [false,false,false,false] },
       { text: fmtUAH(subtotal) + ' грн', fontSize: 8.5, alignment: 'right', border: [false,false,false,false] },
     ]);
     sumRows.push([
@@ -12673,7 +12673,7 @@ function ncf_downloadInvoice(saveOnly) {
     ]);
   }
   sumRows.push([
-    { text: discount > 0 ? 'Сума після знижки' : 'Сума', fontSize: 11, bold: true, border: [false,false,false,false] },
+    { text: discount > 0 ? 'Сума після знижки, без ПДВ' : 'Сума, без ПДВ', fontSize: 11, bold: true, border: [false,false,false,false] },
     { text: fmtUAH(total) + '\nгрн', fontSize: 11, bold: true, alignment: 'right', border: [false,false,false,false] },
   ]);
 
@@ -15145,8 +15145,8 @@ function osf_downloadInvoice() {
     { text: 'К-сть\nполів',          color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'center' },
     { text: 'Площа, га',             color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'right' },
     { text: 'К-сть\nпроб',           color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'center' },
-    { text: 'Ціна, грн',             color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'right' },
-    { text: 'Сума, грн',             color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'right' },
+    { text: 'Ціна, грн\nБез ПДВ',    color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'right' },
+    { text: 'Сума, грн\nБез ПДВ',   color: '#000', fontSize: 8, bold: true, fillColor: '#f0f0f0', alignment: 'right' },
   ]];
 
   var svcNames = { soil: 'Відбір ґрунту (агрохімія)', moisture: 'Відбір ґрунту (волога)', plants: 'Відбір рослин', density: 'Відбір (об’ємна щільність)' };
