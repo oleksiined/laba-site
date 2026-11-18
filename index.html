@@ -3419,7 +3419,8 @@ main{flex:1}
 .os-proto-link:hover{text-decoration:underline}
 .os-srv-and-map{display:grid;grid-template-columns:1fr 220px;gap:16px;align-items:start}
 #os-map-s2-0,#os-map-s2-1{height:200px;width:100%}
-.os-map-wrap-sm{border-radius:var(--radius-sm);overflow:hidden;border:1.5px solid var(--border);height:200px}
+.os-map-wrap-sm{border-radius:var(--radius-sm);overflow:hidden;border:1.5px solid var(--border);height:200px;position:relative}
+.os-probe-overlay{position:absolute;bottom:10px;left:10px;z-index:500;background:rgba(255,255,255,0.92);backdrop-filter:blur(4px);border-radius:8px;padding:6px 10px;display:flex;align-items:baseline;gap:5px;pointer-events:none;box-shadow:0 1px 6px rgba(0,0,0,0.15)}
 .os-map-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--navy);background:var(--white);cursor:pointer;margin-top:8px}
 .os-saved-row{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#3a7a2a;margin-top:8px}
 .os-step2-note{font-size:12px;color:var(--text-soft);margin-top:6px}
@@ -14200,12 +14201,12 @@ function osRenderFieldBody(f, i) {
     + osSelect('Пакет досліджень','soil_pkg_'+i, osSoilPkgOptions(), s.soilPackage,"osFieldChange("+i+",'soilPackage',this.value)")
     + '<a class="os-proto-link" onclick="return false" href="#" style="margin-top:4px">Переглянути протокол</a>'
     + '</div>' : '')
-    + '<div class="os-form-group" style="justify-content:flex-end">'
-    + '<div class="os-probe-row"><span class="os-probe-count" id="probeCount_'+i+'">'+probes+'</span><span class="os-probe-note">проб</span></div>'
-    + (probes < 25 ? '<span class="os-probe-warn" id="probeWarn_'+i+'">Мінімум 25 проб</span>' : '<span class="os-probe-ok" id="probeWarn_'+i+'"></span>')
-    + '</div></div>'
+    + (probes < 25 ? '<div class="os-form-group" style="justify-content:flex-end"><span class="os-probe-warn" id="probeWarn_'+i+'">Мінімум 25 проб</span></div>' : '<span id="probeWarn_'+i+'"></span>')
     + '</div>'
-    + '<div class="os-map-wrap-sm"><div id="os-map-s2-'+i+'"></div></div>'
+    + '</div>'
+    + '<div class="os-map-wrap-sm"><div id="os-map-s2-'+i+'"></div>'
+    + '<div class="os-probe-overlay"><span class="os-probe-count" id="probeCount_'+i+'">'+probes+'</span><span class="os-probe-note">проб</span></div>'
+    + '</div>'
     + '</div>'
     + '</div>'
   ) : '';
