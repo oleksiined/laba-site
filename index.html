@@ -13811,11 +13811,12 @@ function osInit() {
         }
       }).catch(function(){});
     // Пакети вологи
-    fetch(SUPABASE_URL+'/rest/v1/catalog_packages?select=package_id,name,sort_order&package_group=eq.'+encodeURIComponent('Волога')+'&status=eq.active&order=sort_order.asc.nullslast,package_id.asc',{headers:h})
+    fetch(SUPABASE_URL+'/rest/v1/catalog_packages?select=package_id,name,price,sort_order&package_group=eq.'+encodeURIComponent('Волога')+'&status=eq.active&order=sort_order.asc.nullslast,package_id.asc',{headers:h})
       .then(function(r){return r.ok?r.json():[];})
       .then(function(pkgs){
         if(!pkgs||!pkgs.length) return;
         OS._moistPkgOptions = pkgs.map(function(p){return p.name;});
+        OS._moistPkgData = pkgs;
         OS.fields.forEach(function(f){
           if(!OS._moistPkgOptions.includes(f.settings.moisturePackage)) f.settings.moisturePackage=OS._moistPkgOptions[0];
         });
@@ -14653,7 +14654,7 @@ function osRenderSidebar() {
       } else if (cnt > 0) {
         priceRows.push('<div style="font-size:13px;color:var(--text-soft);margin-bottom:5px">' + (svcNames2[svc]||svc) + ' · ' + cnt + ' ' + (unitNames2[svc]||'') + '</div>');
       }
-      // Package research cost (soil only, when not "only sampling" mode)
+      // Package research cost (soil and moisture, when not "only sampling" mode)
       if (svc === 'soil' && cnt > 0 && OS.mode !== 'only') {
         var pkgName2 = (OS.fields[0] && OS.fields[0].settings && OS.fields[0].settings.soilPackage) || '';
         var soilPkgs2 = (typeof SERVICES !== 'undefined' && SERVICES.soil) ? SERVICES.soil.packages : [];
@@ -14668,6 +14669,22 @@ function osRenderSidebar() {
             + '</div>');
         } else if (pkgName2) {
           priceRows.push('<div style="font-size:13px;color:var(--text-soft);margin-bottom:5px">' + osEsc(pkgName2) + ' · за запитом</div>');
+        }
+      }
+      if (svc === 'moisture' && cnt > 0 && OS.mode !== 'only') {
+        var mPkgName2 = (OS.fields[0] && OS.fields[0].settings && OS.fields[0].settings.moisturePackage) || '';
+        var mPkgData2 = OS._moistPkgData || [];
+        var mPkg2 = mPkgData2.find(function(p){ return p.name === mPkgName2; });
+        if (mPkg2 && mPkg2.price) {
+          var mPkgSubtotal2 = mPkg2.price * cnt;
+          totalPrice += mPkgSubtotal2;
+          hasPrices = true;
+          priceRows.push('<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:5px;gap:6px">'
+            + '<span style="color:var(--text-mid);flex:1;min-width:0">' + osEsc(mPkgName2) + ' · ' + cnt + ' точок</span>'
+            + '<span style="font-weight:700;color:var(--navy);flex-shrink:0;white-space:nowrap">' + mPkgSubtotal2.toLocaleString('uk-UA') + ' грн</span>'
+            + '</div>');
+        } else if (mPkgName2) {
+          priceRows.push('<div style="font-size:13px;color:var(--text-soft);margin-bottom:5px">' + osEsc(mPkgName2) + ' · за запитом</div>');
         }
       }
     });
@@ -14995,14 +15012,34 @@ function osRenderStep4() {
       var svc = ss[key];
       if (!svc) return;
       // Для вологи/рослин/щільності — рахуємо точки з полів (або мінімум)
-      var units = OS.fields.reduce(function(sum, f) {
-        var s = f.settings || {};
-        if (key === 'moisture') return sum + (s.moistureCount || 0);
-        return sum;
-      }, 0) || svc.min_units;
+      var units = 0;
+      if (key === 'moisture') {
+        units = OS.fields.reduce(function(sum, f) { return sum + (f.settings.moistureCount || 0); }, 0) || (svc.min_units || 0);
+      } else if (key === 'plants') {
+        units = OS.fields.reduce(function(sum, f) { return sum + (f.settings.plantsCount || 10); }, 0);
+      } else if (key === 'density') {
+        units = OS.fields.reduce(function(sum, f) { return sum + (f.settings.densityCount || osCalcProbes(f.areaHa, f.settings.areaPerProbe)); }, 0);
+      }
+      if (units <= 0) return;
+      var svcName = svc.name || key;
+      var svcUnit = svc.unit || 'точок';
       var cost = units * svc.price;
-      priceLines.push({ label: svc.name + ' · ' + units + ' ' + svc.unit + ' × ' + svc.price + ' грн', val: cost });
+      priceLines.push({ label: svcName + ' · ' + units + ' ' + svcUnit + ' × ' + svc.price + ' грн', val: cost });
       grandTotal += cost;
+      // Пакет дослідження для вологи
+      if (key === 'moisture' && OS.mode !== 'only') {
+        var mPkgName = (OS.fields[0] && OS.fields[0].settings.moisturePackage) || '';
+        var mPkgData = OS._moistPkgData || [];
+        var mPkg = mPkgData.find(function(p){ return p.name === mPkgName; });
+        if (mPkg && mPkg.price) {
+          var mPkgCost = units * mPkg.price;
+          priceLines.push({ label: osEsc(mPkgName) + ' · ' + units + ' точок × ' + mPkg.price + ' грн', val: mPkgCost });
+          grandTotal += mPkgCost;
+          hasPkgPrice = true;
+        } else if (mPkgName) {
+          priceLines.push({ label: mPkgName, val: null });
+        }
+      }
     });
 
     if (priceLines.length) {
@@ -15058,13 +15095,29 @@ function osSubmitOrder() {
   // Розрахунок орієнтовної ціни
   var priceEstimate = 0;
   var ss = OS.samplingServices || {};
-  if (OS.services.indexOf('soil') >= 0 && ss.soil) priceEstimate += totalProbes * ss.soil.price;
+  if (OS.services.indexOf('soil') >= 0 && ss.soil) {
+    priceEstimate += totalProbes * ss.soil.price;
+    if (OS.mode !== 'only') {
+      var _spkgName = (OS.fields[0] && OS.fields[0].settings.soilPackage) || '';
+      var _spkgs = (typeof SERVICES !== 'undefined' && SERVICES.soil) ? SERVICES.soil.packages : [];
+      var _spkg = _spkgs.find(function(p){ return p.name === _spkgName; });
+      if (_spkg && _spkg.price) priceEstimate += totalProbes * _spkg.price;
+    }
+  }
   ['moisture','plants','density'].forEach(function(key) {
     if (OS.services.indexOf(key) < 0 || !ss[key]) return;
-    var units = OS.fields.reduce(function(sum, f) {
-      return sum + (key === 'moisture' ? (f.settings.moistureCount || 0) : 0);
-    }, 0) || ss[key].min_units;
+    var units = 0;
+    if (key === 'moisture') units = OS.fields.reduce(function(sum, f){ return sum + (f.settings.moistureCount || 0); }, 0) || (ss[key].min_units || 0);
+    else if (key === 'plants') units = OS.fields.reduce(function(sum, f){ return sum + (f.settings.plantsCount || 10); }, 0);
+    else if (key === 'density') units = OS.fields.reduce(function(sum, f){ return sum + (f.settings.densityCount || osCalcProbes(f.areaHa, f.settings.areaPerProbe)); }, 0);
+    if (units <= 0) return;
     priceEstimate += units * ss[key].price;
+    if (key === 'moisture' && OS.mode !== 'only') {
+      var _mPkgName = (OS.fields[0] && OS.fields[0].settings.moisturePackage) || '';
+      var _mPkgData = OS._moistPkgData || [];
+      var _mPkg = _mPkgData.find(function(p){ return p.name === _mPkgName; });
+      if (_mPkg && _mPkg.price) priceEstimate += units * _mPkg.price;
+    }
   });
 
   var now = new Date();
