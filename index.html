@@ -14146,7 +14146,7 @@ function osInitMap1() {
   var el = document.getElementById('os-map-s1');
   if (!el) return;
   OS.map1 = L.map('os-map-s1', { zoomControl:true, attributionControl:false });
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom:19 }).addTo(OS.map1);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'' }).addTo(OS.map1);
   var group = L.featureGroup();
   OS.fields.forEach(function(f) {
     var poly = L.polygon(f.latLngs, { color:'#CCFF00', weight:2, fillOpacity:0.15 }).addTo(OS.map1);
@@ -14267,7 +14267,6 @@ function osRenderFieldBody(f, i) {
     + (probes < 25 ? '<span class="os-probe-warn" id="probeWarn_'+i+'">Мінімум 25 проб</span>' : '<span class="os-probe-ok" id="probeWarn_'+i+'"></span>')
     + '</div></div>'
     + '</div>'
-    + '<div class="os-map-wrap-sm"><div id="os-map-s2-'+i+'"></div></div>'
     + '</div>'
     + '</div>'
   ) : '';
@@ -14414,7 +14413,7 @@ function osInitFieldMap(f, i) {
   if (!el || !window.L) return;
   if (OS.fieldMaps[i]) { OS.fieldMaps[i].remove(); }
   var m = L.map('os-map-s2-' + i, { zoomControl:false, attributionControl:false, dragging:false, scrollWheelZoom:false });
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom:19 }).addTo(m);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'' }).addTo(m);
   var poly = L.polygon(f.latLngs, { color:'#CCFF00', weight:2, fillOpacity:0.15 }).addTo(m);
   m.fitBounds(poly.getBounds(), { padding:[10,10] });
   var bounds = poly.getBounds();
@@ -14441,7 +14440,7 @@ function osInitMap3() {
   var el = document.getElementById('os-map-s3');
   if (!el || !window.L || !OS.fields.length) return;
   OS.map3 = L.map('os-map-s3', { zoomControl:true, attributionControl:false });
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom:19 }).addTo(OS.map3);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'' }).addTo(OS.map3);
   var group = L.featureGroup();
   OS.fields.forEach(function(f, i) {
     var poly = L.polygon(f.latLngs, { color:'#CCFF00', weight:2, fillOpacity:0.1 }).addTo(OS.map3);
@@ -14822,18 +14821,6 @@ function osRenderStep5() {
   html += '<textarea class="os-form-input" id="os5-comment" rows="3" style="resize:vertical;min-height:80px" placeholder="Будь-яка додаткова інформація для агронома або менеджера..."></textarea>';
   html += '</div>';
 
-  // Section 5: Орієнтовна вартість
-  html += '<div style="background:#f8faf3;border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px">';
-  html += '<div style="font-size:13px;font-weight:600;color:var(--text-mid);margin-bottom:12px">Орієнтовна вартість</div>';
-  if (totalProbes > 0 && priceEstimate > 0) {
-    html += '<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-mid);margin-bottom:6px"><span>Відбір ґрунту · ' + totalProbes + ' проб × ' + (ss.soil ? ss.soil.price : 0) + ' грн</span><span>' + fmtPrice(priceEstimate) + '</span></div>';
-    html += '<div style="border-top:1px solid var(--border);margin:10px 0"></div>';
-    html += '<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:var(--navy)"><span>Разом</span><span>' + fmtPrice(priceEstimate) + '</span></div>';
-  } else {
-    html += '<div style="font-size:13px;color:var(--text-soft)">Вартість розрахуємо після підтвердження деталей виїзду</div>';
-  }
-  html += '</div>';
-
   el.innerHTML = html;
   OS._payerType = 'legal';
 }
@@ -15038,6 +15025,26 @@ function osRenderStep4() {
 }
 
 function osSubmitOrder() {
+  // Validate required fields
+  var nameVal = (document.getElementById('os5-name')||{}).value || '';
+  var phoneVal = (document.getElementById('os5-phone')||{}).value || '';
+  var emailVal = (document.getElementById('os5-email')||{}).value || '';
+  if (!nameVal.trim()) { var el = document.getElementById('os5-name'); if(el){el.focus();el.style.borderColor='var(--red)';} alert('Вкажіть імʼя та прізвище контактної особи'); return; }
+  if (!phoneVal.trim()) { var el = document.getElementById('os5-phone'); if(el){el.focus();el.style.borderColor='var(--red)';} alert('Вкажіть телефон контактної особи'); return; }
+  if (!emailVal.trim()) { var el = document.getElementById('os5-email'); if(el){el.focus();el.style.borderColor='var(--red)';} alert('Вкажіть email контактної особи'); return; }
+  var payerType = OS._payerType || 'legal';
+  if (payerType === 'legal') {
+    var compVal = (document.getElementById('os5-company')||{}).value || '';
+    var edrpouVal = (document.getElementById('os5-edrpou')||{}).value || '';
+    if (!compVal.trim()) { var el = document.getElementById('os5-company'); if(el){el.focus();el.style.borderColor='var(--red)';} alert('Вкажіть назву організації'); return; }
+    if (!edrpouVal.trim()) { var el = document.getElementById('os5-edrpou'); if(el){el.focus();el.style.borderColor='var(--red)';} alert('Вкажіть ЄДРПОУ'); return; }
+  } else if (payerType === 'fop') {
+    var compVal = (document.getElementById('os5-company')||{}).value || '';
+    var rnokppVal = (document.getElementById('os5-edrpou')||{}).value || '';
+    if (!compVal.trim()) { var el = document.getElementById('os5-company'); if(el){el.focus();el.style.borderColor='var(--red)';} alert('Вкажіть ПІБ підприємця'); return; }
+    if (!rnokppVal.trim()) { var el = document.getElementById('os5-edrpou'); if(el){el.focus();el.style.borderColor='var(--red)';} alert('Вкажіть РНОКПП / ІПН'); return; }
+  }
+
   // Collect totals
   var totalProbes = 0, totalHa = 0;
   OS.fields.forEach(function(f) {
