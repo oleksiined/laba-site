@@ -9266,6 +9266,7 @@ async function loadMethodsCatalog() {
     _mcatLoaded = true;
     mcatApplyFilters();
   } catch(e) {
+    console.error('[mcat] loadMethodsCatalog error:', e && e.message, e && e.stack);
     const isTimeout = e && e.name === 'AbortError';
     document.getElementById('mcatContent').innerHTML = `<div class="mcat-empty">${isTimeout ? 'Сервер не відповідає. Перевірте підключення або спробуйте пізніше.' : 'Помилка завантаження. Спробуйте пізніше.'}</div>`;
   }
