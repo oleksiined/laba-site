@@ -11358,7 +11358,7 @@ async function loadCatalogFromSupabase() {
         : location.hash.slice(1);
       var _activePage = document.querySelector('.page.active');
       var _activeId = _activePage ? _activePage.id.replace('page-', '') : '';
-      if (_expectedPage && _activeId !== _expectedPage && typeof currentPage !== 'undefined' && currentPage !== _expectedPage) {
+      if (_expectedPage && _activeId !== _expectedPage) {
         window._navigateFromHash(location.hash);
       }
     }
