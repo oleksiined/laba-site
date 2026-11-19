@@ -16254,7 +16254,7 @@ function initForLabsPage() {
         <select id="pg-positionType" class="pg-select" aria-label="Тип позиції"><option value="all">Тип: усі</option><option value="packages" selected>Пакети</option><option value="tests">Окремі дослідження</option></select>
         <select id="pg-status" class="pg-select" aria-label="Статус тарифу"><option value="">Статус: усі</option><option value="current">Чинна ціна</option><option value="wait">Очікуємо ціну</option><option value="review">Потрібне підтвердження</option><option value="future">Запланована ціна</option></select>
         <select id="pg-group" class="pg-select" aria-label="Група пакетів"><option value="">Група: усі</option><option>Агрохімічна</option><option>Автоматичний відбір</option></select>
-        <select id="pg-laboratory" class="pg-select" aria-label="Лабораторія"><option value="">Лабораторії: усі</option><option value="sat">SAT LAB</option><option value="demo-b">Лабораторія Б (демо)</option></select>
+        <select id="pg-laboratory" class="pg-select" aria-label="Лабораторія"><option value="">Показати всі позиції</option><option value="sat">Тільки з тарифом SAT LAB</option></select>
         <span class="pg-asof">Ґрунт · ціни за зразок без ПДВ</span>
       </div>
       <div class="pg-scroll"><table class="pg-table"><thead><tr><th scope="col">Код</th><th id="pg-colname" scope="col">Назва пакета</th><th>Лабораторія</th><th class="pg-num">Ціна лабораторії</th><th class="pg-num">Ціна продажу</th><th class="pg-num" title="(Ціна продажу − ціна лабораторії) ÷ ціна продажу">Маржа</th><th>Ціна діє з</th><th>Статус</th><th aria-label="Деталі"></th></tr></thead><tbody id="pg-list"></tbody></table></div>
@@ -16266,7 +16266,7 @@ function initForLabsPage() {
 </div>
 
 <dialog id="pg-detail" class="pg-dialog pg-drawer"><div class="pg-dlg-head"><div><h2 id="pg-detailTitle"></h2><span class="pg-light" id="pg-detailCode"></span></div><button class="pg-icon-btn" data-pg-close="pg-detail" aria-label="Закрити">×</button></div><div class="pg-dlg-body" id="pg-detailBody"></div></dialog>
-<dialog id="pg-formDialog" class="pg-dialog"><form id="pg-priceForm"><div class="pg-dlg-head"><h2>Додати тариф лабораторії</h2><button type="button" class="pg-icon-btn" data-pg-close="pg-formDialog" aria-label="Закрити">×</button></div><div class="pg-dlg-body"><div class="pg-fields"><label class="pg-wide">Лабораторія<select id="pg-formLab" class="pg-input" required><option value="sat">SAT LAB</option><option value="demo-b">Лабораторія Б (демо)</option></select></label><label class="pg-wide">Позиція<select id="pg-position" class="pg-input" required></select></label><label>Закупівельна ціна, грн без ПДВ<input id="pg-amount" class="pg-input" type="number" min="0" max="10000000" step="0.01" required></label><label>Діє з<input id="pg-from" class="pg-input" type="date" required></label><label>Діє до включно<input id="pg-to" class="pg-input" type="date"></label></div><div class="pg-err" id="pg-formError" role="alert"></div></div><div class="pg-dlg-foot"><button class="pg-btn" type="button" data-pg-close="pg-formDialog">Скасувати</button><button class="pg-btn primary" type="submit">Зберегти тариф</button></div></form></dialog>
+<dialog id="pg-formDialog" class="pg-dialog"><form id="pg-priceForm"><div class="pg-dlg-head"><h2>Додати тариф лабораторії</h2><button type="button" class="pg-icon-btn" data-pg-close="pg-formDialog" aria-label="Закрити">×</button></div><div class="pg-dlg-body"><div class="pg-fields"><label class="pg-wide">Лабораторія<select id="pg-formLab" class="pg-input" required><option value="sat">SAT LAB</option></select></label><label class="pg-wide">Позиція<select id="pg-position" class="pg-input" required></select></label><label>Закупівельна ціна, грн без ПДВ<input id="pg-amount" class="pg-input" type="number" min="0" max="10000000" step="0.01" required></label><label>Діє з<input id="pg-from" class="pg-input" type="date" required></label><label>Діє до включно<input id="pg-to" class="pg-input" type="date"></label></div><div class="pg-err" id="pg-formError" role="alert"></div></div><div class="pg-dlg-foot"><button class="pg-btn" type="button" data-pg-close="pg-formDialog">Скасувати</button><button class="pg-btn primary" type="submit">Зберегти тариф</button></div></form></dialog>
 <dialog id="pg-importDialog" class="pg-dialog"><div class="pg-dlg-head"><h2>Імпорт тарифів лабораторій</h2><button class="pg-icon-btn" data-pg-close="pg-importDialog" aria-label="Закрити">×</button></div><div class="pg-dlg-body"><p>Завантажте CSV із заповненими цінами за зразок без ПДВ. Шаблон містить ID лабораторій, позицій та актуальні редакції пакетів.</p><button class="pg-btn" id="pg-template">↓ Шаблон CSV</button><p style="margin-top:13px"><input type="file" id="pg-csv" accept=".csv,text/csv" aria-label="CSV із тарифами"></p><div id="pg-importMessage" role="status"></div></div><div class="pg-dlg-foot"><button class="pg-btn" data-pg-close="pg-importDialog">Скасувати</button><button class="pg-btn primary" id="pg-commitImport" disabled>Імпортувати</button></div></dialog>
 <div id="pg-toast" class="pg-toast" role="status" hidden></div>
 
@@ -16332,7 +16332,12 @@ function pgBaseRows(){
 }
 function pgScopedOffers(){
   const lab=pgId('pg-laboratory').value;
-  return pgOffers(pgBaseRows()).filter(row=>!lab||row.lab===lab);
+  if(lab==='sat'){
+    // Показуємо тільки SAT LAB з активним тарифом
+    return pgOffers(pgBaseRows()).filter(row=>row.lab==='sat'&&pgCurrent(row).status==='active');
+  }
+  // "Усі" — показуємо всі позиції (тільки sat, без demo-b дублікатів)
+  return pgOffers(pgBaseRows()).filter(row=>row.lab==='sat');
 }
 function pgMarginLabel(sale,price){
   return price&&sale>0?pgMoney.format(Math.round((sale-price.price)/sale*1000)/10)+'%':'—';
