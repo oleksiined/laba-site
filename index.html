@@ -9168,6 +9168,7 @@ function showToast(msg,ms=2500){
 
 /* ══ METHODS CATALOG ══ */
 let _mcatLoaded = false;
+let _mcatInFlight = false;
 let _mcatAllRows = [];
 let _mcatFilteredRows = [];
 let _mcatPage = 1;
@@ -9190,6 +9191,8 @@ const _mcatMatLabel = {
 
 async function loadMethodsCatalog() {
   if (_mcatLoaded) { mcatApplyFilters(); return; }
+  if (_mcatInFlight) return;
+  _mcatInFlight = true;
   document.getElementById('mcatContent').innerHTML = '<div class="mcat-loading">Завантаження...</div>';
   try {
     const [services, methods, materials, refLinks, refScales, refBands] = await Promise.all([
@@ -9269,6 +9272,8 @@ async function loadMethodsCatalog() {
     console.error('[mcat] loadMethodsCatalog error:', e && e.message, e && e.stack);
     const isTimeout = e && e.name === 'AbortError';
     document.getElementById('mcatContent').innerHTML = `<div class="mcat-empty">${isTimeout ? 'Сервер не відповідає. Перевірте підключення або спробуйте пізніше.' : 'Помилка завантаження. Спробуйте пізніше.'}</div>`;
+  } finally {
+    _mcatInFlight = false;
   }
 }
 
