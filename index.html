@@ -4570,6 +4570,10 @@ main{flex:1}
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3M3 13h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
               Завантажити рахунок
             </button>
+            <button class="btn-outline" style="padding:10px 18px;font-size:14px;gap:8px" onclick="ncf_downloadAct()">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3M3 13h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Завантажити акт
+            </button>
             <button class="btn-outline" style="padding:10px 18px;font-size:14px;gap:8px" onclick="ncf_printLabels()">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="1" width="10" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/><path d="M3 8H1.5A.5.5 0 001 8.5v5a.5.5 0 00.5.5h13a.5.5 0 00.5-.5v-5a.5.5 0 00-.5-.5H13" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="10" width="10" height="5" rx="1" stroke="currentColor" stroke-width="1.6"/><circle cx="12.5" cy="10.5" r="0.75" fill="currentColor"/></svg>
               Роздрукувати етикетки
@@ -13052,6 +13056,319 @@ function ncf_downloadInvoice(saveOnly) {
       else      console.warn('[LABA] Invoice save failed:', d.error);
     }).catch(e => console.warn('[LABA] Invoice save error:', e.message));
   });
+}
+
+// ══════════════════════════════════════════
+// ACT DOWNLOAD
+// ══════════════════════════════════════════
+function ncf_downloadAct() {
+  if (typeof pdfMake === 'undefined') {
+    toast('PDF-бібліотека завантажується, спробуйте ще раз');
+    return;
+  }
+
+  const o = window._ncfOrder || {};
+  const orderNum  = o.num  || 'L26000000';
+  const actDate   = o.date || new Date().toLocaleDateString('uk-UA');
+  const total = o.total || (NCO.pkgSum + NCO.addSum - NCO.promoDiscount);
+
+  const SELLER = {
+    name:    'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ «ЗЕМЛЕРОБ ХАБ»',
+    edrpou:  '45801119',
+    address: 'вул. Б. Вишневецького, 36/1, м. Черкаси, 18000',
+    phone:   '+380 67 181 99 67',
+    site:    'laba.zemlerob.com.ua',
+    director: 'Директор',
+  };
+
+  // ── Покупець ────────────────────────────────────────────────
+  let buyerLines = [];
+  let buyerName = '';
+  if (NCO.payerType === 'legal') {
+    buyerName = NCO.legal.company || '—';
+    buyerLines.push({ text: buyerName, bold: true, fontSize: 9 });
+    if (NCO.legal.edrpou) buyerLines.push({ text: 'Код за ЄДРПОУ / ІПН: ' + NCO.legal.edrpou, fontSize: 8, color: '#000' });
+    if (NCO.legal.address) buyerLines.push({ text: 'Адреса: ' + NCO.legal.address, fontSize: 8, color: '#000' });
+  } else if (NCO.payerType === 'fop') {
+    buyerName = 'ФОП ' + (NCO.fop.name || '—');
+    buyerLines.push({ text: buyerName, bold: true, fontSize: 9 });
+    if (NCO.fop.rnokpp) buyerLines.push({ text: 'Код за ЄДРПОУ / ІПН: ' + NCO.fop.rnokpp, fontSize: 8, color: '#000' });
+    if (NCO.fop.address) buyerLines.push({ text: 'Адреса: ' + NCO.fop.address, fontSize: 8, color: '#000' });
+  } else {
+    const nm = (NCO.person && NCO.person.name) || (NCO.recipient && NCO.recipient.name) || (o.clientName || '');
+    buyerName = nm || '—';
+    buyerLines.push({ text: buyerName, bold: true, fontSize: 9 });
+    const ph = (NCO.person && NCO.person.phone) || (NCO.recipient && NCO.recipient.phone) || '';
+    if (ph) buyerLines.push({ text: ph, fontSize: 8, color: '#000' });
+    if (o.email) buyerLines.push({ text: o.email, fontSize: 8, color: '#000' });
+  }
+
+  // ── Дисконт ──────────────────────────────────────────────────
+  const samples = (o.samples && o.samples.length) ? o.samples : (NS.samples || []);
+
+  function getMat(matId) {
+    const MAP = { soil:'Ґрунт', water:'Вода', fertilizer:'Добриво', seeds:'Насіння', grain:'Зерно', plants:'Рослини' };
+    return MAP[matId] || matId || 'Ґрунт';
+  }
+
+  const subtotal = NCO.pkgSum + NCO.addSum;
+  const discount = NCO.promoDiscount || 0;
+  const discPct  = discount > 0 && subtotal > 0 ? Math.round(discount / subtotal * 100) : 0;
+
+  // Групуємо по packageId + materialId (ті ж pkgMap/addMap що в рахунку)
+  const pkgMap = {};
+  samples.forEach(s => {
+    const pkg = (NS_CAT && NS_CAT.packages && NS_CAT.packages[s.packageId])
+             || (NC_CATALOG && NC_CATALOG.packages && NC_CATALOG.packages[s.packageId]);
+    const key = (s.packageId||'') + '|' + (s.materialId||'');
+    if (!pkgMap[key]) {
+      let displayCode = s.packageId || '—';
+      let displayName = pkg ? (pkg.baseName || pkg.name) : (s.packageId || '—');
+      if (pkg && pkg.baseName) {
+        const cats = [
+          ...((NC_CATALOG && NC_CATALOG.categories) || []),
+          ...((NS_CAT && NS_CAT.categories) || []),
+        ];
+        for (const cat of cats) {
+          const found = (cat.items || []).find(i => i.name === pkg.baseName);
+          if (found) { displayCode = found.id || displayCode; break; }
+        }
+      }
+      pkgMap[key] = {
+        code: displayCode,
+        name: displayName,
+        material: getMat(s.materialId),
+        price: pkg ? (pkg.price || 0) : 0,
+        qty: 0
+      };
+    }
+    pkgMap[key].qty++;
+  });
+
+  const addMap = {};
+  samples.forEach(s => {
+    (s.additionalIndicatorIds || []).forEach(id => {
+      const ind = (typeof nc_findInd === 'function' && nc_findInd(id))
+               || (typeof ns_findInd === 'function' && ns_findInd(id));
+      if (ind) {
+        if (!addMap[id]) addMap[id] = { code: id, name: ind.name, material: getMat(s.materialId), price: ind.price || 0, qty: 0 };
+        addMap[id].qty++;
+      }
+    });
+  });
+
+  const fmtUAH = n => n.toLocaleString('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // ── Таблиця послуг (ціни зі знижкою) ────────────────────────
+  const thStyle = { fontSize: 8, bold: true, color: '#000', fillColor: '#f0f0f0' };
+  const tdStyle = { fontSize: 8.5, color: '#000' };
+  const tableBody = [[
+    { text: '№',              ...thStyle, alignment: 'center' },
+    { text: 'Код\nпослуги',   ...thStyle, alignment: 'center' },
+    { text: 'Найменування послуги', ...thStyle },
+    { text: 'Матеріал',       ...thStyle },
+    { text: 'К-сть\nзразків', ...thStyle, alignment: 'center' },
+    { text: 'Ціна, грн\nБез ПДВ', ...thStyle, alignment: 'right' },
+    { text: 'Сума, грн\nБез ПДВ', ...thStyle, alignment: 'right' },
+  ]];
+
+  let rowNum = 1;
+  Object.values(pkgMap).forEach(p => {
+    // Якщо є знижка — застосовуємо її до ціни кожного рядка
+    const discountedPrice = discPct > 0 ? Math.round(p.price * (1 - discPct / 100) * 100) / 100 : p.price;
+    tableBody.push([
+      { text: rowNum++, ...tdStyle, alignment: 'center' },
+      { text: p.code,   ...tdStyle, fontSize: 7.5, color: '#000' },
+      { text: p.name,   ...tdStyle },
+      { text: p.material, ...tdStyle },
+      { text: p.qty,    ...tdStyle, alignment: 'center' },
+      { text: fmtUAH(discountedPrice), ...tdStyle, alignment: 'right' },
+      { text: fmtUAH(discountedPrice * p.qty), ...tdStyle, alignment: 'right' },
+    ]);
+  });
+  Object.values(addMap).forEach(ind => {
+    const discountedPrice = discPct > 0 ? Math.round(ind.price * (1 - discPct / 100) * 100) / 100 : ind.price;
+    tableBody.push([
+      { text: rowNum++, ...tdStyle, alignment: 'center' },
+      { text: ind.code, ...tdStyle, fontSize: 7.5, color: '#000' },
+      { text: ind.name, ...tdStyle },
+      { text: ind.material || 'Ґрунт', ...tdStyle },
+      { text: ind.qty,  ...tdStyle, alignment: 'center' },
+      { text: fmtUAH(discountedPrice), ...tdStyle, alignment: 'right' },
+      { text: fmtUAH(discountedPrice * ind.qty), ...tdStyle, alignment: 'right' },
+    ]);
+  });
+
+  // ── Підсумок (вже зі знижкою, без рядка "Знижка:") ───────────
+  const sumRows = [[
+    { text: 'Всього, без ПДВ', fontSize: 11, bold: true, border: [false,false,false,false] },
+    { text: fmtUAH(total) + '\nгрн', fontSize: 11, bold: true, alignment: 'right', border: [false,false,false,false] },
+  ]];
+
+  // Акт наданих послуг № … від …
+  const actNum = 'АКТ-' + orderNum;
+
+  const docDef = {
+    pageSize: 'A4',
+    pageMargins: [36, 24, 36, 40],
+    defaultStyle: { font: 'Helvetica', fontSize: 9, color: '#000' },
+    content: [
+
+      // ── Шапка ───────────────────────────────────────────────
+      {
+        columns: [
+          {
+            width: 120,
+            stack: [
+              { text: 'LABA.', fontSize: 22, bold: true, color: '#000', lineHeight: 1 },
+              { text: 'by Zemlerob', fontSize: 8, color: '#000' },
+            ]
+          },
+          {
+            stack: [
+              { text: 'АКТ НАДАНИХ ПОСЛУГ', fontSize: 13, bold: true, alignment: 'right', color: '#000' },
+              { text: actDate, fontSize: 8.5, color: '#000', alignment: 'right', margin: [0, 3, 0, 0] },
+            ]
+          }
+        ],
+        margin: [0, 0, 0, 10],
+      },
+
+      // ── Акт № / Замовлення ────────────────────────────────────
+      {
+        columns: [
+          { stack: [{ text: 'ЗАМОВЛЕННЯ', fontSize: 7.5, color: '#888', bold: true }, { text: orderNum, fontSize: 10, bold: true, color: '#000', margin: [0,2,0,0] }] },
+          { stack: [{ text: 'ДАТА СКЛАДАННЯ', fontSize: 7.5, color: '#888', bold: true }, { text: actDate, fontSize: 10, bold: true, color: '#000', margin: [0,2,0,0] }], alignment: 'right' },
+        ],
+        margin: [0, 0, 0, 4],
+      },
+
+      { text: `Акт наданих послуг № ${actNum} від ${actDate}`, fontSize: 10, bold: true, color: '#000', alignment: 'center', margin: [0, 13, 0, 4] },
+
+      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 8] },
+
+      // ── Виконавець / Замовник ─────────────────────────────────
+      {
+        columns: [
+          {
+            width: '50%',
+            stack: [
+              { text: 'ВИКОНАВЕЦЬ', fontSize: 7.5, bold: true, color: '#888', margin: [0,0,0,4] },
+              { text: SELLER.name, fontSize: 8.5, bold: true, color: '#000', lineHeight: 1.2 },
+              { text: `Код за ЄДРПОУ: ${SELLER.edrpou}`, fontSize: 8, color: '#333', margin: [0,2,0,0] },
+              { text: SELLER.address, fontSize: 8, color: '#333' },
+            ],
+            margin: [0, 0, 16, 0],
+          },
+          {
+            width: '50%',
+            stack: [
+              { text: 'ЗАМОВНИК', fontSize: 7.5, bold: true, color: '#888', margin: [0,0,0,4] },
+              ...buyerLines,
+            ]
+          }
+        ],
+        margin: [0, 0, 0, 8],
+      },
+
+      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 6] },
+
+      // ── Преамбула ─────────────────────────────────────────────
+      { text: `Цей акт складено між ТОВ «ЗЕМЛЕРОБ ХАБ» (надалі — Виконавець) та ${buyerName} (надалі — Замовник) про те, що Виконавець надав, а Замовник прийняв наступні послуги:`, fontSize: 8.5, color: '#000', margin: [0, 0, 0, 8], lineHeight: 1.3 },
+
+      { text: 'ПЕРЕЛІК НАДАНИХ ПОСЛУГ', fontSize: 9, bold: true, color: '#000', margin: [0, 0, 0, 4] },
+
+      // ── Таблиця послуг ────────────────────────────────────────
+      {
+        table: {
+          headerRows: 1,
+          widths: [16, 52, '*', 42, 36, 48, 52],
+          body: tableBody,
+        },
+        layout: {
+          hLineWidth: (i, node) => i === 0 || i === 1 || i === node.table.body.length ? 1 : 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#d8dce8',
+          vLineColor: () => '#d8dce8',
+          paddingLeft:  () => 5,
+          paddingRight: () => 5,
+          paddingTop:   () => 3,
+          paddingBottom:() => 3,
+        },
+        margin: [0, 0, 0, 8],
+      },
+
+      // ── Підсумок ──────────────────────────────────────────────
+      {
+        columns: [
+          { width: '60%', text: '' },
+          {
+            width: '40%',
+            table: {
+              widths: ['*', 'auto'],
+              body: sumRows,
+            },
+            layout: { defaultBorder: false },
+            margin: [0, 6, 0, 0],
+          }
+        ],
+        margin: [0, 0, 0, 10],
+      },
+
+      // ── Підсумковий текст ─────────────────────────────────────
+      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 523, y2: 0, lineWidth: 0.5, lineColor: '#ccc' }], margin: [0, 0, 0, 5] },
+      { text: `Загальна вартість наданих послуг становить ${fmtUAH(total)} грн (${fmtUAH(total)} гривень), без ПДВ. Послуги надані в повному обсязі та в належній якості. Замовник претензій не має.`, fontSize: 8.5, color: '#000', margin: [0, 0, 0, 16], lineHeight: 1.3 },
+
+      // ── Підписи ───────────────────────────────────────────────
+      {
+        columns: [
+          {
+            width: '45%',
+            stack: [
+              { text: 'ВИКОНАВЕЦЬ', fontSize: 8, bold: true, color: '#888', margin: [0,0,0,8] },
+              { text: SELLER.name, fontSize: 7.5, color: '#000', lineHeight: 1.3 },
+              { canvas: [{ type: 'line', x1: 0, y1: 12, x2: 160, y2: 12, lineWidth: 0.5, lineColor: '#000' }], margin: [0, 10, 0, 2] },
+              { text: SELLER.director + ' _____________ /підпис/', fontSize: 7.5, color: '#555' },
+              { text: 'М.П.', fontSize: 7.5, color: '#555', margin: [0, 6, 0, 0] },
+            ]
+          },
+          { width: '10%', text: '' },
+          {
+            width: '45%',
+            stack: [
+              { text: 'ЗАМОВНИК', fontSize: 8, bold: true, color: '#888', margin: [0,0,0,8] },
+              { text: buyerName, fontSize: 7.5, color: '#000', lineHeight: 1.3 },
+              { canvas: [{ type: 'line', x1: 0, y1: 12, x2: 160, y2: 12, lineWidth: 0.5, lineColor: '#000' }], margin: [0, 10, 0, 2] },
+              { text: '_____________ /підпис/', fontSize: 7.5, color: '#555' },
+              { text: 'М.П.', fontSize: 7.5, color: '#555', margin: [0, 6, 0, 0] },
+            ]
+          },
+        ],
+        margin: [0, 0, 0, 0],
+      },
+    ],
+
+    footer: (currentPage, pageCount) => ({
+      columns: [
+        { text: 'LABA by Zemlerob · Акт наданих послуг', fontSize: 7, color: '#333', margin: [40, 10, 0, 0] },
+        { text: `Сторінка ${currentPage} з ${pageCount}`, fontSize: 7, color: '#333', alignment: 'right', margin: [0, 10, 40, 0] },
+      ]
+    }),
+  };
+
+  pdfMake.fonts = {
+    Helvetica: {
+      normal:      'LiberationSans-Regular.ttf',
+      bold:        'LiberationSans-Bold.ttf',
+      italics:     'LiberationSans-Italic.ttf',
+      bolditalics: 'LiberationSans-BoldItalic.ttf',
+    }
+  };
+
+  const safeDate = actDate.replace(/\./g, '-');
+  const _actFileName = `Акт_${orderNum}_${safeDate}.pdf`;
+
+  pdfMake.createPdf(docDef).download(_actFileName);
 }
 
 // ══════════════════════════════════════════
