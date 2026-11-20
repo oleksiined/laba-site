@@ -13668,6 +13668,14 @@ function toast(msg) {
           </div>
         </div>
 
+        <!-- Map step 3 -->
+        <div class="os-section" id="osMapS3Section" style="display:none">
+          <div class="os-section-title">Поля на карті</div>
+          <div class="os-map-wrap-entry">
+            <div id="os-map-s3"></div>
+          </div>
+        </div>
+
       </div><!-- /step 3 -->
 
       <!-- ═══ STEP 4 ═══ -->
@@ -14441,7 +14449,10 @@ function osRenderEntryList() {
 function osInitMap3() {
   if (OS.map3) { OS.map3.remove(); OS.map3 = null; }
   var el = document.getElementById('os-map-s3');
-  if (!el || !window.L || !OS.fields.length) return;
+  var sec = document.getElementById('osMapS3Section');
+  if (!el || !window.L) return;
+  if (!OS.fields.length) { if(sec) sec.style.display='none'; return; }
+  if(sec) sec.style.display='';
   OS.map3 = L.map('os-map-s3', { zoomControl:true, attributionControl:false });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'' }).addTo(OS.map3);
   var group = L.featureGroup();
@@ -14690,6 +14701,17 @@ function osRenderSidebar() {
         }
       }
     });
+    // Logistics cost
+    var logisticsCost = 0;
+    if (OS._locDist && OS._locDist > 0) {
+      logisticsCost = OS._locDist * 20;
+      totalPrice += logisticsCost;
+      hasPrices = true;
+      priceRows.push('<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:5px;gap:6px">'
+        + '<span style="color:var(--text-mid);flex:1;min-width:0">Логістика · ' + OS._locDist + ' км × 20 грн</span>'
+        + '<span style="font-weight:700;color:var(--navy);flex-shrink:0;white-space:nowrap">' + logisticsCost.toLocaleString('uk-UA') + ' грн</span>'
+        + '</div>');
+    }
     if (hasPrices) {
       priceRows.push('<div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--border-soft);margin-top:6px;padding-top:6px;gap:6px">'
         + '<span style="font-size:13px;font-weight:700;color:var(--navy);flex:1;min-width:0">Разом</span>'
@@ -14979,86 +15001,6 @@ function osRenderStep4() {
   if (contactEmail) html += row('Email', osEsc(contactEmail));
   html += '</div></div>';
 
-  // ── Block 4: Вартість ──
-  if (OS.services.length && OS.samplingServices) {
-    var ss = OS.samplingServices;
-    var priceLines = [];
-    var grandTotal = 0;
-    var hasPkgPrice = false;
-
-    if (hasSoil) {
-      var soilSvc = ss['soil'];
-      if (soilSvc) {
-        // Відбір: к-ть проб * ціна за пробу
-        var soilCost = totalProbes * soilSvc.price;
-        priceLines.push({ label: 'Відбір ґрунту · ' + totalProbes + ' проб × ' + soilSvc.price + ' грн', val: soilCost });
-        grandTotal += soilCost;
-        // Пакет дослідження
-        if (OS.mode !== 'only') {
-          var pkgName = (OS.fields[0] && OS.fields[0].settings.soilPackage) || '';
-          var soilPkgs = (typeof SERVICES !== 'undefined' && SERVICES.soil) ? SERVICES.soil.packages : [];
-          var pkg = soilPkgs.find(function(p){ return p.name === pkgName; });
-          if (pkg && pkg.price) {
-            var pkgCost = totalProbes * pkg.price;
-            priceLines.push({ label: pkgName + ' · ' + totalProbes + ' проб × ' + pkg.price + ' грн', val: pkgCost });
-            grandTotal += pkgCost;
-            hasPkgPrice = true;
-          } else if (pkgName) {
-            priceLines.push({ label: pkgName, val: null });
-          }
-        }
-      }
-    }
-    ['moisture','plants','density'].forEach(function(key) {
-      if (!OS.services.includes(key)) return;
-      var svc = ss[key];
-      if (!svc) return;
-      // Для вологи/рослин/щільності — рахуємо точки з полів (або мінімум)
-      var units = 0;
-      if (key === 'moisture') {
-        units = OS.fields.reduce(function(sum, f) { return sum + (f.settings.moistureCount || 0); }, 0) || (svc.min_units || 0);
-      } else if (key === 'plants') {
-        units = OS.fields.reduce(function(sum, f) { return sum + (f.settings.plantsCount || 10); }, 0);
-      } else if (key === 'density') {
-        units = OS.fields.reduce(function(sum, f) { return sum + (f.settings.densityCount || osCalcProbes(f.areaHa, f.settings.areaPerProbe)); }, 0);
-      }
-      if (units <= 0) return;
-      var svcName = svc.name || key;
-      var svcUnit = svc.unit || 'точок';
-      var cost = units * svc.price;
-      priceLines.push({ label: svcName + ' · ' + units + ' ' + svcUnit + ' × ' + svc.price + ' грн', val: cost });
-      grandTotal += cost;
-      // Пакет дослідження для вологи
-      if (key === 'moisture' && OS.mode !== 'only') {
-        var mPkgName = (OS.fields[0] && OS.fields[0].settings.moisturePackage) || '';
-        var mPkgData = OS._moistPkgData || [];
-        var mPkg = mPkgData.find(function(p){ return p.name === mPkgName; });
-        if (mPkg && mPkg.price) {
-          var mPkgCost = units * mPkg.price;
-          priceLines.push({ label: osEsc(mPkgName) + ' · ' + units + ' точок × ' + mPkg.price + ' грн', val: mPkgCost });
-          grandTotal += mPkgCost;
-          hasPkgPrice = true;
-        } else if (mPkgName) {
-          priceLines.push({ label: mPkgName, val: null });
-        }
-      }
-    });
-
-    if (priceLines.length) {
-      html += '<div class="os-price-block">';
-      html += '<div class="os-price-title">Орієнтовна вартість</div>';
-      priceLines.forEach(function(l) {
-        html += '<div class="os-price-line"><span class="os-price-line-label">' + osEsc(l.label) + '</span>';
-        html += '<span>' + (l.val !== null ? l.val.toLocaleString('uk-UA') + ' грн' : 'за запитом') + '</span></div>';
-      });
-      html += '<hr class="os-price-divider">';
-      html += '<div class="os-price-total"><span>Разом</span><span>' + grandTotal.toLocaleString('uk-UA') + ' грн</span></div>';
-      if (!hasPkgPrice && OS.mode !== 'only') {
-        html += '<div class="os-price-note">* Вартість дослідження буде розраховано після підтвердження пакету</div>';
-      }
-      html += '</div>';
-    }
-  }
 
   el.innerHTML = html;
 }
