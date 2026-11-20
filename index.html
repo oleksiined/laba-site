@@ -12766,18 +12766,17 @@ function ncf_downloadInvoice(saveOnly) {
              || (NC_CATALOG && NC_CATALOG.packages && NC_CATALOG.packages[s.packageId]);
     const key = (s.packageId||'') + '|' + (s.materialId||'');
     if (!pkgMap[key]) {
-      // Якщо пакет є "virtual" (має baseName = реальна послуга, напр. 'Пробопідготовка'),
-      // шукаємо фактичний показник у каталозі, щоб отримати правильний код і назву
-      let displayCode = s.packageId || '—';
+      let displayCode = '—';
       let displayName = pkg ? (pkg.baseName || pkg.name) : (s.packageId || '—');
-      if (pkg && pkg.baseName) {
+      if (pkg) {
+        const searchName = pkg.baseName || pkg.name;
         const cats = [
           ...((NC_CATALOG && NC_CATALOG.categories) || []),
           ...((NS_CAT && NS_CAT.categories) || []),
         ];
         for (const cat of cats) {
-          const found = (cat.items || []).find(i => i.name === pkg.baseName);
-          if (found) { displayCode = found.id || displayCode; break; }
+          const found = (cat.items || []).find(i => i.name === searchName);
+          if (found) { displayCode = found.id || '—'; break; }
         }
       }
       pkgMap[key] = {
