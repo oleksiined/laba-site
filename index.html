@@ -8794,7 +8794,7 @@ async function submitOrder(){
     const onRes = await fetch('https://laba.zemlerob.com.ua/api/next-order-num').then(r => r.json());
     if (onRes.ok) orderNum = `L${onRes.year}${String(onRes.nextNum).padStart(4, '0')}`;
   } catch(e) { /* fallback below */ }
-  if (!orderNum) orderNum = `L${_yy}${String(Math.floor(Math.random()*900000)+100000)}`;
+  if (!orderNum) orderNum = `L${_yy}${String(Math.floor(Math.random()*9000)+1000)}`;
   currentOrder={
     order_number:orderNum,
     status:'new',
@@ -12289,6 +12289,8 @@ async function submitOrder() {
   const _snData = _snRes.status === 'fulfilled' && _snRes.value?.ok ? _snRes.value : null;
   const orderNum = _onData ? `L${_onData.year}${String(_onData.nextNum).padStart(4, '0')}` : `L${yy}${String(Math.floor(Math.random()*9000)+1000)}`;
   const clientEmail = email ? email.value.trim() : '';
+  const clientName  = name  ? name.value.trim()  : '';
+  const clientPhone = phone ? phone.value.trim() : '';
   const grand = NCO.pkgSum + NCO.addSum - NCO.promoDiscount;
   // Store for confirm page
   const _snapSamples = (NS.samples && NS.samples.length) ? NS.samples.map(s=>({...s}))
@@ -12301,8 +12303,6 @@ async function submitOrder() {
   }
 
   // ── Build order payload for backend ──
-  const clientName = name ? name.value.trim() : '';
-  const clientPhone = phone ? phone.value.trim() : '';
 
   // Collect cart items from samples
   const pkgCountMap = {};
