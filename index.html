@@ -10934,6 +10934,7 @@ function ns_clearCart() {
 
 // ── тултіп для показників: position:fixed щоб не обрізався overflow:hidden ──
 document.addEventListener('mouseover', e => {
+  if (!e.target || typeof e.target.closest !== 'function') return;
   const chip = e.target.closest('.srv-param-chip');
   if(!chip) return;
   const tip = chip.querySelector('.ind-tooltip');
@@ -10952,6 +10953,7 @@ document.addEventListener('mouseover', e => {
   });
 });
 document.addEventListener('mouseout', e => {
+  if (!e.target || typeof e.target.closest !== 'function') return;
   const chip = e.target.closest('.srv-param-chip');
   if(!chip) return;
   const tip = chip.querySelector('.ind-tooltip');
