@@ -9079,6 +9079,7 @@ function addParamToCard(){
 (function initParamDrag(){
   let drag=null,ox=0,oy=0;
   document.addEventListener('mousedown',e=>{
+    if(!e.target||typeof e.target.closest!=='function')return;
     const h=e.target.closest('.param-popup-head');
     if(!h||e.target.classList.contains('param-popup-close'))return;
     drag=h.closest('.param-popup');
@@ -9168,6 +9169,7 @@ function saveOrderToHistory(order) {
     _cp.style.left=left+'px'; _cp.style.top=top+'px';
   }
   document.addEventListener('mouseover',e=>{
+    if(!e.target||typeof e.target.closest!=='function')return;
     if(e.target.closest('#chipPopover')){ _cpCancelHide(); return; }
     const el=e.target.closest('[data-chip-json]');
     if(!el||!_cp)return;
@@ -9183,18 +9185,20 @@ function saveOrderToHistory(order) {
     }catch(e){}
   });
   document.addEventListener('mouseout',e=>{
+    if(!e.target||typeof e.target.closest!=='function')return;
     if(e.target.closest('[data-chip-json]')||e.target.closest('#chipPopover')) _cpScheduleHide();
   });
 
   // ── Pkg description popover (same white style as chipPopover) ──
   document.addEventListener('mouseover',e=>{
+    if(!e.target||typeof e.target.closest!=='function')return;
     const el=e.target.closest('[data-pkg-desc]');
     if(!el||!_cp)return;
     _cp.innerHTML=`<div class="chip-pop-desc-text">${el.dataset.pkgDesc}</div>`;
     _cp.classList.add('show');
     _positionChipPop(el);
   });
-  document.addEventListener('mouseout',e=>{ if(e.target.closest('[data-pkg-desc]')&&_cp)_cp.classList.remove('show'); });
+  document.addEventListener('mouseout',e=>{ if(!e.target||typeof e.target.closest!=='function')return; if(e.target.closest('[data-pkg-desc]')&&_cp)_cp.classList.remove('show'); });
 
   document.addEventListener('scroll',()=>{ if(_cp)_cp.classList.remove('show'); },{passive:true});
 })();
