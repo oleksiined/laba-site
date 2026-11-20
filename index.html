@@ -6051,6 +6051,33 @@ function expandSearchQuery(q) {
 let cart = [];
 let paramNotes = {};
 let samples = [];
+
+// ── GTM dataLayer helper ──────────────────────────────────────
+window.dataLayer = window.dataLayer || [];
+function _dl(event, ecommerceData) {
+  window.dataLayer.push({ ecommerce: null }); // clear previous
+  const payload = { event };
+  if (ecommerceData) payload.ecommerce = ecommerceData;
+  window.dataLayer.push(payload);
+}
+function _dlItem(item) {
+  // Convert cart item to GA4 ecommerce item format
+  const safeId = (item.code || '').replace(/[^a-zA-Z0-9_-]/g, '');
+  return {
+    item_id:       safeId || 'unknown',
+    item_name:     item.name || safeId || 'Послуга',
+    item_category: item.type === 'ind' ? 'Індивідуальні показники' : 'Пакетні послуги',
+    price:         Number(item.price) || 0,
+    quantity:      Number(item.qty) || 1,
+  };
+}
+function _dlCartItems() {
+  return (cart || []).map(_dlItem);
+}
+function _dlCartValue() {
+  return (cart || []).reduce((s, it) => s + (Number(it.price) || 0) * (Number(it.qty) || 1), 0);
+}
+// ─────────────────────────────────────────────────────────────
 let payerType = 'individual';
 let deliveryType = 'nova_poshta';
 let currentOrder = null;
@@ -6743,6 +6770,7 @@ function navigate(page) {
     if (typeof NC_S !== 'undefined' && _ck !== NC_S._lastCartKey) { buildNCFromCart(); NC_S._lastCartKey = _ck; nc_maxStep = 1; }
     if (typeof nc_render === 'function') nc_render();
     if (typeof nc_setMaxStep === 'function') nc_setMaxStep(1);
+    _dl('begin_checkout',{currency:'UAH',value:_dlCartValue(),items:_dlCartItems()});
     try { history.pushState({page},'','#checkout'); } catch(e){} window.scrollTo(0,0); updateCartUI(); return;
   }
   if (page === 'sampling') { var _sm = (location.hash.startsWith('#sampling/') ? location.hash.slice('#sampling/'.length) : 'soil'); try { history.pushState({page:'sampling',mat:_sm},'','#sampling/'+_sm); } catch(e){} }
@@ -6809,7 +6837,15 @@ function saveCart() { localStorage.setItem('laba_cart', JSON.stringify(cart)); l
 
 function toggleCart(code,type,price,name){
   const idx=cart.findIndex(c=>c.code===code&&c.type===type);
-  if(idx>=0) cart.splice(idx,1); else cart.push({code,type,price,name,notes:[],qty:1});
+  if(idx>=0){
+    const removed=cart[idx];
+    cart.splice(idx,1);
+    _dl('remove_from_cart',{currency:'UAH',value:Number(removed.price||0)*Number(removed.qty||1),items:[_dlItem(removed)]});
+  } else {
+    const newItem={code,type,price,name,notes:[],qty:1};
+    cart.push(newItem);
+    _dl('add_to_cart',{currency:'UAH',value:Number(price||0),items:[_dlItem(newItem)]});
+  }
   saveCart(); updateCartUI(); render();
 }
 
@@ -6833,7 +6869,13 @@ function _ckUpdateInline(inputEl,index){
   if(minusBtn) minusBtn.disabled=qty<=1;
 }
 
-function removeCartItem(index){ cart.splice(index,1); saveCart(); updateCartUI(); render(); }
+function removeCartItem(index){
+  if(cart[index]){
+    const removed=cart[index];
+    _dl('remove_from_cart',{currency:'UAH',value:Number(removed.price||0)*Number(removed.qty||1),items:[_dlItem(removed)]});
+  }
+  cart.splice(index,1); saveCart(); updateCartUI(); render();
+}
 
 function clearCart(){ cart=[]; paramNotes={}; saveCart(); updateCartUI(); renderCheckout(); }
 
@@ -6842,6 +6884,7 @@ function openCart(){
   document.getElementById('cartDrawer')?.classList.add('open');
   document.body.style.overflow='hidden';
   updateCartUI();
+  _dl('view_cart',{currency:'UAH',value:_dlCartValue(),items:_dlCartItems()});
   // Render cart items in drawer
   const body=document.getElementById('cartBody');
   if(!body)return;
@@ -7175,7 +7218,11 @@ document.addEventListener('click',function(e){
 });
 
 document.getElementById('searchInput').addEventListener('input', function(){
-  searchQ=this.value.toLowerCase(); render();
+  searchQ=this.value.toLowerCase();
+  if (searchQ.length >= 2) {
+    _dl('search', { search_term: this.value.trim() });
+  }
+  render();
 });
 
 let ALL_TASKS = [];
@@ -7373,7 +7420,9 @@ function clickCartIcon(safeCode, event){
   if(idx<0){
     const _pkgSlug = (_PKG_NAMES[safeCode]||{}).slug||safeCode;
     const _pkgMin = (NS_CAT.packages[_pkgSlug]||NS_CAT.packages[safeCode]||{}).minSamplesCount||1;
-    cart.push({code:safeCode,type:'pkg',price,name,notes:[],qty:_pkgMin});
+    const newItem={code:safeCode,type:'pkg',price,name,notes:[],qty:_pkgMin};
+    cart.push(newItem);
+    _dl('add_to_cart',{currency:'UAH',value:Number(price||0)*_pkgMin,items:[_dlItem(newItem)]});
     saveCart(); updateCartUI();
   }
   // Ховаємо іконку, показуємо лічильник
@@ -7638,7 +7687,11 @@ function updateExpQtyUI(safeCode, price, qty){
 
 function removeFromCart(safeCode){
   const idx = cart.findIndex(c=>c.code===safeCode&&c.type==='pkg');
-  if(idx>=0){ cart.splice(idx,1); saveCart(); updateCartUI(); }
+  if(idx>=0){
+    const removed=cart[idx];
+    _dl('remove_from_cart',{currency:'UAH',value:Number(removed.price||0)*Number(removed.qty||1),items:[_dlItem(removed)]});
+    cart.splice(idx,1); saveCart(); updateCartUI();
+  }
   // Collapsed UI reset
   const icon = document.getElementById('cicon-'+safeCode);
   const zone = document.getElementById('czone-'+safeCode);
@@ -8842,6 +8895,18 @@ async function submitOrder(){
       await new Promise(r=>setTimeout(r,600));
     }
     saveOrderToHistory({...currentOrder});
+    _dl('purchase', {
+      transaction_id: currentOrder.order_number,
+      currency: 'UAH',
+      value: total,
+      items: samples.map((s, i) => ({
+        item_id:       s.itemCode || ('sample_' + i),
+        item_name:     s.basePkg || s.name || 'Послуга',
+        item_category: 'Пакетні послуги',
+        price:         Number(s.basePrice) || 0,
+        quantity:      1,
+      })),
+    });
     btn.disabled=false; btn.textContent='Підтвердити →';
     goStep('payment');
   }catch(err){
@@ -8933,6 +8998,7 @@ function openCallModal(src){
   _callSource=src||'Сайт LABA';
   const bd=document.getElementById('callModalBackdrop');
   if(bd){ bd.classList.add('open'); document.body.style.overflow='hidden'; }
+  window.dataLayer.push({ event: 'consultation_open', form_id: 'consultation', form_name: 'Консультація' });
 }
 function closeCallModal(){ const bd=document.getElementById('callModalBackdrop'); if(bd)bd.classList.remove('open'); document.body.style.overflow=''; }
 function closeCallSuccess(){ const m=document.getElementById('call-success-modal'); if(m){ m.classList.add('hidden'); m.style.display='none'; } document.body.style.overflow=''; }
@@ -8947,13 +9013,18 @@ async function submitCallModal(){
   if(!phone||phone.length<13){ showToast('Введіть коректний номер телефону'); return; }
   const btn=document.querySelector('#callFormBody .btn-submit');
   if(btn){ btn.disabled=true; btn.textContent='Надсилаємо…'; }
+  let _callOk = false;
   try{
     await fetch('/api/call-request',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({name,phone,comment,source:_callSource})
     });
+    _callOk = true;
   }catch(e){ console.warn('call-request error',e); }
+  if(_callOk){
+    window.dataLayer.push({ event: 'generate_lead', form_id: 'consultation', form_name: 'Консультація', lead_type: 'consultation' });
+  }
   if(btn){ btn.disabled=false; btn.textContent='Надіслати'; }
   closeCallModal();
   const csm=document.getElementById('call-success-modal');
@@ -10728,6 +10799,18 @@ async function submitQuickOrder() {
     }
 
     // Success
+    _dl('purchase', {
+      transaction_id: result.orderNum || orderNum,
+      currency: 'UAH',
+      value: tt.grand,
+      items: (payload.items || []).map((it, i) => ({
+        item_id:       (it.code || 'pkg_' + i),
+        item_name:     it.name || 'Послуга',
+        item_category: 'Пакетні послуги',
+        price:         Number(it.price) || 0,
+        quantity:      Number(it.qty) || 1,
+      })),
+    });
     closeQuickOrder();
     const numEl = document.getElementById('order-success-num');
     if (numEl) numEl.textContent = result.orderNum || orderNum;
@@ -12408,6 +12491,20 @@ async function submitOrder() {
     _resetBtns();
     return;
   }
+
+  // ── GTM purchase event (fires once after successful backend save) ──
+  _dl('purchase', {
+    transaction_id: orderNum,
+    currency: 'UAH',
+    value: grand,
+    items: (orderPayload.items || []).map((it, i) => ({
+      item_id:       (it.code || 'pkg_' + i),
+      item_name:     it.name || 'Послуга',
+      item_category: 'Пакетні послуги',
+      price:         Number(it.price) || 0,
+      quantity:      Number(it.qty) || 1,
+    })),
+  });
 
   // ── Online payment → LiqPay redirect ──
   if (NCO.payment === 'online') {
