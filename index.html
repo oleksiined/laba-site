@@ -14402,11 +14402,12 @@ function osToggleMap1() {
 var _osLocTimer = null;
 // Base: Cherkasy office — вул. Байди Вишневецького 36/1
 var OS_BASE_LAT = 49.4418, OS_BASE_LNG = 32.0551;
-function osLocSelectPlace(lat, lng, placeName) {
+function osLocSelectPlace(lat, lng, placeName, placeLabel) {
   var inp = document.getElementById('osLocationInput');
   var dd = document.getElementById('osLocDropdown');
   var st = document.getElementById('osLocationStatus');
-  if(inp) inp.value = placeName;
+  var displayName = placeLabel ? placeName+', '+placeLabel : placeName;
+  if(inp) inp.value = displayName;
   if(dd) { dd.style.display='none'; dd.innerHTML=''; }
   OS._locLat=lat; OS._locLng=lng;
   if(st){st.style.display='';st.textContent='Розраховую відстань по дорогах...';}
@@ -14414,11 +14415,11 @@ function osLocSelectPlace(lat, lng, placeName) {
     .then(function(r){return r.json();})
     .then(function(route){
       var dist = route&&route.routes&&route.routes[0] ? Math.round(route.routes[0].distance/1000) : null;
-      if(dist){ OS._locDist=dist; if(st){st.textContent='📍 '+placeName+' — ~'+dist+' км по дорогах від Черкас';} }
-      else { if(st){st.textContent='📍 '+placeName+' (відстань не визначена)';} }
+      if(dist){ OS._locDist=dist; if(st){st.textContent='📍 '+displayName+' — ~'+dist+' км по дорогах від Черкас';} }
+      else { if(st){st.textContent='📍 '+displayName+' (відстань не визначена)';} }
       osRenderSidebar();
     })
-    .catch(function(){ if(st){st.textContent='📍 '+placeName+' (не вдалось розрахувати відстань)';} osRenderSidebar(); });
+    .catch(function(){ if(st){st.textContent='📍 '+displayName+' (не вдалось розрахувати відстань)';} osRenderSidebar(); });
 }
 function osLocationInputChange() {
   var val = (document.getElementById('osLocationInput')||{}).value||'';
@@ -14483,7 +14484,7 @@ function osLocShowDropdown(results, st, dd) {
   }
   if(st){st.style.display='none';}
   dd.innerHTML = results.map(function(r,i){
-    return '<div class="os-loc-opt" onclick="osLocSelectPlace('+r.lat+','+r.lng+','+JSON.stringify(r.name)+')">'
+    return '<div class="os-loc-opt" onmousedown="event.preventDefault();osLocSelectPlace('+r.lat+','+r.lng+','+JSON.stringify(r.name)+','+JSON.stringify(r.label)+')">'
       +'<strong>'+osEsc(r.name)+'</strong>'
       +(r.label?'<span>'+osEsc(r.label)+'</span>':'')
       +'</div>';
@@ -14491,7 +14492,7 @@ function osLocShowDropdown(results, st, dd) {
   dd.style.display='block';
   if(!dd._outsideHandler){
     dd._outsideHandler=true;
-    document.addEventListener('click',function(e){
+    document.addEventListener('mousedown',function(e){
       var inp=document.getElementById('osLocationInput');
       if(dd&&!dd.contains(e.target)&&e.target!==inp){dd.style.display='none';}
     });
