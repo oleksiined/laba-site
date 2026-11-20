@@ -10084,7 +10084,7 @@ document.addEventListener('DOMContentLoaded', _featInit);
 
 
 <!-- ══ QUICK ORDER MODAL ══ -->
-<div id="quick-order-modal" class="m-overlay hidden">
+<div id="quick-order-modal" class="m-overlay hidden" onclick="if(event.target===this)closeQuickOrder()">
   <div class="modal qo-modal">
     <div class="modal-hd" style="flex-direction:column;align-items:stretch;gap:6px">
       <div style="display:flex;align-items:center;justify-content:space-between">
