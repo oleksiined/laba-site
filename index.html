@@ -6714,13 +6714,22 @@ function navigate(page) {
   if (page === 'calculator') calcInit();
   if (page === 'order-sampling') {
     if (typeof osInit === 'function') osInit();
-    // If map was already initialized while page was hidden (display:none),
-    // the container had 0x0 size. Re-fit now that the page is visible.
+    // If file was loaded while this page was hidden, init the map now
+    // (the container has real dimensions once the page is visible).
     requestAnimationFrame(function(){
       requestAnimationFrame(function(){
-        if (window.OS) {
-          if (OS.map1) { OS.map1.invalidateSize(); if (OS._map1Bounds) OS.map1.fitBounds(OS._map1Bounds, {padding:[20,20]}); }
-          if (OS.map3) { OS.map3.invalidateSize(); if (OS._map3Bounds) OS.map3.fitBounds(OS._map3Bounds, {padding:[30,30]}); }
+        if (!window.OS) return;
+        if (OS._pendingMapInit) {
+          OS._pendingMapInit = false;
+          osInitMap1();
+        } else if (OS.map1) {
+          // Map already exists but was sized at 0x0 — re-measure and re-fit
+          OS.map1.invalidateSize();
+          if (OS._map1Bounds) OS.map1.fitBounds(OS._map1Bounds, {padding:[20,20]});
+        }
+        if (OS.map3) {
+          OS.map3.invalidateSize();
+          if (OS._map3Bounds) OS.map3.fitBounds(OS._map3Bounds, {padding:[30,30]});
         }
       });
     });
@@ -14068,13 +14077,16 @@ function osHandleFile(file) {
     osRenderFieldsList();
     osRenderSidebar();
     document.getElementById('osFieldsSection').style.display = 'block';
-    // Wait two animation frames so the browser paints the grid layout
-    // before Leaflet measures the container size
-    requestAnimationFrame(function(){
+    // Defer map init: if the order page is visible now, init immediately (double rAF);
+    // if not (page hidden), set a flag so navigate() will init on page show.
+    var orderPage = document.getElementById('page-order-sampling');
+    if (orderPage && orderPage.offsetWidth > 0) {
       requestAnimationFrame(function(){
-        osInitMap1();
+        requestAnimationFrame(function(){ osInitMap1(); });
       });
-    });
+    } else {
+      OS._pendingMapInit = true;
+    }
   };
   reader.readAsText(file);
 }
