@@ -14056,10 +14056,13 @@ function osHandleFile(file) {
     osRenderFieldsList();
     osRenderSidebar();
     document.getElementById('osFieldsSection').style.display = 'block';
-    setTimeout(function(){
-      osInitMap1();
-      if(OS.map1){ OS.map1.invalidateSize(); setTimeout(function(){ if(OS.map1) OS.map1.invalidateSize(); },200); }
-    }, 50);
+    // Wait two animation frames so the browser paints the grid layout
+    // before Leaflet measures the container size
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        osInitMap1();
+      });
+    });
   };
   reader.readAsText(file);
 }
@@ -14178,9 +14181,17 @@ function osInitMap1() {
     group.addLayer(poly);
   });
 
-  // invalidateSize then fitBounds so size is correct before fitting
+  // Force Leaflet to recalculate the container size, then fit polygons
   OS.map1.invalidateSize();
-  OS.map1.fitBounds(group.getBounds(), { padding:[20,20] });
+  var _bounds = group.getBounds();
+  OS.map1.fitBounds(_bounds, { padding:[20,20] });
+  // Second pass: ensure SVG paths are redrawn at the correct zoom
+  requestAnimationFrame(function(){
+    if (OS.map1) {
+      OS.map1.invalidateSize();
+      OS.map1.fitBounds(_bounds, { padding:[20,20] });
+    }
+  });
 }
 
 /* ── Accordions (step 2) ── */
@@ -14486,7 +14497,14 @@ function osInitMap3() {
     group.addLayer(poly);
   });
   OS.map3.invalidateSize();
-  OS.map3.fitBounds(group.getBounds(), { padding:[30,30] });
+  var _bounds3 = group.getBounds();
+  OS.map3.fitBounds(_bounds3, { padding:[30,30] });
+  requestAnimationFrame(function(){
+    if (OS.map3) {
+      OS.map3.invalidateSize();
+      OS.map3.fitBounds(_bounds3, { padding:[30,30] });
+    }
+  });
 }
 
 /* ── Dates ── */
