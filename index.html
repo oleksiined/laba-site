@@ -14193,9 +14193,10 @@ function osInitMap1() {
   var tmpGroup = L.featureGroup(fieldsWithCoords.map(function(f){ return L.polygon(f.latLngs); }));
   var bounds = tmpGroup.getBounds();
 
-  // Use Leaflet's whenReady to defer fitBounds until the map is fully painted.
-  // Do NOT pass center/zoom here — let fitBounds set the view entirely.
-  OS.map1 = L.map('os-map-s1', { zoomControl:true, attributionControl:false });
+  // Pass a temporary center/zoom so Leaflet initializes fully (_loaded=true).
+  // We use the bounds center at zoom 10 — fitBounds will immediately correct it.
+  var boundsCenter = bounds.getCenter();
+  OS.map1 = L.map('os-map-s1', { center: boundsCenter, zoom: 10, zoomControl:true, attributionControl:false });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'' }).addTo(OS.map1);
 
   var group = L.featureGroup();
@@ -14209,24 +14210,20 @@ function osInitMap1() {
   var _bounds = group.getBounds();
   OS._map1Bounds = _bounds;
 
-  // whenReady fires after Leaflet has sized the container.
-  // We must ensure the page is scrolled to 0 BEFORE fitBounds, because Leaflet
-  // computes the SVG pixel origin via getBoundingClientRect at that moment.
-  // scrollTo() is async, so we scroll, then wait two rAFs for the paint to settle.
+  // The SVG pixel origin is set at the moment setView/fitBounds is called, using
+  // getBoundingClientRect(). If the page is scrolled, the SVG is offset by scrollY.
+  // Fix: scroll to 0, then wait two rAFs so the browser has painted the new scroll
+  // position before we call fitBounds.
   function _fitMap() {
     if (!OS.map1) return;
     OS.map1.invalidateSize();
     OS.map1.fitBounds(_bounds, { padding:[20,20] });
   }
-  OS.map1.whenReady(function() {
-    window.scrollTo(0, 0);
-    // Two rAFs: first fires before paint, second fires after the scroll paint
+  window.scrollTo(0, 0);
+  requestAnimationFrame(function() {
     requestAnimationFrame(function() {
-      requestAnimationFrame(function() {
-        _fitMap();
-        // One more pass after a short delay to handle slow scroll animations
-        setTimeout(function(){ _fitMap(); }, 150);
-      });
+      _fitMap();
+      setTimeout(function(){ _fitMap(); }, 200);
     });
   });
 }
