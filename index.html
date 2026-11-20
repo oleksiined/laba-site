@@ -14160,7 +14160,7 @@ function osInitMap1() {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'' }).addTo(OS.map1);
   var group = L.featureGroup();
   OS.fields.forEach(function(f) {
-    var poly = L.polygon(f.latLngs, { color:'#CCFF00', weight:2, fillOpacity:0.15 }).addTo(OS.map1);
+    var poly = L.polygon(f.latLngs, { color:'#2563EB', weight:2.5, fillColor:'#3B82F6', fillOpacity:0.2 }).addTo(OS.map1);
     var center = poly.getBounds().getCenter();
     L.tooltip({ permanent:true, direction:'center', className:'os-map-tooltip' }).setContent(f.name + ' · ' + f.areaHa.toFixed(0) + ' га').setLatLng(center).addTo(OS.map1);
     group.addLayer(poly);
@@ -14425,7 +14425,7 @@ function osInitFieldMap(f, i) {
   if (OS.fieldMaps[i]) { OS.fieldMaps[i].remove(); }
   var m = L.map('os-map-s2-' + i, { zoomControl:false, attributionControl:false, dragging:false, scrollWheelZoom:false });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'' }).addTo(m);
-  var poly = L.polygon(f.latLngs, { color:'#CCFF00', weight:2, fillOpacity:0.15 }).addTo(m);
+  var poly = L.polygon(f.latLngs, { color:'#2563EB', weight:2.5, fillColor:'#3B82F6', fillOpacity:0.2 }).addTo(m);
   m.fitBounds(poly.getBounds(), { padding:[10,10] });
   var bounds = poly.getBounds();
   var labelText = f.name + ' · ' + f.areaHa.toFixed(0) + ' га';
@@ -14457,7 +14457,7 @@ function osInitMap3() {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'' }).addTo(OS.map3);
   var group = L.featureGroup();
   OS.fields.forEach(function(f, i) {
-    var poly = L.polygon(f.latLngs, { color:'#CCFF00', weight:2, fillOpacity:0.1 }).addTo(OS.map3);
+    var poly = L.polygon(f.latLngs, { color:'#2563EB', weight:2.5, fillColor:'#3B82F6', fillOpacity:0.2 }).addTo(OS.map3);
     var center = poly.getBounds().getCenter();
     L.tooltip({ permanent:true, direction:'center', className:'os-map-tooltip' }).setContent(f.name + '<br>' + f.areaHa.toFixed(0) + ' га').setLatLng(center).addTo(OS.map3);
     // entry marker
