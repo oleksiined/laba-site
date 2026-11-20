@@ -6733,7 +6733,7 @@ function navigate(page) {
         OS.map3.invalidateSize();
         if (OS._map3Bounds) OS.map3.fitBounds(OS._map3Bounds, {padding:[30,30]});
       }
-    }, 50);
+    }, 100);
   }
   if (page === 'for-labs') { setTimeout(function(){ if (typeof initForLabsPage === 'function') initForLabsPage(); }, 50); }
   document.querySelector('nav.navbar').style.display = (page === 'price-guide') ? 'none' : '';
@@ -14083,7 +14083,7 @@ function osHandleFile(file) {
     var orderPage = document.getElementById('page-order-sampling');
     if (orderPage && orderPage.offsetWidth > 0) {
       window.scrollTo(0, 0);
-      setTimeout(function(){ osInitMap1(); }, 50);
+      setTimeout(function(){ osInitMap1(); }, 100);
     } else {
       OS._pendingMapInit = true;
     }
@@ -14205,19 +14205,19 @@ function osInitMap1() {
     group.addLayer(poly);
   });
 
-  // Store bounds for re-fit when page becomes visible after display:none
+  // Store bounds for re-fit
   var _bounds = group.getBounds();
   OS._map1Bounds = _bounds;
-  // Force Leaflet to recalculate the container size, then fit polygons
-  OS.map1.invalidateSize();
-  OS.map1.fitBounds(_bounds, { padding:[20,20] });
-  // Second pass: ensure SVG paths are redrawn at the correct zoom
-  requestAnimationFrame(function(){
-    if (OS.map1) {
-      OS.map1.invalidateSize();
-      OS.map1.fitBounds(_bounds, { padding:[20,20] });
-    }
-  });
+
+  // Fit polygons — repeated at increasing delays to survive scroll/layout timing
+  function _fit() {
+    if (!OS.map1) return;
+    OS.map1.invalidateSize();
+    OS.map1.fitBounds(_bounds, { padding:[20,20] });
+  }
+  _fit();
+  setTimeout(_fit, 50);
+  setTimeout(_fit, 200);
 }
 
 /* ── Accordions (step 2) ── */
