@@ -14161,23 +14161,26 @@ function osInitMap1() {
   if (!el) return;
   var fieldsWithCoords = OS.fields.filter(function(f){ return f.latLngs && f.latLngs.length >= 3; });
   if (!fieldsWithCoords.length) return;
-  OS.map1 = L.map('os-map-s1', { zoomControl:true, attributionControl:false });
+
+  // Build bounds first — before creating the map
+  var tmpGroup = L.featureGroup(fieldsWithCoords.map(function(f){ return L.polygon(f.latLngs); }));
+  var bounds = tmpGroup.getBounds();
+
+  // Init map with explicit center+zoom so Leaflet never sits at zoom=0
+  OS.map1 = L.map('os-map-s1', { zoomControl:true, attributionControl:false, center: bounds.getCenter(), zoom: 13 });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'' }).addTo(OS.map1);
+
   var group = L.featureGroup();
   fieldsWithCoords.forEach(function(f) {
-    try {
-      var poly = L.polygon(f.latLngs, { color:'#2563EB', weight:2.5, fillColor:'#3B82F6', fillOpacity:0.2 }).addTo(OS.map1);
-      var center = poly.getBounds().getCenter();
-      L.tooltip({ permanent:true, direction:'center', className:'os-map-tooltip' }).setContent(f.name + ' · ' + f.areaHa.toFixed(0) + ' га').setLatLng(center).addTo(OS.map1);
-      group.addLayer(poly);
-    } catch(e) { console.warn('osInitMap1 polygon error', e); }
+    var poly = L.polygon(f.latLngs, { color:'#2563EB', weight:2.5, fillColor:'#3B82F6', fillOpacity:0.2 }).addTo(OS.map1);
+    var center = poly.getBounds().getCenter();
+    L.tooltip({ permanent:true, direction:'center', className:'os-map-tooltip' }).setContent(f.name + ' · ' + f.areaHa.toFixed(0) + ' га').setLatLng(center).addTo(OS.map1);
+    group.addLayer(poly);
   });
+
+  // invalidateSize then fitBounds so size is correct before fitting
   OS.map1.invalidateSize();
-  if (group.getLayers().length) {
-    OS.map1.fitBounds(group.getBounds(), { padding:[20,20] });
-    // re-fit after tiles load to ensure correct positioning
-    setTimeout(function(){ if(OS.map1 && group.getLayers().length) { OS.map1.invalidateSize(); OS.map1.fitBounds(group.getBounds(), { padding:[20,20] }); } }, 300);
-  }
+  OS.map1.fitBounds(group.getBounds(), { padding:[20,20] });
 }
 
 /* ── Accordions (step 2) ── */
@@ -14463,25 +14466,27 @@ function osInitMap3() {
   var el = document.getElementById('os-map-s3');
   var sec = document.getElementById('osMapS3Section');
   if (!el || !window.L) return;
-  if (!OS.fields.length) { if(sec) sec.style.display='none'; return; }
+  var fieldsWithCoords = OS.fields.filter(function(f){ return f.latLngs && f.latLngs.length >= 3; });
+  if (!fieldsWithCoords.length) { if(sec) sec.style.display='none'; return; }
   if(sec) sec.style.display='';
-  OS.map3 = L.map('os-map-s3', { zoomControl:true, attributionControl:false });
+
+  // Build bounds before map init
+  var tmpGroup = L.featureGroup(fieldsWithCoords.map(function(f){ return L.polygon(f.latLngs); }));
+  var bounds = tmpGroup.getBounds();
+
+  OS.map3 = L.map('os-map-s3', { zoomControl:true, attributionControl:false, center: bounds.getCenter(), zoom: 13 });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'' }).addTo(OS.map3);
   var group = L.featureGroup();
-  OS.fields.forEach(function(f, i) {
+  fieldsWithCoords.forEach(function(f) {
     var poly = L.polygon(f.latLngs, { color:'#2563EB', weight:2.5, fillColor:'#3B82F6', fillOpacity:0.2 }).addTo(OS.map3);
     var center = poly.getBounds().getCenter();
     L.tooltip({ permanent:true, direction:'center', className:'os-map-tooltip' }).setContent(f.name + '<br>' + f.areaHa.toFixed(0) + ' га').setLatLng(center).addTo(OS.map3);
-    // entry marker
     var entryPt = poly.getBounds().getSouthEast();
     L.marker(entryPt, { icon: L.divIcon({ className:'', html:'<div style="width:14px;height:14px;background:#CCFF00;border:2px solid #111;border-radius:3px"></div>', iconSize:[14,14], iconAnchor:[7,7] }) }).addTo(OS.map3);
     group.addLayer(poly);
   });
   OS.map3.invalidateSize();
-  if (group.getLayers().length) {
-    OS.map3.fitBounds(group.getBounds(), { padding:[30,30] });
-    setTimeout(function(){ if(OS.map3 && group.getLayers().length) { OS.map3.invalidateSize(); OS.map3.fitBounds(group.getBounds(), { padding:[30,30] }); } }, 300);
-  }
+  OS.map3.fitBounds(group.getBounds(), { padding:[30,30] });
 }
 
 /* ── Dates ── */
