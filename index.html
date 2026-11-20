@@ -6712,7 +6712,19 @@ function navigate(page) {
   var nb = document.querySelector('nav.navbar');
   if(nb) nb.classList.toggle('navbar--transparent', page === 'about');
   if (page === 'calculator') calcInit();
-  if (page === 'order-sampling') { if (typeof osInit === 'function') osInit(); }
+  if (page === 'order-sampling') {
+    if (typeof osInit === 'function') osInit();
+    // If map was already initialized while page was hidden (display:none),
+    // the container had 0x0 size. Re-fit now that the page is visible.
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        if (window.OS) {
+          if (OS.map1) { OS.map1.invalidateSize(); if (OS._map1Bounds) OS.map1.fitBounds(OS._map1Bounds, {padding:[20,20]}); }
+          if (OS.map3) { OS.map3.invalidateSize(); if (OS._map3Bounds) OS.map3.fitBounds(OS._map3Bounds, {padding:[30,30]}); }
+        }
+      });
+    });
+  }
   if (page === 'for-labs') { setTimeout(function(){ if (typeof initForLabsPage === 'function') initForLabsPage(); }, 50); }
   document.querySelector('nav.navbar').style.display = (page === 'price-guide') ? 'none' : '';
   if (page === 'price-guide') { if (typeof priceGuideInit === 'function') priceGuideInit(); }
@@ -14181,9 +14193,11 @@ function osInitMap1() {
     group.addLayer(poly);
   });
 
+  // Store bounds for re-fit when page becomes visible after display:none
+  var _bounds = group.getBounds();
+  OS._map1Bounds = _bounds;
   // Force Leaflet to recalculate the container size, then fit polygons
   OS.map1.invalidateSize();
-  var _bounds = group.getBounds();
   OS.map1.fitBounds(_bounds, { padding:[20,20] });
   // Second pass: ensure SVG paths are redrawn at the correct zoom
   requestAnimationFrame(function(){
@@ -14496,8 +14510,9 @@ function osInitMap3() {
     L.marker(entryPt, { icon: L.divIcon({ className:'', html:'<div style="width:14px;height:14px;background:#CCFF00;border:2px solid #111;border-radius:3px"></div>', iconSize:[14,14], iconAnchor:[7,7] }) }).addTo(OS.map3);
     group.addLayer(poly);
   });
-  OS.map3.invalidateSize();
   var _bounds3 = group.getBounds();
+  OS._map3Bounds = _bounds3;
+  OS.map3.invalidateSize();
   OS.map3.fitBounds(_bounds3, { padding:[30,30] });
   requestAnimationFrame(function(){
     if (OS.map3) {
