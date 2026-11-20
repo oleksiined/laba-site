@@ -26,9 +26,13 @@ module.exports = async function handler(req, res) {
   if (!url || !key) return res.status(500).json({ ok: false, error: 'Supabase not configured' });
 
   try {
-    // Count all orders
+    const year = new Date().getFullYear().toString().slice(-2); // "26"
+    const prefix = `L${year}`;
+
+    // Find the highest existing order number for the current year via RPC
+    // e.g. orders with order_num like 'L26%' → extract numeric suffix → MAX + 1
     const result = await new Promise((resolve, reject) => {
-      const u = new URL(`${url}/rest/v1/orders?select=id`);
+      const u = new URL(`${url}/rest/v1/orders?select=order_num&order_num=like.${prefix}*&order=order_num.desc&limit=1`);
       const opts = {
         hostname: u.hostname,
         path:     u.pathname + u.search,
@@ -37,13 +41,12 @@ module.exports = async function handler(req, res) {
           'apikey':        key,
           'Authorization': `Bearer ${key}`,
           'Accept':        'application/json',
-          'Prefer':        'count=exact',
         },
       };
       const req = https.request(opts, r => {
         let raw = '';
         r.on('data', c => raw += c);
-        r.on('end', () => resolve({ status: r.statusCode, body: raw, headers: r.headers }));
+        r.on('end', () => resolve({ status: r.statusCode, body: raw }));
       });
       req.on('error', reject);
       req.end();
@@ -53,20 +56,15 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ ok: false, error: `Supabase ${result.status}: ${result.body}` });
     }
 
-    // Use Content-Range header for count, fallback to body length
-    let totalOrders = 0;
-    const contentRange = result.headers['content-range'];
-    if (contentRange) {
-      // Format: "0-N/TOTAL" or "*/TOTAL"
-      const match = contentRange.match(/\/(\d+)$/);
-      if (match) totalOrders = parseInt(match[1], 10);
-    } else {
-      const orders = JSON.parse(result.body);
-      totalOrders = Array.isArray(orders) ? orders.length : 0;
-    }
-
-    const year   = new Date().getFullYear().toString().slice(-2); // "26"
-    const nextNum = totalOrders + 1;
+    let nextNum = 1;
+    try {
+      const rows = JSON.parse(result.body);
+      if (Array.isArray(rows) && rows.length > 0 && rows[0].order_num) {
+        const lastNum = rows[0].order_num.replace(prefix, '');
+        const parsed  = parseInt(lastNum, 10);
+        if (!isNaN(parsed)) nextNum = parsed + 1;
+      }
+    } catch (_) { /* use nextNum = 1 */ }
 
     return res.status(200).json({ ok: true, nextNum, year });
   } catch (err) {

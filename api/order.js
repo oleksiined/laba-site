@@ -74,10 +74,11 @@ function buildTelegramText(o) {
     if (o.delivery.city)    lines.push(`Місто: ${o.delivery.city}`);
   }
 
-  // Payment
+  // Payment — may be a string ('invoice') or legacy object ({method:'bank'})
   if (o.payment) {
-    const payLabels = { invoice: 'Рахунок (безготівково)', cash: 'Готівка' };
-    lines.push(`💳 Оплата: ${payLabels[o.payment] || o.payment}`);
+    const payStr = typeof o.payment === 'object' ? (o.payment.method || JSON.stringify(o.payment)) : o.payment;
+    const payLabels = { invoice: 'Рахунок (безготівково)', cash: 'Готівка', bank: 'Банківський переказ', online: 'Онлайн (LiqPay)' };
+    lines.push(`💳 Оплата: ${payLabels[payStr] || payStr}`);
   }
 
   // Samples
