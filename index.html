@@ -14432,7 +14432,7 @@ function osLocationInputChange() {
   if(st){st.style.display='';st.textContent='Пошук...';}
   clearTimeout(_osLocTimer);
   _osLocTimer = setTimeout(function(){
-    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=7&countrycodes=ua&q='+encodeURIComponent(val),{headers:{'Accept-Language':'uk','User-Agent':'laba.zemlerob.com.ua/1.0'}})
+    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=10&countrycodes=ua&addressdetails=1&q='+encodeURIComponent(val),{headers:{'Accept-Language':'uk','User-Agent':'laba.zemlerob.com.ua/1.0'}})
       .then(function(r){return r.json();})
       .then(function(data){
         if(!data||!data.length){
@@ -14456,11 +14456,20 @@ function osLocationInputChange() {
             });
         }
         var results = data.map(function(item){
-          var parts=item.display_name.split(',');
-          var name=parts[0].trim();
-          var label=parts.slice(1,4).map(function(s){return s.trim();}).filter(Boolean).join(', ');
+          var addr=item.address||{};
+          var name=addr.village||addr.town||addr.city||addr.hamlet||addr.suburb||item.display_name.split(',')[0].trim();
+          var community=addr.municipality||addr.county||'';
+          var district=addr.state_district||'';
+          var oblast=addr.state||'';
+          var labelParts=[];
+          if(community&&community!==name) labelParts.push(community);
+          if(district&&district!==community&&district!==name) labelParts.push(district);
+          if(oblast&&oblast!==district&&oblast!==community) labelParts.push(oblast);
+          var label=labelParts.slice(0,3).join(', ');
           return {lat:parseFloat(item.lat),lng:parseFloat(item.lon),name:name,label:label,type:item.type};
         });
+        var seen={};
+        results=results.filter(function(r){var k=r.name+'|'+r.label;if(seen[k])return false;seen[k]=1;return true;});
         osLocShowDropdown(results, st, dd);
       })
       .catch(function(){if(st){st.textContent='Не вдалося знайти';}});
@@ -14811,7 +14820,7 @@ function osRenderFieldBody(f, i) {
     + '<div>'
     + '<div class="os-form-row">'
     + osSelect('Схема відбору','soil_scheme_'+i,['Зонально','Гектарно','Гібридно'],s.soilScheme||'Зонально',"osFieldChange("+i+",'soilScheme',this.value)")
-    + '<div class="os-form-group"><label class="os-form-label" for="soil_area_'+i+'">Площа проби, га</label><input class="os-form-input" type="number" id="soil_area_'+i+'" min="0.1" step="0.1" value="'+s.areaPerProbe+'" oninput="osFieldChange('+i+',\'areaPerProbe\',parseFloat(this.value)||1);osUpdateProbes('+i+')"></div>'
+    + '<div class="os-form-group"><label class="os-form-label" for="soil_area_'+i+'">Площа проби, га</label><input class="os-form-input" type="number" id="soil_area_'+i+'" min="1" max="50" step="1" value="'+s.areaPerProbe+'" oninput="osFieldChange('+i+',\'areaPerProbe\',parseFloat(this.value)||1);osUpdateProbes('+i+')"></div>'
     + osSelect('Глибина','soil_depth_'+i,['0–10 см','0–15 см','0–20 см','0–25 см','0–30 см'],s.depth,"osFieldChange("+i+",'depth',this.value)")
     + '</div>'
     + '<div class="os-form-row-2">'
