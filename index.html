@@ -14189,12 +14189,13 @@ function osInitMap1() {
   var fieldsWithCoords = OS.fields.filter(function(f){ return f.latLngs && f.latLngs.length >= 3; });
   if (!fieldsWithCoords.length) return;
 
-  // Build bounds first — before creating the map
+  // Build bounds first
   var tmpGroup = L.featureGroup(fieldsWithCoords.map(function(f){ return L.polygon(f.latLngs); }));
   var bounds = tmpGroup.getBounds();
 
-  // Init map with explicit center+zoom so Leaflet never sits at zoom=0
-  OS.map1 = L.map('os-map-s1', { zoomControl:true, attributionControl:false, center: bounds.getCenter(), zoom: 13 });
+  // Use Leaflet's whenReady to defer fitBounds until the map is fully painted.
+  // Do NOT pass center/zoom here — let fitBounds set the view entirely.
+  OS.map1 = L.map('os-map-s1', { zoomControl:true, attributionControl:false });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'' }).addTo(OS.map1);
 
   var group = L.featureGroup();
@@ -14205,19 +14206,21 @@ function osInitMap1() {
     group.addLayer(poly);
   });
 
-  // Store bounds for re-fit
   var _bounds = group.getBounds();
   OS._map1Bounds = _bounds;
 
-  // Fit polygons — repeated at increasing delays to survive scroll/layout timing
-  function _fit() {
-    if (!OS.map1) return;
+  // whenReady fires after the map container has been sized and the first
+  // tiles have been requested — at that point getBoundingClientRect() is stable.
+  OS.map1.whenReady(function() {
     OS.map1.invalidateSize();
     OS.map1.fitBounds(_bounds, { padding:[20,20] });
-  }
-  _fit();
-  setTimeout(_fit, 50);
-  setTimeout(_fit, 200);
+    // Extra pass after a tick in case scroll happened between init and paint
+    setTimeout(function(){
+      if (!OS.map1) return;
+      OS.map1.invalidateSize();
+      OS.map1.fitBounds(_bounds, { padding:[20,20] });
+    }, 100);
+  });
 }
 
 /* ── Accordions (step 2) ── */
