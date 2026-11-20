@@ -13912,7 +13912,7 @@ function osGoStep(n) {
   });
   window.scrollTo(0,0);
   if (n === 2) { osRenderAccordions(); }
-  if (n === 3) { osRenderEntryList(); setTimeout(function(){ osInitMap3(); }, 100); }
+  if (n === 3) { osRenderEntryList(); setTimeout(function(){ osInitMap3(); if(OS.map3) OS.map3.invalidateSize(); }, 150); }
   if (n === 4) osRenderStep4();
   osRenderSidebar();
 }
@@ -14054,9 +14054,9 @@ function osHandleFile(file) {
     OS.fields = fields;
     osShowFileRow(file.name, fields.length);
     osRenderFieldsList();
-    osInitMap1();
     osRenderSidebar();
     document.getElementById('osFieldsSection').style.display = 'block';
+    setTimeout(function(){ osInitMap1(); if(OS.map1) OS.map1.invalidateSize(); }, 50);
   };
   reader.readAsText(file);
 }
