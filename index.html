@@ -14244,7 +14244,7 @@ function osRenderAccordions() {
     var collapsed = i > 0;
     var summaryParts = [];
     if (OS.services.includes('soil')) summaryParts.push('Агрохімія: ' + probes + ' проб');
-    if (OS.services.includes('moisture')) summaryParts.push('Волога: ' + (s.moistureCount||probes) + ' точок');
+    if (OS.services.includes('moisture')) summaryParts.push('Волога: ' + (s.moistureCount||Math.ceil(f.areaHa/(s.moistureAreaPerPoint||5))) + ' точок');
     if (OS.services.includes('plants')) summaryParts.push('Рослини: ' + (s.plantsCount||10) + ' зразків');
     if (OS.services.includes('density')) summaryParts.push('Щільність: ' + (s.densityCount||probes) + ' точок');
     var summary = collapsed ? summaryParts.join(' · ') : '';
@@ -14294,7 +14294,7 @@ function osToggleAccord(i) {
     var probes = osCalcProbes(f.areaHa, s.areaPerProbe);
     var sp2 = [];
     if (OS.services.includes('soil')) sp2.push('Агрохімія: '+probes+' проб');
-    if (OS.services.includes('moisture')) sp2.push('Волога: '+(s.moistureCount||probes)+' точок');
+    if (OS.services.includes('moisture')) sp2.push('Волога: '+(s.moistureCount||Math.ceil(f.areaHa/(s.moistureAreaPerPoint||5)))+' точок');
     if (OS.services.includes('plants')) sp2.push('Рослини: '+(s.plantsCount||10)+' зразків');
     if (OS.services.includes('density')) sp2.push('Щільність: '+(s.densityCount||probes)+' точок');
     if (summaryEl) { summaryEl.textContent = sp2.join(' · '); summaryEl.style.display=''; }
@@ -14385,8 +14385,8 @@ function osRenderFieldBody(f, i) {
     + '</div>'
   ) : '';
 
-  var moisturePoints = hasSoil ? probes : (s.moistureCount||0);
-  if (hasSoil && s.moistureCount !== probes) { s.moistureCount = probes; OS.fields[i].settings.moistureCount = probes; }
+  var moisturePoints = Math.ceil(f.areaHa / (s.moistureAreaPerPoint||5));
+  if (s.moistureCount !== moisturePoints) { s.moistureCount = moisturePoints; OS.fields[i].settings.moistureCount = moisturePoints; }
   // Normalize moisturePackage
   if (hasMoisture) {
     var _mPkgOpts = osMoistPkgOptions();
@@ -14401,18 +14401,12 @@ function osRenderFieldBody(f, i) {
     + (_ssMoist.price ? '<div class="os-srv-section-price">'+_ssMoist.price+' грн <span>/ '+(_ssMoist.unit||'точка')+'</span></div>' : '')
     + '</div>'
     + osSelect('Пакет досліджень','moist_pkg_'+i, osMoistPkgOptions(), s.moisturePackage||osMoistPkgOptions()[0],"osFieldChange("+i+",'moisturePackage',this.value)")
-    + (hasSoil
-      ? '<p class="os-step2-note" style="margin-top:0;margin-bottom:10px">Кількість точок = кількість агрохімічних проб: <strong>' + probes + '</strong></p>'
-        + '<div class="os-form-row">'
-        + osSelect('Розміщення точок','moist_place_'+i,['Зонально','Гектарно','Рівномірно'],s.moisturePlacement||'Зонально',"osFieldChange("+i+",'moisturePlacement',this.value)")
-        + osSelect('Шари відбору','moist_layers_'+i,['3 шари','10 шарів'],s.moistureLayers||'3 шари',"osFieldChange("+i+",'moistureLayers',this.value)")
-        + '</div>'
-      : '<div class="os-form-row">'
+    + '<div class="os-form-row">'
         + osSelect('Розміщення точок','moist_place_'+i,['Зонально','Гектарно','Рівномірно'],s.moisturePlacement||'Зонально',"osFieldChange("+i+",'moisturePlacement',this.value)")
         + '<div class="os-form-group"><label class="os-form-label" for="moist_area_'+i+'">Площа на точку, га</label><input class="os-form-input" type="number" id="moist_area_'+i+'" min="0.1" step="0.1" value="'+(s.moistureAreaPerPoint||5)+'" oninput="osFieldChangeMoistArea('+i+',parseFloat(this.value)||5)"></div>'
         + osSelect('Шари відбору','moist_layers_'+i,['3 шари','10 шарів'],s.moistureLayers||'3 шари',"osFieldChange("+i+",'moistureLayers',this.value)")
         + '</div>'
-        + '<p class="os-step2-note">Кількість точок: <strong>' + (Math.ceil(f.areaHa/(s.moistureAreaPerPoint||5))) + '</strong></p>')
+        + '<p class="os-step2-note">Кількість точок: <strong>' + moisturePoints + '</strong></p>')
     + '<p class="os-step2-note">Шари не збільшують кількість точок для мінімального виїзду.</p>'
     + '</div>'
   ) : '';
@@ -14439,10 +14433,9 @@ function osSelect(label, id, options, currentVal, onchange) {
 
 function osFieldChange(i, key, val) {
   if (OS.fields[i]) OS.fields[i].settings[key] = val;
-  // If areaPerProbe changed, sync moisture/density counts if soil is selected
+  // If areaPerProbe changed, sync density count if soil is selected
   if (key === 'areaPerProbe' && OS.services.includes('soil') && OS.fields[i]) {
     var probes = osCalcProbes(OS.fields[i].areaHa, val);
-    if (OS.services.includes('moisture')) OS.fields[i].settings.moistureCount = probes;
     if (OS.services.includes('density')) OS.fields[i].settings.densityCount = probes;
   }
   osRenderSidebar();
@@ -14672,7 +14665,7 @@ function osRenderSidebar() {
   if (svcEl) {
     if (OS.services.length) {
       if (svcLabel) svcLabel.style.display='';
-      var svcMap = { soil:{icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/></svg>',name:'Ґрунт: агрохімія',min:25,unit:'проб',countFn:function(){ return OS.fields.reduce(function(s,f){ return s + osCalcProbes(f.areaHa, f.settings.areaPerProbe); },0); }}, moisture:{icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>',name:'Продуктивна волога',min:10,unit:'точок',countFn:function(){ return OS.fields.reduce(function(s,f){ var c=f.settings.moistureCount; if(!c||c===0){ return s+(OS.services.includes('soil')?osCalcProbes(f.areaHa,f.settings.areaPerProbe):Math.ceil(f.areaHa/(f.settings.moistureAreaPerPoint||5))); } return s+c; },0); }}, plants:{icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22V2M12 2C12 2 6 6 6 13M12 2C12 2 18 6 18 13"/></svg>',name:'Рослини',min:10,unit:'зразків',countFn:function(){ return OS.fields.reduce(function(s,f){ return s+(f.settings.plantsCount||10); },0); }}, density:{icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="4" rx="1"/><rect x="2" y="10" width="20" height="4" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1"/></svg>',name:"Об'ємна щільність",min:10,unit:'точок',countFn:function(){ return OS.fields.reduce(function(s,f){ var c=f.settings.densityCount; if(!c||c===0){ return s+(OS.services.includes('soil')?osCalcProbes(f.areaHa,f.settings.areaPerProbe):Math.ceil(f.areaHa/(f.settings.densityAreaPerPoint||5))); } return s+c; },0); }} };
+      var svcMap = { soil:{icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/></svg>',name:'Ґрунт: агрохімія',min:25,unit:'проб',countFn:function(){ return OS.fields.reduce(function(s,f){ return s + osCalcProbes(f.areaHa, f.settings.areaPerProbe); },0); }}, moisture:{icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>',name:'Продуктивна волога',min:10,unit:'точок',countFn:function(){ return OS.fields.reduce(function(s,f){ return s+Math.ceil(f.areaHa/(f.settings.moistureAreaPerPoint||5)); },0); }}, plants:{icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22V2M12 2C12 2 6 6 6 13M12 2C12 2 18 6 18 13"/></svg>',name:'Рослини',min:10,unit:'зразків',countFn:function(){ return OS.fields.reduce(function(s,f){ return s+(f.settings.plantsCount||10); },0); }}, density:{icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="4" rx="1"/><rect x="2" y="10" width="20" height="4" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1"/></svg>',name:"Об'ємна щільність",min:10,unit:'точок',countFn:function(){ return OS.fields.reduce(function(s,f){ var c=f.settings.densityCount; if(!c||c===0){ return s+(OS.services.includes('soil')?osCalcProbes(f.areaHa,f.settings.areaPerProbe):Math.ceil(f.areaHa/(f.settings.densityAreaPerPoint||5))); } return s+c; },0); }} };
       var showCounts = OS.step >= 2 && OS.fields.length > 0;
       svcEl.innerHTML = OS.services.map(function(s){
         var info = svcMap[s]; if (!info) return '';
@@ -14733,7 +14726,7 @@ function osRenderSidebar() {
       var info2 = ss2[svc];
       var cnt = 0;
       if (svc === 'soil') cnt = OS.fields.reduce(function(s,f){ return s + osCalcProbes(f.areaHa, f.settings.areaPerProbe); }, 0);
-      else if (svc === 'moisture') cnt = OS.fields.reduce(function(s,f){ return s + (f.settings.moistureCount || osCalcProbes(f.areaHa, f.settings.areaPerProbe)); }, 0);
+      else if (svc === 'moisture') cnt = OS.fields.reduce(function(s,f){ return s + Math.ceil(f.areaHa/(f.settings.moistureAreaPerPoint||5)); }, 0);
       else if (svc === 'plants') cnt = OS.fields.reduce(function(s,f){ return s + (f.settings.plantsCount || 10); }, 0);
       else if (svc === 'density') cnt = OS.fields.reduce(function(s,f){ return s + (f.settings.densityCount || osCalcProbes(f.areaHa, f.settings.areaPerProbe)); }, 0);
       if (info2 && info2.price && cnt > 0) {
