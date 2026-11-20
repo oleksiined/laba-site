@@ -29,10 +29,9 @@ module.exports = async function handler(req, res) {
     const year = new Date().getFullYear().toString().slice(-2); // "26"
     const prefix = `L${year}`;
 
-    // Find the highest existing order number for the current year via RPC
-    // e.g. orders with order_num like 'L26%' → extract numeric suffix → MAX + 1
+    // Fetch all existing order numbers for the current year
     const result = await new Promise((resolve, reject) => {
-      const u = new URL(`${url}/rest/v1/orders?select=order_num&order_num=like.${prefix}*&order=order_num.desc&limit=1`);
+      const u = new URL(`${url}/rest/v1/orders?select=order_num&order_num=like.${prefix}*`);
       const opts = {
         hostname: u.hostname,
         path:     u.pathname + u.search,
@@ -56,15 +55,22 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ ok: false, error: `Supabase ${result.status}: ${result.body}` });
     }
 
-    let nextNum = 1;
+    // Build a set of taken numbers, then find the first free slot starting from 1
+    const taken = new Set();
     try {
       const rows = JSON.parse(result.body);
-      if (Array.isArray(rows) && rows.length > 0 && rows[0].order_num) {
-        const lastNum = rows[0].order_num.replace(prefix, '');
-        const parsed  = parseInt(lastNum, 10);
-        if (!isNaN(parsed)) nextNum = parsed + 1;
+      if (Array.isArray(rows)) {
+        rows.forEach(r => {
+          if (r.order_num && r.order_num.startsWith(prefix)) {
+            const n = parseInt(r.order_num.slice(prefix.length), 10);
+            if (!isNaN(n)) taken.add(n);
+          }
+        });
       }
-    } catch (_) { /* use nextNum = 1 */ }
+    } catch (_) { /* taken stays empty */ }
+
+    let nextNum = 1;
+    while (taken.has(nextNum)) nextNum++;
 
     return res.status(200).json({ ok: true, nextNum, year });
   } catch (err) {
