@@ -14209,17 +14209,25 @@ function osInitMap1() {
   var _bounds = group.getBounds();
   OS._map1Bounds = _bounds;
 
-  // whenReady fires after the map container has been sized and the first
-  // tiles have been requested — at that point getBoundingClientRect() is stable.
-  OS.map1.whenReady(function() {
+  // whenReady fires after Leaflet has sized the container.
+  // We must ensure the page is scrolled to 0 BEFORE fitBounds, because Leaflet
+  // computes the SVG pixel origin via getBoundingClientRect at that moment.
+  // scrollTo() is async, so we scroll, then wait two rAFs for the paint to settle.
+  function _fitMap() {
+    if (!OS.map1) return;
     OS.map1.invalidateSize();
     OS.map1.fitBounds(_bounds, { padding:[20,20] });
-    // Extra pass after a tick in case scroll happened between init and paint
-    setTimeout(function(){
-      if (!OS.map1) return;
-      OS.map1.invalidateSize();
-      OS.map1.fitBounds(_bounds, { padding:[20,20] });
-    }, 100);
+  }
+  OS.map1.whenReady(function() {
+    window.scrollTo(0, 0);
+    // Two rAFs: first fires before paint, second fires after the scroll paint
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        _fitMap();
+        // One more pass after a short delay to handle slow scroll animations
+        setTimeout(function(){ _fitMap(); }, 150);
+      });
+    });
   });
 }
 
