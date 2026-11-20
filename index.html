@@ -7340,6 +7340,7 @@ function render(){
   const empty = document.getElementById('emptyState');
   if(empty) empty.classList.toggle('show', !items.length && (srvMat||'')!=='other');
   list.innerHTML = items.map(item => makeRow(item, item._type)).join('');
+  if(items.length){_dl('view_item_list',{item_list_id:'catalog',item_list_name:'Каталог послуг',currency:'UAH',items:items.slice(0,20).map(function(it,idx){return{item_id:it.code||it.id||'',item_name:it.name||'',item_list_id:'catalog',item_list_name:'Каталог послуг',item_category:it._type==='ind'?'Індивідуальні показники':'Пакетні послуги',price:Number(it.price)||0,index:idx};})});}
   // Відкриваємо картку по URL хешу (після першого рендеру каталогу)
   if(location.hash.startsWith('#card-')) openCardFromHash(); else window.scrollTo(0, savedY);
   document.querySelectorAll('[data-tooltip]').forEach(el=>el.addEventListener('mouseenter',e=>{
@@ -8030,6 +8031,7 @@ function qaChangeQty(delta){ if(qaCurrentItem){ qaCurrentItem.qty=Math.max(1,(qa
 function openQAModal(code,type,price,btn,name){
   const item = getServiceByCode(code) || {code,name,price,type};
   qaCurrentItem = {...item, type, qty:1};
+  _dl('view_item',{currency:'UAH',value:Number(item.price||0),items:[{item_id:code||'',item_name:item.name||name||'',item_category:type==='ind'?'Індивідуальні показники':'Пакетні послуги',price:Number(item.price||0),quantity:1}]});
   const bd = document.getElementById('qaBackdrop');
   if(!bd) return;
   bd.classList.add('open');
