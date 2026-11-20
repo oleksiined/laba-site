@@ -6716,23 +6716,24 @@ function navigate(page) {
     if (typeof osInit === 'function') osInit();
     // If file was loaded while this page was hidden, init the map now
     // (the container has real dimensions once the page is visible).
-    requestAnimationFrame(function(){
-      requestAnimationFrame(function(){
-        if (!window.OS) return;
-        if (OS._pendingMapInit) {
-          OS._pendingMapInit = false;
-          osInitMap1();
-        } else if (OS.map1) {
-          // Map already exists but was sized at 0x0 — re-measure and re-fit
-          OS.map1.invalidateSize();
-          if (OS._map1Bounds) OS.map1.fitBounds(OS._map1Bounds, {padding:[20,20]});
-        }
-        if (OS.map3) {
-          OS.map3.invalidateSize();
-          if (OS._map3Bounds) OS.map3.fitBounds(OS._map3Bounds, {padding:[30,30]});
-        }
-      });
-    });
+    // Scroll to top first, then wait for the browser to actually paint the
+    // scrolled position before Leaflet calls getBoundingClientRect().
+    // scrollTo is async — rAF fires before the paint, so we use setTimeout.
+    window.scrollTo(0, 0);
+    setTimeout(function(){
+      if (!window.OS) return;
+      if (OS._pendingMapInit) {
+        OS._pendingMapInit = false;
+        osInitMap1();
+      } else if (OS.map1) {
+        OS.map1.invalidateSize();
+        if (OS._map1Bounds) OS.map1.fitBounds(OS._map1Bounds, {padding:[20,20]});
+      }
+      if (OS.map3) {
+        OS.map3.invalidateSize();
+        if (OS._map3Bounds) OS.map3.fitBounds(OS._map3Bounds, {padding:[30,30]});
+      }
+    }, 50);
   }
   if (page === 'for-labs') { setTimeout(function(){ if (typeof initForLabsPage === 'function') initForLabsPage(); }, 50); }
   document.querySelector('nav.navbar').style.display = (page === 'price-guide') ? 'none' : '';
@@ -14081,9 +14082,8 @@ function osHandleFile(file) {
     // if not (page hidden), set a flag so navigate() will init on page show.
     var orderPage = document.getElementById('page-order-sampling');
     if (orderPage && orderPage.offsetWidth > 0) {
-      requestAnimationFrame(function(){
-        requestAnimationFrame(function(){ osInitMap1(); });
-      });
+      window.scrollTo(0, 0);
+      setTimeout(function(){ osInitMap1(); }, 50);
     } else {
       OS._pendingMapInit = true;
     }
