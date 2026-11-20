@@ -10767,8 +10767,13 @@ async function submitQuickOrder() {
     });
 
     // /api/order expects the same format as the full checkout
+    const _qNow = new Date();
+    const _qdd = String(_qNow.getDate()).padStart(2,'0');
+    const _qmm = String(_qNow.getMonth()+1).padStart(2,'0');
+    const _qyy = _qNow.getFullYear();
     const payload = {
       orderNum,
+      date:    `${_qdd}.${_qmm}.${_qyy}`,
       client: {
         name,
         phone,
@@ -10778,7 +10783,8 @@ async function submitQuickOrder() {
       samples: samplesPayload,
       items:   gs.map(g => {
         const p = NC_CATALOG.packages[g.pkg] || NS_CAT?.packages?.[g.pkg] || { name: g.pkg, price: 0 };
-        return { name: p.name, qty: g.qty, price: g.unitPrice };
+        const unitP = Number(g.unitPrice) || Number(p.price) || 0;
+        return { name: p.name, qty: g.qty, price: unitP, subtotal: unitP * g.qty };
       }),
       delivery: { type: 'nova_poshta' },
       payment:  { method: 'bank' },
@@ -12404,7 +12410,9 @@ async function submitOrder() {
   });
   const pkgItems = Object.entries(pkgCountMap).map(([pname, info]) => {
     const qty = info.qty;
-    const unitPrice = qty > 0 ? Math.round(NCO.pkgSum / (_snapSamples.length || 1)) : 0;
+    const cat2 = (typeof NS_CAT !== 'undefined' ? NS_CAT : null) || (typeof NC_CATALOG !== 'undefined' ? NC_CATALOG : null) || {};
+    const pkgObj2 = (cat2.packages && cat2.packages[info.code]) || {};
+    const unitPrice = Number(pkgObj2.price) || (qty > 0 ? Math.round(NCO.pkgSum / (_snapSamples.length || 1)) : 0);
     return { code: info.code, name: pname, qty, price: unitPrice, subtotal: unitPrice * qty };
   });
 
@@ -12432,6 +12440,7 @@ async function submitOrder() {
       address: NCO.np ? NCO.np.dept : '',
     },
     payment: NCO.payment,
+    date:    `${dd}.${mm}.20${yy}`,
     items:   pkgItems,
     promo:   NCO.promo || '',
     discount: NCO.promoDiscount || 0,

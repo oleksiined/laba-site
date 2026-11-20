@@ -59,7 +59,8 @@ function buildTelegramText(o) {
 
   // Promo
   if (o.discount > 0) {
-    lines.push(`🏷 Знижка (${o.promo || ''}): −${fmtPrice(o.discount)}`);
+    const promoLabel = o.promo ? ` (${o.promo})` : '';
+    lines.push(`🏷 Знижка${promoLabel}: −${fmtPrice(o.discount)}`);
   }
 
   // Total
