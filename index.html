@@ -9222,6 +9222,55 @@ function saveOrderToHistory(order) {
 })();
 
 // ═══════════════════════════════════════════════
+// PDF MODAL
+// ═══════════════════════════════════════════════
+function openPdfModal(){
+  var el=document.getElementById('pdfBackdrop');
+  if(el){el.classList.add('open');document.body.style.overflow='hidden';}
+}
+function closePdfModal(){
+  var el=document.getElementById('pdfBackdrop');
+  if(el){el.classList.remove('open');document.body.style.overflow='';}
+  var sp=document.getElementById('sharePopup');
+  if(sp) sp.classList.remove('open');
+}
+function downloadPdf(){
+  var frame=document.getElementById('pdfViewer');
+  if(!frame){showToast('PDF недоступний');return;}
+  showToast('Завантаження...');
+}
+function printPdf(){
+  var frame=document.getElementById('pdfViewer');
+  if(!frame){showToast('PDF недоступний');return;}
+  window.print();
+}
+function toggleSharePopup(e){
+  if(e) e.stopPropagation();
+  var sp=document.getElementById('sharePopup');
+  if(sp) sp.classList.toggle('open');
+}
+function shareVia(method){
+  var url=window.location.href;
+  var sp=document.getElementById('sharePopup');
+  if(sp) sp.classList.remove('open');
+  if(method==='copy'){
+    navigator.clipboard&&navigator.clipboard.writeText(url).then(function(){showToast('Посилання скопійовано');}).catch(function(){showToast('Не вдалося скопіювати');});
+  } else if(method==='telegram'){
+    window.open('https://t.me/share/url?url='+encodeURIComponent(url),'_blank');
+  } else if(method==='viber'){
+    window.open('viber://forward?text='+encodeURIComponent(url));
+  } else if(method==='email'){
+    window.open('mailto:?body='+encodeURIComponent(url));
+  }
+}
+document.addEventListener('click',function(e){
+  var sp=document.getElementById('sharePopup');
+  if(sp&&sp.classList.contains('open')){
+    if(!sp.contains(e.target)) sp.classList.remove('open');
+  }
+});
+
+// ═══════════════════════════════════════════════
 // TOAST
 // ═══════════════════════════════════════════════
 function showToast(msg,ms=2500){
