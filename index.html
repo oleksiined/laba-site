@@ -3325,9 +3325,15 @@ main{flex:1}
 .os-service-price{font-size:13px;font-weight:700;color:var(--navy);margin-top:5px}
 .os-service-price span{font-weight:400;color:var(--text-soft)}
 /* location section */
-.os-location-section{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-md);margin-top:12px}
+.os-location-section{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-md);margin-top:12px;position:relative}
 .os-location-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
 .os-location-status{font-size:12px;color:var(--text-soft);margin-top:6px;padding-left:2px}
+.os-loc-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--white);border:1.5px solid var(--border);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);box-shadow:0 6px 20px rgba(0,0,0,.10);z-index:9999;max-height:220px;overflow-y:auto}
+.os-loc-opt{padding:10px 14px;font-size:13px;color:var(--navy);cursor:pointer;border-bottom:1px solid var(--border-soft);line-height:1.4}
+.os-loc-opt:last-child{border-bottom:none}
+.os-loc-opt:hover{background:#f5ffe0}
+.os-loc-opt strong{display:block;font-size:14px;font-weight:600}
+.os-loc-opt span{color:var(--text-soft);font-size:12px}
 /* upload zone */
 .os-upload-zone{border:2px dashed var(--border);border-radius:var(--radius-md);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;cursor:pointer;transition:border-color .15s,background .15s}
 .os-upload-zone:hover{border-color:#a0cc30;background:#fafff2}
@@ -3472,7 +3478,7 @@ main{flex:1}
 .os-entry-link{font-size:13px;font-weight:600;color:#2563eb;text-decoration:none;cursor:pointer;white-space:nowrap}
 .os-entry-link:hover{text-decoration:underline}
 #os-map-s3{height:220px;width:100%}
-.os-map-wrap-entry{border-radius:var(--radius-md);overflow:hidden;border:1.5px solid var(--border);height:220px;margin-bottom:14px}
+.os-map-wrap-entry{border-radius:0 0 var(--radius-lg) var(--radius-lg);overflow:hidden;height:220px;margin:12px -24px -24px}
 .os-textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--navy);font-family:inherit;resize:vertical;min-height:80px;box-sizing:border-box}
 .os-textarea:focus{outline:none;border-color:#a0cc30}
 .os-attach-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#2563eb;cursor:pointer;text-decoration:none;margin-top:10px}
@@ -13977,8 +13983,9 @@ function toast(msg) {
           <div class="os-location-section">
             <div class="os-location-left">
               <div class="os-location-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-              <input class="os-location-input" id="osLocationInput" placeholder="Населений пункт або адреса" type="text" oninput="osLocationInputChange()">
+              <input class="os-location-input" id="osLocationInput" placeholder="Населений пункт або адреса" type="text" oninput="osLocationInputChange()" autocomplete="off">
             </div>
+            <div class="os-loc-dropdown" id="osLocDropdown" style="display:none"></div>
           </div>
           <p class="os-location-status" id="osLocationStatus" style="display:none"></p>
         </div>
@@ -14395,57 +14402,91 @@ function osToggleMap1() {
 var _osLocTimer = null;
 // Base: Cherkasy office — вул. Байди Вишневецького 36/1
 var OS_BASE_LAT = 49.4418, OS_BASE_LNG = 32.0551;
+function osLocSelectPlace(lat, lng, placeName) {
+  var inp = document.getElementById('osLocationInput');
+  var dd = document.getElementById('osLocDropdown');
+  var st = document.getElementById('osLocationStatus');
+  if(inp) inp.value = placeName;
+  if(dd) { dd.style.display='none'; dd.innerHTML=''; }
+  OS._locLat=lat; OS._locLng=lng;
+  if(st){st.style.display='';st.textContent='Розраховую відстань по дорогах...';}
+  fetch('https://router.project-osrm.org/route/v1/driving/'+OS_BASE_LNG+','+OS_BASE_LAT+';'+lng+','+lat+'?overview=false')
+    .then(function(r){return r.json();})
+    .then(function(route){
+      var dist = route&&route.routes&&route.routes[0] ? Math.round(route.routes[0].distance/1000) : null;
+      if(dist){ OS._locDist=dist; if(st){st.textContent='📍 '+placeName+' — ~'+dist+' км по дорогах від Черкас';} }
+      else { if(st){st.textContent='📍 '+placeName+' (відстань не визначена)';} }
+      osRenderSidebar();
+    })
+    .catch(function(){ if(st){st.textContent='📍 '+placeName+' (не вдалось розрахувати відстань)';} osRenderSidebar(); });
+}
 function osLocationInputChange() {
   var val = (document.getElementById('osLocationInput')||{}).value||'';
   var st = document.getElementById('osLocationStatus');
-  if (!val) { if(st){st.style.display='none';st.textContent='';} OS._locDist=null; osRenderSidebar(); return; }
+  var dd = document.getElementById('osLocDropdown');
+  if (!val) {
+    if(st){st.style.display='none';st.textContent='';}
+    if(dd){dd.style.display='none';dd.innerHTML='';}
+    OS._locDist=null; osRenderSidebar(); return;
+  }
   if(st){st.style.display='';st.textContent='Пошук...';}
   clearTimeout(_osLocTimer);
   _osLocTimer = setTimeout(function(){
-    // 1. Geocode via Nominatim з User-Agent
-    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=ua&q='+encodeURIComponent(val),{headers:{'Accept-Language':'uk','User-Agent':'laba.zemlerob.com.ua/1.0'}})
+    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=7&countrycodes=ua&q='+encodeURIComponent(val),{headers:{'Accept-Language':'uk','User-Agent':'laba.zemlerob.com.ua/1.0'}})
       .then(function(r){return r.json();})
       .then(function(data){
         if(!data||!data.length){
-          // Fallback: Photon geocoder
-          return fetch('https://photon.komoot.io/api/?q='+encodeURIComponent(val+' Україна')+'&limit=1&lang=uk&bbox=22,44,40,52')
+          return fetch('https://photon.komoot.io/api/?q='+encodeURIComponent(val+' Україна')+'&limit=5&lang=uk&bbox=22,44,40,52')
             .then(function(r2){return r2.json();})
             .then(function(ph){
-              if(!ph||!ph.features||!ph.features.length){if(st){st.textContent='Місце не знайдено';} return null;}
-              var f=ph.features[0];
-              var lat=f.geometry.coordinates[1], lng=f.geometry.coordinates[0];
-              var placeName=(f.properties.city||f.properties.name||f.properties.state||val);
-              OS._locLat=lat; OS._locLng=lng;
-              if(st){st.textContent='Розраховую відстань...';}
-              return {lat:lat,lng:lng,name:placeName};
+              if(!ph||!ph.features||!ph.features.length){
+                if(st){st.textContent='Місце не знайдено';}
+                if(dd){dd.style.display='none';dd.innerHTML='';}
+                return;
+              }
+              var results = ph.features.map(function(f){
+                var props=f.properties;
+                var name=props.name||props.city||props.state||val;
+                var region=props.county||props.state||'';
+                var district=props.district||'';
+                var label=region?(district?district+', '+region:region):'';
+                return {lat:f.geometry.coordinates[1],lng:f.geometry.coordinates[0],name:name,label:label};
+              });
+              osLocShowDropdown(results, st, dd);
             });
         }
-        var lat=parseFloat(data[0].lat), lng=parseFloat(data[0].lon);
-        var placeName=data[0].display_name.split(',')[0];
-        OS._locLat=lat; OS._locLng=lng;
-        return {lat:lat,lng:lng,name:placeName};
+        var results = data.map(function(item){
+          var parts=item.display_name.split(',');
+          var name=parts[0].trim();
+          var label=parts.slice(1,4).map(function(s){return s.trim();}).filter(Boolean).join(', ');
+          return {lat:parseFloat(item.lat),lng:parseFloat(item.lon),name:name,label:label,type:item.type};
+        });
+        osLocShowDropdown(results, st, dd);
       })
-      .then(function(loc){
-        if(!loc){return;}
-        var lat=loc.lat, lng=loc.lng, placeName=loc.name;
-        if(st){st.textContent='Розраховую відстань по дорогах...';}
-        // 2. Route via OSRM (free, no key)
-        return fetch('https://router.project-osrm.org/route/v1/driving/'+OS_BASE_LNG+','+OS_BASE_LAT+';'+lng+','+lat+'?overview=false')
-          .then(function(r2){return r2.json();})
-          .then(function(route){
-            var dist = route&&route.routes&&route.routes[0] ? Math.round(route.routes[0].distance/1000) : null;
-            if(dist){
-              OS._locDist=dist;
-              if(st){st.textContent='📍 '+placeName+' — ~'+dist+' км по дорогах від Черкас';}
-            } else {
-              if(st){st.textContent='📍 '+placeName+' (відстань не визначена)';}
-            }
-            osRenderSidebar();
-          });
-      })
-      .catch(function(){if(st){st.textContent='Не вдалося визначити відстань';}});
-  }, 800);
-  osRenderSidebar();
+      .catch(function(){if(st){st.textContent='Не вдалося знайти';}});
+  }, 600);
+}
+function osLocShowDropdown(results, st, dd) {
+  if(!dd) return;
+  if(!results||!results.length){
+    if(st){st.textContent='Місце не знайдено';}
+    dd.style.display='none'; dd.innerHTML=''; return;
+  }
+  if(st){st.style.display='none';}
+  dd.innerHTML = results.map(function(r,i){
+    return '<div class="os-loc-opt" onclick="osLocSelectPlace('+r.lat+','+r.lng+','+JSON.stringify(r.name)+')">'
+      +'<strong>'+osEsc(r.name)+'</strong>'
+      +(r.label?'<span>'+osEsc(r.label)+'</span>':'')
+      +'</div>';
+  }).join('');
+  dd.style.display='block';
+  if(!dd._outsideHandler){
+    dd._outsideHandler=true;
+    document.addEventListener('click',function(e){
+      var inp=document.getElementById('osLocationInput');
+      if(dd&&!dd.contains(e.target)&&e.target!==inp){dd.style.display='none';}
+    });
+  }
 }
 
 function osAddManualField() {
@@ -15006,7 +15047,6 @@ function osInitMap3() {
     var center = poly.getBounds().getCenter();
     L.tooltip({ permanent:true, direction:'center', className:'os-map-tooltip' }).setContent(f.name + '<br>' + f.areaHa.toFixed(0) + ' га').setLatLng(center).addTo(OS.map3);
     var entryPt = poly.getBounds().getSouthEast();
-    L.marker(entryPt, { icon: L.divIcon({ className:'', html:'<div style="width:14px;height:14px;background:#CCFF00;border:2px solid #111;border-radius:3px"></div>', iconSize:[14,14], iconAnchor:[7,7] }) }).addTo(OS.map3);
     group.addLayer(poly);
   });
   var _bounds3 = group.getBounds();
