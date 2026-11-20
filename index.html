@@ -14406,7 +14406,7 @@ function osRenderFieldBody(f, i) {
         + '<div class="os-form-group"><label class="os-form-label" for="moist_area_'+i+'">Площа на точку, га</label><input class="os-form-input" type="number" id="moist_area_'+i+'" min="0.1" step="0.1" value="'+(s.moistureAreaPerPoint||5)+'" oninput="osFieldChangeMoistArea('+i+',parseFloat(this.value)||5)"></div>'
         + osSelect('Шари відбору','moist_layers_'+i,['3 шари','10 шарів'],s.moistureLayers||'3 шари',"osFieldChange("+i+",'moistureLayers',this.value)")
         + '</div>'
-        + '<p class="os-step2-note">Кількість точок: <strong>' + moisturePoints + '</strong></p>')
+        + '<p class="os-step2-note">Кількість точок: <strong>' + moisturePoints + '</strong></p>'
     + '<p class="os-step2-note">Шари не збільшують кількість точок для мінімального виїзду.</p>'
     + '</div>'
   ) : '';
