@@ -14189,13 +14189,29 @@ function osInitMap1() {
   var fieldsWithCoords = OS.fields.filter(function(f){ return f.latLngs && f.latLngs.length >= 3; });
   if (!fieldsWithCoords.length) return;
 
-  // Build bounds first
+  // Leaflet records the SVG pixel origin at the moment L.map() is first called with
+  // center/zoom. It uses getBoundingClientRect() internally, which is affected by
+  // window.scrollY. If the page is scrolled, the SVG is permanently offset by that
+  // amount and polygons become invisible.
+  //
+  // Fix: scroll to 0, wait for the browser to actually paint that scroll position
+  // (two rAFs), then create the Leaflet map. Only after the scroll is committed does
+  // getBoundingClientRect() return the correct unscrolled position.
+  if (window.scrollY !== 0) {
+    window.scrollTo(0, 0);
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        osInitMap1();
+      });
+    });
+    return;
+  }
+
+  // Build bounds first (using temporary polygons, not added to map)
   var tmpGroup = L.featureGroup(fieldsWithCoords.map(function(f){ return L.polygon(f.latLngs); }));
   var bounds = tmpGroup.getBounds();
-
-  // Pass a temporary center/zoom so Leaflet initializes fully (_loaded=true).
-  // We use the bounds center at zoom 10 — fitBounds will immediately correct it.
   var boundsCenter = bounds.getCenter();
+
   OS.map1 = L.map('os-map-s1', { center: boundsCenter, zoom: 10, zoomControl:true, attributionControl:false });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'' }).addTo(OS.map1);
 
@@ -14210,22 +14226,13 @@ function osInitMap1() {
   var _bounds = group.getBounds();
   OS._map1Bounds = _bounds;
 
-  // The SVG pixel origin is set at the moment setView/fitBounds is called, using
-  // getBoundingClientRect(). If the page is scrolled, the SVG is offset by scrollY.
-  // Fix: scroll to 0, then wait two rAFs so the browser has painted the new scroll
-  // position before we call fitBounds.
-  function _fitMap() {
+  OS.map1.invalidateSize();
+  OS.map1.fitBounds(_bounds, { padding:[20,20] });
+  setTimeout(function(){
     if (!OS.map1) return;
     OS.map1.invalidateSize();
     OS.map1.fitBounds(_bounds, { padding:[20,20] });
-  }
-  window.scrollTo(0, 0);
-  requestAnimationFrame(function() {
-    requestAnimationFrame(function() {
-      _fitMap();
-      setTimeout(function(){ _fitMap(); }, 200);
-    });
-  });
+  }, 200);
 }
 
 /* ── Accordions (step 2) ── */
