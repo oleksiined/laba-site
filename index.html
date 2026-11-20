@@ -6855,7 +6855,7 @@ window.addEventListener('popstate', e => {
 // ═══════════════════════════════════════════════
 // CART
 // ═══════════════════════════════════════════════
-function saveCart() { localStorage.setItem('laba_cart', JSON.stringify(cart)); localStorage.setItem('laba_notes', JSON.stringify(paramNotes)); }
+function saveCart() { try { localStorage.setItem('laba_cart', JSON.stringify(cart)); localStorage.setItem('laba_notes', JSON.stringify(paramNotes)); } catch(e) {} }
 
 function toggleCart(code,type,price,name){
   const idx=cart.findIndex(c=>c.code===code&&c.type===type);
@@ -8997,7 +8997,7 @@ function showConfirmPage(){
 function startOver(){
   cart=[]; samples=[]; currentOrder=null;
   paramNotes={}; payerType='individual'; deliveryType='nova_poshta';
-  localStorage.removeItem('laba_cart'); localStorage.removeItem('laba_notes');
+  try { localStorage.removeItem('laba_cart'); localStorage.removeItem('laba_notes'); } catch(e) {}
   updateCartUI();
   navigate('home');
 }
@@ -9287,8 +9287,7 @@ function showToast(msg,ms=2500){
 (function init(){
   // Скидаємо кошик при кожному новому відкритті сайту
   cart = []; paramNotes = {}; samples = [];
-  localStorage.removeItem('laba_cart');
-  localStorage.removeItem('laba_notes');
+  try { localStorage.removeItem('laba_cart'); localStorage.removeItem('laba_notes'); } catch(e) {}
 
   // Відкриваємо сторінку з хешу або Головну
   const _ALL_PAGES=['home','services','about','contacts','checkout','calculator','sampling','order-sampling','blog','article','status','methods','payment','confirm','samples','contract','os-confirm','price-guide'];
@@ -16881,7 +16880,7 @@ const pgLabs = {sat:'SAT LAB','demo-b':'Лабораторія Б (демо)'};
 const pgDemoAvailable = new Set(['01-2-003','01-2-014','01-1-001-01','01-1-004-01','01-1-005-02','01-1-023-01','01-1-046-01']);
 function pgSupportedLabs(row){return pgDemoAvailable.has(row.key)?['sat','demo-b']:['sat'];}
 function pgOffers(rows){return rows.flatMap(row=>pgSupportedLabs(row).map(lab=>({...row,lab})));}
-const pgToday = new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Kyiv'}).format(new Date());
+let pgToday;try{pgToday=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Kyiv'}).format(new Date());}catch(e){try{pgToday=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Kiev'}).format(new Date());}catch(e2){pgToday=new Date().toISOString().slice(0,10);}}
 const pgState = {page:1, pending:[]};
 const pgStatuses = {current:'Чинна ціна',wait:'Очікуємо ціну',review:'Потрібне підтвердження',future:'Запланована ціна'};
 const pgMoney = new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2});
