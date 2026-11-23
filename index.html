@@ -9,7 +9,7 @@
 <meta name="description" content="Досліджуйте ґрунт, воду, добрива, насіння, зерно та рослини. Обирайте потрібні дослідження й замовляйте онлайн — усе в одному місці.">
 <meta name="google-site-verification" content="WBz2Q61Mub0fIvunvzh5M9riqhetYaXx3Nj9Bnl3mZY" />
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://laba.zemlerob.com.ua/">
+<link rel="canonical" id="canonical-tag" href="https://laba.zemlerob.com.ua/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://laba.zemlerob.com.ua/">
 <meta property="og:title" content="LABA — лабораторні дослідження для агробізнесу">
@@ -6586,7 +6586,9 @@ async function navigateToArticle(slug) {
   document.title = art.seoTitle || art.title || 'LABA';
   var metaDesc = document.querySelector('meta[name="description"]');
   if (metaDesc) metaDesc.setAttribute('content', art.metaDesc);
-  try { history.pushState({page:'article', slug: slug}, '', '#article=' + slug); } catch(e){}
+  try { history.pushState({page:'article', slug: slug}, '', '/blog/' + slug); } catch(e){}
+  var _artCanon = document.getElementById('canonical-tag'); if(_artCanon) _artCanon.setAttribute('href','https://laba.zemlerob.com.ua/blog/'+slug);
+  var _artOgUrl = document.querySelector('meta[property="og:url"]'); if(_artOgUrl) _artOgUrl.setAttribute('content','https://laba.zemlerob.com.ua/blog/'+slug);
   navigate('article');
   window.scrollTo(0, 0);
   // Align ToC top with #art-content, then activate scroll spy
@@ -6723,10 +6725,11 @@ function navigate(page) {
     if (typeof nc_render === 'function') nc_render();
     if (typeof nc_setMaxStep === 'function') nc_setMaxStep(1);
     _dl('begin_checkout',{currency:'UAH',value:_dlCartValue(),items:_dlCartItems()});
-    try { history.pushState({page},'','#checkout'); } catch(e){} window.scrollTo(0,0); updateCartUI(); return;
+    try { history.pushState({page},'','/checkout'); } catch(e){} window.scrollTo(0,0); updateCartUI(); return;
   }
-  if (page === 'sampling') { var _sm = (location.hash.startsWith('#sampling/') ? location.hash.slice('#sampling/'.length) : 'soil'); try { history.pushState({page:'sampling',mat:_sm},'','#sampling/'+_sm); } catch(e){} }
-  else if (page !== 'article') { try { history.pushState({page}, '', '#' + page); } catch(e){} }
+  if (page === 'sampling') { var _sm = (location.pathname.startsWith('/sampling/') ? location.pathname.slice('/sampling/'.length) : (location.hash.startsWith('#sampling/') ? location.hash.slice('#sampling/'.length) : 'soil')); try { history.pushState({page:'sampling',mat:_sm},'','/sampling/'+_sm); } catch(e){} }
+  else if (page !== 'article') { try { history.pushState({page}, '', '/' + (page === 'home' ? '' : page)); } catch(e){} }
+  _updatePageMeta(page);
   window.scrollTo(0,0);
   updateCartUI();
 }
@@ -6763,22 +6766,20 @@ function goStep(step) {
 }
 
 window.addEventListener('popstate', e => {
-  var _h = location.hash;
-  if (_h && _h.startsWith('#sampling/')) {
-    var _mat = _h.slice('#sampling/'.length);
+  var _path = location.pathname;
+  if (_path.startsWith('/sampling/')) {
+    var _mat = _path.slice('/sampling/'.length).replace(/\/$/, '') || 'soil';
     var _btn = document.querySelector('.samp-tab[data-mat="' + _mat + '"]');
     if (currentPage !== 'sampling') navigate('sampling');
     if (_btn) sampSwitchTab(_mat, _btn);
     return;
   }
-  if(e.state?.card){
-    openCardFromHash();
-  } else if(e.state?.page === 'article' && e.state?.slug){
+  if(e.state?.page === 'article' && e.state?.slug){
     navigateToArticle(e.state.slug);
   } else if(e.state?.page){
     navigate(e.state.page);
-  } else if(window._navigateFromHash) {
-    window._navigateFromHash(location.hash);
+  } else if(typeof _navigateFromPath === 'function') {
+    _navigateFromPath(location.pathname, location.hash);
   }
 });
 
@@ -6976,7 +6977,7 @@ function sampSwitchTab(mat, btn) {
   document.querySelectorAll('.samp-panel').forEach(p => p.classList.remove('active'));
   const panel = document.getElementById('samp-panel-' + mat);
   if (panel) panel.classList.add('active');
-  try { history.pushState({page:'sampling', mat}, '', '#sampling/' + mat); } catch(e){}
+  try { history.pushState({page:'sampling', mat}, '', '/sampling/' + mat); } catch(e){}
 }
 function sampCopyLink(btn) {
   var url = location.origin + location.pathname + location.hash;
@@ -7326,9 +7327,9 @@ function toggleRowExpand(safeCode){
   try {
     const slug=row.dataset.slug||safeCode;
     if(row.classList.contains('expanded')){
-      history.pushState({page: currentPage, card: slug}, '', '#card-'+slug);
+      history.pushState({page: currentPage, card: slug}, '', '/services?card='+slug);
     } else {
-      history.pushState({page: currentPage}, '', '#'+currentPage);
+      history.pushState({page: currentPage}, '', '/' + (currentPage === 'home' ? '' : currentPage));
     }
   } catch(e){}
   // Синхронізуємо ширину чіпів до ширини рядка кнопок
@@ -9223,27 +9224,84 @@ function showToast(msg,ms=2500){
   cart = []; paramNotes = {}; samples = [];
   try { localStorage.removeItem('laba_cart'); localStorage.removeItem('laba_notes'); } catch(e) {}
 
+  // Оновлення мета-тегів при навігації
+  var _PAGE_TITLES = {
+    'home': 'Лаба — агрохімічна лабораторія',
+    'services': 'Послуги — Лаба',
+    'blog': 'Блог — Лаба',
+    'about': 'Про нас — Лаба',
+    'contacts': 'Контакти — Лаба',
+    'checkout': 'Оформлення замовлення — Лаба',
+    'calculator': 'Калькулятор — Лаба',
+    'sampling': 'Відбір зразків — Лаба',
+    'order-sampling': 'Замовити відбір — Лаба',
+    'status': 'Статус замовлення — Лаба',
+    'methods': 'Методи досліджень — Лаба',
+    'payment': 'Оплата — Лаба',
+    'confirm': 'Підтвердження — Лаба',
+    'samples': 'Зразки — Лаба',
+    'contract': 'Договір — Лаба',
+    'os-confirm': 'Відбір підтверджено — Лаба'
+  };
+  function _updatePageMeta(page) {
+    var title = _PAGE_TITLES[page] || 'Лаба — агрохімічна лабораторія';
+    document.title = title;
+    var _canon = document.getElementById('canonical-tag');
+    var _ogUrl = document.querySelector('meta[property="og:url"]');
+    var _ogTitle = document.querySelector('meta[property="og:title"]');
+    var _base = 'https://laba.zemlerob.com.ua';
+    var _path = (page === 'home') ? '' : '/' + page;
+    if(_canon) _canon.setAttribute('href', _base + _path);
+    if(_ogUrl) _ogUrl.setAttribute('content', _base + _path);
+    if(_ogTitle) _ogTitle.setAttribute('content', title);
+  }
+
   // Відкриваємо сторінку з хешу або Головну
   const _ALL_PAGES=['home','services','about','contacts','checkout','calculator','sampling','order-sampling','blog','article','status','methods','payment','confirm','samples','contract','os-confirm'];
-  window._navigateFromHash = function(hash) {
-    if(hash.startsWith('#card-')){
-      navigate('services');
-      try { history.replaceState({page:'services',card:hash.slice(6)}, '', hash); } catch(e){}
-    } else if(hash.startsWith('#article=')){
-      const _slug = hash.slice('#article='.length);
+  function _navigateFromPath(pathname, hash) {
+    var path = pathname || '/';
+    if (path.startsWith('/blog/')) {
+      var _slug = path.slice('/blog/'.length).replace(/\/$/, '');
       if(_slug) navigateToArticle(_slug); else navigate('blog');
-    } else if(hash.startsWith('#sampling/')){
+    } else if (path.startsWith('/sampling/')) {
       navigate('sampling');
-      var _mat = hash.slice('#sampling/'.length);
+      var _mat = path.slice('/sampling/'.length).replace(/\/$/, '') || 'soil';
       var _btn = document.querySelector('.samp-tab[data-mat="' + _mat + '"]');
       if(_btn) sampSwitchTab(_mat, _btn);
-    } else if(hash && hash !== '#'){
-      const _pg = hash.slice(1);
+    } else if (path === '/services' || path === '/services/') {
+      navigate('services');
+      var _cardParam = new URLSearchParams(window.location.search).get('card');
+      if(_cardParam) { setTimeout(function(){ var _r=document.querySelector('[data-slug="'+_cardParam+'"]'); if(_r) _r.click(); },200); }
+    } else if (path !== '/' && path !== '') {
+      var _pg = path.replace(/^\//, '').replace(/\/$/, '');
       if(_ALL_PAGES.includes(_pg)) navigate(_pg); else navigate('home');
+    } else if (hash && hash !== '#') {
+      _navigateFromLegacyHash(hash);
     } else {
       navigate('home');
     }
-  };
+  }
+  function _navigateFromLegacyHash(hash) {
+    if(hash.startsWith('#card-')){
+      navigate('services');
+      try { history.replaceState({page:'services'}, '', '/services?card='+hash.slice(6)); } catch(e){}
+    } else if(hash.startsWith('#article=')){
+      var _slug = hash.slice('#article='.length);
+      if(_slug) { navigateToArticle(_slug); try { history.replaceState({page:'article',slug:_slug},'','/blog/'+_slug); } catch(e){} } else navigate('blog');
+    } else if(hash.startsWith('#sampling/')){
+      var _mat = hash.slice('#sampling/'.length);
+      navigate('sampling');
+      try { history.replaceState({page:'sampling',mat:_mat},'','/sampling/'+_mat); } catch(e){}
+      var _btn = document.querySelector('.samp-tab[data-mat="' + _mat + '"]');
+      if(_btn) sampSwitchTab(_mat, _btn);
+    } else if(hash && hash !== '#'){
+      var _pg = hash.slice(1);
+      if(_ALL_PAGES.includes(_pg)) { navigate(_pg); try { history.replaceState({page:_pg},'','/'+((_pg==='home')?'':_pg)); } catch(e){} } else navigate('home');
+    } else {
+      navigate('home');
+    }
+  }
+  window._navigateFromHash = _navigateFromLegacyHash;
   // Handle ?order=ORDER_NUM&action=invoice|labels — from email buttons
   const _emailParams = new URLSearchParams(window.location.search);
   const _emailOrder  = _emailParams.get('order');
@@ -9278,7 +9336,7 @@ function showToast(msg,ms=2500){
     // Defer hash navigation so it runs after all IIFE init code completes
     // (prevents content being overwritten by subsequent init steps)
     // 50ms gives enough margin for all synchronous init and any micro-tasks
-    setTimeout(function(){ _navigateFromHash(location.hash); }, 50);
+    setTimeout(function(){ _navigateFromPath(location.pathname, location.hash); }, 50);
   }
   } // end else (_emailOrder)
   // popstate handled by the global listener above
@@ -11512,16 +11570,13 @@ async function loadCatalogFromSupabase() {
     // Re-apply hash navigation if the catalog load finished before the initial hash navigation ran
     // (can happen on fast connections where async fetch completes before setTimeout fires)
     // Also fixes the case where hash navigation ran but catalog data was needed to fully init the page
-    if (window._navigateFromHash && location.hash && location.hash !== '#') {
-      var _expectedPage = location.hash.startsWith('#card-') ? 'services'
-        : location.hash.startsWith('#article=') ? 'blog'
-        : location.hash.startsWith('#sampling/') ? 'sampling'
-        : location.hash.slice(1);
-      var _activePage = document.querySelector('.page.active');
-      var _activeId = _activePage ? _activePage.id.replace('page-', '') : '';
-      if (_expectedPage && _activeId !== _expectedPage) {
-        window._navigateFromHash(location.hash);
-      }
+    var _activePage2 = document.querySelector('.page.active');
+    var _activeId2 = _activePage2 ? _activePage2.id.replace('page-', '') : '';
+    var _expectedPage2 = location.pathname.startsWith('/blog/') ? 'blog'
+      : location.pathname.startsWith('/sampling/') ? 'sampling'
+      : (location.pathname.replace(/^\//, '').replace(/\/$/, '') || 'home');
+    if (_expectedPage2 && _activeId2 !== _expectedPage2 && typeof _navigateFromPath === 'function') {
+      _navigateFromPath(location.pathname, location.hash);
     }
   } catch (err) {
     console.warn('⚠ Supabase catalog load failed, using hardcoded data:', err.message);

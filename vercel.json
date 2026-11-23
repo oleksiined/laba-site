@@ -32,6 +32,10 @@
       "src":  "/(.*)",
       "has":  [{ "type": "host", "value": "admin\\.laba\\.zemlerob\\.com\\.ua" }],
       "dest": "/admin.html"
+    },
+    {
+      "src":  "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
