@@ -11413,7 +11413,7 @@ async function loadCatalogFromSupabase() {
       const key = pkg.slug || pkg.package_id;
       if (!key) continue;
       const existing = NS_CAT.packages[key] || {};
-      NS_CAT.packages[key] = {
+      const entry = {
         name:            pkg.name || existing.name || key,
         materialId:      matKey,
         price:           pkg.price,
@@ -11423,6 +11423,11 @@ async function loadCatalogFromSupabase() {
         billingUnit:     pkg.billing_unit || 'sample',
         packageId:       pkg.package_id,
       };
+      NS_CAT.packages[key] = entry;
+      // Також індексуємо за package_id, щоб lookup спрацьовував коли s.packageId = '01-2-003'
+      if (pkg.package_id && pkg.package_id !== key) {
+        NS_CAT.packages[pkg.package_id] = entry;
+      }
     }
 
     // ── Перебудовуємо категорії з services ──
