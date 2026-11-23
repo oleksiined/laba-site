@@ -16663,11 +16663,11 @@ padding-left:7px
           </div><p class="form-error" id="fl-materials-error" role="alert" hidden>Оберіть хоча б один матеріал.</p></fieldset>
           <label class="field span-2"><span>Що досліджуєте? <i>Необов’язково</i></span><textarea name="details" placeholder="Наприклад: агрохімія ґрунту. Тут також можна додати посилання на сайт або перелік досліджень."></textarea></label>
         </div>
-        <div class="form-actions"><button class="button" type="submit">Надіслати заявку <svg class="arrow" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button><p class="demo">Демо: дані не надсилаються.</p></div>
+        <div class="form-actions"><button class="button" type="submit" id="fl-submit-btn">Надіслати заявку <svg class="arrow" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button></div>
       </form>
       <div class="form-state" id="fl-form-state" hidden>
-        <span class="token" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg></span><h3 tabindex="-1" id="fl-form-state-title">Заявку заповнено</h3>
-        <p>Це демонстрація. Дані не були надіслані.</p><button type="button" class="button small" id="fl-edit-form">Повернутися до форми</button>
+        <span class="token" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg></span><h3 tabindex="-1" id="fl-form-state-title">Заявку надіслано</h3>
+        <p>Ми зв'яжемося з вами найближчим часом.</p><button type="button" class="button small" id="fl-edit-form">Повернутися до форми</button>
       </div>
     </div>
   </section>
@@ -16717,13 +16717,14 @@ function initForLabsPage() {
   const state = document.getElementById('fl-form-state');
   const heading = document.getElementById('fl-form-state-title');
   const edit = document.getElementById('fl-edit-form');
+  const submitBtn = document.getElementById('fl-submit-btn');
   for (const field of materials) field.addEventListener('change', () => {
     if (materials.some(field => field.checked)) {
       error.hidden = true;
       materials[0].removeAttribute('aria-invalid');
     }
   });
-  form.addEventListener('submit', event => {
+  form.addEventListener('submit', async function(event) {
     event.preventDefault();
     if (!materials.some(field => field.checked)) {
       error.hidden = false;
@@ -16731,9 +16732,32 @@ function initForLabsPage() {
       materials[0].focus();
       return;
     }
-    form.hidden = true;
-    state.hidden = false;
-    heading.focus({preventScroll:true});
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Надсилаємо...';
+    const checkedMaterials = materials.filter(f => f.checked).map(f => f.value);
+    const data = {
+      laboratory:   form.elements.laboratory.value.trim(),
+      contact_name: form.elements.contact_name.value.trim(),
+      phone:        form.elements.phone.value.trim(),
+      email:        (form.elements.email && form.elements.email.value.trim()) || '',
+      materials:    checkedMaterials,
+      details:      (form.elements.details && form.elements.details.value.trim()) || '',
+    };
+    try {
+      const r = await fetch('/api/lab-partner-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!r.ok) throw new Error('server ' + r.status);
+      form.hidden = true;
+      state.hidden = false;
+      heading.focus({preventScroll:true});
+    } catch (err) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'Надіслати заявку <svg class="arrow" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>';
+      alert('Помилка надсилання. Будь ласка, зателефонуйте нам або напишіть на laba@zemlerob.com.ua');
+    }
   });
   edit.addEventListener('click', () => {
     state.hidden = true;
