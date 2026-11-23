@@ -10491,6 +10491,7 @@ function nc_stepClick(n) {
     if (nc_maxStep >= 4) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById('page-nc-confirm').classList.add('active');
+      const _sb2 = document.getElementById('stepBar'); if (_sb2) _sb2.style.display = 'none';
       window.scrollTo(0, 0);
     }
   }
@@ -12707,6 +12708,7 @@ function ncf_show() {
   ncf_renderSidebar();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-nc-confirm').classList.add('active');
+  const _sb = document.getElementById('stepBar'); if (_sb) _sb.style.display = 'none';
   nc_setMaxStep(4);
   window.scrollTo(0, 0);
 
