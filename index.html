@@ -4288,7 +4288,7 @@ main{flex:1}
 </div>
 
 <!-- PDF MODAL -->
-<div class="pdfmodal-backdrop" id="pdfBackdrop" onclick="if(event.target===this)closePdfModal()">
+<div class="pdfmodal-backdrop" id="pdfBackdrop">
   <div class="pdfmodal">
     <div class="pdfmodal-head">
       <div class="pdfmodal-title">
@@ -9234,6 +9234,10 @@ function closePdfModal(){
   var sp=document.getElementById('sharePopup');
   if(sp) sp.classList.remove('open');
 }
+document.addEventListener('click',function(e){
+  var bd=document.getElementById('pdfBackdrop');
+  if(bd&&e.target===bd) closePdfModal();
+});
 function downloadPdf(){
   var frame=document.getElementById('pdfViewer');
   if(!frame){showToast('PDF недоступний');return;}
