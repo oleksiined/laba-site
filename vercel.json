@@ -30,7 +30,7 @@
       "destination": "/admin.html"
     },
     {
-      "source": "/((?!.*\\.(png|jpg|jpeg|gif|webp|svg|ico|css|js|woff2|woff|ttf|eot|pdf|txt|xml)).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
