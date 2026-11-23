@@ -269,14 +269,23 @@ module.exports = async function handler(req, res) {
       };
     });
 
-    // Build flat catalog for the admin panel: service_id/code → {name, price}
+    // Build flat catalog for the admin panel: service_id/code → {name, price, code}
     const catalogServices = {};
     if (svcResult.status === 'fulfilled' && svcResult.value.status < 300) {
       try {
         JSON.parse(svcResult.value.body).forEach(s => {
-          const entry = { name: s.name || null, price: s.price != null ? Number(s.price) : null };
+          const entry = { name: s.name || null, price: s.price != null ? Number(s.price) : null, code: s.service_code || null };
           if (s.service_id)   catalogServices[s.service_id]   = entry;
           if (s.service_code) catalogServices[s.service_code] = entry;
+        });
+      } catch (_) {}
+    }
+    // Also map package_id → { name, price, code: package_code } for invoice code lookup
+    if (pkgResult.status === 'fulfilled' && pkgResult.value.status < 300) {
+      try {
+        JSON.parse(pkgResult.value.body).forEach(p => {
+          const entry = { name: p.name || null, price: p.price != null ? Number(p.price) : null, code: p.package_code || null };
+          if (p.package_id) catalogServices[p.package_id] = entry;
         });
       } catch (_) {}
     }
