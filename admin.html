@@ -2379,6 +2379,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-h
   </div><!-- /adm-shell -->
 
 <script>
+const API_BASE = 'https://laba.zemlerob.com.ua';
 // Orders loaded from API (replaces static mock data)
 let _admOrders = [];
 let _admOrdersRaw = [];
@@ -3169,7 +3170,7 @@ async function _admLoadHistory() {
 
   try {
     const orderNum = o.order_num || o.id;
-    const r = await fetch(`/api/order-events?order_num=${encodeURIComponent(orderNum)}`);
+    const r = await fetch(`${API_BASE}/api/order-events?order_num=${encodeURIComponent(orderNum)}`);
     const data = await r.json();
     if (!data.ok) throw new Error(data.error || 'API error');
     _admHistLoaded = o.id;
@@ -4321,7 +4322,7 @@ function admGenAkt(o) {
     // 2. Save to Supabase via /api/save-act
     try {
       const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
-      const resp   = await fetch('/api/save-act', {
+      const resp   = await fetch(`${API_BASE}/api/save-act`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderNum: o.id, pdfBase64: base64, actDate: aktDate }),
@@ -4668,7 +4669,7 @@ function admGenInvoice(o) {
     // 2. Save to Supabase via /api/save-invoice
     try {
       const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
-      const resp   = await fetch('/api/save-invoice', {
+      const resp   = await fetch(`${API_BASE}/api/save-invoice`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderNum: o.id, pdfBase64: base64, invDate }),
@@ -6340,7 +6341,7 @@ async function _conSearchFetch(q) {
   const drop = document.getElementById('conSearchDrop');
   if (!drop) return;
   try {
-    const resp = await fetch(`/api/documents-list?type=contract&q=${encodeURIComponent(q)}`);
+    const resp = await fetch(`${API_BASE}/api/documents-list?type=contract&q=${encodeURIComponent(q)}`);
     const data = await resp.json();
     if (!data.ok || !data.documents || !data.documents.length) {
       drop.innerHTML = '<div class="adm-doc-con-drop-hint">Нічого не знайдено</div>';
@@ -6375,7 +6376,7 @@ async function _conAttachSelected() {
     return;
   }
   try {
-    const resp = await fetch('/api/order-update', {
+    const resp = await fetch(`${API_BASE}/api/order-update', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: o.id, contract_document_id: doc.id }),
@@ -6394,7 +6395,7 @@ async function _conAttachSelected() {
 async function admDetachContract(orderId) {
   if (!confirm('Відкріпити договір?')) return;
   try {
-    const resp = await fetch('/api/order-update', {
+    const resp = await fetch(`${API_BASE}/api/order-update', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: orderId, contract_document_id: null }),
@@ -6627,7 +6628,7 @@ async function blogLoad(force) {
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text-soft)">Завантаження…</td></tr>';
   try {
-    const r = await fetch('/api/blog-article?list=1');
+    const r = await fetch(`${API_BASE}/api/blog-article?list=1');
     const data = await r.json();
     if (!data.ok) throw new Error(data.error);
     _blogAdmArticles = data.articles || [];
@@ -6683,7 +6684,7 @@ async function blogToggleStatus(slug, currentStatus) {
   const confirmed = confirm(`${newStatus === 'published' ? 'Опублікувати' : 'Зняти з публікації'} статтю "${slug}"?`);
   if (!confirmed) return;
   try {
-    const r = await fetch('/api/blog-article', {
+    const r = await fetch(`${API_BASE}/api/blog-article', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ slug, status: newStatus })
@@ -6702,7 +6703,7 @@ async function blogToggleStatus(slug, currentStatus) {
 async function blogOpenEdit(slug) {
   // Load full article data
   try {
-    const r = await fetch('/api/blog-article?slug=' + encodeURIComponent(slug));
+    const r = await fetch(`${API_BASE}/api/blog-article?slug=' + encodeURIComponent(slug));
     const data = await r.json();
     if (!data.ok || !data.article) throw new Error('Не вдалося завантажити');
     blogOpenModal(data.article);
@@ -6894,7 +6895,7 @@ async function blogSave() {
   };
 
   try {
-    const r = await fetch('/api/blog-article', {
+    const r = await fetch(`${API_BASE}/api/blog-article', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -6912,7 +6913,7 @@ async function blogSave() {
 async function blogDelete(slug) {
   if (!confirm(`Видалити статтю "${slug}"? Цю дію не можна скасувати.`)) return;
   try {
-    const r = await fetch('/api/blog-article', {
+    const r = await fetch(`${API_BASE}/api/blog-article', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ slug })
