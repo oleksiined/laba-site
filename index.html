@@ -11762,10 +11762,69 @@ function ns_fmtDoslidzhen(n) {
 // ══════════════════════════════════════════
 // ОПЕРАЦІЇ
 // ══════════════════════════════════════════
+// ── Сигнатура зразка (для групування в NS) ──
+function ns_sig(s) {
+  return [s.materialId, s.packageId, [...s.additionalIndicatorIds].sort().join(','), s.urgencyType].join('|');
+}
+
+// ── Синхронізація NS → NC_S після редагування ──
+function syncNStoNC() {
+  NS.samples.forEach(ns => {
+    const nc = NC_S.samples.find(x => x.id === ns.id);
+    if (nc) {
+      nc.additionalIndicatorIds = [...ns.additionalIndicatorIds].sort();
+      nc.urgencyType = ns.urgencyType;
+    }
+  });
+  _nc_lastBuiltKey = _nc_stateKey();
+}
+
+// ── Визначити до якої «групи NS» належить зразок ──
+function ns_groupOf(sampleId) {
+  const s = NS.samples.find(x => x.id === sampleId);
+  if (!s) return [];
+  const sig = ns_sig(s);
+  return NS.samples.filter(x => ns_sig(x) === sig).map(x => x.id);
+}
+
+// ── Показати попередження про розбиття групи (якщо потрібно) ──
+function ns_warnIfSplit(targetIds, groupIds) {
+  // Якщо targetIds — не всі зразки групи → буде розбиття
+  const isPartial = groupIds.length > 1 && targetIds.some(id => !groupIds.includes(id) === false)
+    && targetIds.length < groupIds.length;
+  if (isPartial) {
+    toast('Вибрані зразки матимуть інший склад досліджень і будуть автоматично перенесені в окрему групу');
+  }
+}
+
 function addIndicator(sampleId, indId) {
   const mode = NS.applyMode[sampleId] || 'one';
-  const targets = mode === 'all' ? NS.samples.map(s => s.id) : [sampleId];
   const ind = ns_findInd(indId);
+
+  // Визначити цілі зразки
+  let targets;
+  if (mode === 'all') {
+    targets = NS.samples.map(s => s.id);
+  } else if (mode === 'selected') {
+    targets = NS.samples.map(s => s.id).filter(id => NS.checked.has(id));
+    if (targets.length === 0) targets = [sampleId];
+  } else {
+    targets = [sampleId];
+  }
+
+  // Попередження якщо ділимо групу
+  const groupIds = ns_groupOf(sampleId);
+  ns_warnIfSplit(targets, groupIds);
+
+  // Перевірка: чи показник вже в пакеті хоча б одного цільового зразка
+  const firstTarget = NS.samples.find(x => x.id === sampleId);
+  if (firstTarget) {
+    const p = ns_getPkg(firstTarget);
+    if ((p.included||[]).includes(indId)) {
+      toast('Цей показник вже входить до складу вибраного пакета');
+      return;
+    }
+  }
 
   targets.forEach(tid => {
     const s = NS.samples.find(x => x.id === tid);
@@ -11773,18 +11832,39 @@ function addIndicator(sampleId, indId) {
     const p = ns_getPkg(s);
     if ((p.included||[]).includes(indId)) return; // вже в пакеті
     if (s.additionalIndicatorIds.includes(indId)) return; // вже є
-    // перевірка сумісності матеріалу
     if (ind && ind.mat && !ind.mat.includes(s.materialId)) return;
     s.additionalIndicatorIds = [...s.additionalIndicatorIds, indId].sort();
   });
 
+  syncNStoNC();
   ns_render();
   ns_showSaved();
 }
 
 function removeIndicator(sampleId, indId) {
-  const s = NS.samples.find(x => x.id === sampleId);
-  if (s) s.additionalIndicatorIds = s.additionalIndicatorIds.filter(i => i !== indId);
+  const mode = NS.applyMode[sampleId] || 'one';
+
+  // Визначити цілі зразки
+  let targets;
+  if (mode === 'all') {
+    targets = NS.samples.map(s => s.id);
+  } else if (mode === 'selected') {
+    targets = NS.samples.map(s => s.id).filter(id => NS.checked.has(id));
+    if (targets.length === 0) targets = [sampleId];
+  } else {
+    targets = [sampleId];
+  }
+
+  // Попередження якщо ділимо групу
+  const groupIds = ns_groupOf(sampleId);
+  ns_warnIfSplit(targets, groupIds);
+
+  targets.forEach(tid => {
+    const s = NS.samples.find(x => x.id === tid);
+    if (s) s.additionalIndicatorIds = s.additionalIndicatorIds.filter(i => i !== indId);
+  });
+
+  syncNStoNC();
   ns_render();
   ns_showSaved();
 }
@@ -12057,6 +12137,7 @@ function renderApplyBar(sid, barEl) {
   if (!el) return;
   const mode = NS.applyMode[sid] || 'one';
   const total = NS.samples.length;
+  const selCount = NS.checked.size;
   el.innerHTML = `
 <span class="apply-bar-lbl">Застосувати зміни</span>
 <div class="apply-opts">
@@ -12064,6 +12145,10 @@ function renderApplyBar(sid, barEl) {
     <div class="apply-radio ${mode === 'one' ? 'checked' : ''}"></div>
     Лише до цього зразка
   </label>
+  ${selCount > 1 ? `<label class="apply-opt ${mode === 'selected' ? 'on' : ''}" onclick="setApplyMode('${sid}','selected')">
+    <div class="apply-radio ${mode === 'selected' ? 'checked' : ''}"></div>
+    До вибраних зразків (${selCount})
+  </label>` : ''}
   <label class="apply-opt ${mode === 'all' ? 'on' : ''}" onclick="setApplyMode('${sid}','all')">
     <div class="apply-radio ${mode === 'all' ? 'checked' : ''}"></div>
     До всіх ${total} зразків
@@ -13926,6 +14011,9 @@ function nc_goToCheckoutExt() {
 
 // Samples "next" button
 function ns_goNext() {
+  // Синхронізуємо зміни NS → NC_S перед переходом до оформлення
+  syncNStoNC();
+  syncCartFromSamples();
   // Save samples snapshot before navigating away — this is the most reliable point
   window._ncfLabelSamples = (NS.samples && NS.samples.length) ? NS.samples.map(s=>({...s})) : [];
   if (window._ncfOrder) window._ncfOrder.samples = window._ncfLabelSamples;
