@@ -6672,6 +6672,59 @@ function blogSearch(q) {
   });
 }
 
+var _PAGE_TITLES = {
+  'home': 'Лаба — агрохімічна лабораторія',
+  'services': 'Послуги — Лаба',
+  'blog': 'Блог — Лаба',
+  'about': 'Про нас — Лаба',
+  'contacts': 'Контакти — Лаба',
+  'checkout': 'Оформлення замовлення — Лаба',
+  'calculator': 'Калькулятор — Лаба',
+  'sampling': 'Відбір зразків — Лаба',
+  'order-sampling': 'Замовити відбір — Лаба',
+  'status': 'Статус замовлення — Лаба',
+  'methods': 'Методи досліджень — Лаба',
+  'payment': 'Оплата — Лаба',
+  'confirm': 'Підтвердження — Лаба',
+  'samples': 'Зразки — Лаба',
+  'contract': 'Договір — Лаба',
+  'os-confirm': 'Відбір підтверджено — Лаба'
+};
+var _PAGE_DESCS = {
+  'home': 'Лаба — агрохімічна лабораторія. Аналіз ґрунту, рослин і води для підвищення врожайності та ефективності агробізнесу.',
+  'services': 'Послуги агрохімічної лабораторії Лаба: аналіз ґрунту, рослин, кормів і води. Швидко, точно, з агрономічною інтерпретацією.',
+  'blog': 'Блог Лаба: корисні статті про агрохімію, аналіз ґрунту, рослинне живлення та ефективне землеробство.',
+  'about': 'Про лабораторію Лаба — сучасне обладнання, кваліфіковані агрохіміки, швидкі результати і підтримка агробізнесу.',
+  'contacts': 'Контакти агрохімічної лабораторії Лаба. Зв\'яжіться з нами для консультації або замовлення аналізів.',
+  'sampling': 'Відбір зразків ґрунту, рослин і води для агрохімічного аналізу. Інструкції та замовлення послуги від Лаба.',
+  'methods': 'Методи досліджень лабораторії Лаба: акредитовані методики аналізу ґрунту, рослин, кормів і води.',
+  'calculator': 'Калькулятор вартості агрохімічних аналізів від Лаба. Розрахуйте ціну для вашого господарства.',
+  'status': 'Перевірте статус вашого замовлення в агрохімічній лабораторії Лаба.'
+};
+var _DEFAULT_DESC = 'Лаба — агрохімічна лабораторія. Аналіз ґрунту, рослин і води для підвищення врожайності та ефективності агробізнесу.';
+var _DEFAULT_OG_IMAGE = 'https://laba.zemlerob.com.ua/og-image.png';
+function _updatePageMeta(page) {
+  var title = _PAGE_TITLES[page] || 'Лаба — агрохімічна лабораторія';
+  var desc = _PAGE_DESCS[page] || _DEFAULT_DESC;
+  document.title = title;
+  var _canon = document.getElementById('canonical-tag');
+  var _metaDesc = document.querySelector('meta[name="description"]');
+  var _ogUrl = document.querySelector('meta[property="og:url"]');
+  var _ogTitle = document.querySelector('meta[property="og:title"]');
+  var _ogDesc = document.querySelector('meta[property="og:description"]');
+  var _ogImg = document.querySelector('meta[property="og:image"]');
+  var _noindex = document.querySelector('meta[name="robots"][content="noindex"]');
+  var _base = 'https://laba.zemlerob.com.ua';
+  var _path = (page === 'home') ? '' : '/' + page;
+  if(_canon) _canon.setAttribute('href', _base + _path);
+  if(_metaDesc) _metaDesc.setAttribute('content', desc);
+  if(_ogUrl) _ogUrl.setAttribute('content', _base + _path);
+  if(_ogTitle) _ogTitle.setAttribute('content', title);
+  if(_ogDesc) _ogDesc.setAttribute('content', desc);
+  if(_ogImg) _ogImg.setAttribute('content', _DEFAULT_OG_IMAGE);
+  if(_noindex) _noindex.parentNode.removeChild(_noindex);
+}
+
 function navigate(page) {
   closeMegaMenu();
   if (page !== 'about' && typeof destroyAboutFeatPin === 'function') destroyAboutFeatPin();
@@ -9230,60 +9283,6 @@ function showToast(msg,ms=2500){
   // Скидаємо кошик при кожному новому відкритті сайту
   cart = []; paramNotes = {}; samples = [];
   try { localStorage.removeItem('laba_cart'); localStorage.removeItem('laba_notes'); } catch(e) {}
-
-  // Оновлення мета-тегів при навігації
-  var _PAGE_TITLES = {
-    'home': 'Лаба — агрохімічна лабораторія',
-    'services': 'Послуги — Лаба',
-    'blog': 'Блог — Лаба',
-    'about': 'Про нас — Лаба',
-    'contacts': 'Контакти — Лаба',
-    'checkout': 'Оформлення замовлення — Лаба',
-    'calculator': 'Калькулятор — Лаба',
-    'sampling': 'Відбір зразків — Лаба',
-    'order-sampling': 'Замовити відбір — Лаба',
-    'status': 'Статус замовлення — Лаба',
-    'methods': 'Методи досліджень — Лаба',
-    'payment': 'Оплата — Лаба',
-    'confirm': 'Підтвердження — Лаба',
-    'samples': 'Зразки — Лаба',
-    'contract': 'Договір — Лаба',
-    'os-confirm': 'Відбір підтверджено — Лаба'
-  };
-  var _PAGE_DESCS = {
-    'home': 'Лаба — агрохімічна лабораторія. Аналіз ґрунту, рослин і води для підвищення врожайності та ефективності агробізнесу.',
-    'services': 'Послуги агрохімічної лабораторії Лаба: аналіз ґрунту, рослин, кормів і води. Швидко, точно, з агрономічною інтерпретацією.',
-    'blog': 'Блог Лаба: корисні статті про агрохімію, аналіз ґрунту, рослинне живлення та ефективне землеробство.',
-    'about': 'Про лабораторію Лаба — сучасне обладнання, кваліфіковані агрохіміки, швидкі результати і підтримка агробізнесу.',
-    'contacts': 'Контакти агрохімічної лабораторії Лаба. Зв\'яжіться з нами для консультації або замовлення аналізів.',
-    'sampling': 'Відбір зразків ґрунту, рослин і води для агрохімічного аналізу. Інструкції та замовлення послуги від Лаба.',
-    'methods': 'Методи досліджень лабораторії Лаба: акредитовані методики аналізу ґрунту, рослин, кормів і води.',
-    'calculator': 'Калькулятор вартості агрохімічних аналізів від Лаба. Розрахуйте ціну для вашого господарства.',
-    'status': 'Перевірте статус вашого замовлення в агрохімічній лабораторії Лаба.'
-  };
-  var _DEFAULT_DESC = 'Лаба — агрохімічна лабораторія. Аналіз ґрунту, рослин і води для підвищення врожайності та ефективності агробізнесу.';
-  var _DEFAULT_OG_IMAGE = 'https://laba.zemlerob.com.ua/og-image.png';
-  function _updatePageMeta(page) {
-    var title = _PAGE_TITLES[page] || 'Лаба — агрохімічна лабораторія';
-    var desc = _PAGE_DESCS[page] || _DEFAULT_DESC;
-    document.title = title;
-    var _canon = document.getElementById('canonical-tag');
-    var _metaDesc = document.querySelector('meta[name="description"]');
-    var _ogUrl = document.querySelector('meta[property="og:url"]');
-    var _ogTitle = document.querySelector('meta[property="og:title"]');
-    var _ogDesc = document.querySelector('meta[property="og:description"]');
-    var _ogImg = document.querySelector('meta[property="og:image"]');
-    var _noindex = document.querySelector('meta[name="robots"][content="noindex"]');
-    var _base = 'https://laba.zemlerob.com.ua';
-    var _path = (page === 'home') ? '' : '/' + page;
-    if(_canon) _canon.setAttribute('href', _base + _path);
-    if(_metaDesc) _metaDesc.setAttribute('content', desc);
-    if(_ogUrl) _ogUrl.setAttribute('content', _base + _path);
-    if(_ogTitle) _ogTitle.setAttribute('content', title);
-    if(_ogDesc) _ogDesc.setAttribute('content', desc);
-    if(_ogImg) _ogImg.setAttribute('content', _DEFAULT_OG_IMAGE);
-    if(_noindex) _noindex.parentNode.removeChild(_noindex);
-  }
 
   // Відкриваємо сторінку з хешу або Головну
   const _ALL_PAGES=['home','services','about','contacts','checkout','calculator','sampling','order-sampling','blog','article','status','methods','payment','confirm','samples','contract','os-confirm'];
