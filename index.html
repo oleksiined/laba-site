@@ -6583,9 +6583,16 @@ async function navigateToArticle(slug) {
       : Object.keys(BLOG_ARTICLES).filter(function(s){ return s !== slug; }).slice(0, 3);
     relGrid.innerHTML = relSlugs.map(_buildRelatedCard).join('');
   }
-  document.title = art.seoTitle || art.title || 'LABA';
+  var _artTitle = art.seoTitle || art.title || 'LABA';
+  document.title = _artTitle;
   var metaDesc = document.querySelector('meta[name="description"]');
-  if (metaDesc) metaDesc.setAttribute('content', art.metaDesc);
+  if (metaDesc) metaDesc.setAttribute('content', art.metaDesc || '');
+  var _artOgTitle = document.querySelector('meta[property="og:title"]');
+  if (_artOgTitle) _artOgTitle.setAttribute('content', _artTitle);
+  var _artOgDesc = document.querySelector('meta[property="og:description"]');
+  if (_artOgDesc) _artOgDesc.setAttribute('content', art.metaDesc || '');
+  var _artOgImg = document.querySelector('meta[property="og:image"]');
+  if (_artOgImg) _artOgImg.setAttribute('content', art.cover || 'https://laba.zemlerob.com.ua/og-image.png');
   try { history.pushState({page:'article', slug: slug}, '', '/blog/' + slug); } catch(e){}
   var _artCanon = document.getElementById('canonical-tag'); if(_artCanon) _artCanon.setAttribute('href','https://laba.zemlerob.com.ua/blog/'+slug);
   var _artOgUrl = document.querySelector('meta[property="og:url"]'); if(_artOgUrl) _artOgUrl.setAttribute('content','https://laba.zemlerob.com.ua/blog/'+slug);
@@ -9243,17 +9250,39 @@ function showToast(msg,ms=2500){
     'contract': 'Договір — Лаба',
     'os-confirm': 'Відбір підтверджено — Лаба'
   };
+  var _PAGE_DESCS = {
+    'home': 'Лаба — агрохімічна лабораторія. Аналіз ґрунту, рослин і води для підвищення врожайності та ефективності агробізнесу.',
+    'services': 'Послуги агрохімічної лабораторії Лаба: аналіз ґрунту, рослин, кормів і води. Швидко, точно, з агрономічною інтерпретацією.',
+    'blog': 'Блог Лаба: корисні статті про агрохімію, аналіз ґрунту, рослинне живлення та ефективне землеробство.',
+    'about': 'Про лабораторію Лаба — сучасне обладнання, кваліфіковані агрохіміки, швидкі результати і підтримка агробізнесу.',
+    'contacts': 'Контакти агрохімічної лабораторії Лаба. Зв\'яжіться з нами для консультації або замовлення аналізів.',
+    'sampling': 'Відбір зразків ґрунту, рослин і води для агрохімічного аналізу. Інструкції та замовлення послуги від Лаба.',
+    'methods': 'Методи досліджень лабораторії Лаба: акредитовані методики аналізу ґрунту, рослин, кормів і води.',
+    'calculator': 'Калькулятор вартості агрохімічних аналізів від Лаба. Розрахуйте ціну для вашого господарства.',
+    'status': 'Перевірте статус вашого замовлення в агрохімічній лабораторії Лаба.'
+  };
+  var _DEFAULT_DESC = 'Лаба — агрохімічна лабораторія. Аналіз ґрунту, рослин і води для підвищення врожайності та ефективності агробізнесу.';
+  var _DEFAULT_OG_IMAGE = 'https://laba.zemlerob.com.ua/og-image.png';
   function _updatePageMeta(page) {
     var title = _PAGE_TITLES[page] || 'Лаба — агрохімічна лабораторія';
+    var desc = _PAGE_DESCS[page] || _DEFAULT_DESC;
     document.title = title;
     var _canon = document.getElementById('canonical-tag');
+    var _metaDesc = document.querySelector('meta[name="description"]');
     var _ogUrl = document.querySelector('meta[property="og:url"]');
     var _ogTitle = document.querySelector('meta[property="og:title"]');
+    var _ogDesc = document.querySelector('meta[property="og:description"]');
+    var _ogImg = document.querySelector('meta[property="og:image"]');
+    var _noindex = document.querySelector('meta[name="robots"][content="noindex"]');
     var _base = 'https://laba.zemlerob.com.ua';
     var _path = (page === 'home') ? '' : '/' + page;
     if(_canon) _canon.setAttribute('href', _base + _path);
+    if(_metaDesc) _metaDesc.setAttribute('content', desc);
     if(_ogUrl) _ogUrl.setAttribute('content', _base + _path);
     if(_ogTitle) _ogTitle.setAttribute('content', title);
+    if(_ogDesc) _ogDesc.setAttribute('content', desc);
+    if(_ogImg) _ogImg.setAttribute('content', _DEFAULT_OG_IMAGE);
+    if(_noindex) _noindex.parentNode.removeChild(_noindex);
   }
 
   // Відкриваємо сторінку з хешу або Головну
@@ -9274,7 +9303,7 @@ function showToast(msg,ms=2500){
       if(_cardParam) { setTimeout(function(){ var _r=document.querySelector('[data-slug="'+_cardParam+'"]'); if(_r) _r.click(); },200); }
     } else if (path !== '/' && path !== '') {
       var _pg = path.replace(/^\//, '').replace(/\/$/, '');
-      if(_ALL_PAGES.includes(_pg)) navigate(_pg); else navigate('home');
+      if(_ALL_PAGES.includes(_pg)) navigate(_pg); else _show404();
     } else if (hash && hash !== '#') {
       _navigateFromLegacyHash(hash);
     } else {
@@ -9301,6 +9330,34 @@ function showToast(msg,ms=2500){
     } else {
       navigate('home');
     }
+  }
+  function _show404() {
+    document.title = 'Сторінку не знайдено — Лаба';
+    var _canon = document.getElementById('canonical-tag');
+    if(_canon) _canon.setAttribute('href', '');
+    var _noindexMeta = document.querySelector('meta[name="robots"][content="noindex"]');
+    if (!_noindexMeta) {
+      _noindexMeta = document.createElement('meta');
+      _noindexMeta.setAttribute('name', 'robots');
+      _noindexMeta.setAttribute('content', 'noindex');
+      document.head.appendChild(_noindexMeta);
+    }
+    var pages = document.querySelectorAll('.page');
+    pages.forEach(function(p){ p.style.display='none'; });
+    var _404page = document.getElementById('page-404');
+    if (!_404page) {
+      _404page = document.createElement('div');
+      _404page.id = 'page-404';
+      _404page.className = 'page';
+      _404page.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:48px 24px';
+      _404page.innerHTML = '<div style="font-size:72px;line-height:1;margin-bottom:16px">404</div>' +
+        '<h1 style="font-size:24px;font-weight:700;margin:0 0 12px">Сторінку не знайдено</h1>' +
+        '<p style="color:var(--text-soft);margin:0 0 32px;max-width:360px">Схоже, такої сторінки не існує. Можливо, посилання застаріло або адресу введено з помилкою.</p>' +
+        '<button onclick="navigate(\'home\')" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:16px;font-weight:600;cursor:pointer">На головну</button>';
+      var main = document.querySelector('main') || document.body;
+      main.appendChild(_404page);
+    }
+    _404page.style.display = 'flex';
   }
   window._navigateFromHash = _navigateFromLegacyHash;
   // Handle ?order=ORDER_NUM&action=invoice|labels — from email buttons
