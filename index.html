@@ -9491,7 +9491,7 @@ function mcatApplyFilters() {
   _mcatFilteredRows = _mcatAllRows.filter(r=>{
     if (_mcatMat && r.matId !== _mcatMat) return false;
     if (_mcatGroup && r.group !== _mcatGroup) return false;
-    if (q && !r.svcName.toLowerCase().includes(q) && !r.methodName.toLowerCase().includes(q) && !r.std.toLowerCase().includes(q)) return false;
+    if (q && !r.svcName.toLowerCase().includes(q) && !r.methodName.toLowerCase().includes(q) && !r.std.toLowerCase().includes(q) && !(r.svcId||'').toLowerCase().includes(q) && !(r.id||'').toString().toLowerCase().includes(q)) return false;
     return true;
   });
   // Sort
