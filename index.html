@@ -9278,6 +9278,7 @@ function showToast(msg,ms=2500){
     } else if (hash && hash !== '#') {
       _navigateFromLegacyHash(hash);
     } else {
+      try { if(hash === '#') history.replaceState({page:'home'}, '', '/'); } catch(e){}
       navigate('home');
     }
   }
