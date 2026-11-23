@@ -3546,6 +3546,18 @@ main{flex:1}
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
 </head>
 <body>
+<div id="cookieBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1A2937;color:#fff;padding:14px 20px;box-shadow:0 -4px 20px rgba(0,0,0,.18);font-family:inherit;font-size:13px;line-height:1.5">
+  <div style="max-width:900px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <div style="flex:1;min-width:200px">
+      🍪 Ми використовуємо cookies для аналітики та маркетингу (Meta Pixel, Microsoft Clarity). Технічні cookies (GTM, Sentry) активні завжди.
+      <a href="#" onclick="navigate('oferta');closeCookieBanner();return false" style="color:#99CEE0;text-decoration:underline;margin-left:4px">Детальніше</a>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0">
+      <button onclick="cookieDecline()" style="padding:8px 16px;border:1.5px solid rgba(255,255,255,.35);border-radius:7px;background:transparent;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Відхилити</button>
+      <button onclick="cookieAccept()" style="padding:8px 18px;border:none;border-radius:7px;background:#99CEE0;color:#1A2937;font-size:13px;font-weight:700;cursor:pointer">Прийняти</button>
+    </div>
+  </div>
+</div>
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MNNXS2VS" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div id="siteTooltip" role="tooltip"></div>
 <div id="chipPopover" role="tooltip"></div>
@@ -16789,6 +16801,42 @@ function initForLabsPage() {
     form.elements.laboratory.focus({preventScroll:true});
   });
 }
+</script>
+
+<script>
+(function(){
+  var COOKIE_KEY = 'laba_cookie_consent';
+  function cookieInit(){
+    var val = localStorage.getItem(COOKIE_KEY);
+    if(!val){
+      var b = document.getElementById('cookieBanner');
+      if(b) b.style.display = 'block';
+    } else if(val === 'declined'){
+      disableMarketingCookies();
+    }
+  }
+  function disableMarketingCookies(){
+    if(typeof window.clarity === 'function') window.clarity('stop');
+  }
+  window.cookieAccept = function(){
+    localStorage.setItem(COOKIE_KEY, 'accepted');
+    closeCookieBanner();
+  };
+  window.cookieDecline = function(){
+    localStorage.setItem(COOKIE_KEY, 'declined');
+    disableMarketingCookies();
+    closeCookieBanner();
+  };
+  window.closeCookieBanner = function(){
+    var b = document.getElementById('cookieBanner');
+    if(b) b.style.display = 'none';
+  };
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', cookieInit);
+  } else {
+    cookieInit();
+  }
+})();
 </script>
 
 </body>
