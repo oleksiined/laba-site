@@ -284,7 +284,7 @@ module.exports = async function handler(req, res) {
     if (pkgResult.status === 'fulfilled' && pkgResult.value.status < 300) {
       try {
         JSON.parse(pkgResult.value.body).forEach(p => {
-          const entry = { name: p.name || null, price: p.price != null ? Number(p.price) : null, code: p.package_code || null };
+          const entry = { name: p.name || null, price: p.price != null ? Number(p.price) : null, code: p.package_code || p.package_id || null };
           if (p.package_id) catalogServices[p.package_id] = entry;
         });
       } catch (_) {}
