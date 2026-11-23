@@ -9305,6 +9305,24 @@ function showToast(msg,ms=2500){
       navigate('home');
     }
   };
+  // Handle ?order=ORDER_NUM&action=invoice|labels — from email buttons
+  const _emailParams = new URLSearchParams(window.location.search);
+  const _emailOrder  = _emailParams.get('order');
+  const _emailAction = _emailParams.get('action');
+  if (_emailOrder && (_emailAction === 'invoice' || _emailAction === 'labels')) {
+    history.replaceState(null, '', window.location.pathname);
+    window._ncfOrder = { num: _emailOrder };
+    window._ncfEmailAction = _emailAction;
+    setTimeout(function() {
+      if (typeof ncf_show === 'function') {
+        ncf_show();
+        setTimeout(function() {
+          if (_emailAction === 'invoice' && typeof ncf_downloadInvoice === 'function') ncf_downloadInvoice();
+          if (_emailAction === 'labels'  && typeof ncf_printLabels  === 'function') ncf_printLabels();
+        }, 1500);
+      }
+    }, 100);
+  } else {
   // Handle ?paid=ORDER_NUM redirect from LiqPay — must check BEFORE navigate so we don't show home
   const _liqpayPaid = new URLSearchParams(window.location.search).get('paid');
   if (_liqpayPaid) {
@@ -9323,6 +9341,7 @@ function showToast(msg,ms=2500){
     // 50ms gives enough margin for all synchronous init and any micro-tasks
     setTimeout(function(){ _navigateFromHash(location.hash); }, 50);
   }
+  } // end else (_emailOrder)
   // popstate handled by the global listener above
   // Скидаємо матеріал — показуємо всі послуги
   srvMat = ''; currentMaterial = '';

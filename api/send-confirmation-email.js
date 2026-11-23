@@ -66,8 +66,11 @@ function buildVars(order) {
   const phoneDisplay = process.env.SUPPORT_PHONE_DISPLAY || '+380 67 181 99 67';
   const hours        = process.env.SUPPORT_HOURS         || 'Пн–Пт 9:00–18:00';
 
-  const orderPage        = `${site}/#order=${encodeURIComponent(order.orderNum || '')}`;
-  const samplingGuideUrl = process.env.SAMPLING_GUIDE_URL || `${site}/#guide`;
+  const orderNum         = encodeURIComponent(order.orderNum || '');
+  const orderPage        = `${site}/?order=${orderNum}`;
+  const invoiceUrl       = `${site}/?order=${orderNum}&action=invoice`;
+  const labelsUrl        = `${site}/?order=${orderNum}&action=labels`;
+  const samplingGuideUrl = `${site}/#sampling/soil`;
 
   return {
     order_number:          order.orderNum  || '',
@@ -76,8 +79,8 @@ function buildVars(order) {
     packages_count:        packagesCount,
     total_amount:          totalAmount,
     invoice_date:          invoiceDate,
-    invoice_url:           orderPage,
-    labels_url:            orderPage,
+    invoice_url:           invoiceUrl,
+    labels_url:            labelsUrl,
     sampling_guide_url:    samplingGuideUrl,
     tracking_url:          orderPage,
     delivery_method:       deliveryMethod,
