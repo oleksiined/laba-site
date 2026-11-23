@@ -6707,6 +6707,17 @@ var _PAGE_DESCS = {
 };
 var _DEFAULT_DESC = 'Замовляйте аналізи ґрунту, води, добрив, насіння, зерна й рослин онлайн. Відбір проб, статус замовлення й результати з агрономічними висновками.';
 var _DEFAULT_OG_IMAGE = 'https://laba.zemlerob.com.ua/og-image.png';
+var _PAGE_OG_IMAGES = {
+  'services': 'https://laba.zemlerob.com.ua/og-services.png',
+  'blog': 'https://laba.zemlerob.com.ua/og-blog.png',
+  'sampling': 'https://laba.zemlerob.com.ua/og-sampling.png',
+  'order-sampling': 'https://laba.zemlerob.com.ua/og-order-sampling.png',
+  'methods': 'https://laba.zemlerob.com.ua/og-methods.png',
+  'about': 'https://laba.zemlerob.com.ua/og-about.png',
+  'contacts': 'https://laba.zemlerob.com.ua/og-contacts.png',
+  'for-labs': 'https://laba.zemlerob.com.ua/og-for-labs.png',
+  'contract': 'https://laba.zemlerob.com.ua/og-contract.png'
+};
 function _updatePageMeta(page) {
   var title = _PAGE_TITLES[page] || 'Лаба — агрохімічна лабораторія';
   var desc = _PAGE_DESCS[page] || _DEFAULT_DESC;
@@ -6717,15 +6728,22 @@ function _updatePageMeta(page) {
   var _ogTitle = document.querySelector('meta[property="og:title"]');
   var _ogDesc = document.querySelector('meta[property="og:description"]');
   var _ogImg = document.querySelector('meta[property="og:image"]');
+  var _twImg = document.querySelector('meta[name="twitter:image"]');
+  var _twTitle = document.querySelector('meta[name="twitter:title"]');
+  var _twDesc = document.querySelector('meta[name="twitter:description"]');
   var _noindex = document.querySelector('meta[name="robots"][content="noindex"]');
   var _base = 'https://laba.zemlerob.com.ua';
   var _path = (page === 'home') ? '' : '/' + page;
+  var _ogImgUrl = _PAGE_OG_IMAGES[page] || _DEFAULT_OG_IMAGE;
   if(_canon) _canon.setAttribute('href', _base + _path);
   if(_metaDesc) _metaDesc.setAttribute('content', desc);
   if(_ogUrl) _ogUrl.setAttribute('content', _base + _path);
   if(_ogTitle) _ogTitle.setAttribute('content', title);
   if(_ogDesc) _ogDesc.setAttribute('content', desc);
-  if(_ogImg) _ogImg.setAttribute('content', _DEFAULT_OG_IMAGE);
+  if(_ogImg) _ogImg.setAttribute('content', _ogImgUrl);
+  if(_twImg) _twImg.setAttribute('content', _ogImgUrl);
+  if(_twTitle) _twTitle.setAttribute('content', title);
+  if(_twDesc) _twDesc.setAttribute('content', desc);
   if(_noindex) _noindex.parentNode.removeChild(_noindex);
 }
 
