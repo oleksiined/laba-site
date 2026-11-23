@@ -12678,6 +12678,23 @@ async function submitOrder() {
     return { code: info.code, name: pname, qty, price: unitPrice, subtotal: unitPrice * qty };
   });
 
+  // Aggregate additionals across samples into separate line items
+  const addCountMap = {};
+  (_snapSamples || []).forEach(s => {
+    if (!Array.isArray(s.additionals)) return;
+    s.additionals.forEach(addName => {
+      if (!addCountMap[addName]) addCountMap[addName] = { qty: 0 };
+      addCountMap[addName].qty++;
+    });
+  });
+  const addItems = Object.entries(addCountMap).map(([addName, info]) => {
+    const qty = info.qty;
+    const cat3 = (typeof NS_CAT !== 'undefined' ? NS_CAT : null) || (typeof NC_CATALOG !== 'undefined' ? NC_CATALOG : null) || {};
+    const svcEntry = Object.values((cat3.services && cat3.services) || {}).find(s => s.name === addName) || {};
+    const unitPrice = Number(svcEntry.price) || 0;
+    return { code: svcEntry.service_code || svcEntry.id || '', name: addName, qty, price: unitPrice, subtotal: unitPrice * qty };
+  });
+
   const orderPayload = {
     orderNum,
     date: `${dd}.${mm}.20${yy}`,
@@ -12703,7 +12720,7 @@ async function submitOrder() {
     },
     payment: NCO.payment,
     date:    `${dd}.${mm}.20${yy}`,
-    items:   pkgItems,
+    items:   [...pkgItems, ...addItems],
     promo:   NCO.promo || '',
     discount: NCO.promoDiscount || 0,
     subtotal: NCO.pkgSum + NCO.addSum,
