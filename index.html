@@ -9851,6 +9851,7 @@ async function ostCheck() {
 
   try {
     const r = await fetch(`/api/order-status?num=${encodeURIComponent(num)}`);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
 
     if (!data.ok) {
@@ -11015,6 +11016,7 @@ async function nc_applyPromo() {
 
   try {
     const res = await fetch('/api/validate-promo?code=' + encodeURIComponent(code));
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     if (!data.ok) {
       toast(data.error || 'Промокод не знайдено');
@@ -12604,6 +12606,7 @@ async function submitOrder() {
           description: `Оплата за рахунок № ${orderNum} від ${new Date().toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'})}`,
         }),
       });
+      if (!lpRes.ok) throw new Error('HTTP ' + lpRes.status);
       const lp = await lpRes.json();
       if (lp.ok && lp.data && lp.signature) {
         const form = document.createElement('form');
@@ -13131,7 +13134,7 @@ function ncf_downloadInvoice(saveOnly) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ orderNum, pdfBase64: _b64, invoiceDate }),
-    }).then(r => r.json()).then(d => {
+    }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(d => {
       if (d.ok) console.log('[LABA] Invoice saved:', d.docId || d.path, d.warn || '');
       else      console.warn('[LABA] Invoice save failed:', d.error);
     }).catch(e => console.warn('[LABA] Invoice save error:', e.message));
@@ -13608,6 +13611,7 @@ async function nco_applyPromo() {
       discountPct = cached.discount;
     } else {
       const res = await fetch('/api/validate-promo?code=' + encodeURIComponent(code));
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       if (!data.ok) {
         toast(data.error || 'Промокод не знайдено');
@@ -14460,7 +14464,7 @@ function osLocSelectPlace(lat, lng, placeName, placeLabel) {
   OS._locLat=lat; OS._locLng=lng;
   if(st){st.style.display='';st.textContent='Розраховую відстань по дорогах...';}
   fetch('https://router.project-osrm.org/route/v1/driving/'+OS_BASE_LNG+','+OS_BASE_LAT+';'+lng+','+lat+'?overview=false')
-    .then(function(r){return r.json();})
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
     .then(function(route){
       var dist = route&&route.routes&&route.routes[0] ? Math.round(route.routes[0].distance/1000) : null;
       if(dist){ OS._locDist=dist; if(st){st.textContent='📍 '+displayName+' — ~'+dist+' км по дорогах від Черкас';} }
@@ -14482,11 +14486,11 @@ function osLocationInputChange() {
   clearTimeout(_osLocTimer);
   _osLocTimer = setTimeout(function(){
     fetch('https://nominatim.openstreetmap.org/search?format=json&limit=10&countrycodes=ua&addressdetails=1&q='+encodeURIComponent(val),{headers:{'Accept-Language':'uk','User-Agent':'laba.zemlerob.com.ua/1.0'}})
-      .then(function(r){return r.json();})
+      .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
       .then(function(data){
         if(!data||!data.length){
           return fetch('https://photon.komoot.io/api/?q='+encodeURIComponent(val+' Україна')+'&limit=5&lang=uk&bbox=22,44,40,52')
-            .then(function(r2){return r2.json();})
+            .then(function(r2){if(!r2.ok)throw new Error('HTTP '+r2.status);return r2.json();})
             .then(function(ph){
               if(!ph||!ph.features||!ph.features.length){
                 if(st){st.textContent='Місце не знайдено';}
