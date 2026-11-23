@@ -19,19 +19,23 @@
       "headers": [{ "key": "Content-Type", "value": "application/xml; charset=utf-8" }]
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "src":  "/api/(.*)",
+      "dest": "/api/$1"
     },
     {
-      "source": "/(.*)",
+      "src":  "/(.*\\.(png|jpg|jpeg|gif|webp|svg|ico|css|js|woff2?|ttf|eot|pdf|txt|xml))",
+      "dest": "/$1"
+    },
+    {
+      "src":  "/(.*)",
       "has":  [{ "type": "host", "value": "admin\\.laba\\.zemlerob\\.com\\.ua" }],
-      "destination": "/admin.html"
+      "dest": "/admin.html"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src":  "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
