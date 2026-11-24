@@ -13732,15 +13732,15 @@ function ncf_printLabels() {
     phone:     '+380 67 181 99 67',
   };
 
-  // ── Save to sessionStorage and open labels.html ──────────────────────────
+  // ── Save to localStorage and open labels.html ────────────────────────────
   try {
-    sessionStorage.setItem('laba_labels', JSON.stringify({
+    localStorage.setItem('laba_labels', JSON.stringify({
       orderNum,
       samples: labelSamples,
       shipping,
     }));
   } catch(e) {
-    console.error('ncf_printLabels: sessionStorage error', e);
+    console.error('ncf_printLabels: localStorage error', e);
     toast('Не вдалося зберегти дані для друку');
     return;
   }

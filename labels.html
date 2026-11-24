@@ -89,7 +89,7 @@
 
   // Parse stored order data
   var stored;
-  try { stored = JSON.parse(sessionStorage.getItem('laba_labels') || 'null'); } catch(e) { stored = null; }
+  try { stored = JSON.parse(localStorage.getItem('laba_labels') || 'null'); } catch(e) { stored = null; }
   if (!stored || !stored.samples || !stored.samples.length) {
     document.getElementById('error').textContent = 'Дані замовлення не знайдено. Поверніться на сторінку замовлення і знову натисніть «Роздрукувати етикетки».';
     document.getElementById('error').classList.add('visible');
