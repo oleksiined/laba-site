@@ -93,7 +93,10 @@ function buildVars(order) {
     const recip   = del.recipient
       ? (del.recipient.name || '') + (del.recipient.phone ? ' · ' + del.recipient.phone : '')
       : '';
-    const lines = [city && branch ? `${esc(city)}, ${esc(branch)}` : esc(city || branch), esc(recip)].filter(Boolean);
+    const addressLine = city && branch ? `${esc(city)}, ${esc(branch)}`
+      : city || branch ? esc(city || branch)
+      : 'Уточніть адресу у менеджера';
+    const lines = [addressLine, esc(recip)].filter(Boolean);
     deliveryBlockHtml = `
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
   style="border-left:3px solid #B6FF00;padding-left:12px;">
