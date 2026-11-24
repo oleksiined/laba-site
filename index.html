@@ -4522,10 +4522,6 @@ main{flex:1}
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3M3 13h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
               Завантажити рахунок
             </button>
-            <button class="btn-outline" style="padding:10px 18px;font-size:14px;gap:8px" onclick="ncf_downloadAct()">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3M3 13h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Завантажити акт
-            </button>
             <button class="btn-outline" style="padding:10px 18px;font-size:14px;gap:8px" onclick="ncf_printLabels()">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="1" width="10" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/><path d="M3 8H1.5A.5.5 0 001 8.5v5a.5.5 0 00.5.5h13a.5.5 0 00.5-.5v-5a.5.5 0 00-.5-.5H13" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="10" width="10" height="5" rx="1" stroke="currentColor" stroke-width="1.6"/><circle cx="12.5" cy="10.5" r="0.75" fill="currentColor"/></svg>
               Роздрукувати етикетки
@@ -13727,19 +13723,14 @@ function ncf_printLabels() {
     };
   });
 
-  // ── Shipping block (Нова Пошта delivery only) ────────────────────────────
-  let shipping = null;
-  if (typeof NCO !== 'undefined' && NCO.delivery && NCO.delivery.type === 'nova_poshta') {
-    const d = NCO.delivery;
-    if (d.city && d.branch) {
-      shipping = {
-        city:      d.city,
-        branch:    d.branch,
-        recipient: (typeof NCO !== 'undefined' && NCO.npRecipient) || 'LABA Агрохімічна лабораторія',
-        phone:     (typeof NCO !== 'undefined' && NCO.npPhone)     || '+380 (XX) XXX-XX-XX',
-      };
-    }
-  }
+  // ── Shipping block ────────────────────────────────────────────────────────
+  // LABA завжди отримує зразки через Нову Пошту в Черкасах
+  const shipping = {
+    city:      'Черкаси',
+    branch:    '9 (до 30 кг)',
+    recipient: 'LABA Агрохімічна лабораторія',
+    phone:     '+380 67 181 99 67',
+  };
 
   // ── Save to sessionStorage and open labels.html ──────────────────────────
   try {
