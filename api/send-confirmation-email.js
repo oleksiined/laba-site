@@ -108,16 +108,81 @@ function buildVars(order) {
 
   // ── Items table rows HTML ─────────────────────────────────────────────────
   const items = Array.isArray(order.items) ? order.items : [];
-  const itemsCount = items.length;
 
   const MATERIAL_MAP = { soil:'Ґрунт', water:'Вода', fertilizer:'Добриво', seeds:'Насіння', grain:'Зерно', plants:'Рослини', plant:'Рослини', fertilizers:'Добриво' };
 
-  const itemsTableHtml = items.map(item => {
-    const name    = esc(item.name || item.code || 'Дослідження');
-    const matKey  = (item.material_id || item.material || '').toLowerCase();
-    const matName = MATERIAL_MAP[matKey] || item.material || '';
-    const qty     = Number(item.qty) || 1;
-    const price   = Number(item.price) || 0;
+  // INDIVIDUAL_CODES — virtual package codes that should be expanded into
+  // sub-services using order.samples[].additionals
+  const INDIVIDUAL_CODES = new Set(['soil_individual', 'soil_individual_no_prep']);
+
+  // Build expanded rows: for individual packages, replace the single item row
+  // with separate rows for each unique additional indicator from samples.
+  function expandItem(item) {
+    const code = item.code || item.packageId || '';
+    if (!INDIVIDUAL_CODES.has(code)) return [item];
+
+    const samples = Array.isArray(order.samples) ? order.samples : [];
+    const relatedSamples = samples.filter(s => s.packageId === code);
+
+    // Count occurrences of each additional indicator
+    const addCounts = {};
+    relatedSamples.forEach(s => {
+      (s.additionals || []).forEach(addName => {
+        addCounts[addName] = (addCounts[addName] || 0) + 1;
+      });
+    });
+
+    const additionalNames = Object.keys(addCounts);
+    if (additionalNames.length === 0) return [item]; // nothing to expand, keep as-is
+
+    const expanded = [];
+
+    // First row: Пробопідготовка (the base prep service included in soil_individual)
+    // soil_individual has price 150 which IS the Пробопідготовка price per sample
+    if (code === 'soil_individual') {
+      const prepQty   = relatedSamples.length || Number(item.qty) || 1;
+      const prepPrice = Number(item.price) || 0;
+      const prepSum   = prepPrice * prepQty;
+      expanded.push({ _name: 'Пробопідготовка', _qty: prepQty, _price: prepPrice, _sum: prepSum, _sub: false });
+    }
+
+    // Subsequent rows: each unique additional indicator
+    additionalNames.forEach(addName => {
+      const qty = addCounts[addName];
+      // Price is unknown here (not stored per-additional in items), show 0 / empty
+      expanded.push({ _name: addName, _qty: qty, _price: null, _sum: null, _sub: true });
+    });
+
+    return expanded;
+  }
+
+  // Count total display rows for the counter
+  const expandedRows = items.flatMap(expandItem);
+  const itemsCount = expandedRows.length;
+
+  function renderRow(row) {
+    if (row._name !== undefined) {
+      // Expanded synthetic row
+      const name  = esc(row._name);
+      const qty   = row._qty;
+      const price = row._price !== null ? fmtMoney(row._price) : '—';
+      const sum   = row._sum   !== null ? fmtMoney(row._sum)   : '—';
+      const nameStyle = row._sub
+        ? 'padding:7px 3px 7px 14px;border-bottom:1px solid #F0F2F3;font-size:12px;line-height:18px;color:#60686F;'
+        : 'padding:7px 3px;border-bottom:1px solid #F0F2F3;font-size:13px;line-height:18px;';
+      return `<tr>
+  <td style="${nameStyle}">${row._sub ? '↳&nbsp;' : ''}${name}</td>
+  <td align="center" style="padding:7px 3px;border-bottom:1px solid #F0F2F3;font-size:13px;">${qty}</td>
+  <td align="right" style="padding:7px 3px;border-bottom:1px solid #F0F2F3;font-size:13px;white-space:nowrap;">${price}</td>
+  <td align="right" style="padding:7px 3px;border-bottom:1px solid #F0F2F3;font-size:13px;font-weight:700;white-space:nowrap;">${sum}</td>
+</tr>`;
+    }
+    // Regular item row
+    const name    = esc(row.name || row.code || 'Дослідження');
+    const matKey  = (row.material_id || row.material || '').toLowerCase();
+    const matName = MATERIAL_MAP[matKey] || row.material || '';
+    const qty     = Number(row.qty) || 1;
+    const price   = Number(row.price) || 0;
     const sum     = price * qty;
     return `<tr>
   <td style="padding:7px 3px;border-bottom:1px solid #F0F2F3;font-size:13px;line-height:18px;">${name}${matName ? `<br><span style="color:#737A80;font-size:11px;">${esc(matName)}</span>` : ''}</td>
@@ -125,7 +190,9 @@ function buildVars(order) {
   <td align="right" style="padding:7px 3px;border-bottom:1px solid #F0F2F3;font-size:13px;white-space:nowrap;">${fmtMoney(price)}</td>
   <td align="right" style="padding:7px 3px;border-bottom:1px solid #F0F2F3;font-size:13px;font-weight:700;white-space:nowrap;">${fmtMoney(sum)}</td>
 </tr>`;
-  }).join('\n');
+  }
+
+  const itemsTableHtml = expandedRows.map(renderRow).join('\n');
 
   // ── Next steps ────────────────────────────────────────────────────────────
   const samplingGuideUrl = `${site}/#sampling/soil`;
