@@ -153,7 +153,7 @@ window._LABA_RENDERER_SRC = `
   details.append(destination,recipient);block.append(details,el('p',null,'Доставка — коштом відправника. Заповнену форму передайте разом зі зразком у LABA.'));return block;
  }
  function qrImage(url,id){
-  if(typeof url!=='string'||!/^data:image\/png;base64,[A-Za-z0-9+\/=]+$/.test(url)){const img=el('img','qr');img.alt='QR '+id;return img;}
+  if(typeof url!=='string'||url.indexOf('data:image/png;base64,')!==0){const img=el('img','qr');img.alt='QR '+id;return img;}
   const img=el('img','qr');img.src=url;img.alt='QR-код зразка '+id;return img;
  }
  function buildLabel(sample,index,total){
