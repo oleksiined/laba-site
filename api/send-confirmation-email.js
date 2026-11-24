@@ -33,61 +33,122 @@ function renderTemplate(html, vars) {
   );
 }
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function esc(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function fmtMoney(val) {
+  const n = Number(val) || 0;
+  return n.toLocaleString('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 // ─── Build template variables from order object ───────────────────────────────
 function buildVars(order) {
   const site = (process.env.SITE_URL || 'https://laba.zemlerob.com.ua').replace(/\/$/, '');
-
-  const serviceName = (order.items || []).map(i => i.name).filter(Boolean).join(', ')
-    || 'Лабораторний аналіз';
-
-  const samplesCount = Array.isArray(order.samples) && order.samples.length > 0
-    ? order.samples.length
-    : (order.items || []).reduce((s, i) => s + (Number(i.samples) || Number(i.qty) || 1), 0);
-
-  const packagesCount = (order.items || []).length || 1;
-
-  const totalAmount = Number(order.total || 0).toLocaleString('uk-UA') + ' грн';
-
-  const invoiceDate = new Date().toLocaleDateString('uk-UA', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-  });
-
-  const del = order.delivery || {};
-  const deliveryMethod = del.type === 'nova_poshta' ? 'Нова Пошта'
-    : del.type === 'ukr_poshta'  ? 'Укрпошта'
-    : del.type === 'pickup'      ? 'Самовивіз'
-    : del.type || 'Доставка';
-
-  const deliveryDetails = del.address || del.branch || del.warehouseAddress
-    || [del.city, del.street].filter(Boolean).join(', ')
-    || '';
 
   const phoneTel     = process.env.SUPPORT_PHONE_TEL     || '+380671819967';
   const phoneDisplay = process.env.SUPPORT_PHONE_DISPLAY || '+380 67 181 99 67';
   const hours        = process.env.SUPPORT_HOURS         || 'Пн–Пт 9:00–18:00';
 
-  const orderNum         = encodeURIComponent(order.orderNum || '');
-  const orderPage        = `${site}/?order=${orderNum}`;
-  const invoiceUrl       = `${site}/?order=${orderNum}&action=invoice`;
-  const labelsUrl        = `${site}/?order=${orderNum}&action=labels`;
+  const orderNum  = order.orderNum || '';
+  const orderPage = `${site}/?order=${encodeURIComponent(orderNum)}`;
+
+  // ── Date ──────────────────────────────────────────────────────────────────
+  const invoiceDate = new Date().toLocaleDateString('uk-UA', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+  });
+
+  // ── Payment status ────────────────────────────────────────────────────────
+  const isPaid = order.payment === 'paid' || order.payment === 'оплачено';
+  const paymentStatusText  = isPaid ? 'Оплачено' : 'Очікує оплати';
+  const paymentStatusColor = isPaid ? '#36733F'  : '#916000';
+  const totalLabel         = isPaid ? 'Разом оплачено' : 'Разом до сплати';
+
+  // ── Total ─────────────────────────────────────────────────────────────────
+  const totalAmount = fmtMoney(order.total) + ' грн';
+
+  // ── Delivery block HTML ───────────────────────────────────────────────────
+  const del = order.delivery || {};
+  const deliveryTypeLabel =
+    del.type === 'nova_poshta' ? 'Нова Пошта'  :
+    del.type === 'ukr_poshta'  ? 'Укрпошта'    :
+    del.type === 'pickup'      ? 'Самовивіз'    :
+    del.type                   ? esc(del.type)  : 'Доставка';
+
+  let deliveryBlockHtml;
+  if (del.type === 'pickup') {
+    deliveryBlockHtml = `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+  style="border-left:3px solid #B6FF00;padding-left:12px;">
+  <tr><td style="font-size:12px;line-height:19px;color:#737A80;padding-bottom:1px;">Отримання</td></tr>
+  <tr><td style="font-size:13px;line-height:20px;font-weight:700;">Самовивіз</td></tr>
+  ${del.address ? `<tr><td style="font-size:12px;line-height:18px;color:#60686F;">${esc(del.address)}</td></tr>` : ''}
+</table>`.trim();
+  } else {
+    const city    = del.city    || del.cityName    || '';
+    const branch  = del.branch  || del.warehouseAddress || del.branchNumber || '';
+    const recip   = del.recipient
+      ? (del.recipient.name || '') + (del.recipient.phone ? ' · ' + del.recipient.phone : '')
+      : '';
+    const lines = [city && branch ? `${esc(city)}, ${esc(branch)}` : esc(city || branch), esc(recip)].filter(Boolean);
+    deliveryBlockHtml = `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+  style="border-left:3px solid #B6FF00;padding-left:12px;">
+  <tr><td style="font-size:12px;line-height:19px;color:#737A80;padding-bottom:1px;">Доставка</td></tr>
+  <tr><td style="font-size:13px;line-height:20px;font-weight:700;">${deliveryTypeLabel}</td></tr>
+  ${lines.map(l => `<tr><td style="font-size:12px;line-height:18px;color:#60686F;">${l}</td></tr>`).join('\n  ')}
+</table>`.trim();
+  }
+
+  // ── Items table rows HTML ─────────────────────────────────────────────────
+  const items = Array.isArray(order.items) ? order.items : [];
+  const itemsCount = items.length;
+
+  const MATERIAL_MAP = { soil:'Ґрунт', water:'Вода', fertilizer:'Добриво', seeds:'Насіння', grain:'Зерно', plants:'Рослини', plant:'Рослини', fertilizers:'Добриво' };
+
+  const itemsTableHtml = items.map(item => {
+    const name    = esc(item.name || item.code || 'Дослідження');
+    const matKey  = (item.material_id || item.material || '').toLowerCase();
+    const matName = MATERIAL_MAP[matKey] || item.material || '';
+    const qty     = Number(item.qty) || 1;
+    const price   = Number(item.price) || 0;
+    const sum     = price * qty;
+    return `<tr>
+  <td style="padding:7px 3px;border-bottom:1px solid #F0F2F3;font-size:13px;line-height:18px;">${name}${matName ? `<br><span style="color:#737A80;font-size:11px;">${esc(matName)}</span>` : ''}</td>
+  <td align="center" style="padding:7px 3px;border-bottom:1px solid #F0F2F3;font-size:13px;">${qty}</td>
+  <td align="right" style="padding:7px 3px;border-bottom:1px solid #F0F2F3;font-size:13px;white-space:nowrap;">${fmtMoney(price)}</td>
+  <td align="right" style="padding:7px 3px;border-bottom:1px solid #F0F2F3;font-size:13px;font-weight:700;white-space:nowrap;">${fmtMoney(sum)}</td>
+</tr>`;
+  }).join('\n');
+
+  // ── Next steps ────────────────────────────────────────────────────────────
   const samplingGuideUrl = `${site}/#sampling/soil`;
+  const nextStepsHtml = `<p style="margin:0 0 8px;">Відбирайте зразки згідно з <a href="${samplingGuideUrl}" style="color:#202326;font-weight:700;">інструкцією з відбору</a> та надсилайте на нашу адресу Новою Поштою.</p><p style="margin:0;">Результати аналізів будуть готові протягом 5–7 робочих днів після отримання зразків лабораторією.</p>`;
+
+  // ── Plain-text summary (kept for plain-text email part) ───────────────────
+  const serviceName = items.map(i => i.name).filter(Boolean).join(', ') || 'Лабораторний аналіз';
 
   return {
-    order_number:          order.orderNum  || '',
-    service_name:          serviceName,
-    samples_count:         samplesCount,
-    packages_count:        packagesCount,
-    total_amount:          totalAmount,
+    order_number:          orderNum,
     invoice_date:          invoiceDate,
-    invoice_url:           invoiceUrl,
-    labels_url:            labelsUrl,
-    sampling_guide_url:    samplingGuideUrl,
+    payment_status_text:   paymentStatusText,
+    payment_status_color:  paymentStatusColor,
+    total_label:           totalLabel,
+    total_amount:          totalAmount,
+    delivery_block_html:   deliveryBlockHtml,
+    items_count:           itemsCount,
+    items_table_html:      itemsTableHtml,
+    next_steps_html:       nextStepsHtml,
     tracking_url:          orderPage,
-    delivery_method:       deliveryMethod,
-    delivery_details:      deliveryDetails,
     support_phone_tel:     phoneTel,
     support_phone_display: phoneDisplay,
     support_hours:         hours,
+    // kept for plain-text fallback
+    service_name:          serviceName,
+    sampling_guide_url:    samplingGuideUrl,
   };
 }
 
