@@ -13656,155 +13656,104 @@ function ncf_downloadAct() {
 }
 
 // ══════════════════════════════════════════
-// LABEL PRINT
+// LABEL PRINT  (нова версія — відкриває labels.html)
 // ══════════════════════════════════════════
 function ncf_printLabels() {
   const o = window._ncfOrder || {};
   const orderNum = o.num || 'L26000000';
-  const clientName = (() => {
-    if (NCO) {
-      if (NCO.payerType === 'legal' && NCO.legal && NCO.legal.company) return NCO.legal.company;
-      if (NCO.payerType === 'fop'   && NCO.fop   && NCO.fop.name)     return NCO.fop.name;
-      // Фізична особа: беремо ім'я з поля "Контактна особа"
-      const fName = document.getElementById('f-name');
-      if (fName && fName.value.trim()) return fName.value.trim();
-      if (NCO.recipient && NCO.recipient.name) return NCO.recipient.name;
-    }
-    return (NS.client && NS.client.company) || 'Клієнт';
-  })();
 
-  // Collect samples: snapshot from order → _ncfLabelSamples → NS → NC_S
+  // ── Collect samples ──────────────────────────────────────────────────────
   let samples = [];
-  if (o.samples && o.samples.length) {
-    samples = o.samples;
-  } else if (window._ncfLabelSamples && window._ncfLabelSamples.length) {
-    samples = window._ncfLabelSamples;
-  } else if (NS.samples && NS.samples.length) {
-    samples = NS.samples;
-  } else if (NC_S.samples && NC_S.samples.length) {
-    samples = NC_S.samples;
-  } else {
+  if (o.samples && o.samples.length) samples = o.samples;
+  else if (window._ncfLabelSamples && window._ncfLabelSamples.length) samples = window._ncfLabelSamples;
+  else if (NS.samples && NS.samples.length) samples = NS.samples;
+  else if (NC_S.samples && NC_S.samples.length) samples = NC_S.samples;
+  else {
     if (typeof buildNCFromCart === 'function') buildNCFromCart();
-    if (typeof buildNSFromNC === 'function') buildNSFromNC();
+    if (typeof buildNSFromNC  === 'function') buildNSFromNC();
     samples = (NS.samples && NS.samples.length) ? NS.samples : (NC_S.samples || []);
   }
 
-  const total = samples.length;
+  if (!samples.length) { toast('Немає зразків для друку етикеток'); return; }
 
-  function getMat(matId) {
-    const MAP = { soil:'Ґрунт', water:'Вода', fertilizer:'Добрива', seeds:'Насіння', grain:'Зерно', plants:'Рослини' };
-    return MAP[matId] || matId || 'Ґрунт';
-  }
+  // ── Helpers ──────────────────────────────────────────────────────────────
+  const MAT_NAMES = { soil:'Ґрунт', water:'Вода', fertilizer:'Добрива', seeds:'Насіння', grain:'Зерно', plants:'Рослини' };
+  const MAT_CODES = { soil:'SOIL', water:'WATER', fertilizer:'FERTILIZER', seeds:'SEEDS', grain:'GRAIN', plants:'PLANTS' };
+  const MAT_FIELDS = {
+    soil:       [{label:'Поле / місце',required:true},{label:'Глибина відбору',required:true},{label:'Попередник',required:true},{label:'Планова культура',required:true},{label:'Планова врожайність',required:true}],
+    fertilizer: [{label:'Назва продукту',required:true},{label:'Вид добрива',required:true},{label:'Партія',required:true},{label:'Виробник',required:false},{label:'Заявлений склад',required:false},{label:'Дата виробництва',required:false}],
+    water:      [{label:'Джерело',required:true},{label:'Точка відбору',required:true},{label:'Час відбору',required:true},{label:'Призначення',required:false}],
+    plants:     [{label:'Культура',required:true},{label:'Частина рослини',required:true},{label:'Фаза розвитку',required:true},{label:'Поле / місце',required:true},{label:'Сорт / гібрид',required:false},{label:'Симптоми',required:false},{label:'Обробки',required:false}],
+    seeds:      [{label:'Культура',required:true},{label:'Сорт / гібрид',required:false},{label:'Партія',required:true},{label:'Протруєння',required:true},{label:'Рік урожаю',required:false},{label:'Виробник',required:false},{label:'Протруйник',required:false}],
+    grain:      [{label:'Культура',required:true},{label:'Партія',required:true},{label:'Рік урожаю',required:true},{label:'Сорт / гібрид',required:false},{label:'Місце зберігання',required:false},{label:'Умови зберігання',required:false}],
+  };
+
   function getPkgName(pkgId) {
     const pkg = (NS_CAT && NS_CAT.packages && NS_CAT.packages[pkgId]) ||
                 (NC_CATALOG && NC_CATALOG.packages && NC_CATALOG.packages[pkgId]);
-    return pkg ? pkg.name : pkgId || '—';
+    return pkg ? pkg.name : (pkgId || '');
   }
   function getAddNames(ids) {
-    if (!ids || !ids.length) return '—';
+    if (!ids || !ids.length) return [];
     return ids.map(id => {
       const ind = typeof ns_findInd === 'function' ? ns_findInd(id) : null;
       return ind ? ind.name : id;
-    }).join(', ');
+    }).filter(Boolean);
   }
-  const sampleData = samples.map((s, i) => {
+
+  // ── Build LABA_LABEL_DATA samples ────────────────────────────────────────
+  const yy = new Date().getFullYear().toString().slice(2);
+  const labelSamples = samples.map((s, i) => {
     const idx = i + 1;
-    const sampleCode = s.num || s.code || `S${new Date().getFullYear().toString().slice(-2)}${String(idx).padStart(7,'0')}`;
-    const sampleLabel = s.name || s.label || `Зразок ${idx}`;
-    const mat = getMat(s.materialId || s.material_id);
-    const pkg = getPkgName(s.packageId) || s.packageName || '—';
-    const add = getAddNames(s.additionalIndicatorIds) || (s.additionals ? s.additionals.join(', ') : '—');
-    const field = s.field || s.fieldName || '';
-    const depth = s.depth || s.horizon || '';
-    const cropPrev = s.crop_previous || s.crop || '';
-    const cropPlan = s.crop_planned || '';
-    const yieldTgt = s.target_yield || '';
-    const sampDate = s.samplingDate || '';
-    return { idx, sampleCode, sampleLabel, mat, pkg, add, field, depth, cropPrev, cropPlan, yieldTgt, sampDate };
+    const matId  = (s.materialId || s.material_id || 'soil').toLowerCase();
+    const sampleId = s.num || s.code || `S${yy}${String(idx).padStart(7,'0')}`;
+    const pkgName  = getPkgName(s.packageId) || s.packageName || '';
+    const addIds   = s.additionalIndicatorIds || [];
+    const addNames = getAddNames(addIds.length ? addIds : []);
+    // Also try pre-resolved additionals from order payload
+    const addExtra = Array.isArray(s.additionals) ? s.additionals.filter(n => typeof n === 'string' && !addNames.includes(n)) : [];
+    const allAdds  = [...addNames, ...addExtra];
+    return {
+      material_code:    MAT_CODES[matId] || 'SOIL',
+      material:         MAT_NAMES[matId] || 'Ґрунт',
+      sample_id:        sampleId,
+      order_id:         orderNum,
+      client_sample_name: s.name || null,
+      sampling_date:    s.samplingDate || null,
+      fields:           (MAT_FIELDS[matId] || MAT_FIELDS.soil).map(f => ({...f, value: null})),
+      packages:         pkgName ? [pkgName] : [],
+      standalone_services: allAdds,
+      qr_data_url:      '',  // generated in labels.html
+    };
   });
 
-  function lblRow(label, value, blank) {
-    if (value) return `<tr><td class="lbl-tl">${label}</td><td class="lbl-tv">${value}</td></tr>`;
-    if (blank) return `<tr><td class="lbl-tl">${label}</td><td class="lbl-tv lbl-blank-line"></td></tr>`;
-    return '';
+  // ── Shipping block (Нова Пошта delivery only) ────────────────────────────
+  let shipping = null;
+  if (typeof NCO !== 'undefined' && NCO.delivery && NCO.delivery.type === 'nova_poshta') {
+    const d = NCO.delivery;
+    if (d.city && d.branch) {
+      shipping = {
+        city:      d.city,
+        branch:    d.branch,
+        recipient: (typeof NCO !== 'undefined' && NCO.npRecipient) || 'LABA Агрохімічна лабораторія',
+        phone:     (typeof NCO !== 'undefined' && NCO.npPhone)     || '+380 (XX) XXX-XX-XX',
+      };
+    }
   }
 
-  const labelHTML = sampleData.map(({ idx, sampleCode, sampleLabel, mat, pkg, add, field, depth, cropPrev, cropPlan, yieldTgt, sampDate }) => `
-    <div class="lbl-card">
-      <div class="lbl-header">
-        <div class="lbl-logo">
-          <span class="lbl-logo-word">LABA</span>
-          <span class="lbl-logo-sub">ЛАБОРАТОРІЯ<br>ДЛЯ АГРОБІЗНЕСУ</span>
-        </div>
-        <div class="lbl-counter">${idx} із ${total}</div>
-      </div>
-      <div class="lbl-order-row">
-        <span class="lbl-field-lbl">Замовлення</span>
-        <span class="lbl-order-num">${orderNum}</span>
-      </div>
-      <div class="lbl-divider"></div>
-      <div class="lbl-sample-lbl">Номер зразка LABA</div>
-      <div class="lbl-sample-code">${sampleCode}</div>
-      <table class="lbl-table">
-        <tr><td class="lbl-tl">Назва</td><td class="lbl-tv">${sampleLabel}</td></tr>
-        <tr><td class="lbl-tl">Матеріал</td><td class="lbl-tv">${mat}</td></tr>
-        ${lblRow('Поле', field, false)}
-        ${lblRow('Глибина', depth, false)}
-        <tr><td class="lbl-tl">Пакет</td><td class="lbl-tv">${pkg}</td></tr>
-        ${add !== '—' ? `<tr><td class="lbl-tl">Додатково</td><td class="lbl-tv">${add}</td></tr>` : ''}
-        ${lblRow('Попередник', cropPrev, true)}
-        ${lblRow('Планова культура', cropPlan, true)}
-        ${lblRow('Врожайність, ц/га', yieldTgt, true)}
-      </table>
-      <div class="lbl-client-row">
-        <span class="lbl-cfield">Клієнт <strong>${clientName}</strong></span>
-        <span class="lbl-cfield lbl-date-field">Дата відбору:&nbsp;<span class="lbl-date-line">${sampDate || ''}</span></span>
-      </div>
-      <div class="lbl-qr" id="lbl-qr-${idx}" data-code="${sampleCode.replace(/"/g,'&quot;')}"></div>
-      <div class="lbl-attach">Прикріпіть до пакування зразка</div>
-    </div>`).join('');
-
-  // Remove existing overlay if any
-  const existing = document.getElementById('lbl-print-overlay');
-  if (existing) existing.remove();
-
-  // Inject QR lib if not loaded
-  if (!window.QRCode) {
-    const s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
-    s.onload = () => _ncfShowLabelOverlay(labelHTML, total);
-    document.head.appendChild(s);
-  } else {
-    _ncfShowLabelOverlay(labelHTML, total);
+  // ── Save to sessionStorage and open labels.html ──────────────────────────
+  try {
+    sessionStorage.setItem('laba_labels', JSON.stringify({
+      orderNum,
+      samples: labelSamples,
+      shipping,
+    }));
+  } catch(e) {
+    console.error('ncf_printLabels: sessionStorage error', e);
+    toast('Не вдалося зберегти дані для друку');
+    return;
   }
-}
-
-function _ncfShowLabelOverlay(labelHTML, total, src) {
-  const overlay = document.createElement('div');
-  overlay.id = 'lbl-print-overlay';
-  overlay.innerHTML = `
-    <div class="lbl-overlay-bg" onclick="document.getElementById('lbl-print-overlay').remove()"></div>
-    <div class="lbl-overlay-panel">
-      <div class="lbl-overlay-toolbar">
-        <span class="lbl-overlay-title">Етикетки (${total})</span>
-        <button class="lbl-overlay-print" onclick="window.print()">🖨 Роздрукувати</button>
-        <button class="lbl-overlay-close" onclick="document.getElementById('lbl-print-overlay').remove()">✕</button>
-      </div>
-      <div class="lbl-overlay-body">
-        <div class="lbl-grid">${labelHTML}</div>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay);
-
-  // Generate QR codes
-  setTimeout(() => {
-    overlay.querySelectorAll('.lbl-qr[data-code]').forEach(el => {
-      const code = el.getAttribute('data-code');
-      try {
-        new QRCode(el, { text: code, width: 72, height: 72, colorDark:'#111111', colorLight:'#ffffff', correctLevel: QRCode.CorrectLevel.M });
-      } catch(e) {}
-    });
-  }, 100);
+  window.open('/labels.html', '_blank', 'noopener');
 }
 
 // ══════════════════════════════════════════

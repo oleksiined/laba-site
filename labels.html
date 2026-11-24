@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Етикетки LABA</title>
+<style>
+:root{font-family:Arial,Helvetica,sans-serif;color:#17191b;background:#eef0f1;font-synthesis:none}*{box-sizing:border-box}body{margin:0}button,select{font:inherit}button{cursor:pointer}.toolbar{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #dce0e2;padding:18px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px}.toolbar h1{margin:0;font-size:21px;letter-spacing:-.5px}.toolbar p{margin:5px 0 0;font-size:12px;color:#697077}.controls{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.controls select,.controls button{min-height:40px;border-radius:7px;padding:8px 13px;border:1px solid #d6dade;background:#fff;font-size:13px}.controls .print{background:#b6ff00;border-color:#b6ff00;font-weight:700}.controls button:disabled{background:#e2e4e5;border-color:#e2e4e5;color:#81868b;cursor:not-allowed}.intro{max-width:1030px;margin:22px auto 16px;padding:0 20px;display:flex;justify-content:space-between;gap:20px;font-size:12px;line-height:18px;color:#626970}.intro strong{font-weight:400;color:#222}.error{display:none;max-width:990px;margin:12px auto;padding:12px 16px;background:#fff0dd;font-size:13px;line-height:19px}.error.visible{display:block}.pages{display:grid;gap:28px;justify-content:center;margin:0 auto 40px}.page{width:210mm;min-height:297mm;padding:8mm;background:white;box-shadow:0 5px 25px #1423350a;display:grid;grid-template-columns:repeat(2,95mm);grid-auto-rows:135mm;align-content:start;gap:4mm}.label{height:135mm;width:95mm;border:1px solid #bfc4c7;border-radius:2mm;padding:4.3mm;display:flex;flex-direction:column;background:white;color:#111;position:relative;overflow-wrap:anywhere}.label-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:2.6mm;border-bottom:1px solid #d3d6d8}.brand{display:flex;align-items:center;gap:8px}.brand img{width:24mm;height:auto;max-height:9mm;object-fit:contain;object-position:left}.brand-text{font-weight:800;font-size:27px;letter-spacing:-1.7px;line-height:1}.brand-caption{font-size:7.7px;line-height:10px;font-weight:700;letter-spacing:.25px;text-transform:uppercase;color:#50555a}.material{font-size:10px;line-height:14px;padding:4px 7px;border:1px solid #111;border-radius:3px;font-weight:700;white-space:nowrap}.identity{padding:2.5mm 0 2mm}.order-row{display:flex;justify-content:space-between;gap:5px;color:#555d62;font-size:9px;line-height:12px}.order-row strong{font-weight:700;color:#17191b}.id-caption{font-size:8.5px;color:#626a70;margin-top:2mm;line-height:11px}.sample-id{font-size:27px;font-weight:800;letter-spacing:-.6px;line-height:32px;font-variant-numeric:tabular-nums}.sample-name{font-size:12px;font-weight:700;line-height:16px;margin-top:1px}.client{padding:1.4mm 0 2mm;font-size:10px;line-height:14px;border-bottom:1px solid #dfe2e4}.client .key{color:#646b70}.facts{margin:2.1mm 0 0;display:grid;grid-template-columns:32mm minmax(0,1fr);column-gap:2mm;row-gap:1.2mm;font-size:10.5px;line-height:13px}.facts dt{margin:0;color:#61676c}.facts dd{margin:0;color:#17191b;font-weight:500}.facts .unknown{color:#737a80;font-style:italic}.services{border-top:1px solid #dfe2e4;margin-top:2.3mm;padding-top:2mm}.services-title{font-size:8.5px;line-height:11px;color:#61676c;margin:0 0 1mm;text-transform:uppercase;letter-spacing:.35px}.services ul{padding:0;margin:0;list-style:none}.services li{font-size:10.5px;line-height:13px;padding:0 0 1.1mm}.services .secondary{margin-top:1mm}.label-footer{display:flex;align-items:flex-end;justify-content:space-between;gap:3mm;margin-top:auto;padding-top:2mm}.qr{width:20mm;height:20mm;flex-shrink:0;image-rendering:pixelated}.footer-copy{font-size:8.3px;line-height:11.5px;max-width:58mm;color:#646b70;text-align:right}.footer-copy strong{color:#242729;font-weight:700}.demo{font-size:7px;letter-spacing:.5px;margin-top:1.5mm}.wide .page{grid-template-columns:194mm}.wide .label{width:194mm}.wide .facts{grid-template-columns:46mm minmax(0,1fr);font-size:12px;line-height:16px}.wide .services li{font-size:12px;line-height:16px}.wide .sample-id{font-size:32px;line-height:37px}.wide .sample-name{font-size:14px;line-height:18px}.wide .client{font-size:12px;line-height:16px}.wide .footer-copy{max-width:140mm;font-size:10px;line-height:14px}.wide .order-row{font-size:11px;line-height:14px}.wide .material{font-size:12px;padding:5px 10px}.wide .brand-caption{font-size:9px;line-height:12px}.label.overflows{border:2px solid #b35e00}.empty{padding:30px;text-align:center;font-size:14px}.toolbar select:focus-visible,.toolbar button:focus-visible{outline:3px solid #2678da;outline-offset:2px}
+@page{size:A4 portrait;margin:8mm}
+@media print{html,body{margin:0!important;padding:0!important;background:white!important}.toolbar,.intro,.error{display:none!important}.pages{display:block;margin:0}.page{padding:0;width:194mm;min-height:0;height:281mm;box-shadow:none;border:0;gap:4mm;break-after:page;page-break-after:always}.page:last-child{break-after:auto;page-break-after:auto}.label{break-inside:avoid;page-break-inside:avoid;border-color:#888;border-radius:0}.label-head,.client,.services{border-color:#aaa}.label.overflows{border:2px solid black}.material{color:black;background:white}.label{print-color-adjust:exact;-webkit-print-color-adjust:exact}body.block-print .pages{display:none}body.block-print:after{content:'Етикетки не готові до друку. Перевірте повідомлення у вікні перегляду.';display:block;font:14pt Arial,sans-serif}}
+@media screen and (max-width:850px){.toolbar{position:static;align-items:flex-start;flex-direction:column;padding:18px}.intro{margin-top:16px;flex-direction:column;gap:4px}.pages{display:block;padding:0 12px;overflow-x:auto}.page{margin:0 auto 20px;background:transparent;box-shadow:none;width:max-content;min-height:0;padding:0;grid-template-columns:95mm;grid-auto-rows:135mm;gap:16px}.wide .page{grid-template-columns:194mm}.label{box-shadow:0 2px 12px #00000008}}
+
+/* Shipping details appear once on the first sheet; label dimensions stay fixed. */
+.first-page{grid-template-rows:38mm 135mm}.shipping{grid-column:1 / -1;border:1px solid #c6cbce;border-radius:2mm;padding:3.8mm 4.3mm;height:38mm;overflow-wrap:anywhere;background:#f6f7f5}.shipping h2{margin:0 0 2mm;font-size:14px;line-height:18px}.shipping-details{display:grid;grid-template-columns:1fr 1fr;gap:5mm;font-size:11px;line-height:16px}.shipping p{margin:2mm 0 0;font-size:9px;line-height:13px;color:#5c6469}
+@media print{.shipping{background:white;border-color:#888;border-radius:0;break-inside:avoid}}
+@media screen and (max-width:850px){.shipping{height:auto;min-height:38mm}.first-page{grid-template-rows:auto}.shipping-details{grid-template-columns:1fr;gap:1.5mm}}
+
+/* Blank fields for handwritten client metadata; values never print here. */
+.facts.handwriting{grid-template-columns:1fr;gap:2mm;margin-top:2.5mm}.write-field{min-width:0}.write-field dt{font-size:10px;line-height:12px;color:#41484d}.write-field dd{margin:0}.write-line{height:7mm;border-bottom:1px solid #7b8388;display:flex;align-items:flex-end;padding-bottom:.8mm}.write-hint{color:#71787d;font-size:10px;line-height:13px;white-space:nowrap}.optional{font-size:8px;color:#71787d}.write-choices{height:7mm;display:flex;align-items:center;gap:4mm}.choice{display:inline-flex;gap:1.5mm;align-items:center;font-size:10px;color:#333}.box{display:inline-block;width:3mm;height:3mm;border:1px solid #333;flex-shrink:0}.wide .facts.handwriting{grid-template-columns:1fr 1fr;column-gap:8mm;row-gap:2mm}.wide .write-field.full{grid-column:1 / -1}.wide .write-field dt{font-size:11px;line-height:14px}.wide .write-line{height:7mm}.wide .services{margin-top:2.5mm}.wide .label-footer{padding-top:1.5mm}.wide .qr{width:17mm;height:17mm}.wide .identity{padding:2mm 0 1mm}.wide .sample-id{font-size:29px;line-height:33px}.wide .label-head{padding-bottom:2mm}.wide .client{padding:1mm 0 1.5mm}
+
+.wide .facts.handwriting{row-gap:1.4mm}.wide .write-line{height:6mm}.wide .write-choices{height:6mm}
+
+/* Detachable laboratory part and retained LABA record. */
+.lab-identification{display:grid;grid-template-columns:minmax(0,1fr) 21mm;align-items:center;gap:4mm}.lab-qr{text-align:center;padding-top:1mm}.lab-qr .qr{display:block;width:20mm;height:20mm}.lab-qr div{font-size:7px;line-height:10px;margin-top:1mm;letter-spacing:.3px}.lab-part .services{margin-top:1mm;padding-top:1.5mm}.cut-line{position:relative;margin:3mm -4.3mm 2.5mm;padding:1.3mm 4.3mm 0;border-top:1px dashed #50575c;color:#60666b;font-size:8px;line-height:11px;text-align:center}.record-header{display:flex;align-items:flex-end;justify-content:space-between;gap:3mm}.record-caption{font-size:8px;line-height:11px;color:#60676b;letter-spacing:.25px}.record-id{font-size:16px;line-height:20px;letter-spacing:.1px}.record-order{font-size:9px;line-height:13px;color:#60666b}.laba-record .facts{margin-top:1.8mm}.label-footer{justify-content:flex-end}.label-footer .footer-copy{text-align:left;max-width:none;width:100%}.wide .label-footer{padding-top:1.3mm}.wide .lab-identification .identity{padding:1.8mm 0 1mm}.wide .lab-part .services li{font-size:10.5px;line-height:13px}.wide .lab-part .services-title{font-size:8px;line-height:10px}.wide .lab-part .services ul{display:flex;flex-wrap:wrap;column-gap:5mm}.wide .lab-part .services li{padding-bottom:.8mm}.wide .label-footer .footer-copy{font-size:8.5px;line-height:11px}.wide .label-footer .demo{display:inline;margin-left:3mm}.wide .label-footer .footer-copy>div{display:inline;margin-left:3mm}.wide .sample-id{font-size:27px;line-height:30px}.wide .record-id{font-size:16px;line-height:20px}.wide .facts.handwriting{row-gap:1.2mm}.wide .write-field dt{font-size:10px;line-height:12px}.wide .write-line{height:6mm}.wide .lab-part .qr{width:19mm;height:19mm}@media print{.cut-line{border-top:1px dashed #333}.lab-part,.laba-record{break-inside:avoid}}
+
+</style>
+</head>
+<body class="wide">
+<header class="toolbar">
+  <div>
+    <h1>Етикетки зразків</h1>
+    <p id="order-subtitle">LABA</p>
+  </div>
+  <div class="controls">
+    <select id="material-filter" aria-label="Матеріал">
+      <option value="all">Усі матеріали</option>
+      <option value="SOIL">Ґрунт</option>
+      <option value="FERTILIZER">Добрива</option>
+      <option value="WATER">Вода</option>
+      <option value="PLANTS">Рослини</option>
+      <option value="SEEDS">Насіння</option>
+      <option value="GRAIN">Зерно</option>
+    </select>
+    <select id="layout" aria-label="Розміщення на аркуші">
+      <option value="2">2 етикетки на A4</option>
+      <option value="4">4 етикетки на A4 · компактно</option>
+    </select>
+    <button id="print" class="print" type="button" disabled>Роздрукувати →</button>
+  </div>
+</header>
+<div class="intro">
+  <div><strong id="count">…</strong> · A4, масштаб друку 100%, без колонтитулів<br>4 на аркуші — 95&thinsp;×&thinsp;135 мм. 2 на аркуші — 194&thinsp;×&thinsp;135 мм.</div>
+  <div>QR-код містить номер зразка.</div>
+</div>
+<div class="error" id="error" role="alert"></div>
+<main id="pages" class="pages"></main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+// ── Load order data from sessionStorage ──────────────────────────────────────
+(function() {
+  'use strict';
+  var LABA_LOGO = 'data:image/png;base64,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';
+
+  // Generate QR data URL using QRCode.js canvas
+  function makeQrDataUrl(text) {
+    return new Promise(function(resolve) {
+      var container = document.createElement('div');
+      container.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:160px;height:160px';
+      document.body.appendChild(container);
+      try {
+        new QRCode(container, {
+          text: text, width: 160, height: 160,
+          colorDark: '#111111', colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        setTimeout(function() {
+          var canvas = container.querySelector('canvas');
+          resolve(canvas ? canvas.toDataURL('image/png') : '');
+          document.body.removeChild(container);
+        }, 60);
+      } catch(e) {
+        document.body.removeChild(container);
+        resolve('');
+      }
+    });
+  }
+
+  // Parse stored order data
+  var stored;
+  try { stored = JSON.parse(sessionStorage.getItem('laba_labels') || 'null'); } catch(e) { stored = null; }
+  if (!stored || !stored.samples || !stored.samples.length) {
+    document.getElementById('error').textContent = 'Дані замовлення не знайдено. Поверніться на сторінку замовлення і знову натисніть «Роздрукувати етикетки».';
+    document.getElementById('error').classList.add('visible');
+    return;
+  }
+
+  var subtitle = stored.orderNum ? 'Замовлення ' + stored.orderNum : 'LABA';
+  document.getElementById('order-subtitle').textContent = subtitle;
+
+  // Generate QR codes for all samples, then render
+  Promise.all(stored.samples.map(function(s) {
+    return makeQrDataUrl(s.sample_id);
+  })).then(function(qrUrls) {
+    stored.samples.forEach(function(s, i) { s.qr_data_url = qrUrls[i]; });
+    window.LABA_LABEL_DATA = {
+      demo: false,
+      logo: LABA_LOGO,
+      shipping: stored.shipping || null,
+      samples: stored.samples
+    };
+    // Inject and run renderer
+    var script = document.createElement('script');
+    script.id = 'laba-renderer';
+    script.textContent = window._LABA_RENDERER_SRC;
+    document.body.appendChild(script);
+  });
+})();
+</script>
+<script>
+// ── LABA renderer source (stored as string, executed after QR ready) ─────────
+window._LABA_RENDERER_SRC = `
+(function(){
+ 'use strict';
+ const config=window.LABA_LABEL_DATA;
+ const root=document.getElementById('pages');
+ const filter=document.getElementById('material-filter');
+ const layout=document.getElementById('layout');
+ const printButton=document.getElementById('print');
+ const error=document.getElementById('error');
+ const el=(tag,cls,text)=>{const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=String(text);return node;};
+ function writingField(label,required=true,full=false){
+  const field=el('div','write-field'+(full?' full':''));
+  const caption=el('dt',null,label);if(!required)caption.append(el('span','optional',' · за наявності'));field.append(caption);
+  const answer=el('dd','write-line');
+  if(label==='Протруєння'){
+   answer.className='write-choices';for(const text of ['Так','Ні','Невідомо']){const choice=el('span','choice');choice.append(el('span','box'),document.createTextNode(text));answer.append(choice);}
+  }else if(/Дата/.test(label)){answer.append(el('span','write-hint','____ . ____ . ________'));}
+  else if(label==='Глибина відбору'){answer.append(el('span','write-hint','від ______ до ______ см'));}
+  else if(label==='Планова врожайність'){answer.append(el('span','write-hint','________________ т/га'));}
+  else if(label==='Час відбору'){answer.append(el('span','write-hint','______ : ______'));}
+  field.append(answer);return field;
+ }
+ function buildShipping(){
+  const s=config.shipping;
+  if(!s)return null;
+  if(['city','branch','recipient','phone'].some(k=>!String(s[k]??'').trim()))return null;
+  const block=el('aside','shipping');block.append(el('h2',null,'Куди надіслати зразки'));
+  const details=el('div','shipping-details');
+  const destination=el('div');destination.append(el('strong',null,'Нова пошта'),el('div',null,s.city+', відділення № '+s.branch));
+  const recipient=el('div');recipient.append(el('div',null,'Отримувач: '+s.recipient),el('div',null,'Телефон: '+s.phone));
+  details.append(destination,recipient);block.append(details,el('p',null,'Доставка — коштом відправника. Заповнену форму передайте разом зі зразком у LABA.'));return block;
+ }
+ function qrImage(url,id){
+  if(typeof url!=='string'||!/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(url)){const img=el('img','qr');img.alt='QR '+id;return img;}
+  const img=el('img','qr');img.src=url;img.alt='QR-код зразка '+id;return img;
+ }
+ function buildLabel(sample,index,total){
+  for(const key of ['sample_id','order_id','material'])if(!String(sample[key]??'').trim())throw new Error('Не заповнено поле '+key+'.');
+  if(!Array.isArray(sample.packages)||!Array.isArray(sample.standalone_services)||!sample.packages.length&&!sample.standalone_services.length)throw new Error('Для зразка '+sample.sample_id+' не вказано досліджень.');
+  const card=el('article','label');card.dataset.sampleId=sample.sample_id;card.setAttribute('aria-label',sample.material+', '+sample.sample_id);
+  const lab=el('section','lab-part');card.append(lab);
+  const head=el('div','label-head'), brand=el('div','brand');
+  if(config.logo){const img=el('img');img.src=config.logo;img.alt='LABA';brand.append(img);}else brand.append(el('div','brand-text','LABA'));
+  const caption=el('div','brand-caption');caption.append(el('div',null,'ЛАБОРАТОРІЯ'),el('div',null,'ДЛЯ АГРОБІЗНЕСУ'));brand.append(caption);
+  head.append(brand,el('span','material',sample.material));lab.append(head);
+  const identity=el('div','identity'), order=el('div','order-row');
+  const orderText=el('span',null,'Замовлення ');orderText.append(el('strong',null,sample.order_id));
+  order.append(orderText,el('span',null,'Зразок '+index+' із '+total));
+  identity.append(order,el('div','id-caption','Номер зразка LABA'),el('div','sample-id',sample.sample_id));
+  const identification=el('div','lab-identification');const qr=el('div','lab-qr');qr.append(qrImage(sample.qr_data_url,sample.sample_id),el('div',null,'ДО ЛАБОРАТОРІЇ'));identification.append(identity,qr);lab.append(identification);
+  const facts=el('dl','facts handwriting');
+  facts.append(writingField('Назва / позначення зразка клієнтом',true,true));
+  for(const field of sample.fields){
+   facts.append(writingField(field.label,field.required));
+  }
+  facts.append(writingField('Дата відбору'));
+  const services=el('section','services');
+  for(const [items,title] of [[sample.packages,'Пакет'],[sample.standalone_services,sample.packages.length?'Додаткові дослідження':'Дослідження']]){
+   if(!items.length)continue;
+   services.append(el('div','services-title'+(services.children.length?' secondary':''),title));const list=el('ul');for(const item of items)list.append(el('li',null,item));services.append(list);
+  }
+  lab.append(services);
+  card.append(el('div','cut-line','Відрізати в LABA · верхня частина — до лабораторії'));
+  const record=el('section','laba-record'), recordHeader=el('div','record-header');
+  const recordId=el('div');recordId.append(el('div','record-caption','ДАНІ ДЛЯ LABA · ЗАЛИШАЮТЬСЯ В LABA'),el('strong','record-id',sample.sample_id));recordHeader.append(recordId,el('span','record-order','Замовлення '+sample.order_id));
+  record.append(recordHeader,facts);card.append(record);
+  const footer=el('footer','label-footer');const copy=el('div','footer-copy');copy.append(el('strong',null,'Заповніть від руки та передайте зі зразком у LABA'),el('div',null,'Якщо дані невідомі, зазначте «Невідомо».'));
+  footer.append(copy);card.append(footer);return card;
+ }
+ let current=[];
+ async function checkFit(){
+  await document.fonts.ready;
+  await Promise.all(Array.from(root.querySelectorAll('img')).map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;})));
+  let bad=[];
+  for(const card of root.querySelectorAll('.label')){
+   const footer=card.querySelector('.label-footer'), record=card.querySelector('.laba-record');
+   const overflow=card.scrollHeight>card.clientHeight+1||card.scrollWidth>card.clientWidth+1||footer.getBoundingClientRect().bottom>card.getBoundingClientRect().bottom-8||record.getBoundingClientRect().bottom>footer.getBoundingClientRect().top+1;
+   card.classList.toggle('overflows',overflow);if(overflow)bad.push(card.dataset.sampleId);
+  }
+  const brokenImages=Array.from(root.querySelectorAll('img')).some(img=>!img.naturalWidth&&img.src&&!img.src.startsWith('data:'));
+  const shipping=root.querySelector('.shipping');const shippingOverflow=shipping&&shipping.scrollHeight>shipping.clientHeight+1;
+  document.body.classList.toggle('block-print',!!bad.length||brokenImages||!current.length||shippingOverflow);
+  printButton.disabled=!!bad.length||brokenImages||!current.length||shippingOverflow;
+  error.classList.toggle('visible',!!bad.length||brokenImages||shippingOverflow);
+  error.textContent=shippingOverflow?'Реквізити відправлення не вмістилися.':brokenImages?'Не вдалося завантажити зображення.':bad.length?'Текст не вмістився для '+bad.join(', ')+'. Оберіть «2 етикетки на A4».':'';
+ }
+ function render(){
+  root.replaceChildren();error.classList.remove('visible');printButton.disabled=true;
+  current=config.samples.filter(s=>filter.value==='all'||s.material_code===filter.value);
+  const hasShipping=config.shipping&&['city','branch','recipient','phone'].every(k=>String(config.shipping[k]??'').trim());
+  document.body.classList.toggle('wide',layout.value==='2');const perPage=Number(layout.value);let page,count=0,capacity=perPage/2,pageNo=0;
+  try{
+   current.forEach(s=>{
+    const isFirst=pageNo===0;
+    if(!page||count>=capacity){
+     pageNo++;const cls=pageNo===1&&hasShipping?'page first-page':'page';
+     page=el('section',cls);page.setAttribute('aria-label','Аркуш '+pageNo);root.append(page);count=0;
+     capacity=pageNo===1&&hasShipping?perPage/2:perPage;
+     if(pageNo===1&&hasShipping)page.append(buildShipping());
+    }
+    page.append(buildLabel(s,config.samples.indexOf(s)+1,config.samples.length));count++;
+   });
+   document.getElementById('count').textContent=current.length+' етикеток';
+   checkFit();
+  }catch(err){root.replaceChildren();error.textContent=err.message;error.classList.add('visible');document.body.classList.add('block-print');}
+ }
+ filter.addEventListener('change',render);layout.addEventListener('change',render);
+ printButton.addEventListener('click',async()=>{await checkFit();if(!printButton.disabled)window.print();});
+ window.addEventListener('resize',()=>checkFit());
+ window.addEventListener('beforeprint',()=>{if(printButton.disabled)document.body.classList.add('block-print');});
+ window.LabaLabels={render,checkFit};render();
+})();
+`;
+</script>
+</body>
+</html>
