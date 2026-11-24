@@ -13078,7 +13078,10 @@ function ncf_downloadInvoice(saveOnly) {
       if (price > 0) {
         const prepKey = '__prep__' + mat;
         if (!addMap[prepKey]) {
-          addMap[prepKey] = { code: '—', name: 'Пробопідготовка', material: mat, price, qty: 0 };
+          // Шукаємо код пробопідготовки в каталозі по назві
+          const prepCatItem = findIndByNameOrId('Пробопідготовка')
+            || (typeof nc_findInd === 'function' && nc_findInd('Пробопідготовка'));
+          addMap[prepKey] = { code: (prepCatItem && prepCatItem.code) || (prepCatItem && prepCatItem.id) || '—', name: 'Пробопідготовка', material: mat, price, qty: 0 };
         }
         addMap[prepKey].qty += (item.qty || 1);
       }
@@ -13096,14 +13099,20 @@ function ncf_downloadInvoice(saveOnly) {
   // Додаткові показники зі зразків (поле additionals або additionalIndicatorIds)
   samples.forEach(s => {
     const list = s.additionals || s.additionalIndicatorIds || [];
+    // additionalsDetails — масив {code, name} з правильними кодами каталогу
+    const detailsMap = {};
+    (s.additionalsDetails || []).forEach(d => { if (d.name) detailsMap[d.name] = d.code || '—'; });
     list.forEach(nameOrId => {
       const ind = findIndByNameOrId(nameOrId)
                || (typeof nc_findInd === 'function' && nc_findInd(nameOrId))
                || (typeof ns_findInd === 'function' && ns_findInd(nameOrId));
+      const catalogCode = detailsMap[nameOrId]
+        || (ind && (ind.code || ind.id))
+        || '—';
       const key = nameOrId;
       if (!addMap[key]) {
         addMap[key] = {
-          code:     '—',
+          code:     catalogCode,
           name:     ind ? (ind.name || nameOrId) : nameOrId,
           material: s.material || getMat(s.material_id),
           price:    ind ? (ind.price || 0) : 0,
@@ -13190,8 +13199,7 @@ function ncf_downloadInvoice(saveOnly) {
           {
             width: 120,
             stack: [
-              { image: _INVOICE_LOGO, width: 80, height: 25, margin: [0, 0, 0, 2] },
-              { text: 'by Zemlerob', fontSize: 8, color: '#000', margin: [0, 0, 0, 0] },
+              { image: _INVOICE_LOGO, width: 80, height: 25, margin: [0, 0, 0, 0] },
             ]
           },
           {
