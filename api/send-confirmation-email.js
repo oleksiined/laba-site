@@ -45,8 +45,27 @@ function fmtMoney(val) {
   return n.toLocaleString('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+// ─── Supabase: fetch service prices by name ───────────────────────────────────
+async function fetchServicePrices(names) {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+  if (!url || !key || !names.length) return {};
+  try {
+    const filter = names.map(n => `name.eq.${encodeURIComponent(n)}`).join(',');
+    const res = await fetch(
+      `${url}/rest/v1/catalog_services?select=name,price&or=(${filter})`,
+      { headers: { apikey: key, Authorization: `Bearer ${key}` } }
+    );
+    if (!res.ok) return {};
+    const rows = await res.json();
+    const map = {};
+    for (const r of rows) map[r.name] = Number(r.price) || 0;
+    return map;
+  } catch { return {}; }
+}
+
 // ─── Build template variables from order object ───────────────────────────────
-function buildVars(order) {
+async function buildVars(order) {
   const site = (process.env.SITE_URL || 'https://laba.zemlerob.com.ua').replace(/\/$/, '');
 
   const phoneTel     = process.env.SUPPORT_PHONE_TEL     || '+380671819967';
@@ -115,13 +134,27 @@ function buildVars(order) {
   // sub-services using order.samples[].additionals
   const INDIVIDUAL_CODES = new Set(['soil_individual', 'soil_individual_no_prep']);
 
+  // Collect all names that need price lookup from soil_individual packages
+  const samples = Array.isArray(order.samples) ? order.samples : [];
+  const priceLookupNames = new Set(['Пробопідготовка']);
+  items.forEach(item => {
+    const code = item.code || item.packageId || '';
+    if (INDIVIDUAL_CODES.has(code)) {
+      samples.filter(s => s.packageId === code).forEach(s => {
+        (s.additionals || []).forEach(n => priceLookupNames.add(n));
+      });
+    }
+  });
+
+  // Fetch real prices from catalog_services
+  const priceMap = await fetchServicePrices([...priceLookupNames]);
+
   // Build expanded rows: for individual packages, replace the single item row
   // with separate rows for each unique additional indicator from samples.
   function expandItem(item) {
     const code = item.code || item.packageId || '';
     if (!INDIVIDUAL_CODES.has(code)) return [item];
 
-    const samples = Array.isArray(order.samples) ? order.samples : [];
     const relatedSamples = samples.filter(s => s.packageId === code);
 
     // Count occurrences of each additional indicator
@@ -137,20 +170,20 @@ function buildVars(order) {
 
     const expanded = [];
 
-    // First row: Пробопідготовка (the base prep service included in soil_individual)
-    // soil_individual has price 150 which IS the Пробопідготовка price per sample
+    // First row: Пробопідготовка (the base prep service)
     if (code === 'soil_individual') {
       const prepQty   = relatedSamples.length || Number(item.qty) || 1;
-      const prepPrice = Number(item.price) || 0;
+      const prepPrice = priceMap['Пробопідготовка'] || 140;
       const prepSum   = prepPrice * prepQty;
       expanded.push({ _name: 'Пробопідготовка', _qty: prepQty, _price: prepPrice, _sum: prepSum, _sub: false });
     }
 
-    // Subsequent rows: each unique additional indicator
+    // Subsequent rows: each unique additional indicator with real catalog price
     additionalNames.forEach(addName => {
-      const qty = addCounts[addName];
-      // Price is unknown here (not stored per-additional in items), show 0 / empty
-      expanded.push({ _name: addName, _qty: qty, _price: null, _sum: null, _sub: true });
+      const qty   = addCounts[addName];
+      const price = priceMap[addName] || 0;
+      const sum   = price * qty;
+      expanded.push({ _name: addName, _qty: qty, _price: price || null, _sum: price ? sum : null, _sub: true });
     });
 
     return expanded;
@@ -255,7 +288,7 @@ async function sendConfirmationEmail(order) {
   if (!apiKey)   throw new Error('RESEND_API_KEY not configured');
   if (!toEmail)  throw new Error('No client email in order');
 
-  const vars    = buildVars(order);
+  const vars    = await buildVars(order);
   const html    = renderTemplate(getTemplate(), vars);
   const text    = buildPlainText(order, vars);
   const subject = `LABA: замовлення № ${vars.order_number} оформлено`;
