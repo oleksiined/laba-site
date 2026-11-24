@@ -29,79 +29,56 @@
     <tr><td class="outer" align="center" style="padding:24px 12px;">
       <!--[if mso]><table role="presentation" width="640" align="center"><tr><td><![endif]-->
       <table class="email" align="center" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;max-width:640px;margin:0 auto;background-color:#FFFFFF;border-radius:8px;text-align:left;">
-
-        <!-- HEADER: logo + label -->
         <tr><td class="pad" style="padding:24px 28px 18px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td valign="middle">
-              <img src="https://laba.zemlerob.com.ua/assets/laba-logo.png" width="116" height="41" alt="LABA" style="display:block;width:116px;height:41px;font-size:28px;font-weight:700;color:#202326;">
-            </td>
+            <td valign="middle"><img src="https://laba.zemlerob.com.ua/assets/laba-logo.png" width="116" height="41" alt="LABA" style="display:block;width:116px;height:41px;font-size:28px;font-weight:700;color:#202326;"></td>
             <td valign="middle" align="right" class="mobile-small" style="font-size:11px;line-height:16px;color:#737A80;">ПІДТВЕРДЖЕННЯ<br>ЗАМОВЛЕННЯ</td>
           </tr></table>
         </td></tr>
-
-        <!-- TITLE + ORDER INFO -->
         <tr><td class="pad" style="padding:0 28px;">
           <h1 class="title" style="margin:0 0 8px;font-size:26px;line-height:32px;letter-spacing:-0.5px;font-weight:700;">Замовлення прийняли</h1>
+          <!-- PAYMENT STATE: Render from confirmed payment data when sending.
+               Unpaid: status "Очікує оплати", color #916000, total label "Разом до сплати".
+               Paid: status "Оплачено", color #36733F, total label "Разом оплачено".
+               Do not mark a payment as confirmed from the selected payment method alone. -->
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
             <td class="stack" style="font-size:13px;line-height:20px;"><strong>№ {{order_number}}</strong><span style="color:#737A80;">&nbsp; · &nbsp;{{invoice_date}}</span></td>
             <td class="stack stack-gap" align="right" style="font-size:12px;line-height:20px;font-weight:700;color:{{payment_status_color}};">{{payment_status_text}}</td>
           </tr></table>
           <p style="margin:10px 0 0;font-size:12px;line-height:19px;color:#737A80;">Рахунок та етикетки можна завантажити на сторінці підтвердження замовлення.</p>
         </td></tr>
-
-        <!-- DELIVERY BLOCK -->
-        <tr><td class="pad" style="padding:18px 28px 0;">
-          {{delivery_block_html}}
-        </td></tr>
-
-        <!-- ITEMS TABLE -->
+        <tr><td class="pad" style="padding:18px 28px 0;">{{delivery_block_html}}</td></tr>
         <tr><td class="pad" style="padding:22px 28px 0;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
             <td class="stack" style="padding-bottom:10px;font-size:15px;line-height:20px;font-weight:700;">Ваше замовлення</td>
             <td class="stack" align="right" style="padding-bottom:10px;font-size:12px;line-height:20px;color:#737A80;">{{items_count}} позицій</td>
           </tr></table>
           <table aria-label="Замовлені дослідження" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;border-collapse:collapse;">
-            <thead><tr>
-              <th scope="col" align="left" style="padding:8px 3px;border-top:1px solid #DEE2E5;border-bottom:1px solid #DEE2E5;font-size:11px;line-height:16px;color:#737A80;font-weight:400;">Пакет / дослідження</th>
-              <th scope="col" width="50" align="center" style="width:50px;padding:8px 3px;border-top:1px solid #DEE2E5;border-bottom:1px solid #DEE2E5;font-size:11px;line-height:16px;color:#737A80;font-weight:400;">К-сть<br>зразків</th>
-              <th scope="col" width="66" align="right" style="width:66px;padding:8px 3px;border-top:1px solid #DEE2E5;border-bottom:1px solid #DEE2E5;font-size:11px;line-height:16px;color:#737A80;font-weight:400;">Ціна,<br>грн</th>
-              <th scope="col" width="80" align="right" style="width:80px;padding:8px 3px;border-top:1px solid #DEE2E5;border-bottom:1px solid #DEE2E5;font-size:11px;line-height:16px;color:#737A80;font-weight:400;">Сума,<br>грн</th>
-            </tr></thead>
-            <tbody>
-              {{items_table_html}}
-            </tbody>
+            <thead><tr><th scope="col" align="left" style="padding:8px 3px;border-top:1px solid #DEE2E5;border-bottom:1px solid #DEE2E5;font-size:11px;line-height:16px;color:#737A80;font-weight:400;">Пакет / дослідження</th><th scope="col" width="50" align="center" style="width:50px;padding:8px 3px;border-top:1px solid #DEE2E5;border-bottom:1px solid #DEE2E5;font-size:11px;line-height:16px;color:#737A80;font-weight:400;">К-сть<br>зразків</th><th scope="col" width="66" align="right" style="width:66px;padding:8px 3px;border-top:1px solid #DEE2E5;border-bottom:1px solid #DEE2E5;font-size:11px;line-height:16px;color:#737A80;font-weight:400;">Ціна,<br>грн</th><th scope="col" width="80" align="right" style="width:80px;padding:8px 3px;border-top:1px solid #DEE2E5;border-bottom:1px solid #DEE2E5;font-size:11px;line-height:16px;color:#737A80;font-weight:400;">Сума,<br>грн</th></tr></thead><tbody>{{items_table_html}}</tbody>
           </table>
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:9px;"><tr>
-            <td style="padding:8px 0 0;font-size:15px;line-height:22px;font-weight:700;">{{total_label}}<br><span style="font-size:11px;font-weight:400;color:#737A80;">Без ПДВ</span></td>
-            <td align="right" style="padding:8px 0 0;font-size:21px;line-height:26px;font-weight:700;white-space:nowrap;">{{total_amount}}</td>
-          </tr></table>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:9px;"><tr><td style="padding:8px 0 0;font-size:15px;line-height:22px;font-weight:700;">{{total_label}}<br><span style="font-size:11px;font-weight:400;color:#737A80;">Без ПДВ</span></td><td align="right" style="padding:8px 0 0;font-size:21px;line-height:26px;font-weight:700;white-space:nowrap;">{{total_amount}} грн</td></tr></table>
         </td></tr>
-
-        <!-- CTA BUTTON -->
+        <!-- Set href to this order's confirmation page URL before sending.
+             The page provides invoice and label downloads; this is not a direct file URL.
+             Escape the URL as an HTML attribute. Do not send the placeholder. -->
         <tr><td class="pad" style="padding:16px 28px 0;">
-          <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-            <td bgcolor="#B6FF00" style="background-color:#B6FF00;border-radius:4px;text-align:center;mso-padding-alt:12px 18px;">
-              <a href="{{tracking_url}}" style="display:inline-block;padding:12px 18px;font-size:13px;line-height:18px;font-weight:700;text-decoration:none;color:#202326;">Завантажити рахунок та етикетки →</a>
-            </td>
-          </tr></table>
+          <table role="presentation" cellpadding="0" cellspacing="0"><tr><td bgcolor="#B6FF00" style="background-color:#B6FF00;border-radius:4px;text-align:center;mso-padding-alt:12px 18px;">
+            <a href="{{tracking_url}}" style="display:inline-block;padding:12px 18px;font-size:13px;line-height:18px;font-weight:700;text-decoration:none;color:#202326;">Завантажити рахунок та етикетки →</a>
+          </td></tr></table>
         </td></tr>
-
-        <!-- NEXT STEPS -->
-        <tr><td class="pad" style="padding:16px 28px 0;font-size:12px;line-height:19px;color:#60686F;">
-          {{next_steps_html}}
-        </td></tr>
-
-        <!-- FOOTER -->
+        <!-- NEXT STEPS: For a confirmed paid order use:
+             "Коли отримаємо зразки, передамо замовлення в роботу. Готові результати надішлемо на вашу електронну пошту."
+             For an unpaid order use the text below.
+             Replace [строк замовлення] with the actual order turnaround, including units,
+             e.g. a value supplied by the order system; do not invent a default.
+             For this order, the clock starts once both samples and payment are received. -->
+        <tr><td class="pad" style="padding:16px 28px 0;font-size:12px;line-height:19px;color:#60686F;">{{next_steps_html}}</td></tr>
         <tr><td class="pad" style="padding:18px 28px 22px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #E8EBED;"><tr>
-            <td style="padding-top:14px;font-size:12px;line-height:19px;color:#737A80;">
-              Є питання? <a href="tel:{{support_phone_tel}}" style="color:#202326;text-decoration:none;font-weight:700;">{{support_phone_display}}</a><span style="white-space:nowrap;">&nbsp; · &nbsp;{{support_hours}}</span><br>
-              <a href="mailto:laba@zemlerob.com.ua" style="color:#60686F;text-decoration:none;">laba@zemlerob.com.ua</a><span class="footer-link"><span class="footer-separator">&nbsp; · &nbsp;</span><a href="https://laba.zemlerob.com.ua/" style="color:#60686F;text-decoration:none;">laba.zemlerob.com.ua</a></span>
-            </td>
-          </tr></table>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #E8EBED;"><tr><td style="padding-top:14px;font-size:12px;line-height:19px;color:#737A80;">
+            Є питання? <a href="tel:{{support_phone_tel}}" style="color:#202326;text-decoration:none;font-weight:700;">{{support_phone_display}}</a><span style="white-space:nowrap;">&nbsp; · &nbsp;{{support_hours}}</span><br>
+            <a href="mailto:laba@zemlerob.com.ua" style="color:#60686F;text-decoration:none;">laba@zemlerob.com.ua</a><span class="footer-link"><span class="footer-separator">&nbsp; · &nbsp;</span><a href="https://laba.zemlerob.com.ua/" style="color:#60686F;text-decoration:none;">laba.zemlerob.com.ua</a></span>
+          </td></tr></table>
         </td></tr>
-
       </table>
       <!--[if mso]></td></tr></table><![endif]-->
     </td></tr>
