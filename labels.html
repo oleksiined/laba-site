@@ -158,7 +158,8 @@ window._LABA_RENDERER_SRC = `
  }
  function buildLabel(sample,index,total){
   for(const key of ['sample_id','order_id','material'])if(!String(sample[key]??'').trim())throw new Error('Не заповнено поле '+key+'.');
-  if(!Array.isArray(sample.packages)||!Array.isArray(sample.standalone_services)||!sample.packages.length&&!sample.standalone_services.length)throw new Error('Для зразка '+sample.sample_id+' не вказано досліджень.');
+  if(!Array.isArray(sample.packages))sample.packages=[];
+  if(!Array.isArray(sample.standalone_services))sample.standalone_services=[];
   const card=el('article','label');card.dataset.sampleId=sample.sample_id;card.setAttribute('aria-label',sample.material+', '+sample.sample_id);
   const lab=el('section','lab-part');card.append(lab);
   const head=el('div','label-head'), brand=el('div','brand');
