@@ -13711,13 +13711,25 @@ function ncf_printLabels() {
     const idx = i + 1;
     const sampleCode = s.num || s.code || `S${new Date().getFullYear().toString().slice(-2)}${String(idx).padStart(7,'0')}`;
     const sampleLabel = s.name || s.label || `Зразок ${idx}`;
-    const mat = getMat(s.materialId);
-    const pkg = getPkgName(s.packageId);
-    const add = getAddNames(s.additionalIndicatorIds);
-    return { idx, sampleCode, sampleLabel, mat, pkg, add };
+    const mat = getMat(s.materialId || s.material_id);
+    const pkg = getPkgName(s.packageId) || s.packageName || '—';
+    const add = getAddNames(s.additionalIndicatorIds) || (s.additionals ? s.additionals.join(', ') : '—');
+    const field = s.field || s.fieldName || '';
+    const depth = s.depth || s.horizon || '';
+    const cropPrev = s.crop_previous || s.crop || '';
+    const cropPlan = s.crop_planned || '';
+    const yieldTgt = s.target_yield || '';
+    const sampDate = s.samplingDate || '';
+    return { idx, sampleCode, sampleLabel, mat, pkg, add, field, depth, cropPrev, cropPlan, yieldTgt, sampDate };
   });
 
-  const labelHTML = sampleData.map(({ idx, sampleCode, sampleLabel, mat, pkg, add }) => `
+  function lblRow(label, value, blank) {
+    if (value) return `<tr><td class="lbl-tl">${label}</td><td class="lbl-tv">${value}</td></tr>`;
+    if (blank) return `<tr><td class="lbl-tl">${label}</td><td class="lbl-tv lbl-blank-line"></td></tr>`;
+    return '';
+  }
+
+  const labelHTML = sampleData.map(({ idx, sampleCode, sampleLabel, mat, pkg, add, field, depth, cropPrev, cropPlan, yieldTgt, sampDate }) => `
     <div class="lbl-card">
       <div class="lbl-header">
         <div class="lbl-logo">
@@ -13736,15 +13748,17 @@ function ncf_printLabels() {
       <table class="lbl-table">
         <tr><td class="lbl-tl">Назва</td><td class="lbl-tv">${sampleLabel}</td></tr>
         <tr><td class="lbl-tl">Матеріал</td><td class="lbl-tv">${mat}</td></tr>
+        ${lblRow('Поле', field, false)}
+        ${lblRow('Глибина', depth, false)}
         <tr><td class="lbl-tl">Пакет</td><td class="lbl-tv">${pkg}</td></tr>
         ${add !== '—' ? `<tr><td class="lbl-tl">Додатково</td><td class="lbl-tv">${add}</td></tr>` : ''}
-        <tr><td class="lbl-tl">Попередник</td><td class="lbl-tv lbl-blank-line"></td></tr>
-        <tr><td class="lbl-tl">Планова культура</td><td class="lbl-tv lbl-blank-line"></td></tr>
-        <tr><td class="lbl-tl">Врожайність</td><td class="lbl-tv lbl-blank-line"></td></tr>
+        ${lblRow('Попередник', cropPrev, true)}
+        ${lblRow('Планова культура', cropPlan, true)}
+        ${lblRow('Врожайність, ц/га', yieldTgt, true)}
       </table>
       <div class="lbl-client-row">
         <span class="lbl-cfield">Клієнт <strong>${clientName}</strong></span>
-        <span class="lbl-cfield lbl-date-field">Дата відбору:&nbsp;<span class="lbl-date-line"></span></span>
+        <span class="lbl-cfield lbl-date-field">Дата відбору:&nbsp;<span class="lbl-date-line">${sampDate || ''}</span></span>
       </div>
       <div class="lbl-qr" id="lbl-qr-${idx}" data-code="${sampleCode.replace(/"/g,'&quot;')}"></div>
       <div class="lbl-attach">Прикріпіть до пакування зразка</div>
