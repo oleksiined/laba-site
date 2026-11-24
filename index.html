@@ -13041,53 +13041,76 @@ function ncf_downloadInvoice(saveOnly) {
 
   // ── Таблиця послуг ──────────────────────────────────────────
   const samples = (o.samples && o.samples.length) ? o.samples : (NS.samples || []);
+  const orderItems = (o.items && o.items.length) ? o.items : [];
 
   function getMat(matId) {
     const MAP = { soil:'Ґрунт', water:'Вода', fertilizer:'Добриво', seeds:'Насіння', grain:'Зерно', plants:'Рослини', plant:'Рослини', fertilizers:'Добриво' };
     return MAP[(matId||'').toLowerCase()] || matId || 'Ґрунт';
   }
-  // Знайти displayCode пакету в SERVICES за його slug
-  function findPkgDisplayCode(pkgId) {
-    if (!pkgId || typeof SERVICES === 'undefined') return '';
-    for (const svcMat of Object.values(SERVICES)) {
-      const found = (svcMat.packages || []).find(p => p.code === pkgId || p.id === pkgId);
-      if (found) return found.displayCode || found.code || '';
-    }
-    return '';
-  }
 
-  // Групуємо по packageId + materialId
-  const pkgMap = {};
+  // Матеріал першого зразка для даного packageId
+  const matByPkg = {};
   samples.forEach(s => {
-    const pkg = (NS_CAT && NS_CAT.packages && NS_CAT.packages[s.packageId])
-             || (NC_CATALOG && NC_CATALOG.packages && NC_CATALOG.packages[s.packageId]);
-    const key = (s.packageId||'') + '|' + (s.materialId||'');
-    if (!pkgMap[key]) {
-      const displayCode = findPkgDisplayCode(s.packageId) || '—';
-      const displayName = pkg ? (pkg.baseName || pkg.name) : (s.packageName || s.packageId || '—');
-      pkgMap[key] = {
-        code: displayCode,
-        name: displayName,
-        material: getMat(s.materialId),
-        price: pkg ? (pkg.price || 0) : 0,
-        qty: 0
-      };
-    }
-    pkgMap[key].qty++;
+    const pid = s.packageId || '';
+    if (!matByPkg[pid]) matByPkg[pid] = s.material || getMat(s.material_id);
   });
 
-  // Додаткові показники
+  // Пошук індикатора по назві або ID в NC_CATALOG
+  function findIndByNameOrId(nameOrId) {
+    for (const cat of (NC_CATALOG.categories || [])) {
+      const f = cat.items.find(i => i.id === nameOrId || i.name === nameOrId);
+      if (f) return f;
+    }
+    return null;
+  }
+
+  const INDIVIDUAL_PKG_RE = /^(soil|water|plant|fertilizer|seeds|grain)_individual/;
+
+  // Рядки пакетів — беремо з order.items (там є правильні name і price)
+  const pkgMap = {};
   const addMap = {};
-  samples.forEach(s => {
-    (s.additionalIndicatorIds || []).forEach(id => {
-      // NC_CATALOG і NS_CAT зберігають показники у categories[].items[], а не у .indicators{}
-      // Використовуємо nc_findInd / ns_findInd для правильного пошуку
-      const ind = (typeof nc_findInd === 'function' && nc_findInd(id))
-               || (typeof ns_findInd === 'function' && ns_findInd(id));
-      if (ind) {
-        if (!addMap[id]) addMap[id] = { code: id, name: ind.name, material: getMat(s.materialId), price: ind.price || 0, qty: 0 };
-        addMap[id].qty++;
+  orderItems.forEach(item => {
+    const code = item.code || '';
+    const mat = matByPkg[code] || 'Ґрунт';
+    if (INDIVIDUAL_PKG_RE.test(code)) {
+      // Пробопідготовка — окремий рядок якщо ціна > 0
+      const price = Number(item.price) || 0;
+      if (price > 0) {
+        const prepKey = '__prep__' + mat;
+        if (!addMap[prepKey]) {
+          addMap[prepKey] = { code: '—', name: 'Пробопідготовка', material: mat, price, qty: 0 };
+        }
+        addMap[prepKey].qty += (item.qty || 1);
       }
+      return;
+    }
+    pkgMap[code] = {
+      code:     code,
+      name:     item.name || code,
+      material: mat,
+      price:    Number(item.price) || 0,
+      qty:      item.qty || 1,
+    };
+  });
+
+  // Додаткові показники зі зразків (поле additionals або additionalIndicatorIds)
+  samples.forEach(s => {
+    const list = s.additionals || s.additionalIndicatorIds || [];
+    list.forEach(nameOrId => {
+      const ind = findIndByNameOrId(nameOrId)
+               || (typeof nc_findInd === 'function' && nc_findInd(nameOrId))
+               || (typeof ns_findInd === 'function' && ns_findInd(nameOrId));
+      const key = nameOrId;
+      if (!addMap[key]) {
+        addMap[key] = {
+          code:     '—',
+          name:     ind ? (ind.name || nameOrId) : nameOrId,
+          material: s.material || getMat(s.material_id),
+          price:    ind ? (ind.price || 0) : 0,
+          qty:      0,
+        };
+      }
+      addMap[key].qty++;
     });
   });
 
