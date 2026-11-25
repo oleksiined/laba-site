@@ -183,7 +183,7 @@ async function buildVars(order) {
       const qty   = addCounts[addName];
       const price = priceMap[addName] || 0;
       const sum   = price * qty;
-      expanded.push({ _name: addName, _qty: qty, _price: price || null, _sum: price ? sum : null, _sub: true });
+      expanded.push({ _name: addName, _qty: qty, _price: price || null, _sum: price ? sum : null });
     });
 
     return expanded;
@@ -200,11 +200,9 @@ async function buildVars(order) {
       const qty   = row._qty;
       const price = row._price !== null ? fmtMoney(row._price) : '—';
       const sum   = row._sum   !== null ? fmtMoney(row._sum)   : '—';
-      const nameStyle = row._sub
-        ? 'padding:7px 3px 7px 14px;border-bottom:1px solid #F0F2F3;font-size:12px;line-height:18px;color:#60686F;'
-        : 'padding:7px 3px;border-bottom:1px solid #F0F2F3;font-size:13px;line-height:18px;';
+      const nameStyle = 'padding:7px 3px;border-bottom:1px solid #F0F2F3;font-size:13px;line-height:18px;';
       return `<tr>
-  <td style="${nameStyle}">${row._sub ? '↳&nbsp;' : ''}${name}</td>
+  <td style="${nameStyle}">${name}</td>
   <td align="center" style="padding:7px 3px;border-bottom:1px solid #F0F2F3;font-size:13px;">${qty}</td>
   <td align="right" style="padding:7px 3px;border-bottom:1px solid #F0F2F3;font-size:13px;white-space:nowrap;">${price}</td>
   <td align="right" style="padding:7px 3px;border-bottom:1px solid #F0F2F3;font-size:13px;font-weight:700;white-space:nowrap;">${sum}</td>
