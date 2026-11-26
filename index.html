@@ -14729,7 +14729,7 @@ function osLocShowDropdown(results, st, dd) {
   }
   if(st){st.style.display='none';}
   dd.innerHTML = results.map(function(r,i){
-    return '<div class="os-loc-opt" onmousedown="event.preventDefault();osLocSelectPlace('+r.lat+','+r.lng+','+JSON.stringify(r.name)+','+JSON.stringify(r.label)+')">'
+    return '<div class="os-loc-opt" onmousedown="event.preventDefault();event.stopPropagation();osLocSelectPlace('+r.lat+','+r.lng+','+JSON.stringify(r.name)+','+JSON.stringify(r.label)+')">'
       +'<strong>'+osEsc(r.name)+'</strong>'
       +(r.label?'<span>'+osEsc(r.label)+'</span>':'')
       +'</div>';
@@ -15076,7 +15076,7 @@ function osRenderFieldBody(f, i) {
     + '</div>' : '')
     + '<div class="os-form-group" style="justify-content:center;align-items:center;flex-direction:column">'
     + '<div class="os-probe-row"><span class="os-probe-count" id="probeCount_'+i+'">'+probes+'</span><span class="os-probe-note">проб</span></div>'
-    + (probes < 25 ? '<span class="os-probe-warn" id="probeWarn_'+i+'">Мінімум 25 проб</span>' : '<span class="os-probe-ok" id="probeWarn_'+i+'"></span>')
+    + '<span class="os-probe-ok" id="probeWarn_'+i+'"></span>'
     + '</div></div>'
     + '</div>'
     + '</div>'
@@ -15242,8 +15242,7 @@ function osUpdateProbes(i) {
   el.textContent = p;
   var warn = document.getElementById('probeWarn_' + i);
   if (warn) {
-    if (p < 25) { warn.className = 'os-probe-warn'; warn.textContent = 'Мінімум 25 проб'; }
-    else        { warn.className = 'os-probe-ok';   warn.textContent = ''; }
+    warn.className = 'os-probe-ok'; warn.textContent = '';
   }
   // Sync moisture/density counts to new probe count
   if (OS.services.includes('moisture')) { OS.fields[i].settings.moistureCount = p; }
