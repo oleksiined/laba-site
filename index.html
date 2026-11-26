@@ -12915,10 +12915,10 @@ function ncf_show() {
 }
 
 function ncf_saveInvoiceBackground() {
-  if (typeof pdfMake === 'undefined') {
+  if (typeof pdfMake === 'undefined' || !pdfMake.vfs || !pdfMake.vfs['LiberationSans-Bold.ttf']) {
     // pdfMake not ready yet — retry once after 2s
     setTimeout(function() {
-      if (typeof pdfMake !== 'undefined') ncf_downloadInvoice(true);
+      if (typeof pdfMake !== 'undefined' && pdfMake.vfs && pdfMake.vfs['LiberationSans-Bold.ttf']) ncf_downloadInvoice(true);
       else console.warn('[LABA] pdfMake not available for auto-save');
     }, 2000);
     return;
@@ -13001,7 +13001,7 @@ function ncf_renderSidebar() {
 }
 
 function ncf_downloadInvoice(saveOnly) {
-  if (typeof pdfMake === 'undefined') {
+  if (typeof pdfMake === 'undefined' || !pdfMake.vfs || !pdfMake.vfs['LiberationSans-Bold.ttf']) {
     if (!saveOnly) toast('PDF-бібліотека завантажується, спробуйте ще раз');
     return;
   }
@@ -16074,7 +16074,7 @@ function _osFinishOrder(record, num) {
 }
 
 function osf_downloadInvoice() {
-  if (typeof pdfMake === 'undefined') {
+  if (typeof pdfMake === 'undefined' || !pdfMake.vfs || !pdfMake.vfs['LiberationSans-Bold.ttf']) {
     showToast('PDF-бібліотека завантажується, спробуйте ще раз');
     return;
   }
