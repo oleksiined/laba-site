@@ -14729,7 +14729,10 @@ function osLocShowDropdown(results, st, dd) {
   }
   if(st){st.style.display='none';}
   dd.innerHTML = results.map(function(r,i){
-    return '<div class="os-loc-opt" onmousedown="event.preventDefault();event.stopPropagation();osLocSelectPlace('+r.lat+','+r.lng+','+JSON.stringify(r.name)+','+JSON.stringify(r.label)+')">'
+    return '<div class="os-loc-opt"'
+      +' data-lat="'+r.lat+'" data-lng="'+r.lng+'"'
+      +' data-name="'+osEsc(r.name)+'" data-label="'+osEsc(r.label||'')+'"'
+      +' onmousedown="event.preventDefault();event.stopPropagation();var d=this.dataset;osLocSelectPlace(parseFloat(d.lat),parseFloat(d.lng),d.name,d.label)">'
       +'<strong>'+osEsc(r.name)+'</strong>'
       +(r.label?'<span>'+osEsc(r.label)+'</span>':'')
       +'</div>';
