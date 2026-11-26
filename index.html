@@ -9175,12 +9175,22 @@ function cabInit() {} // removed
 function cabUpdateSamplingBadge() {} // removed
 function cabSetFilter() {} // removed
 
+function _labaPdfFonts() {
+  var v = (typeof pdfMake !== 'undefined' && pdfMake.vfs) || {};
+  var lib = ['Regular','Bold','Italic','BoldItalic'].map(function(k){ return 'LiberationSans-' + k + '.ttf'; });
+  if (lib.every(function(f){ return v[f]; })) {
+    return { Helvetica: { normal: lib[0], bold: lib[1], italics: lib[2], bolditalics: lib[3] } };
+  }
+  console.warn('[LABA] LiberationSans missing in pdfMake.vfs, falling back to Roboto');
+  return { Helvetica: { normal: 'Roboto-Regular.ttf', bold: 'Roboto-Medium.ttf', italics: 'Roboto-Italic.ttf', bolditalics: 'Roboto-MediumItalic.ttf' } };
+}
+
 // Save order to localStorage after confirm
 function saveOrderToHistory(order) {
   let orders = [];
   try { orders = JSON.parse(localStorage.getItem('laba_orders') || '[]'); } catch(e) {}
   orders.unshift(order);
-  localStorage.setItem('laba_orders', JSON.stringify(orders.slice(0, 50)));
+  try { localStorage.setItem('laba_orders', JSON.stringify(orders.slice(0, 50))); } catch(e) {}
 }
 
 // ── Chip popover (rich popup for package service chips) ──
@@ -13336,14 +13346,7 @@ function ncf_downloadInvoice(saveOnly) {
 
 
 
-  pdfMake.fonts = {
-    Helvetica: {
-      normal:      'LiberationSans-Regular.ttf',
-      bold:        'LiberationSans-Bold.ttf',
-      italics:     'LiberationSans-Italic.ttf',
-      bolditalics: 'LiberationSans-BoldItalic.ttf',
-    }
-  };
+  pdfMake.fonts = _labaPdfFonts();
 
   const safeDate = invoiceDate.replace(/\./g, '-');
   const _invFileName = `Рахунок_${orderNum}_${safeDate}.pdf`;
@@ -13670,14 +13673,7 @@ function ncf_downloadAct() {
     }),
   };
 
-  pdfMake.fonts = {
-    Helvetica: {
-      normal:      'LiberationSans-Regular.ttf',
-      bold:        'LiberationSans-Bold.ttf',
-      italics:     'LiberationSans-Italic.ttf',
-      bolditalics: 'LiberationSans-BoldItalic.ttf',
-    }
-  };
+  pdfMake.fonts = _labaPdfFonts();
 
   const safeDate = actDate.replace(/\./g, '-');
   const _actFileName = `Акт_${orderNum}_${safeDate}.pdf`;
@@ -16257,14 +16253,7 @@ function osf_downloadInvoice() {
     },
   };
 
-  pdfMake.fonts = {
-    Helvetica: {
-      normal:      'LiberationSans-Regular.ttf',
-      bold:        'LiberationSans-Bold.ttf',
-      italics:     'LiberationSans-Italic.ttf',
-      bolditalics: 'LiberationSans-BoldItalic.ttf',
-    }
-  };
+  pdfMake.fonts = _labaPdfFonts();
 
   var safeDate = invoiceDate.replace(/\./g, '-');
   pdfMake.createPdf(docDef).download('Рахунок_' + orderNum + '_' + safeDate + '.pdf');
@@ -17029,7 +17018,8 @@ function initForLabsPage() {
 (function(){
   var COOKIE_KEY = 'laba_cookie_consent';
   function cookieInit(){
-    var val = localStorage.getItem(COOKIE_KEY);
+    var val = null;
+    try { val = localStorage.getItem(COOKIE_KEY); } catch(e) {}
     if(!val){
       var b = document.getElementById('cookieBanner');
       if(b) b.style.display = 'block';
@@ -17041,11 +17031,11 @@ function initForLabsPage() {
     if(typeof window.clarity === 'function') window.clarity('stop');
   }
   window.cookieAccept = function(){
-    localStorage.setItem(COOKIE_KEY, 'accepted');
+    try { localStorage.setItem(COOKIE_KEY, 'accepted'); } catch(e) {}
     closeCookieBanner();
   };
   window.cookieDecline = function(){
-    localStorage.setItem(COOKIE_KEY, 'declined');
+    try { localStorage.setItem(COOKIE_KEY, 'declined'); } catch(e) {}
     disableMarketingCookies();
     closeCookieBanner();
   };
