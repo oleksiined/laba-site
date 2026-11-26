@@ -14652,7 +14652,12 @@ function osLocSelectPlace(lat, lng, placeName, placeLabel) {
   OS._locLat=lat; OS._locLng=lng;
   if(st){st.style.display='';st.textContent='Розраховую відстань по дорогах...';}
   fetch('https://router.project-osrm.org/route/v1/driving/'+OS_BASE_LNG+','+OS_BASE_LAT+';'+lng+','+lat+'?overview=false')
-    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+    .then(function(r){
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      var ct = r.headers.get('content-type')||'';
+      if(ct.indexOf('application/json')<0) throw new Error('not-json');
+      return r.json();
+    })
     .then(function(route){
       var dist = route&&route.routes&&route.routes[0] ? Math.round(route.routes[0].distance/1000) : null;
       if(dist){ OS._locDist=dist; if(st){st.textContent='📍 '+displayName+' — ~'+dist+' км по дорогах від Черкас';} }
