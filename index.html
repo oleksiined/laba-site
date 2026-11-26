@@ -12761,7 +12761,8 @@ async function submitOrder() {
         depth:        s.depth || s.horizon || '',
         packageId:    s.packageId || '',
         packageName:  pkgObj.name || s.packageId || '',
-        additionals:  addNames,
+        additionals:           addNames,
+        additionalIndicatorIds: s.additionalIndicatorIds || [],
       };
     }),
     notes: (document.getElementById('f-notes') || {}).value || '',
@@ -13473,16 +13474,36 @@ function ncf_downloadAct() {
     pkgMap[key].qty++;
   });
 
+  // Build price lookup from o.items (saved in order payload)
+  const itemPriceByName = {};
+  const itemPriceById   = {};
+  (o.items || []).forEach(it => {
+    if (it.name) itemPriceByName[it.name] = { price: it.price || 0, code: it.code || '' };
+    if (it.code) itemPriceById[it.code]   = { price: it.price || 0, name: it.name || '' };
+  });
+
   const addMap = {};
   samples.forEach(s => {
-    (s.additionalIndicatorIds || []).forEach(id => {
-      const ind = (typeof nc_findInd === 'function' && nc_findInd(id))
-               || (typeof ns_findInd === 'function' && ns_findInd(id));
-      if (ind) {
-        if (!addMap[id]) addMap[id] = { code: id, name: ind.name, material: getMat(s.materialId), price: ind.price || 0, qty: 0 };
+    const ids   = s.additionalIndicatorIds || [];
+    const names = s.additionals || [];
+    if (ids.length > 0) {
+      ids.forEach(id => {
+        const ind = (typeof nc_findInd === 'function' && nc_findInd(id))
+                 || (typeof ns_findInd === 'function' && ns_findInd(id));
+        const fromItems = itemPriceById[id] || {};
+        const name  = (ind && ind.name) || fromItems.name || id;
+        const price = (ind && (ind.price || 0)) || fromItems.price || 0;
+        if (!addMap[id]) addMap[id] = { code: id, name, material: getMat(s.materialId), price, qty: 0 };
         addMap[id].qty++;
-      }
-    });
+      });
+    } else if (names.length > 0) {
+      names.forEach(addName => {
+        const fromItems = itemPriceByName[addName] || {};
+        const key = fromItems.code || addName;
+        if (!addMap[key]) addMap[key] = { code: fromItems.code || '', name: addName, material: getMat(s.materialId), price: fromItems.price || 0, qty: 0 };
+        addMap[key].qty++;
+      });
+    }
   });
 
   const fmtUAH = n => n.toLocaleString('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
