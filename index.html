@@ -12687,19 +12687,30 @@ async function submitOrder() {
   // Aggregate additionals across samples into separate line items
   const addCountMap = {};
   (_snapSamples || []).forEach(s => {
-    if (!Array.isArray(s.additionals)) return;
-    s.additionals.forEach(addName => {
-      if (!addCountMap[addName]) addCountMap[addName] = { qty: 0 };
-      addCountMap[addName].qty++;
-    });
+    const ids = Array.isArray(s.additionalIndicatorIds) ? s.additionalIndicatorIds : [];
+    const names = Array.isArray(s.additionals) ? s.additionals : [];
+    if (ids.length > 0) {
+      ids.forEach(id => {
+        const ind = (typeof nc_findInd === 'function' && nc_findInd(id))
+                 || (typeof ns_findInd === 'function' && ns_findInd(id));
+        if (!ind) return;
+        if (!addCountMap[id]) addCountMap[id] = { qty: 0, name: ind.name, price: Number(ind.price) || 0, code: id };
+        addCountMap[id].qty++;
+      });
+    } else {
+      names.forEach(addName => {
+        if (!addCountMap[addName]) addCountMap[addName] = { qty: 0, name: addName, price: 0, code: '' };
+        addCountMap[addName].qty++;
+      });
+    }
   });
-  const addItems = Object.entries(addCountMap).map(([addName, info]) => {
-    const qty = info.qty;
-    const cat3 = (typeof NS_CAT !== 'undefined' ? NS_CAT : null) || (typeof NC_CATALOG !== 'undefined' ? NC_CATALOG : null) || {};
-    const svcEntry = Object.values((cat3.services && cat3.services) || {}).find(s => s.name === addName) || {};
-    const unitPrice = Number(svcEntry.price) || 0;
-    return { code: svcEntry.service_code || svcEntry.id || '', name: addName, qty, price: unitPrice, subtotal: unitPrice * qty };
-  });
+  const addItems = Object.entries(addCountMap).map(([key, info]) => ({
+    code: info.code,
+    name: info.name,
+    qty: info.qty,
+    price: info.price,
+    subtotal: info.price * info.qty,
+  }));
 
   const orderPayload = {
     orderNum,
