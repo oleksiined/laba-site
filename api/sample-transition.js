@@ -56,7 +56,8 @@ module.exports = async function handler(req, res) {
   if (!indices || !indices.length || indices.length > 500 || !indices.every(n => Number.isInteger(n) && n >= 0 && n < 10000)) {
     return res.status(400).json({ ok: false, error: 'Invalid indices' });
   }
-  const lab = body.lab ? String(body.lab) : '';
+  // Only one lab exists for now: default to SAT LAB when accepting without an explicit choice
+  const lab = body.lab ? String(body.lab) : (action === 'accept' ? 'sat' : '');
   if (lab && !LAB_RE.test(lab)) return res.status(400).json({ ok: false, error: 'Invalid lab' });
   const ttn = body.ttn ? String(body.ttn).slice(0, 200) : '';
   const comment = body.comment ? String(body.comment).slice(0, 1000) : '';
@@ -65,10 +66,10 @@ module.exports = async function handler(req, res) {
   try {
     const rpc = await httpsReq(
       host,
-      '/rest/v1/rpc/apply_sample_transition',
+      '/rest/v1/rpc/apply_sample_transition_v2',
       key,
       'POST',
-      JSON.stringify({ p_order_id: id, p_action: action, p_indices: indices, p_lab: lab || null }),
+      JSON.stringify({ p_order_id: id, p_action: action, p_indices: indices, p_lab: lab || null, p_ttn: ttn || null }),
     );
     if (rpc.status >= 300) {
       return res.status(500).json({ ok: false, error: `Supabase ${rpc.status}: ${rpc.body}` });
