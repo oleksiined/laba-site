@@ -323,9 +323,10 @@ async function syncInterpretations() {
 
 // ─── HTTP Handler ─────────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  const { isCron, requireAdmin, applyCors } = require('./_auth');
+  applyCors(req, res, 'GET, POST, OPTIONS');
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
+  if (!isCron(req) && !requireAdmin(req, res)) return;
 
   try {
     const result = await syncInterpretations();

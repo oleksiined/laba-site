@@ -620,14 +620,13 @@ async function syncCatalog(debug = false) {
 
 // ─── HTTP Handler ─────────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const { isCron, isAdmin, applyCors } = require('./_auth');
+  applyCors(req, res, 'GET, POST, OPTIONS');
+  if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
 
-  const secret     = process.env.SYNC_SECRET;
-  const cronHeader = req.headers['x-vercel-cron'];
-  const querySecret = (req.url || '').match(/[?&]secret=([^&]+)/)?.[1];
-  const isDebug    = (req.url || '').includes('debug=1');
+  const isDebug = (req.url || '').includes('debug=1');
 
-  if (secret && !cronHeader && querySecret !== secret) {
+  if (!isCron(req) && !isAdmin(req)) {
     res.writeHead(401, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Unauthorized' }));
     return;
