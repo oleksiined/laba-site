@@ -22,11 +22,6 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "has":  [{ "type": "host", "value": "admin\\.laba\\.zemlerob\\.com\\.ua" }],
-      "destination": "/admin.html"
-    },
-    {
-      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
