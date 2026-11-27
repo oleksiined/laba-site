@@ -183,10 +183,6 @@ async function upsert(table, conflictCol, rows) {
 
 // ─── Основна функція синхронізації ───────────────────────────────────────────
 async function syncInterpretations() {
-  if (GS_PUB_ID === '__REPLACE_WITH_PUBLISHED_ID__') {
-    throw new Error('GS_PUB_ID не задано. Опублікуй таблицю Google Sheets і встанови INTERP_GS_PUB_ID в Vercel env або задай GID-и через env vars.');
-  }
-
   // cation — optional sheet; skip if GID not set
   // GID-и вже hardcoded, але перевіримо що spreadsheet ID є
   if (!GS_SPREADSHEET_ID) {
