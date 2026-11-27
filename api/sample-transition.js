@@ -59,7 +59,8 @@ module.exports = async function handler(req, res) {
   // Only one lab exists for now: default to SAT LAB when accepting without an explicit choice
   const lab = body.lab ? String(body.lab) : (action === 'accept' ? 'sat' : '');
   if (lab && !LAB_RE.test(lab)) return res.status(400).json({ ok: false, error: 'Invalid lab' });
-  const ttn = body.ttn ? String(body.ttn).slice(0, 200) : '';
+  const ttn = body.ttn ? String(body.ttn).trim() : '';
+  if (ttn && !/^\d{14}$/.test(ttn)) return res.status(400).json({ ok: false, error: 'ТТН має містити рівно 14 цифр' });
   const comment = body.comment ? String(body.comment).slice(0, 1000) : '';
 
   const host = new URL(url).hostname;
